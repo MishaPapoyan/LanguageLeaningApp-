@@ -1,0 +1,281 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum GameType {
+  FLASHCARDS
+  MATCHING
+  MEMORY_PALACE
+}
+
+// ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String?
+  password       String?
+  image          String?
+  role           Role     @default(STUDENT)
+  nativeLanguage String   @default("en")
+  targetLanguage String   @default("fr")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  progress       Progress?
+  savedWords     SavedWord[]
+  storyProgress  StoryProgress[]
+  aiInteractions AiInteraction[]
+  voiceSessions  VoiceSession[]
+  gameScores     GameScore[]
+  taughtGroups   Group[]         @relation("Teacher")
+  studentGroups  GroupMember[]
+}
+
+// ─── Stories ──────────────────────────────────────────────────────────────────
+
+model Story {
+  id          String          @id @default(cuid())
+  title       String
+  description String
+  content     Json
+  difficulty  Difficulty      @default(BEGINNER)
+  chapter     Int
+  imageEmoji  String          @default("📖")
+  quizzes     Quiz[]
+  words       StoryWord[]
+  progress    StoryProgress[]
+  createdAt   DateTime        @default(now())
+}
+
+model StoryWord {
+  storyId String
+  wordId  String
+  story   Story  @relation(fields: [storyId], references: [id])
+  word    Word   @relation(fields: [wordId], references: [id])
+
+  @@id([storyId, wordId])
+}
+
+model StoryProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  storyId   String
+  completed Boolean  @default(false)
+  score     Int      @default(0)
+  xpEarned  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story     Story    @relation(fields: [storyId], references: [id])
+
+  @@unique([userId, storyId])
+  @@index([userId])
+}
+
+model Quiz {
+  id       String @id @default(cuid())
+  storyId  String
+  question String
+  options  Json
+  answer   Int
+  story    Story  @relation(fields: [storyId], references: [id])
+}
+
+// ─── Dictionary ───────────────────────────────────────────────────────────────
+
+model Word {
+  id          String      @id @default(cuid())
+  word        String
+  translation String
+  definition  String
+  exampleFr   String
+  exampleEn   String
+  miniStory   String?
+  category    String
+  difficulty  Difficulty  @default(BEGINNER)
+  imageEmoji  String      @default("📝")
+  stories     StoryWord[]
+  savedBy     SavedWord[]
+  createdAt   DateTime    @default(now())
+}
+
+model SavedWord {
+  id           String    @id @default(cuid())
+  userId       String
+  wordId       String
+  masteryLevel Int       @default(0)
+  lastReviewed DateTime?
+  addedAt      DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word         Word      @relation(fields: [wordId], references: [id])
+
+  @@unique([userId, wordId])
+  @@index([userId])
+}
+
+// ─── Progress & Gamification ──────────────────────────────────────────────────
+
+model Progress {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  xp         Int      @default(0)
+  level      Int      @default(1)
+  streak     Int      @default(0)
+  lastActive DateTime @default(now())
+  badges     String[] @default([])
+  skillTree  Json     @default("{\"vocabulary\":0,\"grammar\":0,\"speaking\":0}")
+  weeklyXp   Json     @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── AI Tutor ─────────────────────────────────────────────────────────────────
+
+model AiInteraction {
+  id               String   @id @default(cuid())
+  userId           String
+  scenario         String
+  messages         Json
+  feedback         Json?
+  xpEarned         Int      @default(0)
+  // Voice chat fields (reserved for future implementation)
+  hasVoice         Boolean  @default(false)
+  voiceLanguage    String?
+  voiceDurationSec Int      @default(0)
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Voice Sessions (reserved for future implementation) ──────────────────────
+
+model VoiceSession {
+  id              String   @id @default(cuid())
+  userId          String
+  // Language being practiced
+  language        String   @default("fr")
+  // Raw transcript from speech-to-text
+  transcript      Json     @default("[]")
+  // AI-generated pronunciation feedback
+  pronunciationFeedback Json?
+  // Accuracy score 0-100
+  accuracyScore   Int?
+  // Duration of voice session in seconds
+  durationSec     Int      @default(0)
+  // XP awarded for the session
+  xpEarned        Int      @default(0)
+  // Voice model / provider used (e.g. "browser-web-speech", "deepgram", "whisper")
+  provider        String?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Games ────────────────────────────────────────────────────────────────────
+
+model GameScore {
+  id        String   @id @default(cuid())
+  userId    String
+  gameType  GameType
+  score     Int
+  wordsUsed String[]
+  xpEarned  Int
+  playedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Classroom ────────────────────────────────────────────────────────────────
+
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  teacherId   String
+  inviteCode  String        @unique @default(cuid())
+  teacher     User          @relation("Teacher", fields: [teacherId], references: [id])
+  members     GroupMember[]
+  assignments Assignment[]
+  createdAt   DateTime      @default(now())
+}
+
+model GroupMember {
+  groupId  String
+  userId   String
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@id([groupId, userId])
+}
+
+model Assignment {
+  id        String   @id @default(cuid())
+  groupId   String
+  title     String
+  type      String
+  content   Json
+  dueDate   DateTime
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id])
+}
