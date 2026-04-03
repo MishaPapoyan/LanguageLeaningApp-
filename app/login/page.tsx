@@ -9,38 +9,49 @@ export default async function LoginPage() {
   if (session) redirect("/home");
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex">
-      {/* Left - decorative */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-violet-600 to-indigo-700 relative overflow-hidden items-center justify-center">
-        <div className="text-center text-white z-10 px-12">
-          <p className="text-7xl mb-4">🇫🇷</p>
-          <h2 className="font-serif text-4xl mb-3 italic">Bienvenue!</h2>
-          <p className="text-violet-200 text-lg">Your French journey continues here.</p>
+    <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
+
+      {/* Left — decorative panel */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center"
+        style={{ background: "linear-gradient(135deg, #1a1535 0%, #0f0e1f 100%)", borderRight: "1px solid var(--border)" }}>
+
+        {/* Glow orbs */}
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(124,106,255,0.2) 0%, transparent 70%)", filter: "blur(40px)" }} />
+        <div className="absolute bottom-1/3 right-1/4 w-56 h-56 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%)", filter: "blur(40px)" }} />
+
+        <div className="text-center z-10 px-12">
+          <p className="text-7xl mb-6">🇫🇷</p>
+          <h2 className="font-serif text-4xl mb-3 italic" style={{ color: "var(--text)" }}>Bienvenue!</h2>
+          <p className="text-lg mb-8" style={{ color: "var(--text-2)" }}>Your French journey continues here.</p>
+
         </div>
-        {/* Decorative blobs */}
-        <div className="absolute top-20 -left-20 w-72 h-72 rounded-full bg-white/5" />
-        <div className="absolute -bottom-16 -right-16 w-96 h-96 rounded-full bg-white/5" />
-        <div className="absolute top-1/2 left-1/3 w-40 h-40 rounded-full bg-white/5" />
       </div>
 
-      {/* Right - form */}
+      {/* Right — form */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <Link href="/" className="inline-flex items-center gap-2 mb-10">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs"
+              style={{ background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)" }}>
               LF
             </div>
-            <span className="font-serif text-lg text-zinc-900">LinguaFlow</span>
+            <span className="font-serif text-lg" style={{ color: "var(--text)" }}>LinguaFlow</span>
           </Link>
-          <h1 className="font-serif text-3xl text-zinc-900 mb-1">Welcome back</h1>
-          <p className="text-zinc-500 text-sm mb-8">Enter your details to continue learning</p>
+
+          <h1 className="font-serif text-3xl mb-1" style={{ color: "var(--text)" }}>Welcome back</h1>
+          <p className="text-sm mb-8" style={{ color: "var(--text-2)" }}>Enter your details to continue learning</p>
+
           <LoginForm />
-          <p className="text-center text-sm text-zinc-500 mt-6">
+
+          <p className="text-center text-sm mt-6" style={{ color: "var(--text-3)" }}>
             No account?{" "}
-            <Link href="/register" className="text-violet-600 font-medium hover:underline">Sign up free</Link>
+            <Link href="/register" className="font-medium hover:underline" style={{ color: "var(--accent)" }}>Sign up free</Link>
           </p>
         </div>
       </div>
+
     </div>
   );
 }

@@ -23,5 +23,7 @@ export async function PATCH(req: NextRequest) {
     select: { id: true, name: true, image: true, nativeLanguage: true, email: true },
   });
 
-  return NextResponse.json({ user });
+  const res = NextResponse.json({ user });
+  res.headers.set("Cache-Control", "private, no-cache");
+  return res;
 }

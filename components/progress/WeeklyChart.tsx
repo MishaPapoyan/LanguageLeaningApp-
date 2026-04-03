@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { SimpleBarChart } from "@/components/charts/LightCharts";
 
 interface Props {
   weeklyXp: Record<string, number>;
@@ -18,8 +18,6 @@ export function WeeklyChart({ weeklyXp }: Props) {
     return { key, label, xp: weeklyXp[key] ?? 0 };
   }).reverse();
 
-  const maxXp = Math.max(...weeks.map((w) => w.xp), 1);
-
   if (weeks.every((w) => w.xp === 0)) {
     return (
       <div className="text-center py-8 text-zinc-400">
@@ -30,24 +28,13 @@ export function WeeklyChart({ weeklyXp }: Props) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={weeks} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-        <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#a1a1aa" }} />
-        <YAxis tick={{ fontSize: 11, fill: "#a1a1aa" }} />
-        <Tooltip
-          formatter={(val) => [`${val} XP`, "XP Earned"]}
-          contentStyle={{ borderRadius: "12px", border: "1px solid #e4e4e7", background: "white" }}
-        />
-        <Bar dataKey="xp" radius={[6, 6, 0, 0]}>
-          {weeks.map((entry, i) => (
-            <Cell
-              key={i}
-              fill={entry.xp === maxXp ? "#7c3aed" : "#ede9fe"}
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <SimpleBarChart
+      data={weeks.map((w) => ({ label: w.label, value: w.xp }))}
+      height={200}
+      barColor="#ede9fe"
+      highlightMax
+      formatValue={(v) => `${v} XP`}
+    />
   );
 }
 

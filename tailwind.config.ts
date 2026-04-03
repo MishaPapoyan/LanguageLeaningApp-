@@ -30,16 +30,20 @@ const config: Config = {
         },
       },
       animation: {
-        "fade-up":        "fadeSlide 0.4s cubic-bezier(0.16,1,0.3,1) forwards",
-        "fade-in":        "fadeIn 0.3s ease-out forwards",
+        "fade-up":        "fadeSlide 0.35s cubic-bezier(0.16,1,0.3,1) both",
+        "fade-in":        "fadeIn 0.25s ease-out both",
         "bounce-subtle":  "bounceSubtle 2s ease-in-out infinite",
+        "bounce-in":      "bounceIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both",
         "streak-flame":   "streakFlame 1.5s ease-in-out infinite",
-        "slide-up":       "slideUp 0.35s cubic-bezier(0.16,1,0.3,1) forwards",
-        "scale-in":       "scaleIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards",
-        "shimmer":        "shimmer 2.5s linear infinite",
-        "typing-dot":     "typingDot 1.4s infinite",
+        "slide-up":       "slideUp 0.35s cubic-bezier(0.16,1,0.3,1) both",
+        "slide-in":       "slideIn 0.3s cubic-bezier(0.16,1,0.3,1) both",
+        "scale-in":       "scaleIn 0.3s cubic-bezier(0.16,1,0.3,1) both",
+        "shimmer":        "shimmer 2s linear infinite",
+        "typing-dot":     "typingDot 1.2s ease infinite",
         "pulse-glow":     "pulseGlow 2s ease-in-out infinite",
+        "spin-slow":      "spin 3s linear infinite",
         "float":          "float 3s ease-in-out infinite",
+        "aurora":         "aurora 8s ease-in-out infinite",
       },
       keyframes: {
         fadeSlide: {
@@ -54,6 +58,11 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%":      { transform: "translateY(-4px)" },
         },
+        bounceIn: {
+          "0%":   { opacity: "0", transform: "scale(0.8)" },
+          "70%":  { transform: "scale(1.05)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
         streakFlame: {
           "0%, 100%": { transform: "scale(1) rotate(-2deg)" },
           "50%":      { transform: "scale(1.15) rotate(2deg)" },
@@ -61,6 +70,10 @@ const config: Config = {
         slideUp: {
           "0%":   { opacity: "0", transform: "translateY(16px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        slideIn: {
+          "0%":   { opacity: "0", transform: "translateX(-16px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
         },
         scaleIn: {
           "0%":   { opacity: "0", transform: "scale(0.95)" },
@@ -71,16 +84,20 @@ const config: Config = {
           "100%": { backgroundPosition: "200% 0" },
         },
         typingDot: {
-          "0%, 60%, 100%": { opacity: "0.3", transform: "scale(0.8)" },
-          "30%":           { opacity: "1",   transform: "scale(1)" },
+          "0%, 60%, 100%": { opacity: "0.4", transform: "translateY(0)" },
+          "30%":           { opacity: "1",   transform: "translateY(-4px)" },
         },
         pulseGlow: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(124,58,237,0.3)" },
-          "50%":      { boxShadow: "0 0 40px rgba(124,58,237,0.6)" },
+          "0%, 100%": { boxShadow: "0 0 12px rgba(99,102,241,0.3)" },
+          "50%":      { boxShadow: "0 0 28px rgba(99,102,241,0.6)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%":      { transform: "translateY(-6px)" },
+        },
+        aurora: {
+          "0%, 100%": { opacity: "0.5", transform: "scale(1) rotate(0deg)" },
+          "50%":      { opacity: "0.8", transform: "scale(1.1) rotate(5deg)" },
         },
       },
     },

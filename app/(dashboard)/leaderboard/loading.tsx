@@ -1,10 +1,10 @@
 export default function LeaderboardLoading() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-pulse">
-      <div className="h-8 w-44 bg-zinc-200 rounded-lg" />
+      <div className="h-8 w-44 bg-transparent rounded-lg" />
       <div className="flex justify-center gap-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="w-20 h-28 bg-zinc-200 rounded-xl" />
+          <div key={i} className="w-20 h-28 bg-transparent rounded-xl" />
         ))}
       </div>
       <div className="space-y-2">

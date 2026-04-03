@@ -3,8 +3,8 @@ export default function HomeLoading() {
     <div className="max-w-4xl mx-auto space-y-6 animate-pulse">
       <div className="flex items-start justify-between">
         <div>
-          <div className="h-8 w-56 bg-zinc-200 rounded-lg" />
-          <div className="h-4 w-40 bg-zinc-100 rounded-lg mt-2" />
+          <div className="h-8 w-56 bg-transparent rounded-lg" />
+          <div className="h-4 w-40 bg-transparent rounded-lg mt-2" />
         </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

@@ -27,24 +27,6 @@ function calculateNext(word: ReviewWord, quality: number): ReviewWord {
   return { ...word, interval, ease, repetitions, nextReview: Date.now() + interval * 86400000 };
 }
 
-const DEFAULT_WORDS: ReviewWord[] = [
-  { id: "r1", word: "bonjour", translation: "hello", imageEmoji: "👋", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r2", word: "merci", translation: "thank you", imageEmoji: "🙏", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r3", word: "au revoir", translation: "goodbye", imageEmoji: "👋", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r4", word: "s'il vous plaît", translation: "please", imageEmoji: "🙏", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r5", word: "oui", translation: "yes", imageEmoji: "✅", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r6", word: "non", translation: "no", imageEmoji: "❌", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r7", word: "le pain", translation: "bread", imageEmoji: "🥖", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r8", word: "le fromage", translation: "cheese", imageEmoji: "🧀", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r9", word: "l'eau", translation: "water", imageEmoji: "💧", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r10", word: "le café", translation: "coffee", imageEmoji: "☕", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r11", word: "la famille", translation: "family", imageEmoji: "👨‍👩‍👧‍👦", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r12", word: "grand", translation: "big / tall", imageEmoji: "📏", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r13", word: "petit", translation: "small / short", imageEmoji: "🤏", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r14", word: "manger", translation: "to eat", imageEmoji: "🍽️", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-  { id: "r15", word: "parler", translation: "to speak", imageEmoji: "🗣️", nextReview: 0, interval: 0, ease: 2.5, repetitions: 0 },
-];
-
 export default function ReviewPage() {
   const [words, setWords] = useState<ReviewWord[]>([]);
   const [dueWords, setDueWords] = useState<ReviewWord[]>([]);
@@ -56,7 +38,7 @@ export default function ReviewPage() {
 
   useEffect(() => {
     const saved = localStorage.getItem("reviewWords");
-    const parsed: ReviewWord[] = saved ? JSON.parse(saved) : DEFAULT_WORDS;
+    const parsed: ReviewWord[] = saved ? JSON.parse(saved) : [];
     setWords(parsed);
     const due = parsed.filter((w) => w.nextReview <= Date.now()).slice(0, 10);
     setDueWords(due);

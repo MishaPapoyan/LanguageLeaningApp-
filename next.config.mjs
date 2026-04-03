@@ -1,12 +1,29 @@
 /** @type {import('next').NextConfig} */
+
+const isProd = process.env.NODE_ENV === "production";
+
+// Derive allowed origins from NEXTAUTH_URL so Server Actions work in production
+// e.g. https://my-app.vercel.app → "my-app.vercel.app"
+function getAllowedOrigins() {
+  const base = ["localhost:3000", "localhost:3001"];
+  const url = process.env.NEXTAUTH_URL;
+  if (url) {
+    try {
+      const { host } = new URL(url);
+      if (host && !base.includes(host)) base.push(host);
+    } catch {}
+  }
+  return base;
+}
+
 const nextConfig = {
-  // Trim X-Powered-By header
+  // Remove X-Powered-By header
   poweredByHeader: false,
 
-  // Tree-shake large barrel packages — only bundles what's imported
+  // Tree-shake large barrel packages
   experimental: {
-    optimizePackageImports: ["recharts", "date-fns", "lodash"],
-    serverActions: { allowedOrigins: ["localhost:3000", "localhost:3001"] },
+    optimizePackageImports: ["date-fns", "lodash"],
+    serverActions: { allowedOrigins: getAllowedOrigins() },
   },
 
   images: {
@@ -16,9 +33,9 @@ const nextConfig = {
     ],
   },
 
-  // Faster production builds
+  // Strip console.* in production builds
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
+    removeConsole: isProd ? { exclude: ["error"] } : false,
   },
 };
 

@@ -37,103 +37,251 @@ export default async function LeaderboardPage() {
   }));
 
   const myRank = leaderboard.find((u) => u.isCurrentUser);
+  const isInTopTen = myRank ? myRank.rank <= 10 : false;
 
+  // Podium: [2nd, 1st, 3rd]
   const podiumOrder = leaderboard.length >= 3 ? [leaderboard[1], leaderboard[0], leaderboard[2]] : [];
 
+  const podiumMedals = ["🥈", "🥇", "🥉"];
+  const podiumHeights = [120, 150, 100];    // px — visual height of the podium block
+  const podiumPadTop  = [28, 0, 38];        // extra top padding to align bases
+  const podiumGlow = [
+    "none",
+    "0 0 32px rgba(245,158,11,0.35), 0 0 64px rgba(245,158,11,0.15)",
+    "none",
+  ];
+  const podiumBorder = [
+    "1px solid var(--border)",
+    "1px solid rgba(245,158,11,0.4)",
+    "1px solid var(--border)",
+  ];
+  const avatarBg = [
+    "var(--surface-3)",
+    "linear-gradient(135deg,#f59e0b,#fbbf24)",
+    "var(--surface-3)",
+  ];
+
   return (
-    <div className="max-w-2xl animate-fade-up">
-      {/* Your rank banner */}
-      {myRank && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 p-5 mb-6 text-white">
-          <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10 blur-xl" />
-          <div className="flex items-center justify-between relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold">
-                #{myRank.rank}
-              </div>
-              <div>
-                <p className="font-semibold text-lg">Your Rank</p>
-                <p className="text-violet-200 text-sm">Level {myRank.level} · {myRank.xp} XP</p>
-              </div>
-            </div>
-            {myRank.streak > 0 && (
-              <div className="bg-amber-400/20 text-amber-200 px-3 py-1 rounded-full text-sm font-semibold">
-                {myRank.streak} day streak
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+    <div style={{ maxWidth: 680 }} className="animate-fade-up">
 
-      {/* Podium */}
+      {/* ── Header ── */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px", marginBottom: 4 }}>
+          Leaderboard
+        </h1>
+        <p style={{ color: "var(--text-2)", fontSize: 14 }}>
+          Top French learners ranked by total XP earned. Keep that streak going!
+        </p>
+      </div>
+
+      {/* ── Podium ── */}
       {podiumOrder.length === 3 && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {podiumOrder.map((user, i) => {
-            const medals = ["2nd", "1st", "3rd"];
-            const heights = ["pt-8", "pt-0", "pt-10"];
-            const ringColors = ["ring-zinc-200", "ring-amber-300", "ring-zinc-200"];
-            const bgColors = ["bg-zinc-50", "bg-amber-50", "bg-zinc-50"];
-            const avatarBgs = ["bg-zinc-400", "bg-amber-500", "bg-zinc-400"];
-            return (
-              <div key={user.id} className={`${heights[i]} transition-all`}>
-                <div className={`rounded-2xl p-4 text-center ring-1 ${ringColors[i]} ${bgColors[i]} ${
-                  user.isCurrentUser ? "ring-2 ring-violet-400" : ""
-                }`}>
-                  <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">{medals[i]}</p>
-                  <div className={`w-11 h-11 ${avatarBgs[i]} rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-2`}>
-                    {user.name[0]?.toUpperCase() ?? "?"}
-                  </div>
-                  <p className="font-medium text-zinc-800 text-sm truncate">{user.name}</p>
-                  <p className="text-xs font-semibold text-violet-600 mt-0.5">{user.xp} XP</p>
-                  <p className="text-[10px] text-zinc-400">Lv.{user.level}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Full table */}
-      <div className="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
-        <div className="divide-y divide-zinc-50">
-          {leaderboard.map((user) => (
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10,
+          marginBottom: 28, alignItems: "flex-end",
+        }}>
+          {podiumOrder.map((user, i) => (
             <div
               key={user.id}
-              className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                user.isCurrentUser ? "bg-violet-50/50" : "hover:bg-zinc-50"
-              }`}
+              style={{
+                paddingTop: podiumPadTop[i],
+                display: "flex", flexDirection: "column",
+              }}
             >
-              <span className={`w-8 text-center text-sm font-bold ${
-                user.rank <= 3 ? "text-amber-500" : "text-zinc-300"
-              }`}>
-                {user.rank}
-              </span>
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {user.name[0]?.toUpperCase() ?? "?"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-zinc-800 truncate">
+              <div style={{
+                background: "var(--surface)",
+                border: `${user.isCurrentUser ? "2px solid var(--accent)" : podiumBorder[i]}`,
+                borderRadius: 18, padding: "20px 12px",
+                textAlign: "center",
+                boxShadow: user.isCurrentUser
+                  ? "0 0 24px rgba(99,102,241,0.25)"
+                  : podiumGlow[i],
+                height: podiumHeights[i],
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center", gap: 6,
+              }}>
+                <span style={{ fontSize: 20 }}>{podiumMedals[i]}</span>
+
+                {/* Avatar circle */}
+                <div style={{
+                  width: i === 1 ? 52 : 42, height: i === 1 ? 52 : 42,
+                  borderRadius: "50%",
+                  background: avatarBg[i],
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: i === 1 ? 20 : 16, fontWeight: 700,
+                  color: i === 1 ? "#fff" : "var(--text-2)",
+                  flexShrink: 0,
+                }}>
+                  {user.name[0]?.toUpperCase() ?? "?"}
+                </div>
+
+                {/* Name */}
+                <p style={{
+                  fontSize: 12, fontWeight: 700, color: "var(--text)",
+                  textOverflow: "ellipsis", overflow: "hidden",
+                  whiteSpace: "nowrap", width: "100%", textAlign: "center",
+                }}>
                   {user.name}
-                  {user.isCurrentUser && <span className="text-violet-500 text-xs ml-1">(you)</span>}
                 </p>
-                <p className="text-[11px] text-zinc-400">Level {user.level}</p>
-              </div>
-              <div className="text-right flex-shrink-0 flex items-center gap-3">
-                {user.streak > 0 && (
-                  <span className="text-[11px] text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full font-medium">{user.streak}d</span>
-                )}
-                <span className="font-semibold text-sm text-violet-600">{user.xp} XP</span>
+
+                {/* XP */}
+                <p style={{
+                  fontSize: i === 1 ? 13 : 11, fontWeight: 700,
+                  color: i === 1 ? "var(--gold)" : "var(--accent-2)",
+                }}>
+                  {user.xp.toLocaleString()} XP
+                </p>
+
+                <p style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600 }}>
+                  Lv.{user.level}
+                </p>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      )}
 
-      {leaderboard.length === 0 && (
-        <div className="bg-white rounded-2xl border border-zinc-100 text-center py-16">
-          <p className="text-4xl mb-3">◈</p>
-          <p className="font-serif text-lg text-zinc-800">No learners yet</p>
-          <p className="text-sm text-zinc-500 mt-1">Start learning to claim the #1 spot!</p>
+      {/* ── Full Rankings Table ── */}
+      {leaderboard.length > 0 ? (
+        <div style={{
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: 18, overflow: "hidden", marginBottom: 20,
+        }}>
+          {/* Table header */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "40px 1fr 80px 70px 54px",
+            padding: "10px 16px", gap: 8,
+            borderBottom: "1px solid var(--border)",
+          }}>
+            {["#", "Player", "Level", "XP", "Streak"].map((h) => (
+              <span key={h} style={{
+                fontSize: 10, fontWeight: 700, color: "var(--text-3)",
+                textTransform: "uppercase", letterSpacing: "0.07em",
+              }}>{h}</span>
+            ))}
+          </div>
+
+          {/* Rows */}
+          <div>
+            {leaderboard.map((user) => (
+              <div
+                key={user.id}
+                style={{
+                  display: "grid", gridTemplateColumns: "40px 1fr 80px 70px 54px",
+                  alignItems: "center", padding: "11px 16px", gap: 8,
+                  background: user.isCurrentUser ? "var(--accent-dim)" : "transparent",
+                  borderBottom: "1px solid var(--border)",
+                  transition: "background 0.12s",
+                }}
+              >
+                {/* Rank */}
+                <span style={{
+                  fontSize: 13, fontWeight: 700,
+                  color: user.rank === 1 ? "var(--gold)"
+                       : user.rank === 2 ? "var(--text-2)"
+                       : user.rank === 3 ? "#cd7f32"
+                       : "var(--text-3)",
+                }}>
+                  {user.rank}
+                </span>
+
+                {/* Player */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                    background: user.isCurrentUser
+                      ? "linear-gradient(135deg, var(--accent), var(--accent-2))"
+                      : "var(--surface-3)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 12, fontWeight: 700,
+                    color: user.isCurrentUser ? "#fff" : "var(--text-2)",
+                  }}>
+                    {user.name[0]?.toUpperCase() ?? "?"}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{
+                      fontSize: 13, fontWeight: 600, color: "var(--text)",
+                      textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap",
+                    }}>
+                      {user.name}
+                      {user.isCurrentUser && (
+                        <span style={{ color: "var(--accent-2)", fontSize: 11, marginLeft: 5, fontWeight: 500 }}>
+                          (you)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Level badge */}
+                <div>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, color: "var(--accent-2)",
+                    background: "var(--accent-dim)", borderRadius: 99,
+                    padding: "3px 10px",
+                  }}>
+                    Lv. {user.level}
+                  </span>
+                </div>
+
+                {/* XP */}
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
+                  {user.xp.toLocaleString()}
+                </span>
+
+                {/* Streak */}
+                <span style={{ fontSize: 12, color: user.streak > 0 ? "var(--gold)" : "var(--text-3)", fontWeight: 600 }}>
+                  {user.streak > 0 ? `🔥 ${user.streak}d` : "—"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div style={{
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: 18, textAlign: "center", padding: "56px 24px",
+          marginBottom: 20,
+        }}>
+          <p style={{ fontSize: 36, marginBottom: 10 }}>◈</p>
+          <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
+            No learners yet
+          </p>
+          <p style={{ fontSize: 13, color: "var(--text-2)" }}>
+            Start learning to claim the #1 spot!
+          </p>
+        </div>
+      )}
+
+      {/* ── Your Rank Summary Card (if not in top 10) ── */}
+      {myRank && !isInTopTen && (
+        <div style={{
+          background: "var(--surface)", border: "1px solid var(--border-md, rgba(255,255,255,0.10))",
+          borderRadius: 18, padding: "20px 24px",
+          display: "flex", alignItems: "center", gap: 16,
+        }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
+            background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 15, fontWeight: 700, color: "#fff",
+          }}>
+            #{myRank.rank}
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
+              Your Rank
+            </p>
+            <p style={{ fontSize: 12, color: "var(--text-2)" }}>
+              Level {myRank.level} · {myRank.xp.toLocaleString()} XP
+              {myRank.streak > 0 && ` · 🔥 ${myRank.streak}-day streak`}
+            </p>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
+              {myRank.rank - 10} spots from top 10
+            </p>
+          </div>
         </div>
       )}
     </div>

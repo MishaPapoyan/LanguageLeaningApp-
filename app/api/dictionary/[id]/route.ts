@@ -20,5 +20,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     masteryLevel = saved?.masteryLevel ?? 0;
   }
 
-  return NextResponse.json({ ...word, isSaved, masteryLevel });
+  const res = NextResponse.json({ ...word, isSaved, masteryLevel });
+  res.headers.set("Cache-Control", "private, s-maxage=300, stale-while-revalidate=600");
+  return res;
 }

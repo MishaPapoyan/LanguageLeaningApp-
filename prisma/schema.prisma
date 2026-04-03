@@ -12,6 +12,7 @@ datasource db {
 enum Role {
   STUDENT
   TEACHER
+  ADMIN
 }
 
 enum Difficulty {
@@ -86,6 +87,21 @@ model User {
   gameScores     GameScore[]
   taughtGroups   Group[]         @relation("Teacher")
   studentGroups  GroupMember[]
+  location       UserLocation?
+}
+
+// ─── User Location ────────────────────────────────────────────────────────────
+
+model UserLocation {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  latitude  Float
+  longitude Float
+  accuracy  Float?
+  city      String?
+  country   String?
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── Stories ──────────────────────────────────────────────────────────────────

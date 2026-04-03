@@ -218,7 +218,7 @@ export async function GET(req: NextRequest) {
     ? Math.round(recentWeeklyXps.reduce((s, v) => s + v, 0) / recentWeeklyXps.length)
     : 0;
 
-  return NextResponse.json({
+  const res = NextResponse.json({
     overview: {
       totalXp: xpTotal,
       level: progress?.level ?? 1,
@@ -291,4 +291,7 @@ export async function GET(req: NextRequest) {
       heatmap,
     },
   });
+
+  res.headers.set("Cache-Control", "private, s-maxage=60, stale-while-revalidate=120");
+  return res;
 }

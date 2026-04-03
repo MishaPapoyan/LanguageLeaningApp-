@@ -3,8 +3,42 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getXpProgress } from "@/types";
+import { unstable_cache } from "next/cache";
 
 const MEDAL: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+
+const getLeaderboard = unstable_cache(
+  async () => {
+    return prisma.user.findMany({
+      where: { progress: { isNot: null } },
+      select: {
+        id: true,
+        name: true,
+        progress: { select: { xp: true, level: true, streak: true } },
+      },
+      orderBy: { progress: { xp: "desc" } },
+      take: 10,
+    });
+  },
+  ["right-panel-leaderboard"],
+  { revalidate: 60, tags: ["right-panel-leaderboard"] }
+);
+
+const getUserPanelData = unstable_cache(
+  async (userId: string) => {
+    const [myProgress, savedWords] = await Promise.all([
+      prisma.progress.findUnique({ where: { userId } }),
+      prisma.savedWord.findMany({
+        where: { userId },
+        select: { word: { select: { word: true, translation: true, imageEmoji: true } } },
+        take: 100,
+      }),
+    ]);
+    return { myProgress, savedWords };
+  },
+  ["right-panel-user"],
+  { revalidate: 30, tags: ["right-panel-user"] }
+);
 
 const TIPS = [
   { tip: "Speak out loud every word you learn — even alone. Your mouth needs practice too.", emoji: "🗣️" },
@@ -30,23 +64,9 @@ export async function RightPanel() {
   const todayTipIndex = Math.floor(Date.now() / 86_400_000) % TIPS.length;
   const todayTip = TIPS[todayTipIndex];
 
-  const [users, myProgress, savedWords] = await Promise.all([
-    prisma.user.findMany({
-      where: { progress: { isNot: null } },
-      select: {
-        id: true,
-        name: true,
-        progress: { select: { xp: true, level: true, streak: true } },
-      },
-      orderBy: { progress: { xp: "desc" } },
-      take: 10,
-    }),
-    prisma.progress.findUnique({ where: { userId: currentUserId } }),
-    prisma.savedWord.findMany({
-      where: { userId: currentUserId },
-      select: { word: { select: { word: true, translation: true, imageEmoji: true } } },
-      take: 100,
-    }),
+  const [users, { myProgress, savedWords }] = await Promise.all([
+    getLeaderboard(),
+    getUserPanelData(currentUserId),
   ]);
 
   const board = users.map((u, i) => ({
