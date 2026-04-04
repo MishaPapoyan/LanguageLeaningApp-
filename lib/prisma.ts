@@ -4,8 +4,12 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function dbUrl() {
   const url = process.env.DATABASE_URL ?? "";
-  if (url.includes("connection_limit")) return url;
-  return url + (url.includes("?") ? "&" : "?") + "connection_limit=1&pool_timeout=20";
+  const params: string[] = [];
+  if (!url.includes("connection_limit")) params.push("connection_limit=1");
+  if (!url.includes("pgbouncer")) params.push("pgbouncer=true");
+  if (!url.includes("pool_timeout")) params.push("pool_timeout=20");
+  if (params.length === 0) return url;
+  return url + (url.includes("?") ? "&" : "?") + params.join("&");
 }
 
 export const prisma =
