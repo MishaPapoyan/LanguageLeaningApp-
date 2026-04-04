@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default async function AdminOverview() {
   let userCount = 0, locationCount = 0, activeToday = 0, totalXp = 0;
-  let recentUsers: Awaited<ReturnType<typeof prisma.user.findMany>> = [];
+  let recentUsers: any[] = [];
 
   try {
     const [uc, lc, totalXpAgg, ru, at] = await Promise.all([
