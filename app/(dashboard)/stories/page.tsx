@@ -11,37 +11,47 @@ export const metadata: Metadata = {
 
 export default async function StoriesPage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id;
 
-  const stories = await prisma.story.findMany({
-    orderBy: { chapter: "asc" },
-    select: {
-      id: true,
-      title: true,
-      chapter: true,
-      difficulty: true,
-      imageEmoji: true,
-      quizzes: { select: { id: true } },
-      _count: { select: { words: true } },
-      progress: { where: { userId }, select: { completed: true, score: true } },
-    },
-  });
+  let storiesData: {
+    id: string; title: string; chapter: number; difficulty: string;
+    imageEmoji: string; quizCount: number; wordCount: number;
+    isCompleted: boolean; isStarted: boolean; score: number;
+  }[] = [];
 
-  const storiesData = stories.map((story) => {
-    const progress = story.progress[0];
-    return {
-      id: story.id,
-      title: story.title,
-      chapter: story.chapter,
-      difficulty: story.difficulty as string,
-      imageEmoji: story.imageEmoji,
-      quizCount: story.quizzes.length,
-      wordCount: story._count.words,
-      isCompleted: progress?.completed ?? false,
-      isStarted: !!progress,
-      score: progress?.score ?? 0,
-    };
-  });
+  try {
+    const stories = await prisma.story.findMany({
+      orderBy: { chapter: "asc" },
+      select: {
+        id: true,
+        title: true,
+        chapter: true,
+        difficulty: true,
+        imageEmoji: true,
+        quizzes: { select: { id: true } },
+        _count: { select: { words: true } },
+        ...(userId ? { progress: { where: { userId }, select: { completed: true, score: true } } } : {}),
+      },
+    });
+
+    storiesData = stories.map((story) => {
+      const progress = (story as any).progress?.[0];
+      return {
+        id: story.id,
+        title: story.title,
+        chapter: story.chapter,
+        difficulty: story.difficulty as string,
+        imageEmoji: story.imageEmoji,
+        quizCount: story.quizzes.length,
+        wordCount: story._count.words,
+        isCompleted: progress?.completed ?? false,
+        isStarted: !!progress,
+        score: progress?.score ?? 0,
+      };
+    });
+  } catch (err) {
+    console.error("[stories] DB error:", err);
+  }
 
   return (
     <div style={{ maxWidth: 760 }}>

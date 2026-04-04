@@ -12,30 +12,48 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id;
 
   const dayIndex = Math.floor(Date.now() / 86_400_000) % 100;
 
-  const [progress, savedWordCount, completedStories, recentWord, lastStory] = await Promise.all([
-    prisma.progress.findUnique({ where: { userId } }),
-    prisma.savedWord.count({ where: { userId } }),
-    prisma.storyProgress.count({ where: { userId, completed: true } }),
-    prisma.word.findFirst({
-      skip: dayIndex,
-      orderBy: { id: "asc" },
-      select: { id: true, word: true, translation: true, exampleFr: true, imageEmoji: true },
-    }),
-    prisma.storyProgress.findFirst({
-      where: { userId },
-      orderBy: { updatedAt: "desc" },
-      include: { story: { select: { title: true, imageEmoji: true, chapter: true } } },
-    }),
-  ]);
+  let progress = null, savedWordCount = 0, completedStories = 0, recentWord = null, lastStory = null;
+
+  if (userId) {
+    try {
+      [progress, savedWordCount, completedStories, recentWord, lastStory] = await Promise.all([
+        prisma.progress.findUnique({ where: { userId } }),
+        prisma.savedWord.count({ where: { userId } }),
+        prisma.storyProgress.count({ where: { userId, completed: true } }),
+        prisma.word.findFirst({
+          skip: dayIndex,
+          orderBy: { id: "asc" },
+          select: { id: true, word: true, translation: true, exampleFr: true, imageEmoji: true },
+        }),
+        prisma.storyProgress.findFirst({
+          where: { userId },
+          orderBy: { updatedAt: "desc" },
+          include: { story: { select: { title: true, imageEmoji: true, chapter: true } } },
+        }),
+      ]);
+    } catch (err) {
+      console.error("[home] DB error:", err);
+    }
+  } else {
+    try {
+      recentWord = await prisma.word.findFirst({
+        skip: dayIndex,
+        orderBy: { id: "asc" },
+        select: { id: true, word: true, translation: true, exampleFr: true, imageEmoji: true },
+      });
+    } catch (err) {
+      console.error("[home] DB error:", err);
+    }
+  }
 
   const xpInfo = progress ? getXpProgress(progress.xp) : { level: 1, current: 0, needed: 100, pct: 0 };
   const skillTree = (progress?.skillTree as Record<string, number>) ?? {};
   const earnedBadges = BADGES.filter((b) => (progress?.badges ?? []).includes(b.id));
-  const firstName = session!.user.name?.split(" ")[0] ?? "there";
+  const firstName = session?.user?.name?.split(" ")[0] ?? "there";
 
   const skills = [
     { key: "vocabulary", label: "Vocab",   emoji: "📖", color: "#60a5fa" },
