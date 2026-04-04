@@ -11,13 +11,19 @@ export async function GET(req: NextRequest) {
 
   const userId = session.user.id;
 
-  const [progress, savedWordCount, completedStories, gamePlays, tutorSessions] = await Promise.all([
-    prisma.progress.findUnique({ where: { userId } }),
-    prisma.savedWord.count({ where: { userId } }),
-    prisma.storyProgress.count({ where: { userId, completed: true } }),
-    prisma.gameScore.count({ where: { userId } }),
-    prisma.aiInteraction.count({ where: { userId } }),
-  ]);
+  let progress, savedWordCount, completedStories, gamePlays, tutorSessions;
+  try {
+    [progress, savedWordCount, completedStories, gamePlays, tutorSessions] = await Promise.all([
+      prisma.progress.findUnique({ where: { userId } }),
+      prisma.savedWord.count({ where: { userId } }),
+      prisma.storyProgress.count({ where: { userId, completed: true } }),
+      prisma.gameScore.count({ where: { userId } }),
+      prisma.aiInteraction.count({ where: { userId } }),
+    ]);
+  } catch (err) {
+    console.error("[progress] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
+  }
 
   return NextResponse.json(
     {

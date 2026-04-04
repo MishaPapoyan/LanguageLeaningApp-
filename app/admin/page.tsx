@@ -2,25 +2,33 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function AdminOverview() {
-  const [userCount, locationCount, totalXpAgg, recentUsers, activeToday] = await Promise.all([
-    prisma.user.count(),
-    prisma.userLocation.count(),
-    prisma.progress.aggregate({ _sum: { xp: true } }),
-    prisma.user.findMany({
-      take: 8,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true, name: true, email: true, role: true, createdAt: true,
-        progress: { select: { xp: true, level: true, streak: true } },
-        location: { select: { city: true, country: true } },
-      },
-    }),
-    prisma.progress.count({
-      where: { lastActive: { gte: new Date(Date.now() - 86400000) } },
-    }),
-  ]);
+  let userCount = 0, locationCount = 0, activeToday = 0, totalXp = 0;
+  let recentUsers: Awaited<ReturnType<typeof prisma.user.findMany>> = [];
 
-  const totalXp = totalXpAgg._sum.xp ?? 0;
+  try {
+    const [uc, lc, totalXpAgg, ru, at] = await Promise.all([
+      prisma.user.count(),
+      prisma.userLocation.count(),
+      prisma.progress.aggregate({ _sum: { xp: true } }),
+      prisma.user.findMany({
+        take: 8,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true, name: true, email: true, role: true, createdAt: true,
+          progress: { select: { xp: true, level: true, streak: true } },
+          location: { select: { city: true, country: true } },
+        },
+      }),
+      prisma.progress.count({
+        where: { lastActive: { gte: new Date(Date.now() - 86400000) } },
+      }),
+    ]);
+    userCount = uc; locationCount = lc; activeToday = at;
+    totalXp = totalXpAgg._sum.xp ?? 0;
+    recentUsers = ru;
+  } catch (err) {
+    console.error("[admin] DB error:", err);
+  }
 
   const stats = [
     { label: "Total users",       value: userCount,       emoji: "👥", href: "/admin/users" },
