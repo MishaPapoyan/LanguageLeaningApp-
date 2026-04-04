@@ -5,7 +5,7 @@ import { AppNav } from "@/components/layout/AppNav";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { NavigationProgress } from "@/components/layout/NavigationProgress";
 import { RightPanel } from "@/components/layout/RightPanel";
-import { LocationTracker } from "@/components/LocationTracker";
+import { LocationBanner } from "@/components/LocationBanner";
 import { Suspense } from "react";
 
 function RightPanelSkeleton() {
@@ -55,7 +55,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </div>
 
       <MobileNav />
-      <LocationTracker />
+      <LocationBanner />
     </div>
   );
 }
