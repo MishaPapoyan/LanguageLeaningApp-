@@ -62,14 +62,21 @@ const GAMES = [
 
 export default async function GamesPage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id ?? "";
 
-  // Fetch best scores per game type
-  const allScores = await prisma.gameScore.findMany({
-    where: { userId },
-    orderBy: { score: "desc" },
-    select: { gameType: true, score: true, xpEarned: true, playedAt: true },
-  });
+  let allScores: { gameType: string; score: number; xpEarned: number; playedAt: Date }[] = [];
+
+  try {
+    if (userId) {
+      allScores = await prisma.gameScore.findMany({
+        where: { userId },
+        orderBy: { score: "desc" },
+        select: { gameType: true, score: true, xpEarned: true, playedAt: true },
+      });
+    }
+  } catch (err) {
+    console.error("[games] DB error:", err);
+  }
 
   // Reduce to best score per game type
   const bestScores = allScores.reduce<Record<string, { score: number; xpEarned: number; playedAt: Date }>>((acc, row) => {

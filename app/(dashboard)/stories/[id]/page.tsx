@@ -6,19 +6,26 @@ import { StoryReader } from "@/components/stories/StoryReader";
 
 export default async function StoryPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id ?? "";
 
-  const [story, savedWordRows] = await Promise.all([
-    prisma.story.findUnique({
-      where: { id: params.id },
-      include: {
-        quizzes: true,
-        words: { include: { word: true } },
-        progress: { where: { userId } },
-      },
-    }),
-    prisma.savedWord.findMany({ where: { userId }, select: { wordId: true } }),
-  ]);
+  let story = null;
+  let savedWordRows: { wordId: string }[] = [];
+
+  try {
+    [story, savedWordRows] = await Promise.all([
+      prisma.story.findUnique({
+        where: { id: params.id },
+        include: {
+          quizzes: true,
+          words: { include: { word: true } },
+          ...(userId ? { progress: { where: { userId } } } : {}),
+        },
+      }),
+      userId ? prisma.savedWord.findMany({ where: { userId }, select: { wordId: true } }) : [],
+    ]);
+  } catch (err) {
+    console.error("[story page] DB error:", err);
+  }
 
   if (!story) notFound();
 

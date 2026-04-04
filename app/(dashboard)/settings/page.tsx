@@ -12,18 +12,27 @@ export const metadata: Metadata = {
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id ?? "";
 
-  const [user, progress, savedWordCount, completedStories, gamePlays] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true, email: true, image: true, role: true, nativeLanguage: true, targetLanguage: true, createdAt: true },
-    }),
-    prisma.progress.findUnique({ where: { userId } }),
-    prisma.savedWord.count({ where: { userId } }),
-    prisma.storyProgress.count({ where: { userId, completed: true } }),
-    prisma.gameScore.count({ where: { userId } }),
-  ]);
+  let user = null, progress = null;
+  let savedWordCount = 0, completedStories = 0, gamePlays = 0;
+
+  try {
+    if (userId) {
+      [user, progress, savedWordCount, completedStories, gamePlays] = await Promise.all([
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: { name: true, email: true, image: true, role: true, nativeLanguage: true, targetLanguage: true, createdAt: true },
+        }),
+        prisma.progress.findUnique({ where: { userId } }),
+        prisma.savedWord.count({ where: { userId } }),
+        prisma.storyProgress.count({ where: { userId, completed: true } }),
+        prisma.gameScore.count({ where: { userId } }),
+      ]);
+    }
+  } catch (err) {
+    console.error("[settings] DB error:", err);
+  }
 
   const xpInfo = getXpProgress(progress?.xp ?? 0);
   const earnedBadges = BADGES.filter((b) => (progress?.badges ?? []).includes(b.id));

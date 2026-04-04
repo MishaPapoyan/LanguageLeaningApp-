@@ -14,11 +14,15 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
-  const user = await prisma.user.update({
-    where: { id: params.id },
-    data: { role },
-    select: { id: true, role: true },
-  });
-
-  return NextResponse.json({ user });
+  try {
+    const user = await prisma.user.update({
+      where: { id: params.id },
+      data: { role },
+      select: { id: true, role: true },
+    });
+    return NextResponse.json({ user });
+  } catch (err) {
+    console.error("[admin/users/role] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
+  }
 }

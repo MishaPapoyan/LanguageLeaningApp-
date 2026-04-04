@@ -14,18 +14,21 @@ export async function POST(req: NextRequest) {
   const { wordId, remove } = await req.json();
   const userId = session.user.id;
 
-  if (remove) {
-    await prisma.savedWord.deleteMany({ where: { userId, wordId } });
-    return NextResponse.json({ saved: false });
+  try {
+    if (remove) {
+      await prisma.savedWord.deleteMany({ where: { userId, wordId } });
+      return NextResponse.json({ saved: false });
+    }
+
+    const saved = await prisma.savedWord.upsert({
+      where: { userId_wordId: { userId, wordId } },
+      create: { userId, wordId },
+      update: {},
+    });
+    await awardXp(userId, XP_REWARDS.saveWord, "vocabulary");
+    return NextResponse.json({ saved: true, data: saved });
+  } catch (err) {
+    console.error("[dictionary/save] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
   }
-
-  const saved = await prisma.savedWord.upsert({
-    where: { userId_wordId: { userId, wordId } },
-    create: { userId, wordId },
-    update: {},
-  });
-
-  await awardXp(userId, XP_REWARDS.saveWord, "vocabulary");
-
-  return NextResponse.json({ saved: true, data: saved });
 }

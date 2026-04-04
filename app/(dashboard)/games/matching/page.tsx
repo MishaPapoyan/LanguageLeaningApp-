@@ -11,17 +11,26 @@ export const metadata: Metadata = {
 
 export default async function MatchingPage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id ?? "";
 
-  const savedWords = await prisma.savedWord.findMany({
-    where: { userId },
-    include: { word: true },
-    take: 8,
-  });
+  let savedWords: any[] = [];
+  let words: any[] = [];
 
-  const words = savedWords.length >= 4
-    ? savedWords.map((sw) => sw.word)
-    : await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, take: 8 });
+  try {
+    if (userId) {
+      savedWords = await prisma.savedWord.findMany({
+        where: { userId },
+        include: { word: true },
+        take: 8,
+      });
+    }
+    words = savedWords.length >= 4
+      ? savedWords.map((sw: any) => sw.word)
+      : await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, take: 8 });
+  } catch (err) {
+    console.error("[matching] DB error:", err);
+    words = [];
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

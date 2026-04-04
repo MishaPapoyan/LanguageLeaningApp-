@@ -14,16 +14,20 @@ export async function PATCH(req: NextRequest) {
 
   const data: Record<string, string> = {};
   if (typeof name === "string" && name.trim()) data.name = name.trim().slice(0, 50);
-  if (typeof image === "string") data.image = image.slice(0, 10); // emoji only
+  if (typeof image === "string") data.image = image.slice(0, 10);
   if (typeof nativeLanguage === "string") data.nativeLanguage = nativeLanguage;
 
-  const user = await prisma.user.update({
-    where: { id: session.user.id },
-    data,
-    select: { id: true, name: true, image: true, nativeLanguage: true, email: true },
-  });
-
-  const res = NextResponse.json({ user });
-  res.headers.set("Cache-Control", "private, no-cache");
-  return res;
+  try {
+    const user = await prisma.user.update({
+      where: { id: session.user.id },
+      data,
+      select: { id: true, name: true, image: true, nativeLanguage: true, email: true },
+    });
+    const res = NextResponse.json({ user });
+    res.headers.set("Cache-Control", "private, no-cache");
+    return res;
+  } catch (err) {
+    console.error("[user] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
+  }
 }

@@ -11,20 +11,26 @@ export const metadata: Metadata = {
 
 export default async function LeaderboardPage() {
   const session = await getServerSession(authOptions);
-  const currentUserId = session!.user.id;
+  const currentUserId = session?.user?.id ?? "";
 
-  const users = await prisma.user.findMany({
-    where: { progress: { isNot: null } },
-    select: {
-      id: true,
-      name: true,
-      progress: {
-        select: { xp: true, level: true, streak: true },
+  let users: { id: string; name: string | null; progress: { xp: number; level: number; streak: number } | null }[] = [];
+
+  try {
+    users = await prisma.user.findMany({
+      where: { progress: { isNot: null } },
+      select: {
+        id: true,
+        name: true,
+        progress: {
+          select: { xp: true, level: true, streak: true },
+        },
       },
-    },
-    orderBy: { progress: { xp: "desc" } },
-    take: 50,
-  });
+      orderBy: { progress: { xp: "desc" } },
+      take: 50,
+    });
+  } catch (err) {
+    console.error("[leaderboard] DB error:", err);
+  }
 
   const leaderboard = users.map((u, i) => ({
     rank: i + 1,

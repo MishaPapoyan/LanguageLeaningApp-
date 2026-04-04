@@ -9,25 +9,23 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      progress: {
-        select: { xp: true, level: true, streak: true, lastActive: true },
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        progress: { select: { xp: true, level: true, streak: true, lastActive: true } },
+        location: { select: { city: true, country: true, updatedAt: true } },
+        _count: { select: { savedWords: true, storyProgress: true, aiInteractions: true, gameScores: true } },
       },
-      location: {
-        select: { city: true, country: true, updatedAt: true },
-      },
-      _count: {
-        select: { savedWords: true, storyProgress: true, aiInteractions: true, gameScores: true },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return NextResponse.json({ users });
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json({ users });
+  } catch (err) {
+    console.error("[admin/users] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
+  }
 }

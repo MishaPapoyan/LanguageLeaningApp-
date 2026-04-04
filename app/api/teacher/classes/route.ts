@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
 
   const inviteCode = crypto.randomUUID().slice(0, 8).toUpperCase();
 
-  const group = await prisma.group.create({
-    data: {
-      name: name.trim(),
-      teacherId: session.user.id,
-      inviteCode,
-    },
-  });
-
-  return Response.json({ group });
+  try {
+    const group = await prisma.group.create({
+      data: { name: name.trim(), teacherId: session.user.id, inviteCode },
+    });
+    return Response.json({ group });
+  } catch (err) {
+    console.error("[teacher/classes] DB error:", err);
+    return Response.json({ error: "Service temporarily unavailable" }, { status: 503 });
+  }
 }

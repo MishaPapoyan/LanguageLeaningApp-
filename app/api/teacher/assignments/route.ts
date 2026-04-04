@@ -15,24 +15,21 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Verify the teacher owns this group
-  const group = await prisma.group.findFirst({
-    where: { id: groupId, teacherId: session.user.id },
-  });
+  try {
+    const group = await prisma.group.findFirst({
+      where: { id: groupId, teacherId: session.user.id },
+    });
 
-  if (!group) {
-    return Response.json({ error: "Group not found" }, { status: 404 });
+    if (!group) {
+      return Response.json({ error: "Group not found" }, { status: 404 });
+    }
+
+    const assignment = await prisma.assignment.create({
+      data: { groupId, title: title.trim(), type, content: {}, dueDate: new Date(dueDate) },
+    });
+    return Response.json({ assignment });
+  } catch (err) {
+    console.error("[teacher/assignments] DB error:", err);
+    return Response.json({ error: "Service temporarily unavailable" }, { status: 503 });
   }
-
-  const assignment = await prisma.assignment.create({
-    data: {
-      groupId,
-      title: title.trim(),
-      type,
-      content: {},
-      dueDate: new Date(dueDate),
-    },
-  });
-
-  return Response.json({ assignment });
 }

@@ -14,22 +14,24 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const { score, completed } = await req.json();
   const userId = session.user.id;
 
-  // Calculate XP earned
   let xpEarned = 0;
   if (completed) xpEarned += XP_REWARDS.completeStory;
   if (score === 100) xpEarned += XP_REWARDS.perfectQuiz;
   else if (score > 0) xpEarned += Math.floor((score / 100) * XP_REWARDS.quizAnswer * 3);
 
-  const progress = await prisma.storyProgress.upsert({
-    where: { userId_storyId: { userId, storyId: params.id } },
-    create: { userId, storyId: params.id, completed, score, xpEarned },
-    update: { completed, score: Math.max(score, 0), xpEarned },
-  });
-
-  if (xpEarned > 0) {
-    await awardXp(userId, xpEarned, "grammar");
-    await updateStreak(userId);
+  try {
+    const progress = await prisma.storyProgress.upsert({
+      where: { userId_storyId: { userId, storyId: params.id } },
+      create: { userId, storyId: params.id, completed, score, xpEarned },
+      update: { completed, score: Math.max(score, 0), xpEarned },
+    });
+    if (xpEarned > 0) {
+      await awardXp(userId, xpEarned, "grammar");
+      await updateStreak(userId);
+    }
+    return NextResponse.json({ progress, xpEarned });
+  } catch (err) {
+    console.error("[stories/progress] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
   }
-
-  return NextResponse.json({ progress, xpEarned });
 }

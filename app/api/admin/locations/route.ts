@@ -9,12 +9,14 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const locations = await prisma.userLocation.findMany({
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
-
-  return NextResponse.json({ locations });
+  try {
+    const locations = await prisma.userLocation.findMany({
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { updatedAt: "desc" },
+    });
+    return NextResponse.json({ locations });
+  } catch (err) {
+    console.error("[admin/locations] DB error:", err);
+    return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503 });
+  }
 }

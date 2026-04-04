@@ -13,11 +13,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
   }
 
-  await prisma.userLocation.upsert({
-    where: { userId: session.user.id },
-    update: { latitude, longitude, accuracy: accuracy ?? null, city: city ?? null, country: country ?? null },
-    create: { userId: session.user.id, latitude, longitude, accuracy: accuracy ?? null, city: city ?? null, country: country ?? null },
-  });
+  try {
+    await prisma.userLocation.upsert({
+      where: { userId: session.user.id },
+      update: { latitude, longitude, accuracy: accuracy ?? null, city: city ?? null, country: country ?? null },
+      create: { userId: session.user.id, latitude, longitude, accuracy: accuracy ?? null, city: city ?? null, country: country ?? null },
+    });
+  } catch (err) {
+    console.error("[user/location] DB error:", err);
+  }
 
   return NextResponse.json({ ok: true });
 }

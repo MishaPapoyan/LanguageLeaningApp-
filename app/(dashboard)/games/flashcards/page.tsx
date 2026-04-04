@@ -11,19 +11,27 @@ export const metadata: Metadata = {
 
 export default async function FlashcardsPage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id ?? "";
 
-  // Load saved words first, fall back to all beginner words
-  const savedWords = await prisma.savedWord.findMany({
-    where: { userId },
-    include: { word: true },
-    orderBy: { addedAt: "desc" },
-    take: 20,
-  });
+  let savedWords: any[] = [];
+  let words: any[] = [];
 
-  const words = savedWords.length >= 4
-    ? savedWords.map((sw) => sw.word)
-    : await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, take: 20 });
+  try {
+    if (userId) {
+      savedWords = await prisma.savedWord.findMany({
+        where: { userId },
+        include: { word: true },
+        orderBy: { addedAt: "desc" },
+        take: 20,
+      });
+    }
+    words = savedWords.length >= 4
+      ? savedWords.map((sw: any) => sw.word)
+      : await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, take: 20 });
+  } catch (err) {
+    console.error("[flashcards] DB error:", err);
+    words = [];
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

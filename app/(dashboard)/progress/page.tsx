@@ -22,20 +22,30 @@ export const metadata: Metadata = {
 
 export default async function ProgressPage() {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session?.user?.id ?? "";
 
-  const [progress, stats] = await Promise.all([
-    prisma.progress.findUnique({ where: { userId } }),
-    Promise.all([
-      prisma.savedWord.count({ where: { userId } }),
-      prisma.storyProgress.count({ where: { userId, completed: true } }),
-      prisma.gameScore.count({ where: { userId } }),
-      prisma.aiInteraction.count({ where: { userId } }),
-      prisma.gameScore.findMany({ where: { userId }, orderBy: { playedAt: "desc" }, take: 5 }),
-    ]),
-  ]);
+  let progress = null;
+  let savedWords = 0, completedStories = 0, gamePlays = 0, tutorSessions = 0;
+  let recentGames: any[] = [];
 
-  const [savedWords, completedStories, gamePlays, tutorSessions, recentGames] = stats;
+  try {
+    if (userId) {
+      const [prog, stats] = await Promise.all([
+        prisma.progress.findUnique({ where: { userId } }),
+        Promise.all([
+          prisma.savedWord.count({ where: { userId } }),
+          prisma.storyProgress.count({ where: { userId, completed: true } }),
+          prisma.gameScore.count({ where: { userId } }),
+          prisma.aiInteraction.count({ where: { userId } }),
+          prisma.gameScore.findMany({ where: { userId }, orderBy: { playedAt: "desc" }, take: 5 }),
+        ]),
+      ]);
+      progress = prog;
+      [savedWords, completedStories, gamePlays, tutorSessions, recentGames] = stats;
+    }
+  } catch (err) {
+    console.error("[progress page] DB error:", err);
+  }
 
   const xpInfo = getXpProgress(progress?.xp ?? 0);
   const badges = progress?.badges ?? [];
