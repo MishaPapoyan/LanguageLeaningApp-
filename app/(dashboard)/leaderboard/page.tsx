@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getXpProgress } from "@/types";
 import { Metadata } from "next";
+import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Leaderboard — LinguaFlow",
@@ -72,7 +73,12 @@ export default async function LeaderboardPage() {
 
       {/* ── Header ── */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px", marginBottom: 4 }}>
+        <h1 style={{
+          fontSize: 28, fontWeight: 700, color: "var(--text)",
+          letterSpacing: "-0.5px", marginBottom: 4,
+          display: "flex", alignItems: "center", gap: 10,
+        }}>
+          <Trophy size={20} style={{ color: "var(--accent-2)", flexShrink: 0 }} />
           Leaderboard
         </h1>
         <p style={{ color: "var(--text-2)", fontSize: 14 }}>
@@ -106,7 +112,12 @@ export default async function LeaderboardPage() {
                 display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center", gap: 6,
               }}>
-                <span style={{ fontSize: 20 }}>{podiumMedals[i]}</span>
+                {/* Medal: #1 gets Crown icon, #2 and #3 keep emoji medals */}
+                {i === 1 ? (
+                  <Crown size={20} style={{ color: "var(--gold)", flexShrink: 0 }} />
+                ) : (
+                  <span style={{ fontSize: 20 }}>{podiumMedals[i]}</span>
+                )}
 
                 {/* Avatar circle */}
                 <div style={{
@@ -236,8 +247,17 @@ export default async function LeaderboardPage() {
                 </span>
 
                 {/* Streak */}
-                <span style={{ fontSize: 12, color: user.streak > 0 ? "var(--gold)" : "var(--text-3)", fontWeight: 600 }}>
-                  {user.streak > 0 ? `🔥 ${user.streak}d` : "—"}
+                <span style={{
+                  fontSize: 12, fontWeight: 600,
+                  color: user.streak > 0 ? "var(--gold)" : "var(--text-3)",
+                  display: "flex", alignItems: "center", gap: 3,
+                }}>
+                  {user.streak > 0 ? (
+                    <>
+                      <Flame size={12} style={{ color: "var(--gold)", flexShrink: 0 }} />
+                      {user.streak}d
+                    </>
+                  ) : "—"}
                 </span>
               </div>
             ))}
@@ -270,17 +290,22 @@ export default async function LeaderboardPage() {
             width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
             background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 15, fontWeight: 700, color: "#fff",
           }}>
-            #{myRank.rank}
+            <Trophy size={18} style={{ color: "#fff" }} />
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
-              Your Rank
+              Your Rank — #{myRank.rank}
             </p>
             <p style={{ fontSize: 12, color: "var(--text-2)" }}>
               Level {myRank.level} · {myRank.xp.toLocaleString()} XP
-              {myRank.streak > 0 && ` · 🔥 ${myRank.streak}-day streak`}
+              {myRank.streak > 0 && (
+                <>
+                  {" · "}
+                  <Flame size={11} style={{ color: "var(--gold)", display: "inline", verticalAlign: "middle", marginRight: 2 }} />
+                  {myRank.streak}-day streak
+                </>
+              )}
             </p>
           </div>
           <div style={{ textAlign: "right" }}>

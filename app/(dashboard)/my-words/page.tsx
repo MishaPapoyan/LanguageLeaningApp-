@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { speakFr } from "@/lib/speech";
+import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CustomWord {
   id: string;
-  front: string; // native language side  (e.g. "hello")
-  back: string;  // French side           (e.g. "bonjour")
+  front: string;
+  back: string;
   createdAt: number;
 }
 
@@ -16,27 +17,24 @@ type Mode = "list" | "quiz" | "result";
 
 interface QuizQuestion {
   word: CustomWord;
-  options: string[]; // 4 native-side choices
+  options: string[];
   correctIndex: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = "linguaflow_custom_words";
+const OPTION_LABELS = ["A", "B", "C", "D"];
 
 function loadWords(): CustomWord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
-
-function saveWords(words: CustomWord[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+function saveWords(w: CustomWord[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(w));
 }
-
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -45,168 +43,112 @@ function shuffle<T>(arr: T[]): T[] {
   }
   return a;
 }
-
-/** Build a quiz question for `word` using the rest of the pool as distractors */
 function buildQuestion(word: CustomWord, pool: CustomWord[]): QuizQuestion {
-  const distractors = shuffle(pool.filter((w) => w.id !== word.id))
-    .slice(0, 3)
-    .map((w) => w.front);
-
-  // Pad with generic fillers when pool is small
-  const fillers = ["None of these", "I don't know", "Skip", "—"];
-  while (distractors.length < 3) {
-    distractors.push(fillers[distractors.length]);
-  }
-
-  const options = shuffle([word.front, ...distractors]);
-  return {
-    word,
-    options,
-    correctIndex: options.indexOf(word.front),
-  };
+  const dist = shuffle(pool.filter(w => w.id !== word.id)).slice(0, 3).map(w => w.front);
+  const fill = ["None of these", "I don't know", "Skip", "—"];
+  while (dist.length < 3) dist.push(fill[dist.length]);
+  const options = shuffle([word.front, ...dist]);
+  return { word, options, correctIndex: options.indexOf(word.front) };
 }
-
 function buildQuiz(words: CustomWord[]): QuizQuestion[] {
-  return shuffle(words).map((w) => buildQuestion(w, words));
+  return shuffle(words).map(w => buildQuestion(w, words));
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MyWordsPage() {
-  const [words, setWords] = useState<CustomWord[]>([]);
-  const [front, setFront] = useState("");
-  const [back, setBack] = useState("");
-  const [mode, setMode] = useState<Mode>("list");
-
-  // Quiz state
+  const [words, setWords]       = useState<CustomWord[]>([]);
+  const [front, setFront]       = useState("");
+  const [back, setBack]         = useState("");
+  const [mode, setMode]         = useState<Mode>("list");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [qIndex, setQIndex] = useState(0);
+  const [qIndex, setQIndex]     = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
+  const [score, setScore]       = useState(0);
 
-  useEffect(() => {
-    setWords(loadWords());
-  }, []);
-
-  // ── Word management ────────────────────────────────────────────────────────
+  useEffect(() => { setWords(loadWords()); }, []);
 
   const addWord = useCallback(() => {
-    const f = front.trim();
-    const b = back.trim();
+    const f = front.trim(), b = back.trim();
     if (!f || !b) return;
-
-    const updated = [
-      { id: crypto.randomUUID(), front: f, back: b, createdAt: Date.now() },
-      ...words,
-    ];
-    setWords(updated);
-    saveWords(updated);
-    setFront("");
-    setBack("");
+    const updated = [{ id: crypto.randomUUID(), front: f, back: b, createdAt: Date.now() }, ...words];
+    setWords(updated); saveWords(updated); setFront(""); setBack("");
   }, [front, back, words]);
 
-  const deleteWord = useCallback(
-    (id: string) => {
-      const updated = words.filter((w) => w.id !== id);
-      setWords(updated);
-      saveWords(updated);
-    },
-    [words]
-  );
-
-  // ── Quiz ──────────────────────────────────────────────────────────────────
+  const deleteWord = useCallback((id: string) => {
+    const updated = words.filter(w => w.id !== id);
+    setWords(updated); saveWords(updated);
+  }, [words]);
 
   const startQuiz = () => {
     if (words.length < 2) return;
-    setQuestions(buildQuiz(words));
-    setQIndex(0);
-    setSelected(null);
-    setScore(0);
-    setMode("quiz");
+    setQuestions(buildQuiz(words)); setQIndex(0); setSelected(null); setScore(0); setMode("quiz");
   };
 
-  const handleAnswer = (optionIndex: number) => {
-    if (selected !== null) return; // already answered
-    setSelected(optionIndex);
-
-    const correct = questions[qIndex].correctIndex === optionIndex;
-    if (correct) setScore((s) => s + 1);
-
-    // Auto-advance after 1 s
+  const handleAnswer = (i: number) => {
+    if (selected !== null) return;
+    setSelected(i);
+    if (questions[qIndex].correctIndex === i) setScore(s => s + 1);
     setTimeout(() => {
-      if (qIndex + 1 >= questions.length) {
-        setMode("result");
-      } else {
-        setQIndex((i) => i + 1);
-        setSelected(null);
-      }
-    }, 1000);
+      if (qIndex + 1 >= questions.length) setMode("result");
+      else { setQIndex(idx => idx + 1); setSelected(null); }
+    }, 900);
   };
-
-  // ── Render helpers ────────────────────────────────────────────────────────
 
   const currentQ = questions[qIndex];
-  const percentage =
-    questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+  const pct = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
 
   // ══════════════════════════════════════════════════════════════════════════
   //  RESULT SCREEN
   // ══════════════════════════════════════════════════════════════════════════
   if (mode === "result") {
-    const emoji =
-      percentage === 100 ? "🏆" : percentage >= 70 ? "🎉" : percentage >= 40 ? "👍" : "💪";
-    return (
-      <div className="max-w-md pt-8 animate-fade-up">
-        <div className="card p-8 text-center space-y-4">
-          <div className="text-6xl">{emoji}</div>
-          <h2 className="font-serif text-2xl text-zinc-900 dark:text-zinc-100">
-            Quiz complete!
-          </h2>
-          <p className="text-zinc-500 dark:text-zinc-400">
-            You got{" "}
-            <span className="font-semibold text-violet-600">{score}</span> out
-            of{" "}
-            <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-              {questions.length}
-            </span>{" "}
-            correct
-          </p>
+    const grade = pct === 100 ? { label: "Perfect!", color: "var(--green)", emoji: "🏆" }
+                : pct >= 70   ? { label: "Great job!", color: "var(--accent)", emoji: "🎉" }
+                : pct >= 40   ? { label: "Keep going!", color: "var(--gold)", emoji: "💪" }
+                :               { label: "Keep practicing", color: "var(--red)", emoji: "📚" };
 
-          {/* Score ring */}
-          <div className="flex justify-center py-2">
-            <div className="relative w-28 h-28">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#f4f4f5" strokeWidth="10" />
-                <circle
-                  cx="50" cy="50" r="40" fill="none"
-                  stroke={percentage >= 70 ? "#7c3aed" : "#f59e0b"}
-                  strokeWidth="10"
-                  strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 40}`}
-                  strokeDashoffset={`${2 * Math.PI * 40 * (1 - percentage / 100)}`}
-                  className="transition-all duration-700"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                  {percentage}%
-                </span>
-              </div>
-            </div>
+    return (
+      <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 16px" }}>
+        <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
+
+          {/* Giant score */}
+          <div style={{
+            width: 160, height: 160, borderRadius: "50%", margin: "0 auto 24px",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            background: "var(--surface-2)", border: `4px solid ${grade.color}`,
+            boxShadow: `0 0 40px ${grade.color}33`,
+            position: "relative",
+          }}>
+            <svg style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }} viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="72" fill="none" stroke="var(--surface-3)" strokeWidth="6" />
+              <circle cx="80" cy="80" r="72" fill="none" stroke={grade.color} strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 72}`}
+                strokeDashoffset={`${2 * Math.PI * 72 * (1 - pct / 100)}`}
+                style={{ transition: "stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)" }}
+              />
+            </svg>
+            <span style={{ fontSize: 36, fontWeight: 900, color: grade.color, lineHeight: 1, position: "relative" }}>{pct}%</span>
+            <span style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4, position: "relative" }}>{score}/{questions.length} correct</span>
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              onClick={startQuiz}
-              className="flex-1 btn-primary py-2.5 text-sm"
-            >
-              Retry quiz
+          <div style={{ fontSize: 40, marginBottom: 8 }}>{grade.emoji}</div>
+          <h2 style={{ fontSize: 26, fontWeight: 900, color: grade.color, margin: "0 0 6px" }}>{grade.label}</h2>
+          <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 32px" }}>
+            You answered {score} out of {questions.length} questions correctly
+          </p>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <button onClick={startQuiz} className="btn-primary" style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+              gap: 8, padding: "13px 0", fontSize: 14, fontWeight: 700,
+            }}>
+              <Play size={15} /> Try again
             </button>
-            <button
-              onClick={() => setMode("list")}
-              className="flex-1 btn-outline py-2.5 text-sm"
-            >
-              My words
+            <button onClick={() => setMode("list")} className="btn-outline" style={{
+              flex: 1, padding: "13px 0", fontSize: 14,
+            }}>
+              Back to words
             </button>
           </div>
         </div>
@@ -218,84 +160,130 @@ export default function MyWordsPage() {
   //  QUIZ SCREEN
   // ══════════════════════════════════════════════════════════════════════════
   if (mode === "quiz" && currentQ) {
+    const progress = ((qIndex + 1) / questions.length) * 100;
+
     return (
-      <div className="max-w-md pt-6 space-y-6 animate-fade-up">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setMode("list")}
-            className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 flex items-center gap-1.5 transition-colors"
-          >
-            <span>←</span> Exit quiz
+      <div style={{ maxWidth: 580, margin: "0 auto", paddingTop: 12 }}>
+
+        {/* Top bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+          <button onClick={() => setMode("list")} style={{
+            display: "flex", alignItems: "center", gap: 5,
+            background: "var(--surface-2)", border: "1px solid var(--border)",
+            borderRadius: 10, padding: "6px 12px", fontSize: 12, fontWeight: 600,
+            color: "var(--text-2)", cursor: "pointer",
+          }}>
+            <ArrowLeft size={13} /> Exit
           </button>
-          <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            {qIndex + 1} / {questions.length}
-          </span>
-        </div>
 
-        {/* Progress bar */}
-        <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-500"
-            style={{ width: `${((qIndex + 1) / questions.length) * 100}%` }}
-          />
-        </div>
+          {/* Progress bar */}
+          <div style={{ flex: 1, height: 8, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", width: `${progress}%`,
+              background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+              borderRadius: 999, transition: "width 0.4s ease",
+            }} />
+          </div>
 
-        {/* Question card */}
-        <div className="card p-8 text-center space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            What does this mean?
-          </p>
-          <div className="flex items-center justify-center gap-2">
-            <p className="font-serif text-4xl text-zinc-900 dark:text-zinc-100">
-              {currentQ.word.back}
-            </p>
-            <button
-              onClick={() => speakFr(currentQ.word.back)}
-              className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center hover:bg-violet-100 dark:hover:bg-violet-950/70 transition-colors flex-shrink-0"
-              title="Listen"
-            >
-              ♪
-            </button>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-2)", whiteSpace: "nowrap" }}>
+            {qIndex + 1}<span style={{ color: "var(--text-3)", fontWeight: 400 }}>/{questions.length}</span>
+          </div>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 4,
+            background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.25)",
+            borderRadius: 99, padding: "4px 10px", fontSize: 12, fontWeight: 700, color: "var(--green)",
+          }}>
+            <Check size={11} /> {score}
           </div>
         </div>
 
-        {/* Options */}
-        <div className="grid grid-cols-2 gap-3">
-          {currentQ.options.map((option, i) => {
-            let style =
-              "border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50/50 dark:hover:bg-violet-950/20 text-zinc-700 dark:text-zinc-300";
+        {/* Question card */}
+        <div style={{
+          borderRadius: 22, padding: "44px 28px 36px",
+          background: "linear-gradient(145deg, var(--surface-2), var(--surface))",
+          border: "1px solid var(--border-md)",
+          textAlign: "center", marginBottom: 16,
+          boxShadow: "0 8px 40px rgba(0,0,0,0.25)",
+        }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 20,
+            background: "var(--surface-3)", borderRadius: 99, padding: "5px 14px",
+            fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em",
+            color: "var(--text-3)",
+          }}>
+            🇫🇷 Translate this word
+          </div>
 
-            if (selected !== null) {
-              if (i === currentQ.correctIndex) {
-                style =
-                  "border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400";
-              } else if (i === selected && selected !== currentQ.correctIndex) {
-                style =
-                  "border-rose-400 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400";
+          <div style={{ fontSize: 52, fontWeight: 900, color: "var(--text)", marginBottom: 24, lineHeight: 1.1 }}>
+            {currentQ.word.back}
+          </div>
+
+          <button onClick={() => speakFr(currentQ.word.back)} style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+            borderRadius: 99, padding: "9px 20px",
+            color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer",
+            transition: "all 0.15s",
+          }}>
+            <Volume2 size={14} /> Listen
+          </button>
+        </div>
+
+        {/* A B C D Options */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {currentQ.options.map((option, i) => {
+            const label = OPTION_LABELS[i];
+            const isCorrect = i === currentQ.correctIndex;
+            const isSelected = i === selected;
+            const revealed = selected !== null;
+
+            let bg = "var(--surface-2)";
+            let border = "var(--border-md)";
+            let labelBg = "var(--surface-3)";
+            let labelColor = "var(--text-3)";
+            let textColor = "var(--text)";
+            let opacity = 1;
+            let shadow = "none";
+
+            if (revealed) {
+              if (isCorrect) {
+                bg = "rgba(34,197,94,0.1)"; border = "rgba(34,197,94,0.45)";
+                labelBg = "rgba(34,197,94,0.2)"; labelColor = "var(--green)"; textColor = "var(--green)";
+                shadow = "0 0 0 2px rgba(34,197,94,0.15)";
+              } else if (isSelected) {
+                bg = "rgba(239,68,68,0.1)"; border = "rgba(239,68,68,0.4)";
+                labelBg = "rgba(239,68,68,0.15)"; labelColor = "var(--red)"; textColor = "var(--red)";
               } else {
-                style =
-                  "border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 opacity-40 text-zinc-500";
+                opacity = 0.3;
               }
             }
 
             return (
-              <button
-                key={i}
-                onClick={() => handleAnswer(i)}
-                disabled={selected !== null}
-                className={`border rounded-xl p-4 text-sm font-medium text-center transition-all duration-150 disabled:cursor-default ${style}`}
+              <button key={i} onClick={() => handleAnswer(i)} disabled={revealed}
+                style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "14px 16px", borderRadius: 14,
+                  background: bg, border: `1.5px solid ${border}`,
+                  cursor: revealed ? "default" : "pointer",
+                  transition: "all 0.15s", opacity,
+                  boxShadow: shadow, textAlign: "left",
+                }}
               >
-                {option}
+                <span style={{
+                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                  background: labelBg, color: labelColor,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12, fontWeight: 800,
+                }}>
+                  {label}
+                </span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: textColor, lineHeight: 1.3 }}>
+                  {option}
+                </span>
               </button>
             );
           })}
         </div>
-
-        {/* Score so far */}
-        <p className="text-center text-xs text-zinc-400 dark:text-zinc-600">
-          Score: {score} correct
-        </p>
       </div>
     );
   }
@@ -304,144 +292,275 @@ export default function MyWordsPage() {
   //  LIST / ADD SCREEN
   // ══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="max-w-2xl space-y-6 animate-fade-up">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
+    <div style={{ maxWidth: 780 }}>
+
+      {/* ── Page header ── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h1 className="font-serif text-2xl text-zinc-900 dark:text-zinc-100">
-            My Words
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Add your own word pairs and quiz yourself
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+            <h1 style={{ fontSize: 30, fontWeight: 900, color: "var(--text)", margin: 0, letterSpacing: "-0.5px" }}>
+              My Words
+            </h1>
+            {words.length > 0 && (
+              <span style={{
+                fontSize: 13, fontWeight: 800, color: "var(--accent)",
+                background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)",
+                borderRadius: 99, padding: "3px 12px",
+              }}>
+                {words.length}
+              </span>
+            )}
+          </div>
+          <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
+            Build your personal vocabulary deck and quiz yourself
           </p>
         </div>
+
         {words.length >= 2 && (
-          <button
-            onClick={startQuiz}
-            className="btn-primary px-5 py-2.5 text-sm flex items-center gap-2"
-          >
-            <span>▶</span> Start quiz
+          <button onClick={startQuiz} className="btn-primary" style={{
+            display: "flex", alignItems: "center", gap: 9,
+            padding: "11px 22px", fontSize: 14, fontWeight: 800,
+            boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
+          }}>
+            <Play size={15} /> Start Quiz
           </button>
         )}
       </div>
 
-      {/* Add word form */}
-      <div className="card p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-          Add a word pair
-        </h2>
-        <div className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
-          <div className="space-y-1">
-            <label className="text-[11px] font-semibold uppercase tracking-widest text-zinc-400">
-              Your language
-            </label>
+      {/* ── Add word panel ── */}
+      <div style={{
+        borderRadius: 20, padding: "24px 24px 20px",
+        background: "var(--surface-2)",
+        border: "1px solid var(--border-md)",
+        marginBottom: 28,
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* accent stripe */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 3,
+          background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+          borderRadius: "20px 20px 0 0",
+        }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+          <div style={{
+            width: 30, height: 30, borderRadius: 9,
+            background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          }}>
+            <Plus size={15} color="#fff" />
+          </div>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>Add a new word pair</span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
+          {/* Native language input */}
+          <div style={{ flex: 1 }}>
+            <label style={{
+              display: "block", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
+              textTransform: "uppercase", color: "var(--text-3)", marginBottom: 7,
+            }}>Your language</label>
             <input
-              type="text"
-              value={front}
-              onChange={(e) => setFront(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && back.trim() && addWord()}
+              type="text" value={front}
+              onChange={e => setFront(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && back.trim() && addWord()}
               placeholder="e.g. hello"
-              className="input text-sm"
+              className="input"
+              style={{ width: "100%", fontSize: 15 }}
             />
           </div>
 
-          <div className="mt-5 text-xl text-zinc-300 dark:text-zinc-600 select-none">→</div>
+          {/* Arrow */}
+          <div style={{
+            flexShrink: 0, paddingBottom: 10,
+            width: 36, height: 38,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 20, color: "var(--text-3)",
+          }}>→</div>
 
-          <div className="space-y-1">
-            <label className="text-[11px] font-semibold uppercase tracking-widest text-zinc-400">
-              French
-            </label>
+          {/* French input */}
+          <div style={{ flex: 1 }}>
+            <label style={{
+              display: "block", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
+              textTransform: "uppercase", color: "var(--accent)", marginBottom: 7,
+            }}>🇫🇷 French</label>
             <input
-              type="text"
-              value={back}
-              onChange={(e) => setBack(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && front.trim() && addWord()}
+              type="text" value={back}
+              onChange={e => setBack(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && front.trim() && addWord()}
               placeholder="e.g. bonjour"
-              className="input text-sm"
+              className="input"
+              style={{ width: "100%", fontSize: 15 }}
             />
           </div>
 
-          <button
-            onClick={addWord}
-            disabled={!front.trim() || !back.trim()}
-            className="mt-5 w-9 h-9 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:bg-zinc-100 dark:disabled:bg-zinc-800 disabled:text-zinc-300 dark:disabled:text-zinc-600 text-white flex items-center justify-center text-lg transition-colors disabled:cursor-not-allowed"
-            title="Add word"
+          {/* Add button */}
+          <button onClick={addWord} disabled={!front.trim() || !back.trim()}
+            style={{
+              flexShrink: 0, height: 42, width: 42, borderRadius: 12,
+              background: front.trim() && back.trim()
+                ? "linear-gradient(135deg, var(--accent), var(--accent-2))"
+                : "var(--surface-3)",
+              border: "none",
+              color: front.trim() && back.trim() ? "#fff" : "var(--text-3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: front.trim() && back.trim() ? "pointer" : "not-allowed",
+              transition: "all 0.2s",
+              boxShadow: front.trim() && back.trim() ? "0 4px 12px rgba(99,102,241,0.35)" : "none",
+            }}
+            title="Add word pair"
           >
-            +
+            <Plus size={18} />
           </button>
         </div>
+
+        {words.length === 1 && (
+          <p style={{ fontSize: 12, color: "var(--gold)", margin: "12px 0 0", display: "flex", alignItems: "center", gap: 5 }}>
+            ⚡ Add 1 more word to unlock the quiz
+          </p>
+        )}
       </div>
 
-      {/* Word list */}
+      {/* ── Word tile grid ── */}
       {words.length === 0 ? (
-        <div className="card p-12 text-center space-y-3">
-          <div className="text-4xl">📝</div>
-          <p className="font-serif text-lg text-zinc-500 dark:text-zinc-400">
-            No words yet
+        <div style={{
+          borderRadius: 20, padding: "64px 24px",
+          border: "2px dashed var(--border-md)",
+          textAlign: "center",
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 14 }}>🗂️</div>
+          <p style={{ fontSize: 18, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>
+            Your deck is empty
           </p>
-          <p className="text-sm text-zinc-400 dark:text-zinc-600">
-            Add your first word pair above to get started
+          <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
+            Add your first word pair above to start building your deck
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
-            {words.length} word{words.length !== 1 ? "s" : ""}
-            {words.length < 2 && (
-              <span className="normal-case font-normal ml-2 text-amber-500">
-                — add at least 2 to start a quiz
-              </span>
-            )}
-          </p>
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <p className="section-label" style={{ margin: 0 }}>Word deck</p>
+            <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+            <span style={{ fontSize: 11, color: "var(--text-3)" }}>{words.length} pairs</span>
+          </div>
 
-          {words.map((word) => (
-            <div
-              key={word.id}
-              className="card px-4 py-3 flex items-center gap-4 group hover:shadow-sm transition-shadow"
+          {/* Grid of flashcard tiles */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: 12,
+          }}>
+            {words.map((word, idx) => {
+              const hues = ["var(--accent)", "var(--teal, #14b8a6)", "var(--gold)", "#f472b6", "var(--green)"];
+              const accentColor = hues[idx % hues.length];
+
+              return (
+                <div key={word.id} style={{
+                  borderRadius: 16,
+                  background: "var(--surface-2)",
+                  border: "1px solid var(--border)",
+                  overflow: "hidden",
+                  display: "flex", flexDirection: "column",
+                  transition: "transform 0.15s, box-shadow 0.15s",
+                  position: "relative",
+                }}>
+                  {/* Colored top strip */}
+                  <div style={{ height: 4, background: accentColor }} />
+
+                  {/* Native word */}
+                  <div style={{ padding: "14px 16px 10px" }}>
+                    <p style={{
+                      fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                      letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px",
+                    }}>
+                      Your language
+                    </p>
+                    <p style={{
+                      fontSize: 16, fontWeight: 700, color: "var(--text-2)",
+                      margin: 0, wordBreak: "break-word",
+                    }}>
+                      {word.front}
+                    </p>
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ height: 1, background: "var(--border)", margin: "0 16px" }} />
+
+                  {/* French word */}
+                  <div style={{ padding: "10px 16px 14px", flex: 1 }}>
+                    <p style={{
+                      fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                      letterSpacing: "0.1em", color: accentColor, margin: "0 0 4px",
+                    }}>
+                      🇫🇷 French
+                    </p>
+                    <p style={{
+                      fontSize: 18, fontWeight: 800, color: accentColor,
+                      margin: 0, wordBreak: "break-word",
+                    }}>
+                      {word.back}
+                    </p>
+                  </div>
+
+                  {/* Action row */}
+                  <div style={{
+                    display: "flex", alignItems: "center",
+                    borderTop: "1px solid var(--border)",
+                    padding: "0 8px",
+                  }}>
+                    <button onClick={() => speakFr(word.back)} style={{
+                      flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                      padding: "9px 0", background: "none", border: "none",
+                      color: "var(--text-3)", cursor: "pointer", fontSize: 12, fontWeight: 600,
+                      transition: "color 0.15s",
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.color = accentColor}
+                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
+                    >
+                      <Volume2 size={13} /> Listen
+                    </button>
+                    <div style={{ width: 1, height: 20, background: "var(--border)" }} />
+                    <button onClick={() => deleteWord(word.id)} style={{
+                      flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                      padding: "9px 0", background: "none", border: "none",
+                      color: "var(--text-3)", cursor: "pointer", fontSize: 12, fontWeight: 600,
+                      transition: "color 0.15s",
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
+                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
+                    >
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom quiz CTA */}
+          {words.length >= 2 && (
+            <button onClick={startQuiz} style={{
+              width: "100%", marginTop: 20, padding: "18px",
+              borderRadius: 16, cursor: "pointer",
+              background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.06))",
+              border: "2px dashed rgba(99,102,241,0.35)",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+              color: "var(--accent)", fontSize: 15, fontWeight: 800,
+              transition: "all 0.18s",
+            }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,0.15)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.06))";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,0.35)";
+              }}
             >
-              {/* Front */}
-              <span className="flex-1 text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate">
-                {word.front}
-              </span>
-
-              {/* Arrow */}
-              <span className="text-zinc-300 dark:text-zinc-600 text-sm select-none">→</span>
-
-              {/* Back + speaker */}
-              <div className="flex-1 flex items-center gap-1.5 min-w-0">
-                <span className="text-sm font-semibold text-violet-600 dark:text-violet-400 truncate">
-                  {word.back}
-                </span>
-                <button
-                  onClick={() => speakFr(word.back)}
-                  className="w-6 h-6 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-500 dark:text-violet-400 flex items-center justify-center text-xs hover:bg-violet-100 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
-                  title="Listen"
-                >
-                  ♪
-                </button>
-              </div>
-
-              {/* Delete */}
-              <button
-                onClick={() => deleteWord(word.id)}
-                className="w-7 h-7 rounded-lg text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center text-sm transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
-                title="Remove"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Start quiz CTA when list is long enough */}
-      {words.length >= 2 && (
-        <button
-          onClick={startQuiz}
-          className="w-full py-3.5 rounded-xl border-2 border-dashed border-violet-200 dark:border-violet-900 text-violet-600 dark:text-violet-400 text-sm font-medium hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors"
-        >
-          ▶ Start quiz ({words.length} words)
-        </button>
+              <Play size={17} /> Quiz me on {words.length} words
+            </button>
+          )}
+        </>
       )}
     </div>
   );

@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BADGES, getXpProgress, getNextMilestone, getLevelThreshold } from "@/types";
 import dynamic from "next/dynamic";
+import { Zap, Flame, BookMarked, Gamepad2, BookOpen, MessageSquare, Lock, BarChart3, Target, Trophy, Mic, PenLine, TrendingUp, Layers, Link2, Puzzle } from "lucide-react";
 
 const WeeklyChart = dynamic(
   () => import("@/components/progress/WeeklyChart").then((m) => ({ default: m.WeeklyChart })),
@@ -76,25 +77,58 @@ export default async function ProgressPage() {
     {
       key: "vocabulary",
       label: "Vocabulary",
-      icon: "📚",
+      icon: <BookOpen size={16} />,
       color: "var(--blue)",
       dimColor: "rgba(96,165,250,0.15)",
     },
     {
       key: "grammar",
       label: "Grammar",
-      icon: "◈",
+      icon: <PenLine size={16} />,
       color: "var(--accent-2)",
       dimColor: "var(--accent-dim)",
     },
     {
       key: "speaking",
       label: "Speaking",
-      icon: "🎙️",
+      icon: <Mic size={16} />,
       color: "var(--teal)",
       dimColor: "rgba(45,212,191,0.15)",
     },
   ];
+
+  const allTimeStats = [
+    {
+      label: "Games Played",
+      value: gamePlays,
+      icon: <Gamepad2 size={20} />,
+      color: "var(--coral)",
+      iconColor: "var(--coral)",
+      dimColor: "rgba(251,113,133,0.15)",
+    },
+    {
+      label: "Stories Completed",
+      value: completedStories,
+      icon: <BookOpen size={20} />,
+      color: "var(--blue)",
+      iconColor: "var(--blue)",
+      dimColor: "rgba(96,165,250,0.15)",
+    },
+    {
+      label: "Tutor Sessions",
+      value: tutorSessions,
+      icon: <MessageSquare size={20} />,
+      color: "var(--green)",
+      iconColor: "var(--green)",
+      dimColor: "rgba(74,222,128,0.15)",
+    },
+  ];
+
+  function gameIcon(gameType: string) {
+    if (gameType === "FLASHCARDS") return <Layers size={16} style={{ color: "var(--accent-2)" }} />;
+    if (gameType === "MATCHING") return <Link2 size={16} style={{ color: "var(--teal)" }} />;
+    return <Puzzle size={16} style={{ color: "var(--gold)" }} />;
+  }
 
   return (
     <div className="animate-fade-up" style={{ maxWidth: 780 }}>
@@ -148,7 +182,14 @@ export default async function ProgressPage() {
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
         }}>
-          <span style={{ fontSize: 22, marginBottom: 4 }}>⚡</span>
+          <div style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: "var(--accent-dim)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, marginBottom: 4,
+          }}>
+            <Zap size={20} style={{ color: "var(--accent-2)" }} />
+          </div>
           <div>
             <p style={{ fontSize: 32, fontWeight: 800, color: "var(--accent-2)", lineHeight: 1, marginBottom: 4 }}>
               {(progress?.xp ?? 0).toLocaleString()}
@@ -163,7 +204,14 @@ export default async function ProgressPage() {
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
         }}>
-          <span style={{ fontSize: 22, marginBottom: 4 }}>🔥</span>
+          <div style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: "rgba(245,158,11,0.15)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, marginBottom: 4,
+          }}>
+            <Flame size={20} style={{ color: "var(--gold)" }} />
+          </div>
           <div>
             <p style={{ fontSize: 32, fontWeight: 800, color: "var(--gold)", lineHeight: 1, marginBottom: 4 }}>
               {progress?.streak ?? 0}
@@ -178,7 +226,14 @@ export default async function ProgressPage() {
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
         }}>
-          <span style={{ fontSize: 22, marginBottom: 4 }}>📖</span>
+          <div style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: "rgba(45,212,191,0.15)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, marginBottom: 4,
+          }}>
+            <BookMarked size={20} style={{ color: "var(--teal)" }} />
+          </div>
           <div>
             <p style={{ fontSize: 32, fontWeight: 800, color: "var(--teal)", lineHeight: 1, marginBottom: 4 }}>
               {savedWords}
@@ -227,7 +282,9 @@ export default async function ProgressPage() {
               <div key={skill.key}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>{skill.icon}</span>
+                    <span style={{ color: skill.color, display: "flex", alignItems: "center" }}>
+                      {skill.icon}
+                    </span>
                     <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
                       {skill.label}
                     </span>
@@ -326,10 +383,7 @@ export default async function ProgressPage() {
                       <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-2)" }}>
                         {badge.name}
                       </p>
-                      <svg width="11" height="11" fill="none" stroke="var(--text-3)" strokeWidth="2" viewBox="0 0 24 24">
-                        <rect x="3" y="11" width="18" height="11" rx="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                      </svg>
+                      <Lock size={11} style={{ color: "var(--text-3)", flexShrink: 0 }} />
                     </div>
                     <p style={{ fontSize: 11, color: "var(--text-3)", lineHeight: 1.3 }}>
                       {badge.description}
@@ -362,7 +416,11 @@ export default async function ProgressPage() {
           }}>
             Next Milestone
           </p>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 18 }}>
+          <h2 style={{
+            fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 18,
+            display: "flex", alignItems: "center", gap: 7,
+          }}>
+            <Target size={16} style={{ color: "var(--accent-2)", flexShrink: 0 }} />
             Reach Level {nextMilestone.level}
           </h2>
 
@@ -412,16 +470,20 @@ export default async function ProgressPage() {
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20,
       }}>
-        {[
-          { label: "Games Played",       value: gamePlays,        icon: "🎮", color: "var(--coral)" },
-          { label: "Stories Completed",  value: completedStories, icon: "📖", color: "var(--blue)"  },
-          { label: "Tutor Sessions",     value: tutorSessions,    icon: "🤖", color: "var(--green)" },
-        ].map((stat) => (
+        {allTimeStats.map((stat) => (
           <div key={stat.label} style={{
             background: "var(--surface)", border: "1px solid var(--border)",
             borderRadius: 18, padding: "18px 16px",
           }}>
-            <span style={{ fontSize: 20, display: "block", marginBottom: 8 }}>{stat.icon}</span>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: stat.dimColor,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0, marginBottom: 8,
+              color: stat.iconColor,
+            }}>
+              {stat.icon}
+            </div>
             <p style={{ fontSize: 28, fontWeight: 800, color: stat.color, lineHeight: 1, marginBottom: 4 }}>
               {stat.value}
             </p>
@@ -456,9 +518,9 @@ export default async function ProgressPage() {
                   <div style={{
                     width: 38, height: 38, borderRadius: 10,
                     background: "var(--surface-3)", border: "1px solid var(--border)",
-                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+                    display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
-                    {game.gameType === "FLASHCARDS" ? "🗂️" : game.gameType === "MATCHING" ? "🔗" : "🧩"}
+                    {gameIcon(game.gameType)}
                   </div>
                   <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>
                     {game.gameType.toLowerCase().replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}

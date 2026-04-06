@@ -3,42 +3,269 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Star, Zap, Globe } from "lucide-react";
 
 export default async function RegisterPage() {
   const session = await getServerSession(authOptions);
   if (session) redirect("/home");
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex">
-      {/* Left - decorative */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-500 to-teal-600 relative overflow-hidden items-center justify-center">
-        <div className="text-center text-white z-10 px-12">
-          <p className="text-7xl mb-4">✨</p>
-          <h2 className="font-serif text-4xl mb-3 italic">Commencez!</h2>
-          <p className="text-emerald-100 text-lg">Start speaking French from day one.</p>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        background: "var(--bg)",
+        color: "var(--text)",
+      }}
+    >
+      {/* Left — decorative panel */}
+      <div
+        style={{
+          display: "none",
+          width: "50%",
+          position: "relative",
+          overflow: "hidden",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(150deg, #0d1f1a 0%, #091512 100%)",
+          borderRight: "1px solid var(--border)",
+          flexShrink: 0,
+        }}
+        className="register-panel"
+      >
+        {/* Glow orbs */}
+        <div
+          style={{
+            position: "absolute",
+            top: "20%",
+            right: "10%",
+            width: "340px",
+            height: "340px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(20,184,166,0.2) 0%, transparent 70%)",
+            filter: "blur(50px)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "20%",
+            left: "10%",
+            width: "260px",
+            height: "260px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(99,102,241,0.16) 0%, transparent 70%)",
+            filter: "blur(40px)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Decorative circles */}
+        <div
+          style={{
+            position: "absolute",
+            top: "60px",
+            right: "-80px",
+            width: "280px",
+            height: "280px",
+            borderRadius: "50%",
+            border: "1px solid rgba(20,184,166,0.1)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-60px",
+            left: "-60px",
+            width: "380px",
+            height: "380px",
+            borderRadius: "50%",
+            border: "1px solid rgba(20,184,166,0.07)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Content */}
+        <div style={{ textAlign: "center", position: "relative", zIndex: 10, padding: "0 48px" }}>
+          <p style={{ fontSize: "72px", lineHeight: 1, marginBottom: "24px" }}>🇫🇷</p>
+          <h2
+            style={{
+              fontFamily: "serif",
+              fontSize: "38px",
+              fontStyle: "italic",
+              color: "var(--text)",
+              marginBottom: "12px",
+            }}
+          >
+            Commencez!
+          </h2>
+          <p
+            style={{
+              fontSize: "16px",
+              color: "var(--text-2)",
+              lineHeight: 1.6,
+              marginBottom: "40px",
+            }}
+          >
+            Start speaking French from day one.
+          </p>
+
+          {/* Benefit list */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left" }}>
+            {[
+              { icon: Zap, label: "Up and running in 60 seconds", color: "var(--gold)" },
+              { icon: Star, label: "No credit card required", color: "var(--teal)" },
+              { icon: Globe, label: "Free forever — seriously", color: "var(--accent-2)" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "8px",
+                    background: "rgba(255,255,255,0.06)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <item.icon size={14} style={{ color: item.color }} />
+                </div>
+                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="absolute top-20 -right-20 w-72 h-72 rounded-full bg-white/5" />
-        <div className="absolute -bottom-16 -left-16 w-96 h-96 rounded-full bg-white/5" />
       </div>
 
-      {/* Right - form */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <Link href="/" className="inline-flex items-center gap-2 mb-10">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs">
+      {/* Right — form */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: "360px" }}>
+
+          {/* Logo */}
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "40px",
+              textDecoration: "none",
+              cursor: "pointer",
+            }}
+          >
+            <div
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontWeight: 700,
+                fontSize: "11px",
+                letterSpacing: "0.05em",
+                flexShrink: 0,
+              }}
+            >
               LF
             </div>
-            <span className="font-serif text-lg text-zinc-900">LinguaFlow</span>
+            <span
+              style={{
+                fontFamily: "serif",
+                fontSize: "18px",
+                color: "var(--text)",
+                fontWeight: 500,
+              }}
+            >
+              LinguaFlow
+            </span>
           </Link>
-          <h1 className="font-serif text-3xl text-zinc-900 mb-1">Create account</h1>
-          <p className="text-zinc-500 text-sm mb-8">Start your free French learning journey</p>
+
+          {/* Heading */}
+          <h1
+            style={{
+              fontFamily: "serif",
+              fontSize: "30px",
+              color: "var(--text)",
+              marginBottom: "6px",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Create your account
+          </h1>
+          <p
+            style={{
+              fontSize: "14px",
+              color: "var(--text-2)",
+              marginBottom: "32px",
+              lineHeight: 1.5,
+            }}
+          >
+            Start your free French learning journey today
+          </p>
+
+          {/* Form */}
           <RegisterForm />
-          <p className="text-center text-sm text-zinc-500 mt-6">
+
+          {/* Log in link */}
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: "13px",
+              color: "var(--text-3)",
+              marginTop: "24px",
+            }}
+          >
             Already learning?{" "}
-            <Link href="/login" className="text-violet-600 font-medium hover:underline">Log in</Link>
+            <Link
+              href="/login"
+              style={{
+                color: "var(--accent)",
+                fontWeight: 600,
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              Log in
+            </Link>
           </p>
         </div>
       </div>
+
+      {/* Responsive: show left panel on large screens */}
+      <style>{`
+        @media (min-width: 1024px) {
+          .register-panel {
+            display: flex !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

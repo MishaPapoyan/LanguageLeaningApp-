@@ -5,6 +5,23 @@ import Link from "next/link";
 import { BADGES, getXpProgress } from "@/types";
 import { DailyGoals } from "@/components/DailyGoals";
 import { Metadata } from "next";
+import {
+  BookOpen,
+  Gamepad2,
+  MessageSquare,
+  BookMarked,
+  Brain,
+  PenLine,
+  Flame,
+  Star,
+  Medal,
+  TrendingUp,
+  Zap,
+  ArrowRight,
+  Volume2,
+  Mic,
+  CheckCircle2,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dashboard — LinguaFlow",
@@ -56,9 +73,9 @@ export default async function HomePage() {
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
 
   const skills = [
-    { key: "vocabulary", label: "Vocab",   emoji: "📖", color: "#60a5fa" },
-    { key: "grammar",    label: "Grammar", emoji: "✏️", color: "var(--accent)" },
-    { key: "speaking",   label: "Speaking", emoji: "🎙️", color: "#2dd4bf" },
+    { key: "vocabulary", label: "Vocab",   icon: <BookOpen size={16} />, color: "#60a5fa" },
+    { key: "grammar",    label: "Grammar", icon: <PenLine size={16} />,  color: "var(--accent)" },
+    { key: "speaking",   label: "Speaking", icon: <Mic size={16} />,     color: "#2dd4bf" },
   ];
 
   return (
@@ -80,7 +97,7 @@ export default async function HomePage() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5 p-6 md:p-8">
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-extrabold mb-1" style={{ color: "var(--text)" }}>
-              Bonjour, {firstName}! 👋
+              Bonjour, {firstName}! 🇫🇷
             </h1>
             <p className="text-sm mb-4" style={{ color: "var(--text-2)" }}>
               {progress?.streak && progress.streak > 0
@@ -92,9 +109,10 @@ export default async function HomePage() {
             <div style={{ maxWidth: 320 }}>
               <div className="flex items-center justify-between mb-1.5">
                 <span
-                  className="text-xs font-bold px-2 py-0.5 rounded-full"
+                  className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"
                   style={{ background: "var(--accent-dim)", color: "var(--accent-2)", border: "1px solid rgba(99,102,241,0.3)" }}
                 >
+                  <Zap size={11} />
                   Level {xpInfo.level}
                 </span>
                 <span className="text-xs" style={{ color: "var(--text-3)" }}>
@@ -114,7 +132,9 @@ export default async function HomePage() {
                 className="stat-pill"
                 style={{ background: "rgba(245,158,11,0.14)", border: "1px solid rgba(245,158,11,0.28)" }}
               >
-                <span className="text-xl animate-streak-flame inline-block">🔥</span>
+                <span className="animate-streak-flame inline-flex" style={{ color: "#f59e0b" }}>
+                  <Flame size={22} />
+                </span>
                 <div>
                   <p className="text-base font-black leading-none" style={{ color: "#f59e0b" }}>{progress.streak}</p>
                   <p className="text-[10px]" style={{ color: "var(--text-3)" }}>day streak</p>
@@ -125,7 +145,9 @@ export default async function HomePage() {
               className="stat-pill"
               style={{ background: "rgba(99,102,241,0.14)", border: "1px solid rgba(99,102,241,0.28)" }}
             >
-              <span className="text-xl">⭐</span>
+              <span className="inline-flex" style={{ color: "var(--accent)" }}>
+                <Star size={20} />
+              </span>
               <div>
                 <p className="text-base font-black leading-none" style={{ color: "var(--accent)" }}>{progress?.xp ?? 0}</p>
                 <p className="text-[10px]" style={{ color: "var(--text-3)" }}>total XP</p>
@@ -143,17 +165,46 @@ export default async function HomePage() {
           <p className="section-label mb-3">Your progress</p>
           <div className="grid grid-cols-2 gap-2.5">
             {[
-              { label: "Words saved",   value: savedWordCount,        emoji: "📖", color: "#60a5fa",        dim: "rgba(96,165,250,0.12)" },
-              { label: "Stories done",  value: completedStories,      emoji: "✅", color: "#22c55e",        dim: "rgba(34,197,94,0.12)" },
-              { label: "Level",         value: `Lv ${xpInfo.level}`,  emoji: "🏅", color: "var(--accent-2)", dim: "var(--accent-dim)" },
-              { label: "Day streak",    value: progress?.streak ?? 0, emoji: "🔥", color: "#f59e0b",        dim: "rgba(245,158,11,0.12)" },
+              {
+                label: "Words saved",
+                value: savedWordCount,
+                icon: <BookMarked size={16} />,
+                color: "#60a5fa",
+                dim: "rgba(96,165,250,0.12)",
+              },
+              {
+                label: "Stories done",
+                value: completedStories,
+                icon: <CheckCircle2 size={16} />,
+                color: "#22c55e",
+                dim: "rgba(34,197,94,0.12)",
+              },
+              {
+                label: "Level",
+                value: `Lv ${xpInfo.level}`,
+                icon: <Medal size={16} />,
+                color: "var(--accent-2)",
+                dim: "var(--accent-dim)",
+              },
+              {
+                label: "Day streak",
+                value: progress?.streak ?? 0,
+                icon: <Flame size={16} />,
+                color: "#f59e0b",
+                dim: "rgba(245,158,11,0.12)",
+              },
             ].map((stat) => (
               <div
                 key={stat.label}
                 className="flex flex-col items-center justify-center text-center p-3 rounded-xl"
                 style={{ background: stat.dim, border: "1px solid rgba(255,255,255,0.05)" }}
               >
-                <span className="text-xl mb-1">{stat.emoji}</span>
+                <span
+                  className="flex items-center justify-center w-7 h-7 rounded-lg mb-1.5"
+                  style={{ background: "rgba(0,0,0,0.18)", color: stat.color }}
+                >
+                  {stat.icon}
+                </span>
                 <p className="text-lg font-extrabold leading-none" style={{ color: stat.color }}>{stat.value}</p>
                 <p className="text-[10px] mt-0.5 font-medium" style={{ color: "var(--text-3)" }}>{stat.label}</p>
               </div>
@@ -198,7 +249,8 @@ export default async function HomePage() {
             className="self-start mt-3 flex items-center gap-1.5 text-sm font-semibold"
             style={{ color: "var(--accent)" }}
           >
-            {lastStory?.completed ? "Read again" : "Resume"} <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
+            {lastStory?.completed ? "Read again" : "Resume"}
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>
       </div>
@@ -213,8 +265,8 @@ export default async function HomePage() {
             href="/stories"
             className="game-card col-span-2 group"
             style={{
-              background: "linear-gradient(135deg, #0d3d3a 0%, #0f4c45 50%, #134e48 100%)",
-              border: "1px solid rgba(45,212,191,0.2)",
+              background: "var(--gc-teal-bg)",
+              borderColor: "var(--gc-teal-border)",
               padding: "1.5rem",
               minHeight: 140,
               display: "flex",
@@ -224,12 +276,18 @@ export default async function HomePage() {
             }}
           >
             <div className="flex items-start justify-between">
-              <span style={{ fontSize: 48, lineHeight: 1 }}>📖</span>
-              <span style={{ color: "rgba(45,212,191,0.6)", fontSize: "1.2rem" }}>→</span>
+              <span style={{ color: "var(--gc-teal-text)", opacity: 0.9 }}>
+                <BookOpen size={32} />
+              </span>
+              <ArrowRight
+                size={18}
+                className="group-hover:translate-x-1 transition-transform"
+                style={{ color: "var(--gc-teal-muted)" }}
+              />
             </div>
             <div>
-              <p className="font-bold text-base" style={{ color: "#99f6e4" }}>Continue Story</p>
-              <p className="text-xs mt-0.5" style={{ color: "rgba(153,246,228,0.6)" }}>Immersive French narratives</p>
+              <p className="font-bold text-base" style={{ color: "var(--gc-teal-text)" }}>Continue Story</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--gc-teal-muted)" }}>Immersive French narratives</p>
             </div>
           </Link>
 
@@ -238,8 +296,8 @@ export default async function HomePage() {
             href="/games"
             className="game-card group"
             style={{
-              background: "linear-gradient(135deg, #1e1b4b 0%, #2d2a6e 100%)",
-              border: "1px solid rgba(124,106,255,0.25)",
+              background: "var(--gc-violet-bg)",
+              borderColor: "var(--gc-violet-border)",
               padding: "1.25rem",
               display: "flex",
               flexDirection: "column",
@@ -248,10 +306,12 @@ export default async function HomePage() {
               textDecoration: "none",
             }}
           >
-            <span style={{ fontSize: 36, lineHeight: 1 }}>🎮</span>
+            <span style={{ color: "var(--gc-violet-text)", opacity: 0.9 }}>
+              <Gamepad2 size={28} />
+            </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "#c4b5fd" }}>Games</p>
-              <p className="text-[11px]" style={{ color: "rgba(196,181,253,0.55)" }}>Play to learn</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-violet-text)" }}>Games</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-violet-muted)" }}>Play to learn</p>
             </div>
           </Link>
 
@@ -260,8 +320,8 @@ export default async function HomePage() {
             href="/tutor"
             className="game-card group"
             style={{
-              background: "linear-gradient(135deg, #1e1f4b 0%, #252760 100%)",
-              border: "1px solid rgba(99,102,241,0.25)",
+              background: "var(--gc-blue-bg)",
+              borderColor: "var(--gc-blue-border)",
               padding: "1.25rem",
               display: "flex",
               flexDirection: "column",
@@ -270,10 +330,12 @@ export default async function HomePage() {
               textDecoration: "none",
             }}
           >
-            <span style={{ fontSize: 36, lineHeight: 1 }}>🗣️</span>
+            <span style={{ color: "var(--gc-blue-text)", opacity: 0.9 }}>
+              <MessageSquare size={28} />
+            </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "#a5b4fc" }}>AI Tutor</p>
-              <p className="text-[11px]" style={{ color: "rgba(165,180,252,0.55)" }}>Conversational practice</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>AI Tutor</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>Conversational practice</p>
             </div>
           </Link>
 
@@ -282,8 +344,8 @@ export default async function HomePage() {
             href="/dictionary"
             className="game-card group"
             style={{
-              background: "linear-gradient(135deg, #0c2340 0%, #0f3460 100%)",
-              border: "1px solid rgba(96,165,250,0.22)",
+              background: "var(--gc-blue-bg)",
+              borderColor: "var(--gc-blue-border)",
               padding: "1.25rem",
               display: "flex",
               flexDirection: "column",
@@ -292,10 +354,12 @@ export default async function HomePage() {
               textDecoration: "none",
             }}
           >
-            <span style={{ fontSize: 36, lineHeight: 1 }}>📚</span>
+            <span style={{ color: "var(--gc-blue-text)", opacity: 0.9 }}>
+              <BookMarked size={28} />
+            </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "#93c5fd" }}>Dictionary</p>
-              <p className="text-[11px]" style={{ color: "rgba(147,197,253,0.55)" }}>Browse all words</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>Dictionary</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>Browse all words</p>
             </div>
           </Link>
 
@@ -304,8 +368,8 @@ export default async function HomePage() {
             href="/review"
             className="game-card group"
             style={{
-              background: "linear-gradient(135deg, #052e16 0%, #064e2e 100%)",
-              border: "1px solid rgba(34,197,94,0.22)",
+              background: "var(--gc-green-bg)",
+              borderColor: "var(--gc-green-border)",
               padding: "1.25rem",
               display: "flex",
               flexDirection: "column",
@@ -314,10 +378,12 @@ export default async function HomePage() {
               textDecoration: "none",
             }}
           >
-            <span style={{ fontSize: 36, lineHeight: 1 }}>🧠</span>
+            <span style={{ color: "var(--gc-green-text)", opacity: 0.9 }}>
+              <Brain size={28} />
+            </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "#86efac" }}>Review</p>
-              <p className="text-[11px]" style={{ color: "rgba(134,239,172,0.55)" }}>Spaced repetition</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-green-text)" }}>Review</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-green-muted)" }}>Spaced repetition</p>
             </div>
           </Link>
 
@@ -326,8 +392,8 @@ export default async function HomePage() {
             href="/my-words"
             className="game-card group"
             style={{
-              background: "linear-gradient(135deg, #431407 0%, #6c2010 100%)",
-              border: "1px solid rgba(249,115,22,0.22)",
+              background: "var(--gc-orange-bg)",
+              borderColor: "var(--gc-orange-border)",
               padding: "1.25rem",
               display: "flex",
               flexDirection: "column",
@@ -336,10 +402,12 @@ export default async function HomePage() {
               textDecoration: "none",
             }}
           >
-            <span style={{ fontSize: 36, lineHeight: 1 }}>✍️</span>
+            <span style={{ color: "var(--gc-orange-text)", opacity: 0.9 }}>
+              <PenLine size={28} />
+            </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "#fdba74" }}>My Words</p>
-              <p className="text-[11px]" style={{ color: "rgba(253,186,116,0.55)" }}>Saved vocabulary</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-orange-text)" }}>My Words</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-orange-muted)" }}>Saved vocabulary</p>
             </div>
           </Link>
         </div>
@@ -360,7 +428,16 @@ export default async function HomePage() {
                 {recentWord.imageEmoji}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xl font-bold" style={{ color: "var(--text)" }}>{recentWord.word}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xl font-bold" style={{ color: "var(--text)" }}>{recentWord.word}</p>
+                  <button
+                    aria-label="Listen to pronunciation"
+                    className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70"
+                    style={{ color: "var(--text-3)", background: "transparent", border: "none", cursor: "pointer" }}
+                  >
+                    <Volume2 size={14} />
+                  </button>
+                </div>
                 <p className="text-sm font-semibold mt-0.5" style={{ color: "var(--accent-2)" }}>{recentWord.translation}</p>
                 <p className="text-xs mt-1 italic truncate" style={{ color: "var(--text-3)" }}>
                   &ldquo;{recentWord.exampleFr}&rdquo;
@@ -369,9 +446,9 @@ export default async function HomePage() {
             </div>
             <Link
               href={`/dictionary/${recentWord.id}`}
-              className="btn-secondary mt-4 inline-flex text-xs px-4 py-2"
+              className="btn-secondary mt-4 inline-flex items-center gap-1.5 text-xs px-4 py-2"
             >
-              Learn this word →
+              Learn this word <ArrowRight size={12} />
             </Link>
           </div>
         ) : (
@@ -405,8 +482,17 @@ export default async function HomePage() {
                         style={{ transition: "stroke-dashoffset 1s ease", filter: `drop-shadow(0 0 5px ${skill.color})` }}
                       />
                     </svg>
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem" }}>
-                      {skill.emoji}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: skill.color,
+                      }}
+                    >
+                      {skill.icon}
                     </div>
                   </div>
                   <p className="text-[11px] font-bold" style={{ color: "var(--text-2)" }}>{skill.label}</p>
@@ -423,8 +509,8 @@ export default async function HomePage() {
         <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
           <div className="flex items-center justify-between mb-4">
             <p className="section-label">Badges earned</p>
-            <Link href="/progress" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-              View all →
+            <Link href="/progress" className="text-xs font-semibold flex items-center gap-1" style={{ color: "var(--accent)" }}>
+              View all <ArrowRight size={12} />
             </Link>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
