@@ -58,6 +58,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
           });
           const d = await res.json();
           setXpEarned(d.xpEarned ?? 10);
+          window.dispatchEvent(new CustomEvent("xp-updated"));
         } catch { /* silent */ }
         setFinished(true);
       }

@@ -29,6 +29,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
 
       if (current + 1 >= words.length) {
         const score = Math.round(((isKnown ? known.length + 1 : known.length) / words.length) * 100);
+        setFinished(true); // show results immediately; don't block on fetch
         try {
           const res = await fetch("/api/games/score", {
             method: "POST",
@@ -37,8 +38,8 @@ export function FlashcardGame({ words }: { words: Word[] }) {
           });
           const data = await res.json();
           setXpEarned(data.xpEarned ?? 10);
+          window.dispatchEvent(new CustomEvent("xp-updated"));
         } catch {}
-        setFinished(true);
       } else {
         setFlipped(false);
         setTimeout(() => setCurrent((prev) => prev + 1), 150);
@@ -49,7 +50,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
 
 
   if (finished) {
-    const knownCount = known.length + 1;
+    const knownCount = known.length;
     const learnCount = words.length - knownCount;
     return (
       <div className="bg-white rounded-2xl border border-zinc-100 p-8 text-center animate-fade-up">

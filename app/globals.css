@@ -64,6 +64,35 @@
   --radius:      16px;
   --radius-sm:   10px;
   --radius-lg:   24px;
+
+  /* ── Nav backdrop ── */
+  --nav-bg:      rgba(5,6,14,0.85);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — applied when html does NOT have .dark class
+   ═══════════════════════════════════════════════════════════════ */
+
+html:not(.dark) {
+  /* Backgrounds */
+  --bg:        #f5f6fb;
+  --surface:   #ffffff;
+  --surface-2: #f0f1f7;
+  --surface-3: #e8e9f0;
+  --surface-4: #dfe0ec;
+
+  /* Borders */
+  --border:    rgba(0,0,0,0.07);
+  --border-md: rgba(0,0,0,0.12);
+  --border-lg: rgba(0,0,0,0.20);
+
+  /* Text */
+  --text:      #0f1117;
+  --text-2:    #4a5068;
+  --text-3:    #9499b5;
+
+  /* Nav */
+  --nav-bg:    rgba(245,246,251,0.92);
 }
 
 /* ── Base ── */

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { getXpProgress } from "@/types";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface ProgressData { xp: number; level: number; streak: number; }
 
@@ -111,6 +112,15 @@ export function AppNav() {
     fetchProgress().then((p) => { if (p) setProgress(p); });
   }, []);
 
+  useEffect(() => {
+    function onXpUpdated() {
+      _pcache = null;
+      fetchProgress().then((p) => { if (p) setProgress(p); });
+    }
+    window.addEventListener("xp-updated", onXpUpdated);
+    return () => window.removeEventListener("xp-updated", onXpUpdated);
+  }, []);
+
   useEffect(() => { setMobileOpen(false); setDropOpen(false); }, [pathname]);
 
   /* close dropdown on outside click */
@@ -148,7 +158,7 @@ export function AppNav() {
         top: 0,
         zIndex: 50,
         width: "100%",
-        background: "rgba(5,6,14,0.85)",
+        background: "var(--nav-bg)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid var(--border)",
@@ -308,6 +318,9 @@ export function AppNav() {
             </div>
           )}
         </div>
+
+        {/* Theme toggle */}
+        <ThemeToggle />
 
         {/* Avatar + dropdown */}
         <div ref={dropRef} style={{ position: "relative", flexShrink: 0 }}>
