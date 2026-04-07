@@ -95,6 +95,7 @@ export default function MyWordsPage() {
   const [eliminated, setEliminated] = useState<number[]>([]);
   const [hintUsed, setHintUsed]     = useState(false);
   const [hintErr, setHintErr]       = useState(false);
+  const [xpEarned, setXpEarned]     = useState(0);
 
   useEffect(() => {
     apiGet().then(w => { setWords(w); setLoading(false); });
@@ -132,7 +133,7 @@ export default function MyWordsPage() {
       ? Math.min(Math.max(parseInt(customCount) || 10, 2), words.length)
       : Math.min(quizCount, words.length);
     setQuestions(buildQuiz(words).slice(0, count));
-    setQIndex(0); setSelected(null); setScore(0); setMode("quiz");
+    setQIndex(0); setSelected(null); setScore(0); setXpEarned(0); setMode("quiz");
   };
 
   // Reset hint state on each new question
@@ -157,8 +158,16 @@ export default function MyWordsPage() {
     setSelected(i);
     if (questions[qIndex].correctIndex === i) setScore(s => s + 1);
     setTimeout(() => {
-      if (qIndex + 1 >= questions.length) setMode("result");
-      else { setQIndex(idx => idx + 1); setSelected(null); }
+      if (qIndex + 1 >= questions.length) {
+        const finalScore = questions[qIndex].correctIndex === i ? score + 1 : score;
+        fetch("/api/my-words/quiz-complete", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correct: finalScore, total: questions.length }),
+        }).then(r => r.json()).then(d => {
+          if (d.xp) { setXpEarned(d.xp); window.dispatchEvent(new CustomEvent("xp-updated")); }
+        });
+        setMode("result");
+      } else { setQIndex(idx => idx + 1); setSelected(null); }
     }, 900);
   };
 
@@ -201,9 +210,19 @@ export default function MyWordsPage() {
 
           <div style={{ fontSize: 40, marginBottom: 8 }}>{grade.emoji}</div>
           <h2 style={{ fontSize: 26, fontWeight: 900, color: grade.color, margin: "0 0 6px" }}>{grade.label}</h2>
-          <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 32px" }}>
+          <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 16px" }}>
             You answered {score} out of {questions.length} questions correctly
           </p>
+          {xpEarned > 0 && (
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 24,
+              background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.3)",
+              borderRadius: 99, padding: "8px 18px",
+              fontSize: 15, fontWeight: 800, color: "var(--gold)",
+            }}>
+              ⚡ +{xpEarned} XP earned
+            </div>
+          )}
 
           <div style={{ display: "flex", gap: 12 }}>
             <button onClick={() => setMode("setup")} className="btn-primary" style={{
