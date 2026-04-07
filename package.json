@@ -11,7 +11,7 @@
     "db:deploy": "prisma db push --accept-data-loss",
     "db:seed": "ts-node -P tsconfig.seed.json prisma/seed.ts",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^20.19.37",
+    "@types/node": "^20.19.39",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "postcss": "^8",

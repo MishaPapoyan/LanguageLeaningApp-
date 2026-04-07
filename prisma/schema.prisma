@@ -83,6 +83,7 @@ model User {
   sessions       Session[]
   progress       Progress?
   savedWords     SavedWord[]
+  customWords    CustomWord[]
   storyProgress  StoryProgress[]
   aiInteractions AiInteraction[]
   voiceSessions  VoiceSession[]
@@ -245,6 +246,19 @@ model VoiceSession {
   provider        String?
   createdAt       DateTime @default(now())
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Custom Words (My Words) ──────────────────────────────────────────────────
+
+model CustomWord {
+  id        String   @id @default(cuid())
+  userId    String
+  front     String
+  back      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

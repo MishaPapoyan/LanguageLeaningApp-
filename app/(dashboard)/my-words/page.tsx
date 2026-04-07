@@ -10,7 +10,7 @@ interface CustomWord {
   id: string;
   front: string;
   back: string;
-  createdAt: number;
+  createdAt: string;
 }
 
 type Mode = "list" | "quiz" | "result";
@@ -23,18 +23,8 @@ interface QuizQuestion {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = "linguaflow_custom_words";
 const OPTION_LABELS = ["A", "B", "C", "D"];
 
-function loadWords(): CustomWord[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-function saveWords(w: CustomWord[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(w));
-}
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -54,44 +44,84 @@ function buildQuiz(words: CustomWord[]): QuizQuestion[] {
   return shuffle(words).map(w => buildQuestion(w, words));
 }
 
+// ─── API helpers ──────────────────────────────────────────────────────────────
+
+async function apiGet(): Promise<CustomWord[]> {
+  const r = await fetch("/api/my-words", { cache: "no-store" });
+  if (!r.ok) return [];
+  return r.json();
+}
+async function apiAdd(front: string, back: string): Promise<CustomWord | null> {
+  const r = await fetch("/api/my-words", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ front, back }),
+  });
+  if (!r.ok) return null;
+  return r.json();
+}
+async function apiDelete(id: string): Promise<boolean> {
+  const r = await fetch(`/api/my-words/${id}`, { method: "DELETE" });
+  return r.ok;
+}
+async function apiPatch(id: string, front: string, back: string): Promise<CustomWord | null> {
+  const r = await fetch(`/api/my-words/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ front, back }),
+  });
+  if (!r.ok) return null;
+  return r.json();
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MyWordsPage() {
-  const [words, setWords]       = useState<CustomWord[]>([]);
-  const [front, setFront]       = useState("");
-  const [back, setBack]         = useState("");
-  const [mode, setMode]         = useState<Mode>("list");
+  const [words, setWords]           = useState<CustomWord[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [front, setFront]           = useState("");
+  const [back, setBack]             = useState("");
+  const [mode, setMode]             = useState<Mode>("list");
   const [editingId, setEditingId]   = useState<string | null>(null);
   const [editFront, setEditFront]   = useState("");
   const [editBack, setEditBack]     = useState("");
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [qIndex, setQIndex]     = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore]       = useState(0);
+  const [saving, setSaving]         = useState(false);
+  const [questions, setQuestions]   = useState<QuizQuestion[]>([]);
+  const [qIndex, setQIndex]         = useState(0);
+  const [selected, setSelected]     = useState<number | null>(null);
+  const [score, setScore]           = useState(0);
   const [eliminated, setEliminated] = useState<number[]>([]);
   const [hintUsed, setHintUsed]     = useState(false);
   const [hintErr, setHintErr]       = useState(false);
 
-  useEffect(() => { setWords(loadWords()); }, []);
+  useEffect(() => {
+    apiGet().then(w => { setWords(w); setLoading(false); });
+  }, []);
 
-  const addWord = useCallback(() => {
+  const addWord = useCallback(async () => {
     const f = front.trim(), b = back.trim();
-    if (!f || !b) return;
-    const updated = [{ id: crypto.randomUUID(), front: f, back: b, createdAt: Date.now() }, ...words];
-    setWords(updated); saveWords(updated); setFront(""); setBack("");
-  }, [front, back, words]);
+    if (!f || !b || saving) return;
+    setSaving(true);
+    const created = await apiAdd(f, b);
+    if (created) setWords(prev => [created, ...prev]);
+    setFront(""); setBack("");
+    setSaving(false);
+  }, [front, back, saving]);
 
-  const deleteWord = useCallback((id: string) => {
-    const updated = words.filter(w => w.id !== id);
-    setWords(updated); saveWords(updated);
-  }, [words]);
+  const deleteWord = useCallback(async (id: string) => {
+    setWords(prev => prev.filter(w => w.id !== id));
+    await apiDelete(id);
+  }, []);
 
-  const startEdit = (word: CustomWord) => { setEditingId(word.id); setEditFront(word.front); setEditBack(word.back); };
-  const saveEdit = () => {
+  const startEdit = (word: CustomWord) => {
+    setEditingId(word.id); setEditFront(word.front); setEditBack(word.back);
+  };
+  const saveEdit = async () => {
     const f = editFront.trim(), b = editBack.trim();
     if (!f || !b) return;
-    const updated = words.map(w => w.id === editingId ? { ...w, front: f, back: b } : w);
-    setWords(updated); saveWords(updated); setEditingId(null);
+    const updated = await apiPatch(editingId!, f, b);
+    if (updated) setWords(prev => prev.map(w => w.id === editingId ? updated : w));
+    setEditingId(null);
   };
 
   const startQuiz = () => {
@@ -445,18 +475,18 @@ export default function MyWordsPage() {
           </div>
 
           {/* Add button */}
-          <button onClick={addWord} disabled={!front.trim() || !back.trim()}
+          <button onClick={addWord} disabled={!front.trim() || !back.trim() || saving}
             style={{
               flexShrink: 0, height: 42, width: 42, borderRadius: 12,
-              background: front.trim() && back.trim()
+              background: front.trim() && back.trim() && !saving
                 ? "linear-gradient(135deg, var(--accent), var(--accent-2))"
                 : "var(--surface-3)",
               border: "none",
-              color: front.trim() && back.trim() ? "#fff" : "var(--text-3)",
+              color: front.trim() && back.trim() && !saving ? "#fff" : "var(--text-3)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: front.trim() && back.trim() ? "pointer" : "not-allowed",
+              cursor: front.trim() && back.trim() && !saving ? "pointer" : "not-allowed",
               transition: "all 0.2s",
-              boxShadow: front.trim() && back.trim() ? "0 4px 12px rgba(99,102,241,0.35)" : "none",
+              boxShadow: front.trim() && back.trim() && !saving ? "0 4px 12px rgba(99,102,241,0.35)" : "none",
             }}
             title="Add word pair"
           >
@@ -472,7 +502,11 @@ export default function MyWordsPage() {
       </div>
 
       {/* ── Word tile grid ── */}
-      {words.length === 0 ? (
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-3)", fontSize: 14 }}>
+          Loading your words…
+        </div>
+      ) : words.length === 0 ? (
         <div style={{
           borderRadius: 20, padding: "64px 24px",
           border: "2px dashed var(--border-md)",
