@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { speakFr } from "@/lib/speech";
-import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X } from "lucide-react";
+import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X, Pencil } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,10 +61,16 @@ export default function MyWordsPage() {
   const [front, setFront]       = useState("");
   const [back, setBack]         = useState("");
   const [mode, setMode]         = useState<Mode>("list");
+  const [editingId, setEditingId]   = useState<string | null>(null);
+  const [editFront, setEditFront]   = useState("");
+  const [editBack, setEditBack]     = useState("");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [qIndex, setQIndex]     = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore]       = useState(0);
+  const [eliminated, setEliminated] = useState<number[]>([]);
+  const [hintUsed, setHintUsed]     = useState(false);
+  const [hintErr, setHintErr]       = useState(false);
 
   useEffect(() => { setWords(loadWords()); }, []);
 
@@ -80,13 +86,38 @@ export default function MyWordsPage() {
     setWords(updated); saveWords(updated);
   }, [words]);
 
+  const startEdit = (word: CustomWord) => { setEditingId(word.id); setEditFront(word.front); setEditBack(word.back); };
+  const saveEdit = () => {
+    const f = editFront.trim(), b = editBack.trim();
+    if (!f || !b) return;
+    const updated = words.map(w => w.id === editingId ? { ...w, front: f, back: b } : w);
+    setWords(updated); saveWords(updated); setEditingId(null);
+  };
+
   const startQuiz = () => {
     if (words.length < 2) return;
     setQuestions(buildQuiz(words)); setQIndex(0); setSelected(null); setScore(0); setMode("quiz");
   };
 
+  // Reset hint state on each new question
+  useEffect(() => { setHintUsed(false); setEliminated([]); setHintErr(false); }, [qIndex]);
+
+  const useHint = async () => {
+    if (hintUsed || selected !== null || !currentQ) return;
+    const r = await fetch("/api/user/spend-xp", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 5 }),
+    });
+    if (!r.ok) { setHintErr(true); setTimeout(() => setHintErr(false), 2000); return; }
+    window.dispatchEvent(new CustomEvent("xp-updated"));
+    setHintUsed(true);
+    const wrongs = currentQ.options.map((_, i) => i).filter(i => i !== currentQ.correctIndex);
+    const toElim = wrongs.sort(() => Math.random() - 0.5).slice(0, 2);
+    setEliminated(toElim);
+  };
+
   const handleAnswer = (i: number) => {
-    if (selected !== null) return;
+    if (selected !== null || eliminated.includes(i)) return;
     setSelected(i);
     if (questions[qIndex].correctIndex === i) setScore(s => s + 1);
     setTimeout(() => {
@@ -245,7 +276,9 @@ export default function MyWordsPage() {
             let opacity = 1;
             let shadow = "none";
 
-            if (revealed) {
+            if (eliminated.includes(i)) {
+              opacity = 0.1;
+            } else if (revealed) {
               if (isCorrect) {
                 bg = "rgba(34,197,94,0.1)"; border = "rgba(34,197,94,0.45)";
                 labelBg = "rgba(34,197,94,0.2)"; labelColor = "var(--green)"; textColor = "var(--green)";
@@ -259,7 +292,7 @@ export default function MyWordsPage() {
             }
 
             return (
-              <button key={i} onClick={() => handleAnswer(i)} disabled={revealed}
+              <button key={i} onClick={() => handleAnswer(i)} disabled={revealed || eliminated.includes(i)}
                 style={{
                   display: "flex", alignItems: "center", gap: 12,
                   padding: "14px 16px", borderRadius: 14,
@@ -283,6 +316,23 @@ export default function MyWordsPage() {
               </button>
             );
           })}
+        </div>
+
+        {/* Hint button */}
+        <div style={{ marginTop: 14 }}>
+          <button onClick={useHint} disabled={hintUsed || selected !== null}
+            style={{
+              display: "flex", alignItems: "center", gap: 7,
+              padding: "9px 16px", borderRadius: 11,
+              border: `1px solid ${hintErr ? "rgba(239,68,68,0.4)" : "rgba(245,158,11,0.35)"}`,
+              background: hintErr ? "rgba(239,68,68,0.08)" : "rgba(245,158,11,0.08)",
+              color: hintErr ? "var(--red)" : "var(--gold)",
+              cursor: hintUsed || selected !== null ? "not-allowed" : "pointer",
+              fontSize: 13, fontWeight: 700,
+              opacity: hintUsed || selected !== null ? 0.5 : 1,
+            }}>
+            💡 {hintErr ? "Not enough XP!" : hintUsed ? "Hint used (2 eliminated)" : "Hint — eliminate 2 wrong answers (5 XP)"}
+          </button>
         </div>
       </div>
     );
@@ -467,71 +517,79 @@ export default function MyWordsPage() {
                   {/* Colored top strip */}
                   <div style={{ height: 4, background: accentColor }} />
 
-                  {/* Native word */}
-                  <div style={{ padding: "14px 16px 10px" }}>
-                    <p style={{
-                      fontSize: 10, fontWeight: 700, textTransform: "uppercase",
-                      letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px",
-                    }}>
-                      Your language
-                    </p>
-                    <p style={{
-                      fontSize: 16, fontWeight: 700, color: "var(--text-2)",
-                      margin: 0, wordBreak: "break-word",
-                    }}>
-                      {word.front}
-                    </p>
-                  </div>
-
-                  {/* Divider */}
-                  <div style={{ height: 1, background: "var(--border)", margin: "0 16px" }} />
-
-                  {/* French word */}
-                  <div style={{ padding: "10px 16px 14px", flex: 1 }}>
-                    <p style={{
-                      fontSize: 10, fontWeight: 700, textTransform: "uppercase",
-                      letterSpacing: "0.1em", color: accentColor, margin: "0 0 4px",
-                    }}>
-                      🇫🇷 French
-                    </p>
-                    <p style={{
-                      fontSize: 18, fontWeight: 800, color: accentColor,
-                      margin: 0, wordBreak: "break-word",
-                    }}>
-                      {word.back}
-                    </p>
-                  </div>
-
-                  {/* Action row */}
-                  <div style={{
-                    display: "flex", alignItems: "center",
-                    borderTop: "1px solid var(--border)",
-                    padding: "0 8px",
-                  }}>
-                    <button onClick={() => speakFr(word.back)} style={{
-                      flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-                      padding: "9px 0", background: "none", border: "none",
-                      color: "var(--text-3)", cursor: "pointer", fontSize: 12, fontWeight: 600,
-                      transition: "color 0.15s",
-                    }}
-                      onMouseEnter={e => e.currentTarget.style.color = accentColor}
-                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                    >
-                      <Volume2 size={13} /> Listen
-                    </button>
-                    <div style={{ width: 1, height: 20, background: "var(--border)" }} />
-                    <button onClick={() => deleteWord(word.id)} style={{
-                      flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-                      padding: "9px 0", background: "none", border: "none",
-                      color: "var(--text-3)", cursor: "pointer", fontSize: 12, fontWeight: 600,
-                      transition: "color 0.15s",
-                    }}
-                      onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
-                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                    >
-                      <Trash2 size={13} /> Delete
-                    </button>
-                  </div>
+                  {editingId === word.id ? (
+                    /* ── Edit mode ── */
+                    <div style={{ padding: "14px 14px 10px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+                      <input
+                        autoFocus value={editFront} onChange={e => setEditFront(e.target.value)}
+                        placeholder="Your language"
+                        className="input" style={{ width: "100%", fontSize: 13 }}
+                      />
+                      <input
+                        value={editBack} onChange={e => setEditBack(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && saveEdit()}
+                        placeholder="French"
+                        className="input" style={{ width: "100%", fontSize: 13 }}
+                      />
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={saveEdit} style={{
+                          flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                          padding: "7px 0", borderRadius: 9, border: "none",
+                          background: "var(--accent)", color: "#fff",
+                          fontSize: 12, fontWeight: 700, cursor: "pointer",
+                        }}>
+                          <Check size={12} /> Save
+                        </button>
+                        <button onClick={() => setEditingId(null)} style={{
+                          flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                          padding: "7px 0", borderRadius: 9,
+                          border: "1px solid var(--border)", background: "none",
+                          color: "var(--text-3)", fontSize: 12, fontWeight: 600, cursor: "pointer",
+                        }}>
+                          <X size={12} /> Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Native word */}
+                      <div style={{ padding: "14px 16px 10px" }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px" }}>
+                          Your language
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-2)", margin: 0, wordBreak: "break-word" }}>
+                          {word.front}
+                        </p>
+                      </div>
+                      <div style={{ height: 1, background: "var(--border)", margin: "0 16px" }} />
+                      {/* French word */}
+                      <div style={{ padding: "10px 16px 14px", flex: 1 }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: accentColor, margin: "0 0 4px" }}>
+                          🇫🇷 French
+                        </p>
+                        <p style={{ fontSize: 18, fontWeight: 800, color: accentColor, margin: 0, wordBreak: "break-word" }}>
+                          {word.back}
+                        </p>
+                      </div>
+                      {/* Action row */}
+                      <div style={{ display: "flex", alignItems: "center", borderTop: "1px solid var(--border)", padding: "0 6px" }}>
+                        <button onClick={() => speakFr(word.back)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                          onMouseEnter={e => e.currentTarget.style.color = accentColor}
+                          onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
+                        ><Volume2 size={12} /> Listen</button>
+                        <div style={{ width: 1, height: 18, background: "var(--border)" }} />
+                        <button onClick={() => startEdit(word)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                          onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
+                          onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
+                        ><Pencil size={12} /> Edit</button>
+                        <div style={{ width: 1, height: 18, background: "var(--border)" }} />
+                        <button onClick={() => deleteWord(word.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                          onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
+                          onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
+                        ><Trash2 size={12} /> Delete</button>
+                      </div>
+                    </>
+                  )}
                 </div>
               );
             })}

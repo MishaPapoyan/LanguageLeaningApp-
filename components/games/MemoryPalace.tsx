@@ -63,6 +63,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
       });
       const data = await res.json();
       setXpEarned(data.xpEarned ?? 10);
+      window.dispatchEvent(new CustomEvent("xp-updated"));
     } catch {}
   };
 

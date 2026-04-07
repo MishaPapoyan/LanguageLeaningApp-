@@ -13,113 +13,79 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") redirect("/home");
 
+  const initial = session.user.name?.[0]?.toUpperCase() ?? "A";
+
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <>
+      <style>{`
+        .admin-wrap { display: flex; min-height: 100vh; background: var(--bg); }
+        .admin-sidebar { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); }
+        .admin-mobile-bar { display: none; }
+        .admin-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .admin-content { flex: 1; padding: 32px; }
+        @media (max-width: 768px) {
+          .admin-wrap { flex-direction: column; }
+          .admin-sidebar { display: none; }
+          .admin-mobile-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; overflow-x: auto;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 40;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .admin-mobile-bar::-webkit-scrollbar { display: none; }
+          .admin-content { padding: 16px; }
+        }
+      `}</style>
 
-      {/* ── Mobile top bar (hidden on md+) ── */}
-      <div
-        className="flex md:hidden items-center gap-2 px-4 py-3 overflow-x-auto"
-        style={{
-          background: "var(--surface)",
-          borderBottom: "1px solid var(--border)",
-          position: "sticky",
-          top: 0,
-          zIndex: 40,
-        }}
-      >
-        <Link
-          href="/home"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0"
-          style={{ color: "var(--text-3)", background: "var(--surface-2)", border: "1px solid var(--border)" }}
-        >
-          ← App
-        </Link>
-        {ADMIN_NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex-shrink-0"
-            style={{ color: "var(--text-2)", background: "var(--surface-2)", border: "1px solid var(--border)" }}
-          >
-            <span>{item.emoji}</span>
-            {item.label}
-          </Link>
-        ))}
-      </div>
+      <div className="admin-wrap">
 
-      {/* ── Desktop layout (sidebar + content) ── */}
-      <div className="flex min-h-screen md:min-h-0">
-
-        {/* Sidebar — hidden on mobile */}
-        <aside
-          className="hidden md:flex w-56 flex-shrink-0 flex-col sticky top-0 h-screen"
-          style={{ background: "var(--surface)", borderRight: "1px solid var(--border)" }}
-        >
-          {/* Logo */}
-          <div className="px-5 py-5 flex items-center gap-2.5" style={{ borderBottom: "1px solid var(--border)" }}>
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-black"
-              style={{ background: "linear-gradient(135deg, #7c6aff, #5b4fcf)" }}
-            >
-              LF
-            </div>
+        {/* Desktop sidebar */}
+        <aside className="admin-sidebar">
+          <div style={{ padding: "20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #7c6aff, #5b4fcf)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 900 }}>LF</div>
             <div>
-              <p className="text-xs font-bold" style={{ color: "var(--text)" }}>LinguaFlow</p>
-              <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--accent)" }}>Admin</p>
+              <p style={{ fontSize: 12, fontWeight: 800, color: "var(--text)", margin: 0 }}>LinguaFlow</p>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent)", margin: 0 }}>Admin</p>
             </div>
           </div>
-
-          {/* Nav */}
-          <nav className="flex-1 px-3 py-4 space-y-0.5">
-            {ADMIN_NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-                style={{ color: "var(--text-2)" }}
-              >
-                <span className="text-base">{item.emoji}</span>
-                {item.label}
+          <nav style={{ flex: 1, padding: "12px 10px" }}>
+            {ADMIN_NAV.map(item => (
+              <Link key={item.href} href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, fontSize: 13, fontWeight: 600, color: "var(--text-2)", textDecoration: "none", marginBottom: 2 }}>
+                <span style={{ fontSize: 15 }}>{item.emoji}</span>{item.label}
               </Link>
             ))}
           </nav>
-
-          {/* Back to app */}
-          <div className="px-3 py-4" style={{ borderTop: "1px solid var(--border)" }}>
-            <Link
-              href="/home"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-              style={{ color: "var(--text-3)" }}
-            >
-              <span>←</span>
-              Back to app
+          <div style={{ padding: "12px 10px", borderTop: "1px solid var(--border)" }}>
+            <Link href="/home" style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 10, fontSize: 12, color: "var(--text-3)", textDecoration: "none", fontWeight: 600 }}>
+              ← Back to app
             </Link>
           </div>
         </aside>
 
-        {/* Main content */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          <header
-            className="px-5 md:px-8 py-4 hidden md:flex items-center justify-between"
-            style={{ borderBottom: "1px solid var(--border)", background: "var(--surface)" }}
-          >
-            <div />
-            <div className="flex items-center gap-2">
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                style={{ background: "linear-gradient(135deg, #7c6aff, #4338ca)" }}
-              >
-                {session.user.name?.[0]?.toUpperCase() ?? "A"}
-              </div>
-              <span className="text-sm" style={{ color: "var(--text-2)" }}>{session.user.name}</span>
-            </div>
-          </header>
+        {/* Mobile top bar */}
+        <div className="admin-mobile-bar">
+          <Link href="/home" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 99, background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12, fontWeight: 700, color: "var(--text-3)", textDecoration: "none", whiteSpace: "nowrap" }}>
+            ← App
+          </Link>
+          {ADMIN_NAV.map(item => (
+            <Link key={item.href} href={item.href} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 99, background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12, fontWeight: 700, color: "var(--text-2)", textDecoration: "none", whiteSpace: "nowrap" }}>
+              {item.emoji} {item.label}
+            </Link>
+          ))}
+          <div style={{ marginLeft: "auto", flexShrink: 0, width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #7c6aff, #4338ca)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800 }}>
+            {initial}
+          </div>
+        </div>
 
-          <main className="flex-1 p-4 md:p-8">
+        {/* Main content */}
+        <div className="admin-main">
+          <div className="admin-content">
             {children}
-          </main>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

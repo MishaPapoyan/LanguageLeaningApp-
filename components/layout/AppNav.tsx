@@ -30,7 +30,7 @@ let _pcache: { data: ProgressData; at: number } | null = null;
 async function fetchProgress(): Promise<ProgressData | null> {
   if (_pcache && Date.now() - _pcache.at < 30_000) return _pcache.data;
   try {
-    const r = await fetch("/api/progress");
+    const r = await fetch("/api/progress", { cache: "no-store" });
     const d = await r.json();
     if (d.progress) { _pcache = { data: d.progress, at: Date.now() }; return d.progress; }
   } catch { /* ignore */ }
@@ -56,7 +56,8 @@ export function AppNav() {
   useEffect(() => {
     function onXpUpdated() {
       _pcache = null;
-      fetchProgress().then((p) => { if (p) setProgress(p); });
+      // 700ms delay so DB write commits before we re-fetch
+      setTimeout(() => fetchProgress().then((p) => { if (p) setProgress(p); }), 700);
     }
     window.addEventListener("xp-updated", onXpUpdated);
     return () => window.removeEventListener("xp-updated", onXpUpdated);
@@ -194,7 +195,7 @@ export function AppNav() {
 
           {xpInfo && (
             <div className="stat-pill" style={{ gap: 7, paddingLeft: 10, paddingRight: 10 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-2)" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-2)", whiteSpace: "nowrap" }}>
                 Lv {xpInfo.level}
               </span>
               <div

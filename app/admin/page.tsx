@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
 
 export default async function AdminOverview() {
   let userCount = 0, locationCount = 0, activeToday = 0, totalXp = 0;
@@ -39,6 +40,7 @@ export default async function AdminOverview() {
 
   return (
     <div>
+      <AdminAutoRefresh />
       <h1 className="font-serif text-3xl mb-1" style={{ color: "var(--text)" }}>Overview</h1>
       <p className="text-sm mb-8" style={{ color: "var(--text-3)" }}>
         {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}

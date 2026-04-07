@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { RotateCcw, ChevronLeft, Volume2, BookOpen } from "lucide-react";
+import { speakFr } from "@/lib/speech";
 
 interface ReviewWord {
   id: string;
@@ -22,25 +24,31 @@ function calculateNext(word: ReviewWord, quality: number): ReviewWord {
     else if (repetitions === 1) interval = 3;
     else interval = Math.round(interval * ease);
     repetitions++;
-    ease = Math.max(1.3, ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+    ease = Math.max(1.3, ease + 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
   }
-  return { ...word, interval, ease, repetitions, nextReview: Date.now() + interval * 86400000 };
+  return { ...word, interval, ease, repetitions, nextReview: Date.now() + interval * 86_400_000 };
 }
 
+const RATINGS = [
+  { q: 0, label: "Forgot",  color: "var(--red)",   bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.35)" },
+  { q: 3, label: "Hard",    color: "var(--gold)",  bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.35)" },
+  { q: 4, label: "Good",    color: "var(--blue)",  bg: "rgba(96,165,250,0.1)",  border: "rgba(96,165,250,0.35)" },
+  { q: 5, label: "Easy",    color: "var(--green)", bg: "rgba(52,211,153,0.1)",  border: "rgba(52,211,153,0.35)" },
+];
+
 export default function ReviewPage() {
-  const [words, setWords] = useState<ReviewWord[]>([]);
-  const [dueWords, setDueWords] = useState<ReviewWord[]>([]);
-  const [current, setCurrent] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [words, setWords]           = useState<ReviewWord[]>([]);
+  const [dueWords, setDueWords]     = useState<ReviewWord[]>([]);
+  const [current, setCurrent]       = useState(0);
+  const [flipped, setFlipped]       = useState(false);
   const [sessionDone, setSessionDone] = useState(false);
-  const [reviewed, setReviewed] = useState(0);
-  const [correct, setCorrect] = useState(0);
+  const [reviewed, setReviewed]     = useState(0);
+  const [correct, setCorrect]       = useState(0);
 
   useEffect(() => {
-    const saved = localStorage.getItem("reviewWords");
-    const parsed: ReviewWord[] = saved ? JSON.parse(saved) : [];
+    const parsed: ReviewWord[] = JSON.parse(localStorage.getItem("reviewWords") ?? "[]");
     setWords(parsed);
-    const due = parsed.filter((w) => w.nextReview <= Date.now()).slice(0, 10);
+    const due = parsed.filter(w => w.nextReview <= Date.now()).slice(0, 20);
     setDueWords(due);
     if (due.length === 0) setSessionDone(true);
   }, []);
@@ -48,9 +56,9 @@ export default function ReviewPage() {
   const handleRate = (quality: number) => {
     const word = dueWords[current];
     const updated = calculateNext(word, quality);
-    if (quality >= 3) setCorrect((c) => c + 1);
-    setReviewed((r) => r + 1);
-    const newWords = words.map((w) => (w.id === updated.id ? updated : w));
+    if (quality >= 3) setCorrect(c => c + 1);
+    setReviewed(r => r + 1);
+    const newWords = words.map(w => w.id === updated.id ? updated : w);
     setWords(newWords);
     localStorage.setItem("reviewWords", JSON.stringify(newWords));
     setFlipped(false);
@@ -58,25 +66,53 @@ export default function ReviewPage() {
     else setSessionDone(true);
   };
 
+  // ── Done / empty state ──────────────────────────────────────────────────
   if (sessionDone) {
-    const hasReviewed = reviewed > 0;
+    const acc = reviewed > 0 ? Math.round((correct / reviewed) * 100) : 0;
     return (
-      <div className="max-w-md text-center py-16">
-        <div className="bg-white rounded-2xl p-10 border border-zinc-100">
-          <p className="text-6xl mb-4">{hasReviewed ? "🎯" : "✨"}</p>
-          <h2 className="font-serif text-2xl text-zinc-900 mb-2">
-            {hasReviewed ? "Review Complete!" : "All Caught Up!"}
+      <div style={{ maxWidth: 520, margin: "0 auto", paddingTop: 48, textAlign: "center" }}>
+        <div className="card" style={{ padding: "52px 32px" }}>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>{reviewed > 0 ? "🎯" : "✨"}</div>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", margin: "0 0 10px" }}>
+            {reviewed > 0 ? "Session complete!" : "All caught up!"}
           </h2>
-          {hasReviewed ? (
-            <p className="text-sm text-zinc-500 mb-6">
-              {reviewed} words reviewed — {correct} correct ({Math.round((correct / reviewed) * 100)}%)
-            </p>
+
+          {reviewed > 0 ? (
+            <>
+              <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 28px" }}>
+                {reviewed} words reviewed · {correct} correct · {acc}% accuracy
+              </p>
+              {/* Accuracy bar */}
+              <div style={{ height: 8, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden", marginBottom: 28 }}>
+                <div style={{
+                  height: "100%", width: `${acc}%`,
+                  background: acc >= 70 ? "var(--green)" : acc >= 40 ? "var(--gold)" : "var(--red)",
+                  borderRadius: 999, transition: "width 0.8s ease",
+                }} />
+              </div>
+            </>
           ) : (
-            <p className="text-sm text-zinc-500 mb-6">No words due right now. Come back later!</p>
+            <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 28px" }}>
+              No words due right now. Keep learning to add more!
+            </p>
           )}
-          <div className="flex flex-col gap-2">
-            <Link href="/learn" className="btn-primary w-full py-3">Continue Learning</Link>
-            <Link href="/home" className="btn-ghost w-full py-2.5">Back to Home</Link>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <Link href="/learn" className="btn-primary" style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              gap: 8, padding: "13px 0", fontSize: 14, fontWeight: 700, textDecoration: "none",
+            }}>
+              <BookOpen size={15} /> Continue learning
+            </Link>
+            <Link href="/home" style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: "12px 0", fontSize: 14, color: "var(--text-3)",
+              textDecoration: "none", borderRadius: 12,
+              border: "1px solid var(--border)",
+              transition: "background 0.15s",
+            }}>
+              Back to home
+            </Link>
           </div>
         </div>
       </div>
@@ -86,53 +122,149 @@ export default function ReviewPage() {
   const word = dueWords[current];
   if (!word) return null;
 
-  const ratings = [
-    { q: 0, label: "Forgot", emoji: "😵", bg: "bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-700" },
-    { q: 3, label: "Hard", emoji: "😬", bg: "bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-700" },
-    { q: 4, label: "Good", emoji: "😊", bg: "bg-sky-50 hover:bg-sky-100 border-sky-200 text-sky-700" },
-    { q: 5, label: "Easy", emoji: "🤩", bg: "bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700" },
-  ];
+  const progress = ((current + 1) / dueWords.length) * 100;
 
   return (
-    <div className="max-w-md">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-medium text-zinc-400">{dueWords.length} words due</span>
-        <span className="text-xs font-bold text-zinc-500">{current + 1}/{dueWords.length}</span>
+    <div style={{ maxWidth: 580, margin: "0 auto" }}>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 9,
+            background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <RotateCcw size={15} color="#fff" />
+          </div>
+          <div>
+            <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>Practice</p>
+            <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0 }}>{dueWords.length} words due today</p>
+          </div>
+        </div>
+        <span style={{
+          fontSize: 13, fontWeight: 700, color: "var(--text-2)",
+          background: "var(--surface-2)", border: "1px solid var(--border)",
+          borderRadius: 99, padding: "4px 12px",
+        }}>
+          {current + 1} / {dueWords.length}
+        </span>
       </div>
 
       {/* Progress */}
-      <div className="h-1 bg-zinc-100 rounded-full overflow-hidden mb-6">
-        <div className="h-full rounded-full bg-violet-500 transition-all duration-500"
-          style={{ width: `${((current + 1) / dueWords.length) * 100}%` }} />
+      <div style={{ height: 6, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden", marginBottom: 24 }}>
+        <div style={{
+          height: "100%", width: `${progress}%`,
+          background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+          borderRadius: 999, transition: "width 0.4s ease",
+        }} />
       </div>
 
-      {/* Card */}
-      <div onClick={() => !flipped && setFlipped(true)}
-        className={`bg-white rounded-2xl border border-zinc-100 min-h-[300px] flex flex-col items-center justify-center cursor-pointer transition-all hover:shadow-sm ${
-          !flipped ? "bg-gradient-to-b from-violet-50/50 to-white" : ""
-        }`}>
-        <span className="text-5xl mb-4">{word.imageEmoji}</span>
-        <p className="text-3xl font-serif text-zinc-900">{word.word}</p>
+      {/* Flashcard */}
+      <div
+        onClick={() => !flipped && setFlipped(true)}
+        style={{
+          borderRadius: 22, minHeight: 320,
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          cursor: flipped ? "default" : "pointer",
+          padding: "40px 32px",
+          border: "1px solid var(--border-md)",
+          background: flipped
+            ? "var(--surface-2)"
+            : "linear-gradient(145deg, var(--surface-2), var(--surface))",
+          transition: "background 0.25s ease",
+          textAlign: "center",
+          userSelect: "none",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          marginBottom: 16,
+          position: "relative",
+        }}
+      >
+        {/* Category badge */}
+        <div style={{
+          position: "absolute", top: 16, left: 20,
+          fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+          letterSpacing: "0.1em", color: "var(--text-3)",
+          background: "var(--surface-3)", borderRadius: 99, padding: "3px 10px",
+        }}>
+          🇫🇷 French
+        </div>
+
+        <div style={{ fontSize: 64, marginBottom: 16 }}>{word.imageEmoji}</div>
+        <p style={{ fontSize: 38, fontWeight: 900, color: "var(--text)", margin: "0 0 8px", lineHeight: 1.1 }}>
+          {word.word}
+        </p>
+
         {!flipped ? (
-          <p className="text-sm text-violet-500 mt-6 font-medium">Tap to reveal</p>
+          <>
+            <p style={{ fontSize: 13, color: "var(--accent)", marginTop: 16, fontWeight: 600 }}>
+              Tap to reveal translation
+            </p>
+          </>
         ) : (
-          <p className="text-xl text-violet-600 font-semibold mt-4">{word.translation}</p>
+          <>
+            <div style={{ width: 48, height: 2, background: "var(--border-md)", borderRadius: 999, margin: "12px 0" }} />
+            <p style={{ fontSize: 26, fontWeight: 800, color: "var(--accent)", margin: "0 0 16px" }}>
+              {word.translation}
+            </p>
+            <button
+              onClick={e => { e.stopPropagation(); speakFr(word.word); }}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "7px 16px", borderRadius: 99,
+                background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)",
+                color: "var(--accent)", fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}
+            >
+              <Volume2 size={13} /> Listen
+            </button>
+          </>
         )}
       </div>
 
-      {/* Rating */}
+      {/* Rating buttons — only when flipped */}
       {flipped && (
-        <div className="mt-4">
-          <p className="text-xs text-center text-zinc-400 mb-3">How well did you know it?</p>
-          <div className="grid grid-cols-4 gap-2">
-            {ratings.map((r) => (
-              <button key={r.q} onClick={() => handleRate(r.q)}
-                className={`btn border py-3 flex-col rounded-xl ${r.bg}`}>
-                <span className="text-lg">{r.emoji}</span>
-                <span className="text-[11px] mt-1 font-medium">{r.label}</span>
+        <>
+          <p style={{ fontSize: 12, textAlign: "center", color: "var(--text-3)", marginBottom: 10 }}>
+            How well did you know it?
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            {RATINGS.map(r => (
+              <button
+                key={r.q}
+                onClick={() => handleRate(r.q)}
+                style={{
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                  padding: "14px 8px", borderRadius: 14,
+                  background: r.bg, border: `1.5px solid ${r.border}`,
+                  color: r.color, cursor: "pointer", fontWeight: 700,
+                  transition: "opacity 0.15s",
+                }}
+              >
+                <span style={{ fontSize: 22 }}>
+                  {r.q === 0 ? "😵" : r.q === 3 ? "😬" : r.q === 4 ? "😊" : "🤩"}
+                </span>
+                <span style={{ fontSize: 11 }}>{r.label}</span>
               </button>
             ))}
           </div>
+        </>
+      )}
+
+      {/* Stats row */}
+      {reviewed > 0 && (
+        <div style={{
+          marginTop: 20, padding: "12px 16px", borderRadius: 14,
+          background: "var(--surface-2)", border: "1px solid var(--border)",
+          display: "flex", alignItems: "center", gap: 16, fontSize: 13,
+        }}>
+          <span style={{ color: "var(--text-3)" }}>Session:</span>
+          <span style={{ color: "var(--green)", fontWeight: 700 }}>✓ {correct} correct</span>
+          <span style={{ color: "var(--red)", fontWeight: 700 }}>✗ {reviewed - correct} missed</span>
+          <span style={{ marginLeft: "auto", color: "var(--text-3)", fontWeight: 600 }}>
+            {Math.round((correct / reviewed) * 100)}% accuracy
+          </span>
         </div>
       )}
     </div>

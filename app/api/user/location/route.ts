@@ -13,11 +13,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
   }
 
+  // Reverse-geocode when browser geolocation gives coords but no city name
+  let finalCity: string | null = city ?? null;
+  let finalCountry: string | null = country ?? null;
+
+  if (!finalCity) {
+    try {
+      const geo = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+        { headers: { "User-Agent": "LinguaFlow/1.0" }, signal: AbortSignal.timeout(5000) }
+      );
+      if (geo.ok) {
+        const d = await geo.json();
+        finalCity    = d.address?.city || d.address?.town || d.address?.village || d.address?.suburb || null;
+        finalCountry = d.address?.country || null;
+      }
+    } catch { /* ignore */ }
+  }
+
   try {
     await prisma.userLocation.upsert({
-      where: { userId: session.user.id },
-      update: { latitude, longitude, accuracy: accuracy ?? null, city: city ?? null, country: country ?? null },
-      create: { userId: session.user.id, latitude, longitude, accuracy: accuracy ?? null, city: city ?? null, country: country ?? null },
+      where:  { userId: session.user.id },
+      update: { latitude, longitude, accuracy: accuracy ?? null, city: finalCity, country: finalCountry },
+      create: { userId: session.user.id, latitude, longitude, accuracy: accuracy ?? null, city: finalCity, country: finalCountry },
     });
   } catch (err) {
     console.error("[user/location] DB error:", err);

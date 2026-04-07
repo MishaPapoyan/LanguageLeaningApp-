@@ -25,6 +25,8 @@ enum GameType {
   FLASHCARDS
   MATCHING
   MEMORY_PALACE
+  WORD_SCRAMBLE
+  FILL_BLANK
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────

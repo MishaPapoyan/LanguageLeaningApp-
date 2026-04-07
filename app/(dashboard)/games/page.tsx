@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2 } from "lucide-react";
+import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Games — LinguaFlow",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const GAMES = [
   {
     href: "/games/flashcards",
-    gameType: "FLASHCARDS" as const,
+    gameType: "FLASHCARDS",
     icon: Layers,
     title: "Flashcards",
     desc: "Flip cards, test recall, build memory through spaced repetition",
@@ -27,7 +27,7 @@ const GAMES = [
   },
   {
     href: "/games/matching",
-    gameType: "MATCHING" as const,
+    gameType: "MATCHING",
     icon: Link2,
     title: "Word Match",
     desc: "Match French words to English translations against the clock",
@@ -41,7 +41,7 @@ const GAMES = [
   },
   {
     href: "/games/memory-palace",
-    gameType: "MEMORY_PALACE" as const,
+    gameType: "MEMORY_PALACE",
     icon: Puzzle,
     title: "Memory Palace",
     desc: "Place words in virtual rooms — spatial memory that never fades",
@@ -53,7 +53,35 @@ const GAMES = [
     diffColor: "#ef4444",
     xpLabel: "+50 XP",
   },
-] as const;
+  {
+    href: "/games/word-scramble",
+    gameType: "WORD_SCRAMBLE",
+    icon: Shuffle,
+    title: "Word Scramble",
+    desc: "Unscramble jumbled French words — race against your brain",
+    colorClass: "gc-rose",
+    textVar: "--gc-rose-text",
+    mutedVar: "--gc-rose-muted",
+    borderVar: "--gc-rose-border",
+    difficulty: "Intermediate",
+    diffColor: "#f59e0b",
+    xpLabel: "+25 XP",
+  },
+  {
+    href: "/games/fill-blank",
+    gameType: "FILL_BLANK",
+    icon: PenLine,
+    title: "Fill the Blank",
+    desc: "Complete French sentences — context makes vocabulary stick",
+    colorClass: "gc-teal",
+    textVar: "--gc-teal-text",
+    mutedVar: "--gc-teal-muted",
+    borderVar: "--gc-teal-border",
+    difficulty: "Intermediate",
+    diffColor: "#f59e0b",
+    xpLabel: "+25 XP",
+  },
+];
 
 export default async function GamesPage() {
   const session = await getServerSession(authOptions);
@@ -144,7 +172,7 @@ export default async function GamesPage() {
       </div>
 
       {/* ── Game Cards ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {GAMES.map((game) => {
           const best = bestScores[game.gameType];
           const GameIcon = game.icon;
