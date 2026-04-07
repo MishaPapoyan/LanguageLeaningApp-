@@ -16,18 +16,27 @@ export default async function FlashcardsPage() {
   let savedWords: any[] = [];
   let words: any[] = [];
 
+  const perfectCount = userId ? await prisma.gameScore.count({ where: { userId, score: 100 } }) : 0;
+
   try {
     if (userId) {
+      const savedCount = await prisma.savedWord.count({ where: { userId } });
+      const savedSkip = savedCount > 20 ? (perfectCount * 20) % Math.max(1, savedCount - 20 + 1) : 0;
       savedWords = await prisma.savedWord.findMany({
         where: { userId },
         include: { word: true },
         orderBy: { addedAt: "desc" },
+        skip: savedSkip,
         take: 20,
       });
     }
-    words = savedWords.length >= 4
-      ? savedWords.map((sw: any) => sw.word)
-      : await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, take: 20 });
+    if (savedWords.length >= 4) {
+      words = savedWords.map((sw: any) => sw.word);
+    } else {
+      const totalWords = await prisma.word.count();
+      const dictSkip = totalWords > 20 ? (perfectCount * 20) % Math.max(1, totalWords - 20 + 1) : 0;
+      words = await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, skip: dictSkip, orderBy: { createdAt: "asc" }, take: 20 });
+    }
   } catch (err) {
     console.error("[flashcards] DB error:", err);
     words = [];

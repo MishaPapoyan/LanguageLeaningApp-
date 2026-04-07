@@ -16,17 +16,26 @@ export default async function MatchingPage() {
   let savedWords: any[] = [];
   let words: any[] = [];
 
+  const perfectCount = userId ? await prisma.gameScore.count({ where: { userId, score: 100 } }) : 0;
+
   try {
     if (userId) {
+      const savedCount = await prisma.savedWord.count({ where: { userId } });
+      const savedSkip = savedCount > 8 ? (perfectCount * 8) % Math.max(1, savedCount - 8 + 1) : 0;
       savedWords = await prisma.savedWord.findMany({
         where: { userId },
         include: { word: true },
+        skip: savedSkip,
         take: 8,
       });
     }
-    words = savedWords.length >= 4
-      ? savedWords.map((sw: any) => sw.word)
-      : await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, take: 8 });
+    if (savedWords.length >= 4) {
+      words = savedWords.map((sw: any) => sw.word);
+    } else {
+      const totalWords = await prisma.word.count();
+      const dictSkip = totalWords > 8 ? (perfectCount * 8) % Math.max(1, totalWords - 8 + 1) : 0;
+      words = await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, skip: dictSkip, orderBy: { createdAt: "asc" }, take: 8 });
+    }
   } catch (err) {
     console.error("[matching] DB error:", err);
     words = [];

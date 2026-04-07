@@ -11,10 +11,17 @@ export const metadata: Metadata = {
 
 export default async function MemoryPalacePage() {
   const session = await getServerSession(authOptions);
+  const userId = session?.user?.id ?? "";
+
+  const perfectCount = userId ? await prisma.gameScore.count({ where: { userId, score: 100 } }) : 0;
+  const totalWords = await prisma.word.count();
+  const dictSkip = totalWords > 8 ? (perfectCount * 8) % Math.max(1, totalWords - 8 + 1) : 0;
 
   // Get kitchen/home words for the memory palace
   const words = await prisma.word.findMany({
     where: { category: { in: ["food", "travel", "places", "greetings"] } },
+    skip: dictSkip,
+    orderBy: { createdAt: "asc" },
     take: 8,
   });
 
