@@ -155,7 +155,7 @@ export default async function LoginPage() {
                 flexShrink: 0,
               }}
             >
-              LF
+              LC
             </div>
             <span
               style={{
@@ -165,7 +165,7 @@ export default async function LoginPage() {
                 fontWeight: 500,
               }}
             >
-              LinguaFlow
+              LangCraft
             </span>
           </Link>
 

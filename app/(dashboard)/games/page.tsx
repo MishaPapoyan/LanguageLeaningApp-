@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Games — LinguaFlow",
+  title: "Games — LangCraft",
   description: "Practice French vocabulary with fun games",
 };
 

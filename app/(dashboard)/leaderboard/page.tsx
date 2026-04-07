@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Leaderboard — LinguaFlow",
+  title: "Leaderboard — LangCraft",
   description: "See how you rank among other French learners",
 };
 

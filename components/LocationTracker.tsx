@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const STORAGE_KEY = "lf_location_consent";
+const STORAGE_KEY = "lc_location_consent";
 
 async function reverseGeocode(lat: number, lng: number): Promise<{ city: string | null; country: string | null }> {
   try {

@@ -193,7 +193,7 @@ export default async function RegisterPage() {
                 flexShrink: 0,
               }}
             >
-              LF
+              LC
             </div>
             <span
               style={{
@@ -203,7 +203,7 @@ export default async function RegisterPage() {
                 fontWeight: 500,
               }}
             >
-              LinguaFlow
+              LangCraft
             </span>
           </Link>
 

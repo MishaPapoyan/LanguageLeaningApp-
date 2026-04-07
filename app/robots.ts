@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ["/api/", "/admin/", "/profile/", "/teacher/"],
       allow: "/",
     },
-    sitemap: "https://linguaflow.app/sitemap.xml",
+    sitemap: "https://langcraft.app/sitemap.xml",
   };
 }

@@ -20,7 +20,7 @@ export function LoginForm() {
       setLoading(false);
       setDemoLoading(false);
     } else {
-      localStorage.removeItem("lf_location_consent");
+      localStorage.removeItem("lc_location_consent");
       router.push("/home");
       router.refresh();
     }
@@ -36,7 +36,7 @@ export function LoginForm() {
   const handleDemo = async () => {
     setDemoLoading(true);
     setError("");
-    await doSignIn("demo@linguaflow.app", "demo123");
+    await doSignIn("demo@langcraft.app", "demo123");
   };
 
   return (

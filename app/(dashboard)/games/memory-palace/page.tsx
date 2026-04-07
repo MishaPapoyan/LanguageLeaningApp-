@@ -5,7 +5,7 @@ import { MemoryPalace } from "@/components/games/MemoryPalace";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Memory Palace — LinguaFlow",
+  title: "Memory Palace — LangCraft",
   description: "Learn French words through spatial memory",
 };
 

@@ -3,7 +3,7 @@ import { PronunciationClient } from "@/components/pronunciation/PronunciationCli
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pronunciation — LinguaFlow",
+  title: "Pronunciation — LangCraft",
   description: "Practice French pronunciation",
 };
 

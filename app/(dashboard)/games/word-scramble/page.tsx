@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { WordScramble } from "@/components/games/WordScramble";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Word Scramble — LinguaFlow" };
+export const metadata: Metadata = { title: "Word Scramble — LangCraft" };
 
 export default async function WordScramblePage() {
   const session = await getServerSession(authOptions);

@@ -5,7 +5,7 @@ import { FlashcardGame } from "@/components/games/FlashcardGame";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Flashcards — LinguaFlow",
+  title: "Flashcards — LangCraft",
   description: "Practice French vocabulary with flashcards",
 };
 

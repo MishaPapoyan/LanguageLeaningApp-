@@ -17,7 +17,7 @@ const WeeklyChart = dynamic(
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Progress — LinguaFlow",
+  title: "My Progress — LangCraft",
   description: "Track your French learning progress and achievements",
 };
 

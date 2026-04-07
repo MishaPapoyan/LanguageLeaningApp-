@@ -145,7 +145,7 @@ export function AppNav() {
               boxShadow: "0 0 12px rgba(99,102,241,0.4)",
             }}
           >
-            LF
+            LC
           </span>
           <span
             style={{
@@ -159,7 +159,7 @@ export function AppNav() {
             }}
             className="hidden-xs"
           >
-            LinguaFlow
+            LangCraft
             <span style={{ fontSize: 14 }}>🇫🇷</span>
           </span>
         </Link>

@@ -5,7 +5,7 @@ import { MatchingGame } from "@/components/games/MatchingGame";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Matching Game — LinguaFlow",
+  title: "Matching Game — LangCraft",
   description: "Match French words with their English translations",
 };
 

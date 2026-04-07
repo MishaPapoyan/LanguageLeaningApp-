@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { StoriesClient } from "@/components/stories/StoriesClient";
 
 export const metadata: Metadata = {
-  title: "Stories — LinguaFlow",
+  title: "Stories — LangCraft",
   description: "Learn French through interactive stories",
 };
 

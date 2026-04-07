@@ -229,7 +229,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
         </div>
         <div className="text-right text-sm text-zinc-400">
           <p>Member since {new Date(overview.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</p>
-          <p>{overview.daysSinceJoin} days on LinguaFlow</p>
+          <p>{overview.daysSinceJoin} days on LangCraft</p>
         </div>
       </div>
 

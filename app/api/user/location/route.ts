@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     try {
       const geo = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
-        { headers: { "User-Agent": "LinguaFlow/1.0" }, signal: AbortSignal.timeout(5000) }
+        { headers: { "User-Agent": "LangCraft/1.0" }, signal: AbortSignal.timeout(5000) }
       );
       if (geo.ok) {
         const d = await geo.json();

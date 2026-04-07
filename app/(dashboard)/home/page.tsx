@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Dashboard — LinguaFlow",
+  title: "Dashboard — LangCraft",
 };
 
 export default async function HomePage() {

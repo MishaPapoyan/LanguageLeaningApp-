@@ -161,10 +161,10 @@ export default async function LandingPage() {
                 flexShrink: 0,
               }}
             >
-              LF
+              LC
             </div>
             <span style={{ fontFamily: "serif", fontSize: "18px", color: "var(--text)", fontWeight: 500 }}>
-              LinguaFlow
+              LangCraft
             </span>
             <span style={{ fontSize: "15px", lineHeight: 1 }}>🇫🇷</span>
           </Link>
@@ -711,9 +711,9 @@ export default async function LandingPage() {
                 fontSize: "8px",
               }}
             >
-              LF
+              LC
             </div>
-            <span>© 2026 LinguaFlow. All rights reserved.</span>
+            <span>© 2026 LangCraft. All rights reserved.</span>
           </div>
           <div style={{ display: "flex", gap: "20px" }}>
             <Link

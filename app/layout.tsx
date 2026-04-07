@@ -12,27 +12,27 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "LinguaFlow — Learn French",
+  title: "LangCraft — Learn French",
   description: "Learn French through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
-  metadataBase: new URL("https://linguaflow.app"),
+  metadataBase: new URL("https://langcraft.app"),
   openGraph: {
-    title: "LinguaFlow — Learn French",
+    title: "LangCraft — Learn French",
     description: "Learn French through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
-    url: "https://linguaflow.app",
-    siteName: "LinguaFlow",
+    url: "https://langcraft.app",
+    siteName: "LangCraft",
     type: "website",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "LinguaFlow — Learn French",
+        alt: "LangCraft — Learn French",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LinguaFlow — Learn French",
+    title: "LangCraft — Learn French",
     description: "Learn French through stories, AI conversation, and games.",
     images: ["/og-image.png"],
   },

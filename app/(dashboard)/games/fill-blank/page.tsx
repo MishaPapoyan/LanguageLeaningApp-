@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { FillBlank } from "@/components/games/FillBlank";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Fill in the Blank — LinguaFlow" };
+export const metadata: Metadata = { title: "Fill in the Blank — LangCraft" };
 
 export default async function FillBlankPage() {
   const session = await getServerSession(authOptions);
