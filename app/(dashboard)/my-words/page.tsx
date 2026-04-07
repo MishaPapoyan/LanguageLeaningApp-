@@ -13,7 +13,7 @@ interface CustomWord {
   createdAt: string;
 }
 
-type Mode = "list" | "quiz" | "result";
+type Mode = "list" | "setup" | "quiz" | "result";
 
 interface QuizQuestion {
   word: CustomWord;
@@ -86,6 +86,8 @@ export default function MyWordsPage() {
   const [editFront, setEditFront]   = useState("");
   const [editBack, setEditBack]     = useState("");
   const [saving, setSaving]         = useState(false);
+  const [quizCount, setQuizCount]   = useState<number | "custom">(10);
+  const [customCount, setCustomCount] = useState("");
   const [questions, setQuestions]   = useState<QuizQuestion[]>([]);
   const [qIndex, setQIndex]         = useState(0);
   const [selected, setSelected]     = useState<number | null>(null);
@@ -126,7 +128,11 @@ export default function MyWordsPage() {
 
   const startQuiz = () => {
     if (words.length < 2) return;
-    setQuestions(buildQuiz(words)); setQIndex(0); setSelected(null); setScore(0); setMode("quiz");
+    const count = quizCount === "custom"
+      ? Math.min(Math.max(parseInt(customCount) || 10, 2), words.length)
+      : Math.min(quizCount, words.length);
+    setQuestions(buildQuiz(words).slice(0, count));
+    setQIndex(0); setSelected(null); setScore(0); setMode("quiz");
   };
 
   // Reset hint state on each new question
@@ -200,7 +206,7 @@ export default function MyWordsPage() {
           </p>
 
           <div style={{ display: "flex", gap: 12 }}>
-            <button onClick={startQuiz} className="btn-primary" style={{
+            <button onClick={() => setMode("setup")} className="btn-primary" style={{
               flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
               gap: 8, padding: "13px 0", fontSize: 14, fontWeight: 700,
             }}>
@@ -213,6 +219,107 @@ export default function MyWordsPage() {
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  SETUP SCREEN
+  // ══════════════════════════════════════════════════════════════════════════
+  if (mode === "setup") {
+    const PRESETS = [10, 20, 40, 50, 100];
+    const resolvedCount = quizCount === "custom"
+      ? Math.min(Math.max(parseInt(customCount) || 0, 2), words.length)
+      : Math.min(quizCount, words.length);
+    const canStart = resolvedCount >= 2;
+
+    return (
+      <div style={{ maxWidth: 480, margin: "0 auto", paddingTop: 24 }}>
+        <button onClick={() => setMode("list")} style={{
+          display: "flex", alignItems: "center", gap: 5, marginBottom: 28,
+          background: "var(--surface-2)", border: "1px solid var(--border)",
+          borderRadius: 10, padding: "6px 12px", fontSize: 12, fontWeight: 600,
+          color: "var(--text-2)", cursor: "pointer",
+        }}>
+          <ArrowLeft size={13} /> Back
+        </button>
+
+        <h2 style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", margin: "0 0 6px" }}>
+          Quiz setup
+        </h2>
+        <p style={{ fontSize: 13, color: "var(--text-3)", margin: "0 0 28px" }}>
+          You have <strong style={{ color: "var(--accent)" }}>{words.length}</strong> words. How many do you want to quiz on?
+        </p>
+
+        {/* Preset pills */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
+          {PRESETS.map(n => {
+            const disabled = n > words.length;
+            const active = quizCount === n;
+            return (
+              <button key={n} onClick={() => !disabled && setQuizCount(n)} disabled={disabled}
+                style={{
+                  padding: "10px 22px", borderRadius: 12, fontWeight: 700, fontSize: 15,
+                  border: `2px solid ${active ? "var(--accent)" : "var(--border-md)"}`,
+                  background: active ? "var(--accent-dim)" : "var(--surface-2)",
+                  color: active ? "var(--accent)" : disabled ? "var(--text-3)" : "var(--text)",
+                  cursor: disabled ? "not-allowed" : "pointer",
+                  opacity: disabled ? 0.4 : 1,
+                  transition: "all 0.15s",
+                }}>
+                {n}
+              </button>
+            );
+          })}
+          {/* Custom */}
+          <button onClick={() => setQuizCount("custom")}
+            style={{
+              padding: "10px 22px", borderRadius: 12, fontWeight: 700, fontSize: 15,
+              border: `2px solid ${quizCount === "custom" ? "var(--accent)" : "var(--border-md)"}`,
+              background: quizCount === "custom" ? "var(--accent-dim)" : "var(--surface-2)",
+              color: quizCount === "custom" ? "var(--accent)" : "var(--text)",
+              cursor: "pointer", transition: "all 0.15s",
+            }}>
+            Custom
+          </button>
+        </div>
+
+        {/* Custom input */}
+        {quizCount === "custom" && (
+          <div style={{ marginBottom: 24 }}>
+            <input
+              type="number" min={2} max={words.length}
+              value={customCount}
+              onChange={e => setCustomCount(e.target.value)}
+              placeholder={`Enter number (2–${words.length})`}
+              className="input"
+              style={{ width: "100%", fontSize: 15 }}
+              autoFocus
+            />
+            {customCount && !canStart && (
+              <p style={{ fontSize: 12, color: "var(--red)", margin: "8px 0 0" }}>
+                Min 2 words required
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Summary */}
+        {canStart && (
+          <div style={{
+            padding: "14px 18px", borderRadius: 14, marginBottom: 24,
+            background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)",
+            fontSize: 13, color: "var(--text-2)",
+          }}>
+            You'll be quizzed on <strong style={{ color: "var(--accent)" }}>{resolvedCount}</strong> words
+          </div>
+        )}
+
+        <button onClick={startQuiz} disabled={!canStart} className="btn-primary"
+          style={{ width: "100%", padding: "14px", fontSize: 15, fontWeight: 800 }}>
+          <Play size={16} style={{ display: "inline", marginRight: 8 }} />
+          Start Quiz
+        </button>
       </div>
     );
   }
@@ -397,7 +504,7 @@ export default function MyWordsPage() {
         </div>
 
         {words.length >= 2 && (
-          <button onClick={startQuiz} className="btn-primary" style={{
+          <button onClick={() => setMode("setup")} className="btn-primary" style={{
             display: "flex", alignItems: "center", gap: 9,
             padding: "11px 22px", fontSize: 14, fontWeight: 800,
             boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
@@ -631,7 +738,7 @@ export default function MyWordsPage() {
 
           {/* Bottom quiz CTA */}
           {words.length >= 2 && (
-            <button onClick={startQuiz} style={{
+            <button onClick={() => setMode("setup")} style={{
               width: "100%", marginTop: 20, padding: "18px",
               borderRadius: 16, cursor: "pointer",
               background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.06))",
