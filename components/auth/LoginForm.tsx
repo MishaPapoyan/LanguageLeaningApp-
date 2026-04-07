@@ -3,51 +3,89 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Zap } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const result = await signIn("credentials", { email, password, redirect: false });
-
+  const doSignIn = async (e: string, p: string) => {
+    const result = await signIn("credentials", { email: e, password: p, redirect: false });
     if (result?.error) {
       setError("Invalid email or password");
       setLoading(false);
+      setDemoLoading(false);
     } else {
-      // Reset location consent on each login so the browser asks again
       localStorage.removeItem("lf_location_consent");
       router.push("/home");
       router.refresh();
     }
   };
 
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    setLoading(true);
+    setError("");
+    await doSignIn(email, password);
+  };
+
+  const handleDemo = async () => {
+    setDemoLoading(true);
+    setError("");
+    await doSignIn("demo@linguaflow.app", "demo123");
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: "var(--red-dim)", color: "var(--red)" }}>
-          {error}
-        </div>
-      )}
-      <div>
-        <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Email</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="you@example.com" required />
-      </div>
-      <div>
-        <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Password</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder="Enter your password" required />
-      </div>
-      <button type="submit" disabled={loading} className="btn-primary w-full py-3">
-        {loading ? "Signing in..." : "Sign in"}
+    <div>
+      {/* Demo banner */}
+      <button
+        type="button"
+        onClick={handleDemo}
+        disabled={demoLoading || loading}
+        style={{
+          width: "100%", marginBottom: 20,
+          padding: "13px 16px", borderRadius: 14,
+          background: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(20,184,166,0.12))",
+          border: "1.5px solid rgba(99,102,241,0.35)",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          cursor: demoLoading ? "wait" : "pointer",
+          transition: "all 0.15s",
+        }}
+      >
+        <Zap size={15} style={{ color: "var(--accent)" }} />
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
+          {demoLoading ? "Loading demo…" : "Try demo account — one click"}
+        </span>
       </button>
 
-    </form>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>or sign in</span>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: "var(--red-dim)", color: "var(--red)" }}>
+            {error}
+          </div>
+        )}
+        <div>
+          <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Email</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="you@example.com" required />
+        </div>
+        <div>
+          <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Password</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" disabled={loading || demoLoading} className="btn-primary w-full py-3">
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+    </div>
   );
 }
