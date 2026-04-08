@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TutorClient } from "@/components/tutor/TutorClient";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { getLevelFromXp } from "@/types";
 import { Metadata } from "next";
 
@@ -22,7 +23,9 @@ export default async function TutorPage() {
 
   return (
     <div className="animate-fade-up">
-      <TutorClient userLevel={userLevel} />
+      <ErrorBoundary label="AI Tutor">
+        <TutorClient userLevel={userLevel} />
+      </ErrorBoundary>
     </div>
   );
 }

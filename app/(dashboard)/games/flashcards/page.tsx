@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FlashcardGame } from "@/components/games/FlashcardGame";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -50,7 +51,9 @@ export default async function FlashcardsPage() {
           {savedWords.length >= 4 ? "Practicing your saved words" : "Practicing beginner vocabulary"}
         </p>
       </div>
-      <FlashcardGame words={words as any} />
+      <ErrorBoundary label="Flashcards">
+        <FlashcardGame words={words as any} />
+      </ErrorBoundary>
     </div>
   );
 }

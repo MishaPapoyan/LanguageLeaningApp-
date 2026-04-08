@@ -17,6 +17,8 @@ interface WordData {
   imageEmoji: string;
   isSaved: boolean;
   masteryLevel: number;
+  quizAttempts: number;
+  quizCorrect: number;
 }
 
 export function WordDetail({ word }: { word: WordData }) {
@@ -94,6 +96,38 @@ export function WordDetail({ word }: { word: WordData }) {
           <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium mb-1">Definition</p>
           <p className="text-zinc-700">{word.definition}</p>
         </div>
+
+        {/* Quiz stats — only shown for saved words with at least one attempt */}
+        {word.isSaved && word.quizAttempts > 0 && (
+          <div className="mt-4 flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-1.5">
+              <span className="text-zinc-400">Quiz accuracy:</span>
+              <span className="font-semibold text-zinc-700">
+                {Math.round((word.quizCorrect / word.quizAttempts) * 100)}%
+              </span>
+              <span className="text-zinc-400">({word.quizCorrect}/{word.quizAttempts})</span>
+            </div>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <div
+                  key={n}
+                  className="w-4 h-4 rounded-sm"
+                  style={{
+                    background: n <= word.masteryLevel
+                      ? "var(--accent, #7c3aed)"
+                      : "#e5e7eb",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {word.isSaved && word.quizAttempts === 0 && (
+          <p className="mt-3 text-xs text-zinc-400">
+            Not reviewed yet — visit <a href="/review" className="text-violet-500 hover:underline">Review</a> to start practicing.
+          </p>
+        )}
       </div>
 
       {/* Examples */}

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FillBlank } from "@/components/games/FillBlank";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Fill in the Blank — LangCraft" };
@@ -34,7 +35,9 @@ export default async function FillBlankPage() {
         <h1 style={{ fontSize: 26, fontWeight: 900, color: "var(--text)", margin: "0 0 4px" }}>Fill in the Blank</h1>
         <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>Complete the French sentence — hints cost 5 XP each</p>
       </div>
-      <FillBlank words={words} />
+      <ErrorBoundary label="Fill in the Blank">
+        <FillBlank words={words} />
+      </ErrorBoundary>
     </div>
   );
 }

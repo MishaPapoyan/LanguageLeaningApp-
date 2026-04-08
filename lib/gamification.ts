@@ -98,32 +98,44 @@ async function checkBadges(
   const newBadges: string[] = [];
   const existing = new Set(existingBadges);
 
-  // Level 5 badge
+  // ── Level badge (no DB query needed) ─────────────────────────────────────
   if (level >= 5 && !existing.has("level_5")) newBadges.push("level_5");
 
-  // Count saved words
-  const wordCount = await prisma.savedWord.count({ where: { userId } });
-  if (wordCount >= 10 && !existing.has("words_10")) newBadges.push("words_10");
-  if (wordCount >= 50 && !existing.has("words_50")) newBadges.push("words_50");
-
-  // Count completed stories
-  const completedStories = await prisma.storyProgress.count({
-    where: { userId, completed: true },
-  });
-  if (completedStories >= 1 && !existing.has("first_story")) newBadges.push("first_story");
-
-  const totalStories = await prisma.story.count();
-  if (completedStories >= totalStories && totalStories > 0 && !existing.has("all_stories")) {
-    newBadges.push("all_stories");
+  // ── Word badges — only query if at least one word badge is still unearned ─
+  const needsWordQuery = !existing.has("words_10") || !existing.has("words_50");
+  if (needsWordQuery) {
+    const wordCount = await prisma.savedWord.count({ where: { userId } });
+    if (wordCount >= 10 && !existing.has("words_10")) newBadges.push("words_10");
+    if (wordCount >= 50 && !existing.has("words_50")) newBadges.push("words_50");
   }
 
-  // Count tutor sessions
-  const tutorCount = await prisma.aiInteraction.count({ where: { userId } });
-  if (tutorCount >= 1 && !existing.has("tutor_first")) newBadges.push("tutor_first");
+  // ── Story badges — only query if at least one story badge is still unearned
+  const needsStoryQuery = !existing.has("first_story") || !existing.has("all_stories");
+  if (needsStoryQuery) {
+    const completedStories = await prisma.storyProgress.count({
+      where: { userId, completed: true },
+    });
+    if (completedStories >= 1 && !existing.has("first_story")) newBadges.push("first_story");
 
-  // Count games
-  const gameCount = await prisma.gameScore.count({ where: { userId } });
-  if (gameCount >= 10 && !existing.has("game_10")) newBadges.push("game_10");
+    if (!existing.has("all_stories")) {
+      const totalStories = await prisma.story.count();
+      if (completedStories >= totalStories && totalStories > 0) {
+        newBadges.push("all_stories");
+      }
+    }
+  }
+
+  // ── Tutor badge — only query if not yet earned ────────────────────────────
+  if (!existing.has("tutor_first")) {
+    const tutorCount = await prisma.aiInteraction.count({ where: { userId } });
+    if (tutorCount >= 1) newBadges.push("tutor_first");
+  }
+
+  // ── Game badge — only query if not yet earned ─────────────────────────────
+  if (!existing.has("game_10")) {
+    const gameCount = await prisma.gameScore.count({ where: { userId } });
+    if (gameCount >= 10) newBadges.push("game_10");
+  }
 
   return newBadges;
 }

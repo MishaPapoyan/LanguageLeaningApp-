@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MemoryPalace } from "@/components/games/MemoryPalace";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -31,7 +32,9 @@ export default async function MemoryPalacePage() {
         <h1 className="text-2xl font-serif text-zinc-900">Memory Palace</h1>
         <p className="text-sm text-zinc-500 mt-1">Place French words around a virtual café — click objects to reveal their names</p>
       </div>
-      <MemoryPalace words={words as any} />
+      <ErrorBoundary label="Memory Palace">
+        <MemoryPalace words={words as any} />
+      </ErrorBoundary>
     </div>
   );
 }

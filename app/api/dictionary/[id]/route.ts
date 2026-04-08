@@ -13,15 +13,20 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     let isSaved = false;
     let masteryLevel = 0;
 
+    let quizAttempts = 0;
+    let quizCorrect = 0;
+
     if (session?.user?.id) {
       const saved = await prisma.savedWord.findUnique({
         where: { userId_wordId: { userId: session.user.id, wordId: params.id } },
       });
       isSaved = !!saved;
       masteryLevel = saved?.masteryLevel ?? 0;
+      quizAttempts = saved?.quizAttempts ?? 0;
+      quizCorrect = saved?.quizCorrect ?? 0;
     }
 
-    const res = NextResponse.json({ ...word, isSaved, masteryLevel });
+    const res = NextResponse.json({ ...word, isSaved, masteryLevel, quizAttempts, quizCorrect });
     res.headers.set("Cache-Control", "private, s-maxage=300, stale-while-revalidate=600");
     return res;
   } catch (err) {

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { WordScramble } from "@/components/games/WordScramble";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Word Scramble — LangCraft" };
@@ -34,7 +35,9 @@ export default async function WordScramblePage() {
         <h1 style={{ fontSize: 26, fontWeight: 900, color: "var(--text)", margin: "0 0 4px" }}>Word Scramble</h1>
         <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>Unscramble the French word — use hints (5 XP each)</p>
       </div>
-      <WordScramble words={words} />
+      <ErrorBoundary label="Word Scramble">
+        <WordScramble words={words} />
+      </ErrorBoundary>
     </div>
   );
 }

@@ -79,18 +79,19 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  accounts       Account[]
-  sessions       Session[]
-  progress       Progress?
-  savedWords     SavedWord[]
-  customWords    CustomWord[]
-  storyProgress  StoryProgress[]
-  aiInteractions AiInteraction[]
-  voiceSessions  VoiceSession[]
-  gameScores     GameScore[]
-  taughtGroups   Group[]         @relation("Teacher")
-  studentGroups  GroupMember[]
-  location       UserLocation?
+  accounts        Account[]
+  sessions        Session[]
+  progress        Progress?
+  savedWords      SavedWord[]
+  customWords     CustomWord[]
+  storyProgress   StoryProgress[]
+  aiInteractions  AiInteraction[]
+  voiceSessions   VoiceSession[]
+  gameScores      GameScore[]
+  writingSessions WritingSession[]
+  taughtGroups    Group[]          @relation("Teacher")
+  studentGroups   GroupMember[]
+  location        UserLocation?
 }
 
 // ─── User Location ────────────────────────────────────────────────────────────
@@ -182,11 +183,20 @@ model SavedWord {
   masteryLevel Int       @default(0)
   lastReviewed DateTime?
   addedAt      DateTime  @default(now())
+  // SM-2 spaced repetition fields
+  interval     Float     @default(1)
+  ease         Float     @default(2.5)
+  repetitions  Int       @default(0)
+  nextReviewAt DateTime?
+  // Quiz accuracy stats
+  quizAttempts Int       @default(0)
+  quizCorrect  Int       @default(0)
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   word         Word      @relation(fields: [wordId], references: [id])
 
   @@unique([userId, wordId])
   @@index([userId])
+  @@index([userId, nextReviewAt])
 }
 
 // ─── Progress & Gamification ──────────────────────────────────────────────────
@@ -310,4 +320,19 @@ model Assignment {
   dueDate   DateTime
   createdAt DateTime @default(now())
   group     Group    @relation(fields: [groupId], references: [id])
+}
+
+// ─── Writing Sessions ─────────────────────────────────────────────────────────
+
+model WritingSession {
+  id        String   @id @default(cuid())
+  userId    String
+  prompt    String
+  text      String   @db.Text
+  feedback  String   @db.Text
+  level     String   @default("beginner")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

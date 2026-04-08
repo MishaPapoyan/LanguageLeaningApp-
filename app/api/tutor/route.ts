@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { groq, getTutorSystemPrompt } from "@/lib/claude";
+import { checkRateLimit } from "@/lib/rateLimit";
 import { TutorScenario, ChatMessage } from "@/types";
 
 export const runtime = "nodejs";
@@ -12,6 +13,27 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
+
+    // 20 tutor messages per minute per user
+    const { allowed, remaining, resetIn } = await checkRateLimit(
+      `tutor:${session.user.id}`,
+      20,
+      60
+    );
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please slow down." }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "X-RateLimit-Remaining": "0",
+            "Retry-After": String(resetIn),
+          },
+        }
+      );
+    }
+    void remaining; // used in header if needed later
 
     const body = await req.json();
     const { messages, scenario } = body as { messages: ChatMessage[]; scenario: TutorScenario };

@@ -1,11 +1,22 @@
 import { groq } from "@/lib/claude";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rateLimit";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // 10 writing feedback requests per minute per user
+  const { allowed, resetIn } = await checkRateLimit(`writing:${session.user.id}`, 10, 60);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait before submitting again." },
+      { status: 429, headers: { "Retry-After": String(resetIn) } }
+    );
+  }
 
   const { text, prompt, level } = await req.json();
 
@@ -39,16 +50,23 @@ Be encouraging but honest. Keep feedback concise and practical. Use simple Engli
 
     const encoder = new TextEncoder();
 
+    const userId = session.user.id;
     const readable = new ReadableStream({
       async start(controller) {
+        let fullFeedback = "";
         try {
           for await (const chunk of stream) {
             const chunkText = chunk.choices[0]?.delta?.content;
             if (chunkText) {
+              fullFeedback += chunkText;
               controller.enqueue(encoder.encode(chunkText));
             }
           }
           controller.close();
+          // Save session to DB after stream completes (non-blocking for client)
+          prisma.writingSession
+            .create({ data: { userId, prompt, text, feedback: fullFeedback, level: level || "beginner" } })
+            .catch((e: Error) => console.error("[writing] save session:", e.message));
         } catch (streamErr) {
           console.error("Writing feedback stream error:", streamErr);
           controller.error(streamErr);

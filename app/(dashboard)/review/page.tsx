@@ -18,8 +18,10 @@ interface ReviewWord {
 
 function calculateNext(word: ReviewWord, quality: number): ReviewWord {
   let { interval, ease, repetitions } = word;
-  if (quality < 3) { repetitions = 0; interval = 1; }
-  else {
+  if (quality < 3) {
+    repetitions = 0;
+    interval = 1;
+  } else {
     if (repetitions === 0) interval = 1;
     else if (repetitions === 1) interval = 3;
     else interval = Math.round(interval * ease);
@@ -37,36 +39,62 @@ const RATINGS = [
 ];
 
 export default function ReviewPage() {
-  const [words, setWords]           = useState<ReviewWord[]>([]);
-  const [dueWords, setDueWords]     = useState<ReviewWord[]>([]);
-  const [current, setCurrent]       = useState(0);
-  const [flipped, setFlipped]       = useState(false);
+  const [dueWords, setDueWords]       = useState<ReviewWord[]>([]);
+  const [current, setCurrent]         = useState(0);
+  const [flipped, setFlipped]         = useState(false);
   const [sessionDone, setSessionDone] = useState(false);
-  const [reviewed, setReviewed]     = useState(0);
-  const [correct, setCorrect]       = useState(0);
+  const [loading, setLoading]         = useState(true);
+  const [reviewed, setReviewed]       = useState(0);
+  const [correct, setCorrect]         = useState(0);
 
   useEffect(() => {
-    const parsed: ReviewWord[] = JSON.parse(localStorage.getItem("reviewWords") ?? "[]");
-    setWords(parsed);
-    const due = parsed.filter(w => w.nextReview <= Date.now()).slice(0, 20);
-    setDueWords(due);
-    if (due.length === 0) setSessionDone(true);
+    fetch("/api/review/words")
+      .then((r) => r.json())
+      .then((data) => {
+        const words: ReviewWord[] = data.words ?? [];
+        setDueWords(words);
+        if (words.length === 0) setSessionDone(true);
+      })
+      .catch(() => setSessionDone(true))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleRate = (quality: number) => {
+  const handleRate = async (quality: number) => {
     const word = dueWords[current];
     const updated = calculateNext(word, quality);
-    if (quality >= 3) setCorrect(c => c + 1);
-    setReviewed(r => r + 1);
-    const newWords = words.map(w => w.id === updated.id ? updated : w);
-    setWords(newWords);
-    localStorage.setItem("reviewWords", JSON.stringify(newWords));
+    if (quality >= 3) setCorrect((c) => c + 1);
+    setReviewed((r) => r + 1);
+
+    // Persist SM-2 state to DB (fire-and-forget; UI doesn't wait)
+    fetch("/api/review/rate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        wordId: updated.id,
+        quality,
+        interval: updated.interval,
+        ease: updated.ease,
+        repetitions: updated.repetitions,
+        nextReview: updated.nextReview,
+      }),
+    }).catch(() => {/* silent — don't block the UI */});
+
     setFlipped(false);
     if (current < dueWords.length - 1) setCurrent(current + 1);
     else setSessionDone(true);
   };
 
-  // ── Done / empty state ──────────────────────────────────────────────────
+  // ── Loading ─────────────────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div style={{ maxWidth: 520, margin: "0 auto", paddingTop: 80, textAlign: "center" }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>⏳</div>
+        <p style={{ color: "var(--text-3)", fontSize: 14 }}>Loading your review queue…</p>
+      </div>
+    );
+  }
+
+  // ── Done / empty state ──────────────────────────────────────────────────────
   if (sessionDone) {
     const acc = reviewed > 0 ? Math.round((correct / reviewed) * 100) : 0;
     return (
@@ -82,7 +110,6 @@ export default function ReviewPage() {
               <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 28px" }}>
                 {reviewed} words reviewed · {correct} correct · {acc}% accuracy
               </p>
-              {/* Accuracy bar */}
               <div style={{ height: 8, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden", marginBottom: 28 }}>
                 <div style={{
                   height: "100%", width: `${acc}%`,
@@ -93,7 +120,7 @@ export default function ReviewPage() {
             </>
           ) : (
             <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 28px" }}>
-              No words due right now. Keep learning to add more!
+              No words due right now. Save more words from the dictionary to build your review queue!
             </p>
           )}
 
@@ -181,7 +208,6 @@ export default function ReviewPage() {
           position: "relative",
         }}
       >
-        {/* Category badge */}
         <div style={{
           position: "absolute", top: 16, left: 20,
           fontSize: 10, fontWeight: 700, textTransform: "uppercase",
@@ -197,11 +223,9 @@ export default function ReviewPage() {
         </p>
 
         {!flipped ? (
-          <>
-            <p style={{ fontSize: 13, color: "var(--accent)", marginTop: 16, fontWeight: 600 }}>
-              Tap to reveal translation
-            </p>
-          </>
+          <p style={{ fontSize: 13, color: "var(--accent)", marginTop: 16, fontWeight: 600 }}>
+            Tap to reveal translation
+          </p>
         ) : (
           <>
             <div style={{ width: 48, height: 2, background: "var(--border-md)", borderRadius: 999, margin: "12px 0" }} />
@@ -209,7 +233,7 @@ export default function ReviewPage() {
               {word.translation}
             </p>
             <button
-              onClick={e => { e.stopPropagation(); speakFr(word.word); }}
+              onClick={(e) => { e.stopPropagation(); speakFr(word.word); }}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
                 padding: "7px 16px", borderRadius: 99,
@@ -230,7 +254,7 @@ export default function ReviewPage() {
             How well did you know it?
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-            {RATINGS.map(r => (
+            {RATINGS.map((r) => (
               <button
                 key={r.q}
                 onClick={() => handleRate(r.q)}

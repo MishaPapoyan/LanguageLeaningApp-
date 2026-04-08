@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -10,6 +11,25 @@ export async function GET(req: NextRequest) {
   }
 
   const userId = session.user.id;
+  const cacheKey = `analytics:${userId}`;
+
+  // Serve from Redis cache if available (60s TTL)
+  if (redis) {
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return new NextResponse(cached, {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "private, s-maxage=60, stale-while-revalidate=120",
+            "X-Cache": "HIT",
+          },
+        });
+      }
+    } catch {
+      // Redis unavailable — fall through to compute
+    }
+  }
 
   const [
     progress,
@@ -218,7 +238,7 @@ export async function GET(req: NextRequest) {
     ? Math.round(recentWeeklyXps.reduce((s, v) => s + v, 0) / recentWeeklyXps.length)
     : 0;
 
-  const res = NextResponse.json({
+  const payload = {
     overview: {
       totalXp: xpTotal,
       level: progress?.level ?? 1,
@@ -290,8 +310,15 @@ export async function GET(req: NextRequest) {
         .sort((a, b) => a.date.localeCompare(b.date)),
       heatmap,
     },
-  });
+  };
 
+  // Store in Redis cache (60s TTL), fire-and-forget
+  if (redis) {
+    redis.setex(cacheKey, 60, JSON.stringify(payload)).catch(() => {/* ignore */});
+  }
+
+  const res = NextResponse.json(payload);
   res.headers.set("Cache-Control", "private, s-maxage=60, stale-while-revalidate=120");
+  res.headers.set("X-Cache", "MISS");
   return res;
 }

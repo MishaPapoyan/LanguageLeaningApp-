@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MatchingGame } from "@/components/games/MatchingGame";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -47,7 +48,9 @@ export default async function MatchingPage() {
         <h1 className="text-2xl font-serif text-zinc-900">Word Matching</h1>
         <p className="text-sm text-zinc-500 mt-1">Match each French word to its English translation</p>
       </div>
-      <MatchingGame words={words.slice(0, 6) as any} />
+      <ErrorBoundary label="Word Matching">
+        <MatchingGame words={words.slice(0, 6) as any} />
+      </ErrorBoundary>
     </div>
   );
 }

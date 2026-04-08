@@ -3,8 +3,11 @@
  *
  * Priority chain:
  *  1. Mistral Voxtral TTS — phrases/sentences (3+ words) via /api/pronunciation/tts
- *  2. Google Translate TTS — single words and short phrases (Voxtral hallucinates on these)
- *  3. Web Speech API      — universal last-resort fallback
+ *  2. Web Speech API      — single words and universal fallback
+ *
+ * NOTE: Google Translate TTS (translate.google.com/translate_tts) was previously
+ * the second tier but uses an unofficial endpoint that Google can break at any time.
+ * Removed in favour of the stable Web Speech API.
  */
 
 export interface SpeakOptions {
@@ -79,30 +82,7 @@ async function speakViaVoxtral(
   return playAudioUrl(blobUrl, volume, onEnd, onError);
 }
 
-// ─── Google Translate TTS (fallback for non-French or Voxtral outage) ─────────
-
-function googleTtsUrl(text: string, lang: string): string {
-  const params = new URLSearchParams({
-    ie: "UTF-8",
-    q: text,
-    tl: lang.split("-")[0],
-    client: "tw-ob",
-    ttsspeed: "1",
-  });
-  return `https://translate.google.com/translate_tts?${params.toString()}`;
-}
-
-async function speakViaGoogle(
-  text: string,
-  lang: string,
-  volume: number,
-  onEnd?: () => void,
-  onError?: () => void
-): Promise<boolean> {
-  return playAudioUrl(googleTtsUrl(text, lang), volume, onEnd, onError);
-}
-
-// ─── Web Speech API (last-resort fallback) ────────────────────────────────────
+// ─── Web Speech API (fallback for single words and Voxtral outages) ──────────
 
 const PREFERRED_FR_VOICE_FRAGMENTS = ["Hortense", "Julie", "Henri", "français", "French"];
 const PREFERRED_EN_VOICE_FRAGMENTS = ["Aria", "Jenny", "Guy", "Davis", "Sonia", "Ryan", "Neural"];
@@ -215,11 +195,7 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
     if (voxtralOk) return;
   }
 
-  // 2. Google Translate TTS — reliable for single words and short phrases
-  const googleOk = await speakViaGoogle(text, lang, volume, onEnd, onError);
-  if (googleOk) return;
-
-  // 3. Web Speech API
+  // 2. Web Speech API — handles single words and acts as universal fallback
   if (!("speechSynthesis" in window)) { onError?.(); return; }
   const voices = await getVoices();
   const voice = pickBestVoice(voices, lang);
