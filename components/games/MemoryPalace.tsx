@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
-import { speakFr } from "@/lib/speech";
+import { speakTarget } from "@/lib/speech";
 
 interface Word { id: string; word: string; translation: string; imageEmoji: string; definition: string; }
 
@@ -18,6 +20,8 @@ const PALACE_OBJECTS = [
 ];
 
 export function MemoryPalace({ words }: { words: Word[] }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [activeObj, setActiveObj] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [quizMode, setQuizMode] = useState(false);
@@ -36,7 +40,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
     const newRevealed = new Set(revealed).add(objId);
     setRevealed(newRevealed);
     const word = assignments[objId];
-    if (word) speakFr(word.word);
+    if (word) speakTarget(word.word, langConfig.code);
   };
 
   const handleStartQuiz = () => {
@@ -117,7 +121,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{assignments[activeObj].imageEmoji}</span>
                     <span className="text-xl font-serif text-zinc-900">{assignments[activeObj].word}</span>
-                    <button onClick={() => speakFr(assignments[activeObj].word)} className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center text-sm">♪</button>
+                    <button onClick={() => speakTarget(assignments[activeObj].word, langConfig.code)} className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center text-sm">♪</button>
                   </div>
                   <p className="text-violet-600 font-medium">{assignments[activeObj].translation}</p>
                   <p className="text-sm text-zinc-500 mt-1">{assignments[activeObj].definition}</p>
@@ -142,7 +146,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
       ) : !quizSubmitted ? (
         <div className="space-y-4 animate-fade-up">
           <p className="text-sm text-zinc-600 mb-4">
-            What French word goes with each object in the café?
+            What {langConfig.label} word goes with each object in the café?
           </p>
           {PALACE_OBJECTS.filter((obj) => assignments[obj.id]).map((obj) => {
             const word = assignments[obj.id];
@@ -156,7 +160,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                     value={quizAnswers[obj.id] ?? ""}
                     onChange={(e) => setQuizAnswers((prev) => ({ ...prev, [obj.id]: e.target.value }))}
                     className="input"
-                    placeholder="Type the French word..."
+                    placeholder={`Type the ${langConfig.label} word...`}
                   />
                 </div>
               </div>

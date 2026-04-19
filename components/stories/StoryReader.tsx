@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { StoryData, WordData, QuizData } from "@/types";
-import { speakFr } from "@/lib/speech";
+import { speakTarget } from "@/lib/speech";
 
 interface Props {
   story: StoryData;
@@ -109,7 +109,7 @@ export function StoryReader({ story }: Props) {
                     <div className="flex items-center gap-2">
                       <span className="text-xl font-serif text-zinc-900">{selectedWord.word}</span>
                       <button
-                        onClick={() => speakFr(selectedWord.word)}
+                        onClick={() => speakTarget(selectedWord.word, story.language)}
                         className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center text-sm hover:bg-violet-100 transition-colors"
                         title="Listen"
                       >

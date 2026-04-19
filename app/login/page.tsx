@@ -63,7 +63,7 @@ export default async function LoginPage() {
 
         {/* Content */}
         <div style={{ textAlign: "center", position: "relative", zIndex: 10, padding: "0 48px" }}>
-          <p style={{ fontSize: "72px", lineHeight: 1, marginBottom: "24px" }}>🇫🇷</p>
+          <p style={{ fontSize: "72px", lineHeight: 1, marginBottom: "24px" }}>{"\u{1F30D}"}</p>
           <h2
             style={{
               fontFamily: "serif",
@@ -73,7 +73,7 @@ export default async function LoginPage() {
               marginBottom: "12px",
             }}
           >
-            Bienvenue!
+            Welcome!
           </h2>
           <p
             style={{
@@ -83,7 +83,7 @@ export default async function LoginPage() {
               marginBottom: "40px",
             }}
           >
-            Your French journey continues here.
+            Your learning journey continues here.
           </p>
 
           {/* Feature pills */}

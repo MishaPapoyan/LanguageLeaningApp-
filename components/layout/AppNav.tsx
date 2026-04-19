@@ -9,21 +9,28 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Home, BookOpen, BookText, MessageCircle, Gamepad2, RotateCcw,
   BookMarked, Library, ChevronDown, Settings, BarChart3, TrendingUp,
-  LogOut, Menu, X, Flame, Zap,
+  LogOut, Menu, X, Flame, Zap, PenLine,
 } from "lucide-react";
+import { t, getLocale, type TranslationKey } from "@/lib/i18n";
 
 interface ProgressData { xp: number; level: number; streak: number; }
 
-const NAV_LINKS = [
-  { href: "/home",       label: "Home",       Icon: Home },
-  { href: "/learn",      label: "Learn",      Icon: BookText },
-  { href: "/stories",    label: "Stories",    Icon: BookOpen },
-  { href: "/tutor",      label: "Tutor",      Icon: MessageCircle },
-  { href: "/games",      label: "Games",      Icon: Gamepad2 },
-  { href: "/review",     label: "Practice",   Icon: RotateCcw },
-  { href: "/dictionary", label: "Dictionary", Icon: Library },
-  { href: "/my-words",   label: "My Words",   Icon: BookMarked },
+const NAV_LINKS: { href: string; labelKey: TranslationKey; Icon: typeof Home }[] = [
+  { href: "/home",       labelKey: "nav_home",       Icon: Home },
+  { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
+  { href: "/stories",    labelKey: "nav_stories",    Icon: BookOpen },
+  { href: "/tutor",      labelKey: "nav_tutor",      Icon: MessageCircle },
+  { href: "/games",      labelKey: "nav_games",      Icon: Gamepad2 },
+  { href: "/review",     labelKey: "nav_practice",   Icon: RotateCcw },
+  { href: "/writing",    labelKey: "nav_writing",    Icon: PenLine },
+  { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
+  { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
 ];
+
+const TARGET_LANG_FLAGS: Record<string, string> = {
+  fr: "\u{1F1EB}\u{1F1F7}",
+  es: "\u{1F1EA}\u{1F1F8}",
+};
 
 let _pcache: { data: ProgressData; at: number } | null = null;
 
@@ -82,14 +89,17 @@ export function AppNav() {
   const userImage = session?.user?.image ?? "";
   const userName  = session?.user?.name  ?? "User";
   const userEmail = session?.user?.email ?? "";
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
+  const targetLang = (session?.user as any)?.targetLanguage ?? "fr";
+  const flag = TARGET_LANG_FLAGS[targetLang] ?? "\u{1F1EB}\u{1F1F7}";
 
   const avatarIsEmoji = isEmoji(userImage);
   const avatarInitial = userName[0]?.toUpperCase() ?? "U";
 
-  const DROPDOWN_ITEMS = [
-    { href: "/settings",  label: "Settings",  Icon: Settings },
-    { href: "/progress",  label: "Progress",  Icon: TrendingUp },
-    { href: "/analytics", label: "Analytics", Icon: BarChart3 },
+  const DROPDOWN_ITEMS: { href: string; labelKey: TranslationKey; Icon: typeof Settings }[] = [
+    { href: "/settings",  labelKey: "nav_settings",  Icon: Settings },
+    { href: "/progress",  labelKey: "nav_progress",  Icon: TrendingUp },
+    { href: "/analytics", labelKey: "nav_analytics", Icon: BarChart3 },
   ];
 
   return (
@@ -160,7 +170,7 @@ export function AppNav() {
             className="hidden-xs"
           >
             LangCraft
-            <span style={{ fontSize: 14 }}>🇫🇷</span>
+            <span style={{ fontSize: 14 }}>{flag}</span>
           </span>
         </Link>
 
@@ -169,12 +179,12 @@ export function AppNav() {
           style={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
           className="desktop-nav"
         >
-          {NAV_LINKS.map(({ href, label, Icon }) => {
+          {NAV_LINKS.map(({ href, labelKey, Icon }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link key={href} href={href} className={active ? "nav-link active" : "nav-link"}>
                 <Icon size={13} aria-hidden="true" />
-                {label}
+                {t(locale, labelKey)}
               </Link>
             );
           })}
@@ -340,7 +350,7 @@ export function AppNav() {
                 </p>
               </div>
 
-              {DROPDOWN_ITEMS.map(({ href, label, Icon }) => (
+              {DROPDOWN_ITEMS.map(({ href, labelKey, Icon }) => (
                 <Link
                   key={href}
                   href={href}
@@ -367,7 +377,7 @@ export function AppNav() {
                   }}
                 >
                   <Icon size={13} style={{ color: "var(--text-3)", flexShrink: 0 }} aria-hidden="true" />
-                  {label}
+                  {t(locale, labelKey)}
                 </Link>
               ))}
 
@@ -396,7 +406,7 @@ export function AppNav() {
                 onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
               >
                 <LogOut size={13} style={{ flexShrink: 0 }} aria-hidden="true" />
-                Sign out
+                {t(locale, "nav_signOut")}
               </button>
             </div>
           )}
@@ -448,7 +458,7 @@ export function AppNav() {
               marginBottom: 10,
             }}
           >
-            {NAV_LINKS.map(({ href, label, Icon }) => {
+            {NAV_LINKS.map(({ href, labelKey, Icon }) => {
               const active = pathname === href || pathname.startsWith(href + "/");
               return (
                 <Link
@@ -474,7 +484,7 @@ export function AppNav() {
                   }}
                 >
                   <Icon size={15} aria-hidden="true" />
-                  {label}
+                  {t(locale, labelKey)}
                 </Link>
               );
             })}

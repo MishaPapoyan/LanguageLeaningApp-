@@ -104,7 +104,7 @@ export function TeacherDashboard({ groups: initialGroups }: { groups: GroupData[
               type="text"
               value={className}
               onChange={(e) => setClassName(e.target.value)}
-              placeholder="Class name (e.g. French Beginners B)"
+              placeholder="Class name (e.g. Beginners B)"
               className="input flex-1"
               onKeyDown={(e) => { if (e.key === "Enter") createClass(); }}
             />

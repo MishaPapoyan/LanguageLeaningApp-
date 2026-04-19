@@ -50,10 +50,21 @@ export const authOptions: NextAuthOptions = {
       : []),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
+      }
+      // Refresh targetLanguage + nativeLanguage from DB on sign-in or when explicitly updated
+      if (user || trigger === "update") {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: (token.id ?? user?.id) as string },
+          select: { targetLanguage: true, nativeLanguage: true },
+        });
+        if (dbUser) {
+          token.targetLanguage = dbUser.targetLanguage;
+          token.nativeLanguage = dbUser.nativeLanguage;
+        }
       }
       return token;
     },
@@ -61,6 +72,8 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.targetLanguage = (token.targetLanguage as string) ?? "fr";
+        session.user.nativeLanguage = (token.nativeLanguage as string) ?? "en";
       }
       return session;
     },
@@ -87,6 +100,8 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       role: string;
+      targetLanguage: string;
+      nativeLanguage: string;
     };
   }
 }

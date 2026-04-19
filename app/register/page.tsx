@@ -88,7 +88,7 @@ export default async function RegisterPage() {
 
         {/* Content */}
         <div style={{ textAlign: "center", position: "relative", zIndex: 10, padding: "0 48px" }}>
-          <p style={{ fontSize: "72px", lineHeight: 1, marginBottom: "24px" }}>🇫🇷</p>
+          <p style={{ fontSize: "72px", lineHeight: 1, marginBottom: "24px" }}>{"\u{1F30D}"}</p>
           <h2
             style={{
               fontFamily: "serif",
@@ -98,7 +98,7 @@ export default async function RegisterPage() {
               marginBottom: "12px",
             }}
           >
-            Commencez!
+            Let's go!
           </h2>
           <p
             style={{
@@ -108,7 +108,7 @@ export default async function RegisterPage() {
               marginBottom: "40px",
             }}
           >
-            Start speaking French from day one.
+            Start speaking from day one.
           </p>
 
           {/* Benefit list */}
@@ -227,7 +227,7 @@ export default async function RegisterPage() {
               lineHeight: 1.5,
             }}
           >
-            Start your free French learning journey today
+            Start your free language learning journey today
           </p>
 
           {/* Form */}

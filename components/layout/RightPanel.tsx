@@ -1,9 +1,11 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { getXpProgress } from "@/types";
 import { unstable_cache } from "next/cache";
+import { StatsWidget } from "@/components/layout/StatsWidget";
 
 const MEDAL: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
@@ -40,29 +42,50 @@ const getUserPanelData = unstable_cache(
   { revalidate: 30, tags: ["right-panel-user"] }
 );
 
-const TIPS = [
-  { tip: "Speak out loud every word you learn — even alone. Your mouth needs practice too.", emoji: "🗣️" },
-  { tip: "French has silent letters everywhere. Focus on the sound, not the spelling, at first.", emoji: "🔇" },
-  { tip: "Learn phrases, not just words. \"Je voudrais\" is more useful than \"vouloir\" alone.", emoji: "💬" },
-  { tip: "Gender (le/la) matters. Learn every noun with its article as one unit.", emoji: "🏷️" },
-  { tip: "Watch French YouTube with subtitles — your ear adapts faster than any exercise.", emoji: "📺" },
-  { tip: "\"Faux amis\" are words that look English but mean something different. Watch out!", emoji: "⚠️" },
-  { tip: "The 100 most common French words cover ~50% of everyday conversation.", emoji: "📊" },
-  { tip: "Say \"Parlez-vous plus lentement, s'il vous plaît?\" — ask locals to slow down.", emoji: "🐌" },
-  { tip: "Liaisons (linking words) make French sound fluid. Practice them daily.", emoji: "🔗" },
-  { tip: "Read children's books in French — perfect vocab level, real grammar.", emoji: "📖" },
-  { tip: "\"C'est\" vs \"Il est\" — both mean \"it is\" but follow different rules. Learn them early.", emoji: "🤔" },
-  { tip: "Immersion beats memorization. Change your phone language to French today.", emoji: "📱" },
-  { tip: "French tenses: start with présent, passé composé, and futur proche. Master those three first.", emoji: "⏳" },
-  { tip: "Repetition spaced over days beats cramming. Even 10 minutes daily beats 2 hours once a week.", emoji: "🗓️" },
-];
+const TIPS: Record<string, { tip: string; emoji: string }[]> = {
+  fr: [
+    { tip: "Speak out loud every word you learn — even alone. Your mouth needs practice too.", emoji: "🗣️" },
+    { tip: "French has silent letters everywhere. Focus on the sound, not the spelling, at first.", emoji: "🔇" },
+    { tip: "Learn phrases, not just words. \"Je voudrais\" is more useful than \"vouloir\" alone.", emoji: "💬" },
+    { tip: "Gender (le/la) matters. Learn every noun with its article as one unit.", emoji: "🏷️" },
+    { tip: "Watch French YouTube with subtitles — your ear adapts faster than any exercise.", emoji: "📺" },
+    { tip: "\"Faux amis\" are words that look English but mean something different. Watch out!", emoji: "⚠️" },
+    { tip: "The 100 most common French words cover ~50% of everyday conversation.", emoji: "📊" },
+    { tip: "Ask locals to slow down — \"Parlez plus lentement, s'il vous plaît?\"", emoji: "🐌" },
+    { tip: "Liaisons (linking words) make French sound fluid. Practice them daily.", emoji: "🔗" },
+    { tip: "Read children's books in French — perfect vocab level, real grammar.", emoji: "📖" },
+    { tip: "\"C'est\" vs \"Il est\" — both mean \"it is\" but follow different rules. Learn them early.", emoji: "🤔" },
+    { tip: "Immersion beats memorization. Change your phone language to French today.", emoji: "📱" },
+    { tip: "Start with présent, passé composé, and futur proche. Master those three tenses first.", emoji: "⏳" },
+    { tip: "Repetition spaced over days beats cramming. Even 10 minutes daily beats 2 hours once a week.", emoji: "🗓️" },
+  ],
+  es: [
+    { tip: "Speak out loud every word you learn — even alone. Your mouth needs practice too.", emoji: "🗣️" },
+    { tip: "Spanish spelling is very phonetic — what you see is what you say!", emoji: "🔤" },
+    { tip: "Learn phrases, not just words. \"Me gustaría\" is more useful than \"gustar\" alone.", emoji: "💬" },
+    { tip: "Gender (el/la) matters. Learn every noun with its article as one unit.", emoji: "🏷️" },
+    { tip: "Watch Spanish YouTube with subtitles — your ear adapts faster than any exercise.", emoji: "📺" },
+    { tip: "\"Falsos amigos\" are words that look English but mean something different. Watch out!", emoji: "⚠️" },
+    { tip: "The 100 most common Spanish words cover ~50% of everyday conversation.", emoji: "📊" },
+    { tip: "Ask locals to slow down — \"¿Puede hablar más despacio, por favor?\"", emoji: "🐌" },
+    { tip: "Ser vs Estar — both mean \"to be\" but are used differently. Learn this early!", emoji: "🔗" },
+    { tip: "Read children's books in Spanish — perfect vocab level, real grammar.", emoji: "📖" },
+    { tip: "Por vs Para — both translate to \"for\" but follow different rules. Master them!", emoji: "🤔" },
+    { tip: "Immersion beats memorization. Change your phone language to Spanish today.", emoji: "📱" },
+    { tip: "Start with presente, pretérito, and futuro. Master those three tenses first.", emoji: "⏳" },
+    { tip: "Repetition spaced over days beats cramming. Even 10 minutes daily beats 2 hours once a week.", emoji: "🗓️" },
+  ],
+};
 
 export async function RightPanel() {
   const session = await getServerSession(authOptions);
   const currentUserId = session?.user?.id ?? "";
+  const targetLang = (session?.user as { targetLanguage?: string })?.targetLanguage ?? "fr";
+  const langConfig = getLanguageConfig(targetLang);
+  const tips = TIPS[targetLang] ?? TIPS["fr"];
 
-  const todayTipIndex = Math.floor(Date.now() / 86_400_000) % TIPS.length;
-  const todayTip = TIPS[todayTipIndex];
+  const todayTipIndex = Math.floor(Date.now() / 86_400_000) % tips.length;
+  const todayTip = tips[todayTipIndex];
 
   const [users, { myProgress, savedWords }] = await Promise.all([
     getLeaderboard(),
@@ -101,61 +124,13 @@ export async function RightPanel() {
 
       {/* ── My Stats ── */}
       {myProgress && xpInfo && (
-        <div className="card p-4">
-          <p className="section-label mb-3">My stats</p>
-
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {[
-              { label: "Streak",  value: `${myProgress.streak ?? 0}d`, emoji: "🔥", color: "var(--gold)" },
-              { label: "Level",   value: `Lv ${xpInfo.level}`,         emoji: "⭐", color: "var(--accent)" },
-              { label: "XP",      value: myProgress.xp.toLocaleString(), emoji: "💎", color: "#60a5fa" },
-              { label: "Rank",    value: myEntry ? `#${myEntry.rank}` : "—", emoji: "🏅", color: "var(--green)" },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className="flex items-center gap-2 px-2.5 py-2 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}
-              >
-                <span className="text-base">{s.emoji}</span>
-                <div>
-                  <p className="text-sm font-extrabold leading-none" style={{ color: s.color }}>{s.value}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: "var(--text-3)" }}>{s.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* XP bar */}
-          <div>
-            <div className="flex justify-between text-[10px] mb-1" style={{ color: "var(--text-3)" }}>
-              <span>{xpInfo.current} XP</span>
-              <span>{xpInfo.needed} to Lv {xpInfo.level + 1}</span>
-            </div>
-            <div className="xp-bar">
-              <div className="xp-bar-fill" style={{ width: `${xpInfo.pct}%` }} />
-            </div>
-          </div>
-
-          {/* Skills mini */}
-          <div className="flex gap-3 mt-3">
-            {[
-              { key: "vocabulary", label: "Vocab",   color: "#60a5fa" },
-              { key: "grammar",    label: "Grammar",  color: "var(--accent)" },
-              { key: "speaking",   label: "Speaking", color: "var(--green)" },
-            ].map((sk) => {
-              const pct = skillTree[sk.key] ?? 0;
-              return (
-                <div key={sk.key} className="flex-1 text-center">
-                  <div className="text-[11px] font-bold mb-1" style={{ color: sk.color }}>{pct}%</div>
-                  <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: sk.color }} />
-                  </div>
-                  <div className="text-[9px] mt-1" style={{ color: "var(--text-3)" }}>{sk.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <StatsWidget
+          initialXp={myProgress.xp}
+          initialLevel={xpInfo.level}
+          initialStreak={myProgress.streak ?? 0}
+          initialRank={myEntry?.rank ?? null}
+          initialSkillTree={skillTree}
+        />
       )}
 
       {/* ── Leaderboard ── */}
@@ -279,7 +254,7 @@ export async function RightPanel() {
         </div>
       )}
 
-      {/* ── French tip of the day ── */}
+      {/* ── Tip of the day ── */}
       <div
         className="rounded-2xl p-4"
         style={{

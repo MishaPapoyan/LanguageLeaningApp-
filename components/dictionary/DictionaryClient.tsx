@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 
 interface Word {
@@ -41,6 +43,8 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
 const DAY_SEED = Math.floor(Date.now() / 86_400_000);
 
 export function DictionaryClient({ initialWords, categories }: Props) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
@@ -69,7 +73,7 @@ export function DictionaryClient({ initialWords, categories }: Props) {
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>Dictionary</h1>
-        <p className="text-sm" style={{ color: "var(--text-2)" }}>Browse all French vocabulary. Save words to practice them later.</p>
+        <p className="text-sm" style={{ color: "var(--text-2)" }}>Browse all {langConfig.label} vocabulary. Save words to practice them later.</p>
       </div>
 
       {/* Yellow warning if DB is empty */}
@@ -85,7 +89,7 @@ export function DictionaryClient({ initialWords, categories }: Props) {
           <div>
             <p className="text-sm font-semibold" style={{ color: "#f59e0b" }}>No vocabulary loaded</p>
             <p className="text-xs mt-0.5" style={{ color: "rgba(245,158,11,0.7)" }}>
-              The dictionary is empty. Run the database seed to populate French vocabulary words.
+              The dictionary is empty. Run the database seed to populate vocabulary words.
             </p>
           </div>
         </div>
@@ -101,7 +105,7 @@ export function DictionaryClient({ initialWords, categories }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search French or English..."
+            placeholder={`Search ${langConfig.label} or English...`}
             className="input pl-10 w-full"
           />
         </div>

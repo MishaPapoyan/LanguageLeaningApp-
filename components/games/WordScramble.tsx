@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { Lightbulb, RotateCcw } from "lucide-react";
 
@@ -29,6 +31,11 @@ async function spendXp(amount: number): Promise<boolean> {
 }
 
 export function WordScramble({ words }: { words: Word[] }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+  // Multi-word vocab (e.g. "la madre") can't be scrambled letter-by-letter meaningfully
+  const singleWords = words.filter(w => !w.word.includes(" "));
+  words = singleWords.length >= 5 ? singleWords : words;
   const ROUNDS = Math.min(words.length, 10);
 
   const [round, setRound]       = useState(0);
@@ -197,9 +204,8 @@ export function WordScramble({ words }: { words: Word[] }) {
 
       {/* Word card */}
       <div className="card" style={{ padding: "28px 24px", textAlign: "center", marginBottom: 20 }}>
-        <div style={{ fontSize: 40, marginBottom: 8 }}>{word.imageEmoji}</div>
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px" }}>
-          Unscramble the French word for:
+          Unscramble the {langConfig.label} word for:
         </p>
         <p style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", margin: 0 }}>{word.translation}</p>
       </div>

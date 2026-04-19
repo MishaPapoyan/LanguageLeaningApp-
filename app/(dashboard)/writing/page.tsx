@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 interface WritingHistoryItem {
   id: string;
@@ -21,7 +22,7 @@ interface WritingPrompt {
   sampleWords: string[];
 }
 
-const PROMPTS: WritingPrompt[] = [
+const PROMPTS_FR: WritingPrompt[] = [
   {
     id: "w1",
     emoji: "👋",
@@ -53,7 +54,7 @@ const PROMPTS: WritingPrompt[] = [
     id: "w4",
     emoji: "📅",
     title: "My Daily Routine",
-    prompt: "Describe a typical day. What do you do in the morning, afternoon, and evening?",
+    prompt: "Describe a typical day in French. What do you do in the morning, afternoon, and evening?",
     level: "intermediate",
     hints: ["Le matin, je...", "L'après-midi, je...", "Le soir, je..."],
     sampleWords: ["manger", "travailler", "regarder", "dormir", "puis"],
@@ -62,7 +63,7 @@ const PROMPTS: WritingPrompt[] = [
     id: "w5",
     emoji: "🌍",
     title: "My Last Trip",
-    prompt: "Write about a trip you took (real or imaginary). Use the past tense (passé composé)!",
+    prompt: "Write in French about a trip you took (real or imaginary). Use the past tense (passé composé)!",
     level: "intermediate",
     hints: ["Je suis allé(e) à...", "J'ai visité...", "C'était magnifique !"],
     sampleWords: ["voyager", "visiter", "manger", "voir", "aimer"],
@@ -71,23 +72,120 @@ const PROMPTS: WritingPrompt[] = [
     id: "w6",
     emoji: "🛒",
     title: "Shopping List",
-    prompt: "You need to go shopping. Write a list of what you need to buy and how you'll ask for each item at the market.",
+    prompt: "In French, write a list of what you need to buy and how you'll ask for each item at the market.",
     level: "beginner",
     hints: ["J'ai besoin de...", "Je voudrais du / de la / des...", "C'est combien ?"],
     sampleWords: ["pain", "fromage", "fruits", "légumes", "combien"],
   },
 ];
 
+const PROMPTS_ES: WritingPrompt[] = [
+  {
+    id: "w1",
+    emoji: "👋",
+    title: "Introduce Yourself",
+    prompt: "Write 3-5 sentences introducing yourself in Spanish. Include your name, where you live, and one thing you like.",
+    level: "beginner",
+    hints: ["Me llamo...", "Vivo en...", "Me gusta..."],
+    sampleWords: ["hola", "yo", "soy", "gustar", "vivir"],
+  },
+  {
+    id: "w2",
+    emoji: "🍽️",
+    title: "At the Restaurant",
+    prompt: "You're at a Spanish tapas bar. Write a short conversation ordering food and drinks.",
+    level: "beginner",
+    hints: ["Hola, quiero...", "La cuenta, por favor", "¡Está delicioso!"],
+    sampleWords: ["quiero", "por favor", "gracias", "agua", "café"],
+  },
+  {
+    id: "w3",
+    emoji: "🏠",
+    title: "Describe Your Family",
+    prompt: "Write about your family in Spanish. Who are they? What do they look like? Use adjectives!",
+    level: "beginner",
+    hints: ["Mi madre es...", "Mi padre es...", "Tengo un hermano / una hermana"],
+    sampleWords: ["familia", "grande", "pequeño", "simpático", "tener"],
+  },
+  {
+    id: "w4",
+    emoji: "📅",
+    title: "My Daily Routine",
+    prompt: "Describe a typical day in Spanish. What do you do in the morning, afternoon, and evening?",
+    level: "intermediate",
+    hints: ["Por la mañana, yo...", "Por la tarde, yo...", "Por la noche, yo..."],
+    sampleWords: ["comer", "trabajar", "ver", "dormir", "después"],
+  },
+  {
+    id: "w5",
+    emoji: "🌍",
+    title: "My Last Trip",
+    prompt: "Write in Spanish about a trip you took (real or imaginary). Use the preterite tense!",
+    level: "intermediate",
+    hints: ["Fui a...", "Visité...", "¡Fue increíble!"],
+    sampleWords: ["viajar", "visitar", "comer", "ver", "gustar"],
+  },
+  {
+    id: "w6",
+    emoji: "🛒",
+    title: "Shopping List",
+    prompt: "In Spanish, write a list of what you need to buy and how you'll ask for each item at the market.",
+    level: "beginner",
+    hints: ["Necesito...", "Quisiera...", "¿Cuánto cuesta?"],
+    sampleWords: ["pan", "queso", "frutas", "verduras", "cuánto"],
+  },
+];
+
 export default function WritingPage() {
+  const { data: session } = useSession();
+  const targetLanguage = session?.user?.targetLanguage ?? "fr";
+  const PROMPTS = targetLanguage === "es" ? PROMPTS_ES : PROMPTS_FR;
+
   const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(null);
   const [text, setText] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showHints, setShowHints] = useState(false);
-  const [view, setView] = useState<"prompts" | "history">("prompts");
+  const [view, setView] = useState<"check" | "prompts" | "history">("check");
   const [history, setHistory] = useState<WritingHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  // Quick sentence check state
+  const [checkText, setCheckText] = useState("");
+  const [checkFeedback, setCheckFeedback] = useState<string | null>(null);
+  const [checkLoading, setCheckLoading] = useState(false);
+
+  const handleQuickCheck = async () => {
+    if (!checkText.trim()) return;
+    setCheckLoading(true);
+    setCheckFeedback(null);
+    const langName = targetLanguage === "es" ? "Spanish" : "French";
+    try {
+      const res = await fetch("/api/writing/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: checkText.trim(),
+          prompt: `The user wrote a sentence in ${langName}. Check grammar, spelling, and naturalness. Be concise and direct — just point out what's wrong and give the corrected version. If it's perfect, say so.`,
+          level: "beginner",
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error("Failed");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        result += decoder.decode(value, { stream: true });
+        setCheckFeedback(result);
+      }
+    } catch {
+      setCheckFeedback("Could not check right now. Please try again.");
+    } finally {
+      setCheckLoading(false);
+    }
+  };
 
   const loadHistory = async () => {
     setHistoryLoading(true);
@@ -139,19 +237,73 @@ export default function WritingPage() {
     return (
       <div className="max-w-3xl">
         {/* Tab bar */}
-        <div className="flex gap-1 mb-5 p-1 bg-zinc-100 rounded-xl w-fit">
-          {(["prompts", "history"] as const).map((tab) => (
+        <div className="flex gap-1 mb-5 p-1 rounded-xl w-fit" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+          {(["check", "prompts", "history"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setView(tab)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold capitalize transition-all ${
-                view === tab ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"
-              }`}
+              style={{
+                padding: "6px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600,
+                background: view === tab ? "var(--accent)" : "transparent",
+                color: view === tab ? "#fff" : "var(--text-3)",
+                border: "none", cursor: "pointer", transition: "all 0.15s",
+              }}
             >
-              {tab === "history" ? "📜 History" : "✍️ Prompts"}
+              {tab === "check" ? "⚡ Check Sentence" : tab === "history" ? "📜 History" : "✍️ Prompts"}
             </button>
           ))}
         </div>
+
+        {/* Quick Sentence Check */}
+        {view === "check" && (
+          <div style={{ maxWidth: 680 }}>
+            <div style={{ padding: "16px 18px", borderRadius: 16, marginBottom: 16, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)" }}>
+              <p style={{ fontSize: 13, color: "var(--text-2)", margin: 0 }}>
+                Type any sentence in <strong style={{ color: "var(--accent)" }}>{targetLanguage === "es" ? "Spanish" : "French"}</strong> and AI will check your grammar, spelling, and naturalness instantly.
+              </p>
+            </div>
+
+            <div style={{ background: "var(--surface-2)", borderRadius: 16, border: "1px solid var(--border)", padding: 20, marginBottom: 14 }}>
+              <textarea
+                value={checkText}
+                onChange={(e) => setCheckText(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleQuickCheck(); }}
+                placeholder={targetLanguage === "es" ? "Escribe tu frase aquí…" : "Écris ta phrase ici…"}
+                rows={4}
+                style={{
+                  width: "100%", boxSizing: "border-box", resize: "none",
+                  background: "transparent", border: "none", outline: "none",
+                  fontSize: 16, color: "var(--text)", lineHeight: 1.6,
+                  fontFamily: "inherit",
+                }}
+              />
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+                <span style={{ fontSize: 12, color: "var(--text-3)" }}>
+                  {checkText.trim().split(/\s+/).filter(Boolean).length} words · Ctrl+Enter to check
+                </span>
+                <button
+                  onClick={handleQuickCheck}
+                  disabled={!checkText.trim() || checkLoading}
+                  className="btn-primary"
+                  style={{ fontSize: 13, padding: "8px 18px" }}
+                >
+                  {checkLoading ? "Checking…" : "Check Grammar ⚡"}
+                </button>
+              </div>
+            </div>
+
+            {checkFeedback && (
+              <div style={{ borderRadius: 16, padding: 20, background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--green)", marginBottom: 10, marginTop: 0 }}>
+                  AI Feedback
+                </p>
+                <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.7, whiteSpace: "pre-wrap", margin: 0 }}>
+                  {checkFeedback}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {view === "prompts" && (
           <div className="space-y-3">
@@ -293,7 +445,7 @@ export default function WritingPage() {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Write in French here..."
+          placeholder={`Write in ${targetLanguage === "es" ? "Spanish" : "French"} here...`}
           rows={8}
           className="w-full resize-none bg-transparent border-none outline-none text-zinc-800 placeholder:text-zinc-300 text-sm leading-relaxed"
         />

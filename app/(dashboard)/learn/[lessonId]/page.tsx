@@ -2,13 +2,17 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { getLessonById, getAllLessons } from "@/data/learning-path";
+import { getLessonByIdEs, getAllLessonsEs } from "@/data/learning-path-es";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function LessonPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const router = useRouter();
-  const lesson = getLessonById(lessonId);
+  const { data: session } = useSession();
+  const targetLang = session?.user?.targetLanguage ?? "fr";
+  const lesson = targetLang === "es" ? getLessonByIdEs(lessonId) : getLessonById(lessonId);
   const [phase, setPhase] = useState<"learn" | "practice" | "done">("learn");
   const [currentExercise, setCurrentExercise] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -19,9 +23,9 @@ export default function LessonPage() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("completedLessons");
+    const saved = localStorage.getItem(`completedLessons_${targetLang}`);
     if (saved) setCompletedLessons(JSON.parse(saved));
-  }, []);
+  }, [targetLang]);
 
   if (!lesson) {
     return (
@@ -36,10 +40,15 @@ export default function LessonPage() {
   const exercises = lesson.exercises;
   const exercise = exercises[currentExercise];
 
+  // Strip punctuation that shouldn't penalise the learner (¿ ¡ . , ? !)
+  function normalize(s: string) {
+    return s.toLowerCase().trim().replace(/^[¿¡]+/, "").replace(/[.!?,;¿¡]+$/, "").trim();
+  }
+
   const handleAnswer = (answer: string) => {
     setAnswers({ ...answers, [currentExercise]: answer });
     setShowResult({ ...showResult, [currentExercise]: true });
-    const isCorrect = answer.toLowerCase().trim() === exercise.answer.toLowerCase().trim();
+    const isCorrect = normalize(answer) === normalize(exercise.answer);
     if (isCorrect) setScore((s) => s + 1);
   };
 
@@ -52,13 +61,13 @@ export default function LessonPage() {
       setPhase("done");
       const updated = [...new Set([...completedLessons, lesson.id])];
       setCompletedLessons(updated);
-      localStorage.setItem("completedLessons", JSON.stringify(updated));
+      localStorage.setItem(`completedLessons_${targetLang}`, JSON.stringify(updated));
       fetch("/api/learn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lessonId: lesson.id,
-          score: score + (answers[currentExercise]?.toLowerCase().trim() === exercise.answer.toLowerCase().trim() ? 1 : 0),
+          score: score + (normalize(answers[currentExercise] ?? "") === normalize(exercise.answer) ? 1 : 0),
           totalQuestions: exercises.length,
         }),
       })
@@ -69,7 +78,7 @@ export default function LessonPage() {
   };
 
   const getNextLesson = () => {
-    const all = getAllLessons();
+    const all = targetLang === "es" ? getAllLessonsEs() : getAllLessons();
     const idx = all.findIndex((l) => l.id === lesson.id);
     return idx < all.length - 1 ? all[idx + 1] : null;
   };

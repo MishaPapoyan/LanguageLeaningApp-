@@ -9,12 +9,13 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   role: z.enum(["STUDENT", "TEACHER"]).default("STUDENT"),
+  targetLanguage: z.enum(["fr", "es"]).default("fr"),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, password, role } = registerSchema.parse(body);
+    const { name, email, password, role, targetLanguage } = registerSchema.parse(body);
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         role,
+        targetLanguage,
         progress: {
           create: {
             skillTree: { vocabulary: 0, grammar: 0, speaking: 0 },

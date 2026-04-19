@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { RotateCcw, ChevronLeft, Volume2, BookOpen } from "lucide-react";
-import { speakFr } from "@/lib/speech";
+import { speak } from "@/lib/speech";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 
 interface ReviewWord {
   id: string;
@@ -39,6 +41,9 @@ const RATINGS = [
 ];
 
 export default function ReviewPage() {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+
   const [dueWords, setDueWords]       = useState<ReviewWord[]>([]);
   const [current, setCurrent]         = useState(0);
   const [flipped, setFlipped]         = useState(false);
@@ -119,9 +124,14 @@ export default function ReviewPage() {
               </div>
             </>
           ) : (
-            <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 28px" }}>
-              No words due right now. Save more words from the dictionary to build your review queue!
-            </p>
+            <>
+              <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 12px" }}>
+                Practice uses <strong style={{ color: "var(--text-2)" }}>spaced repetition</strong> — words come back right before you forget them.
+              </p>
+              <p style={{ fontSize: 13, color: "var(--text-3)", margin: "0 0 28px" }}>
+                Play any game — words you practice are <strong style={{ color: "var(--accent)" }}>automatically added</strong> to your review queue. Or save words from the dictionary manually.
+              </p>
+            </>
           )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -214,7 +224,7 @@ export default function ReviewPage() {
           letterSpacing: "0.1em", color: "var(--text-3)",
           background: "var(--surface-3)", borderRadius: 99, padding: "3px 10px",
         }}>
-          🇫🇷 French
+          {langConfig.flag} {langConfig.label}
         </div>
 
         <div style={{ fontSize: 64, marginBottom: 16 }}>{word.imageEmoji}</div>
@@ -233,7 +243,7 @@ export default function ReviewPage() {
               {word.translation}
             </p>
             <button
-              onClick={(e) => { e.stopPropagation(); speakFr(word.word); }}
+              onClick={(e) => { e.stopPropagation(); speak(word.word, { lang: langConfig.ttsLocale }); }}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
                 padding: "7px 16px", borderRadius: 99,

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/types";
 
@@ -25,10 +27,16 @@ const LANGUAGES = [
 
 interface XpInfo { level: number; current: number; needed: number; pct: number; }
 
+const TARGET_LANGUAGES = [
+  { code: "fr", label: "French", flag: "🇫🇷" },
+  { code: "es", label: "Spanish", flag: "🇪🇸" },
+];
+
 interface Props {
   initialName: string;
   initialAvatar: string;
   initialNativeLang: string;
+  initialTargetLang: string;
   email: string;
   role: string;
   joinDate: string;
@@ -41,13 +49,16 @@ interface Props {
 }
 
 export function SettingsClient({
-  initialName, initialAvatar, initialNativeLang,
+  initialName, initialAvatar, initialNativeLang, initialTargetLang,
   email, role, joinDate, xpInfo, streak,
   savedWordCount, completedStories, gamePlays, earnedBadges,
 }: Props) {
+  const { update: updateSession } = useSession();
+  const router = useRouter();
   const [name, setName] = useState(initialName);
   const [avatar, setAvatar] = useState(initialAvatar || "🧑");
   const [nativeLang, setNativeLang] = useState(initialNativeLang);
+  const [targetLang, setTargetLang] = useState(initialTargetLang || "fr");
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -61,9 +72,13 @@ export function SettingsClient({
       const res = await fetch("/api/user", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, image: avatar, nativeLanguage: nativeLang }),
+        body: JSON.stringify({ name, image: avatar, nativeLanguage: nativeLang, targetLanguage: targetLang }),
       });
       if (!res.ok) throw new Error("Failed to save");
+      // Refresh session so targetLanguage/nativeLanguage is reflected immediately
+      await updateSession();
+      // Force server components to re-render with new language data
+      router.refresh();
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch {
@@ -177,13 +192,15 @@ export function SettingsClient({
             <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
               LEARNING
             </label>
-            <div
-              className="input w-full flex items-center gap-2"
-              style={{ cursor: "not-allowed", opacity: 0.6 }}
+            <select
+              value={targetLang}
+              onChange={(e) => setTargetLang(e.target.value)}
+              className="input w-full"
             >
-              <span>🇫🇷</span>
-              <span>French (fixed for this app)</span>
-            </div>
+              {TARGET_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
+              ))}
+            </select>
           </div>
         </div>
 

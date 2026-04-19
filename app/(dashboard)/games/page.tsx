@@ -3,11 +3,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine } from "lucide-react";
+import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Games — LangCraft",
-  description: "Practice French vocabulary with fun games",
+  description: "Practice vocabulary with fun games",
 };
 
 const GAMES = [
@@ -30,7 +30,7 @@ const GAMES = [
     gameType: "MATCHING",
     icon: Link2,
     title: "Word Match",
-    desc: "Match French words to English translations against the clock",
+    desc: "Match target language words to English translations against the clock",
     colorClass: "gc-green",
     textVar: "--gc-green-text",
     mutedVar: "--gc-green-muted",
@@ -58,7 +58,7 @@ const GAMES = [
     gameType: "WORD_SCRAMBLE",
     icon: Shuffle,
     title: "Word Scramble",
-    desc: "Unscramble jumbled French words — race against your brain",
+    desc: "Unscramble jumbled vocabulary words — race against your brain",
     colorClass: "gc-rose",
     textVar: "--gc-rose-text",
     mutedVar: "--gc-rose-muted",
@@ -72,7 +72,7 @@ const GAMES = [
     gameType: "FILL_BLANK",
     icon: PenLine,
     title: "Fill the Blank",
-    desc: "Complete French sentences — context makes vocabulary stick",
+    desc: "Complete sentences — context makes vocabulary stick",
     colorClass: "gc-teal",
     textVar: "--gc-teal-text",
     mutedVar: "--gc-teal-muted",
@@ -80,6 +80,48 @@ const GAMES = [
     difficulty: "Intermediate",
     diffColor: "#f59e0b",
     xpLabel: "+25 XP",
+  },
+  {
+    href: "/games/true-false",
+    gameType: "TRUE_FALSE",
+    icon: CheckSquare,
+    title: "True or False",
+    desc: "Is the translation correct? Quick-fire judgement rounds",
+    colorClass: "gc-orange",
+    textVar: "--gc-orange-text",
+    mutedVar: "--gc-orange-muted",
+    borderVar: "--gc-orange-border",
+    difficulty: "Beginner",
+    diffColor: "#10b981",
+    xpLabel: "+20 XP",
+  },
+  {
+    href: "/games/speed-typing",
+    gameType: "SPEED_TYPING",
+    icon: Keyboard,
+    title: "Speed Typing",
+    desc: "See the meaning, type the word — train muscle memory fast",
+    colorClass: "gc-violet",
+    textVar: "--gc-violet-text",
+    mutedVar: "--gc-violet-muted",
+    borderVar: "--gc-violet-border",
+    difficulty: "Intermediate",
+    diffColor: "#f59e0b",
+    xpLabel: "+30 XP",
+  },
+  {
+    href: "/games/listen-quiz",
+    gameType: "LISTEN_QUIZ",
+    icon: Headphones,
+    title: "Listen & Choose",
+    desc: "Hear the word spoken — pick the right translation from 4",
+    colorClass: "gc-blue",
+    textVar: "--gc-blue-text",
+    mutedVar: "--gc-blue-muted",
+    borderVar: "--gc-blue-border",
+    difficulty: "Advanced",
+    diffColor: "#ef4444",
+    xpLabel: "+35 XP",
   },
 ];
 

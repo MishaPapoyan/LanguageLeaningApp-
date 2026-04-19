@@ -4,17 +4,17 @@ export const SCENARIO_INFO: Record<TutorScenario, { label: string; emoji: string
   waiter: {
     label: "At the Café",
     emoji: "☕",
-    description: "Order food & drinks in French",
+    description: "Order food & drinks in your target language",
     color: "amber",
   },
   traveler: {
-    label: "Exploring Paris",
-    emoji: "🗼",
+    label: "Exploring the City",
+    emoji: "🏙️",
     description: "Navigate and ask for directions",
     color: "blue",
   },
   teacher: {
-    label: "French Class",
+    label: "Language Class",
     emoji: "📚",
     description: "Structured grammar lesson",
     color: "purple",

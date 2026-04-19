@@ -50,7 +50,7 @@ export default async function LandingPage() {
     {
       icon: PenLine,
       title: "Writing",
-      desc: "Write French & get instant feedback",
+      desc: "Write & get instant feedback",
       tag: "Grammar",
       color: "var(--coral)",
       colorDim: "rgba(251,113,133,0.12)",
@@ -75,9 +75,9 @@ export default async function LandingPage() {
 
   const words = [
     { fr: "Bonjour", en: "Hello" },
+    { fr: "Hola", en: "Hi" },
     { fr: "Merci", en: "Thank you" },
-    { fr: "S'il vous plaît", en: "Please" },
-    { fr: "Comment ça va?", en: "How are you?" },
+    { fr: "Gracias", en: "Thanks" },
   ];
 
   const wordPositions = [
@@ -93,7 +93,7 @@ export default async function LandingPage() {
     {
       n: "01",
       title: "Read stories",
-      desc: "Short French stories with tap-to-translate. Learn words in context, not from lists.",
+      desc: "Short stories with tap-to-translate. Learn words in context, not from lists.",
       accent: "var(--gold)",
     },
     {
@@ -166,7 +166,7 @@ export default async function LandingPage() {
             <span style={{ fontFamily: "serif", fontSize: "18px", color: "var(--text)", fontWeight: 500 }}>
               LangCraft
             </span>
-            <span style={{ fontSize: "15px", lineHeight: 1 }}>🇫🇷</span>
+            <span style={{ fontSize: "15px", lineHeight: 1 }}>{"\u{1F30D}"}</span>
           </Link>
 
           {/* Nav actions */}
@@ -230,7 +230,7 @@ export default async function LandingPage() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Learn French,
+              Learn languages,
               <br />
               <em style={{ color: "var(--accent)", fontStyle: "italic" }}>naturally.</em>
             </h1>
@@ -578,7 +578,7 @@ export default async function LandingPage() {
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px" }}>
             <Trophy size={14} style={{ color: "var(--gold)" }} />
             <span style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>
-              #1 French learning app
+              #1 language learning app
             </span>
           </div>
         </div>
@@ -643,7 +643,7 @@ export default async function LandingPage() {
               position: "relative",
             }}
           >
-            Ready to speak French?
+            Ready to start speaking?
           </h2>
           <p
             style={{

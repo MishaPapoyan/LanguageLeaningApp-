@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import {
   SimpleBarChart,
@@ -96,7 +98,7 @@ const GAME_EMOJI: Record<string, string> = {
 };
 
 const SCENARIO_LABELS: Record<string, string> = {
-  waiter: "Cafe Waiter", traveler: "Parisian Guide", teacher: "French Teacher", free: "Free Chat",
+  waiter: "Café Waiter", traveler: "City Explorer", teacher: "Language Teacher", free: "Free Chat",
 };
 
 const SCENARIO_EMOJI: Record<string, string> = {
@@ -174,6 +176,8 @@ function getWeekNumber(date: Date): number {
 }
 
 export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   const chartData = useMemo(() => {
@@ -225,7 +229,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-serif font-bold text-zinc-900 tracking-tight">Analytics Dashboard</h1>
-          <p className="text-zinc-500 text-sm mt-1">Deep insights into your French learning journey</p>
+          <p className="text-zinc-500 text-sm mt-1">Deep insights into your {langConfig.label} learning journey</p>
         </div>
         <div className="text-right text-sm text-zinc-400">
           <p>Member since {new Date(overview.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</p>
@@ -610,7 +614,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
               <h3 className="font-serif font-semibold text-violet-700 mb-2">Tutor Insights</h3>
               <div className="space-y-2 text-sm text-zinc-500">
                 {tutor.avgGrammarScore !== null && tutor.avgGrammarScore < 60 && (
-                  <p>Your grammar score is below 60% — try the <strong>French Teacher</strong> scenario for structured practice.</p>
+                  <p>Your grammar score is below 60% — try the <strong>Language Teacher</strong> scenario for structured practice.</p>
                 )}
                 {tutor.avgAccuracy !== null && tutor.avgAccuracy >= 80 && (
                   <p>Great accuracy at {tutor.avgAccuracy}%! Try more advanced scenarios to keep improving.</p>

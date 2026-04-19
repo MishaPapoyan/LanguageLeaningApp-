@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import { ChatMessage, TutorScenario, TutorFeedback, LEVEL_MILESTONES } from "@/types";
 import { SCENARIO_INFO } from "@/lib/scenarios";
 import Link from "next/link";
@@ -26,6 +28,8 @@ const avatarNames: Record<string, string> = {
 interface Props { userLevel: number; }
 
 export function TutorClient({ userLevel }: Props) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [scenario, setScenario] = useState<TutorScenario | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -176,7 +180,7 @@ export function TutorClient({ userLevel }: Props) {
       setFeedback({
         grammarScore: 75, accuracyPct: 75,
         strengths: ["Great effort!"], corrections: [],
-        recommendation: "Continuez à pratiquer le français!",
+        recommendation: "Keep practicing!",
       });
     }
   };
@@ -188,7 +192,7 @@ export function TutorClient({ userLevel }: Props) {
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>AI Tutor</h1>
           <p className="text-sm" style={{ color: "var(--text-2)" }}>
-            Choose a scenario. The AI will speak mostly French — you must respond in French too.
+            Choose a scenario. The AI will speak mostly {langConfig.label} — you must respond in {langConfig.label} too.
           </p>
         </div>
 
@@ -196,9 +200,9 @@ export function TutorClient({ userLevel }: Props) {
           className="flex items-center gap-2 px-4 py-3 rounded-2xl mb-2"
           style={{ background: "rgba(124,106,255,0.1)", border: "1px solid rgba(124,106,255,0.2)" }}
         >
-          <span>🇫🇷</span>
+          <span>{langConfig.flag}</span>
           <p className="text-xs" style={{ color: "var(--accent)" }}>
-            <strong>French only mode.</strong> The AI will correct your grammar and insist on French responses.
+            <strong>{langConfig.label} only mode.</strong> The AI will correct your grammar and insist on {langConfig.label} responses.
           </p>
         </div>
 
@@ -428,7 +432,7 @@ export function TutorClient({ userLevel }: Props) {
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs mb-2 self-center"
         style={{ background: "rgba(124,106,255,0.1)", color: "var(--accent)", border: "1px solid rgba(124,106,255,0.15)" }}
       >
-        🇫🇷 Répondez en français
+        {langConfig.flag} Respond in {langConfig.label}
       </div>
 
       {/* Input */}
@@ -439,7 +443,7 @@ export function TutorClient({ userLevel }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder="Écrivez en français..."
+          placeholder={`Write in ${langConfig.label}...`}
           className="input flex-1"
           disabled={streaming}
         />

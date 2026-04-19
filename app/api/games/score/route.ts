@@ -22,6 +22,15 @@ export async function POST(req: NextRequest) {
     });
     await awardXp(userId, xpEarned, "vocabulary");
     await updateStreak(userId);
+
+    // Auto-save all played words to the user's dictionary
+    if (wordsUsed && wordsUsed.length > 0) {
+      await prisma.savedWord.createMany({
+        data: wordsUsed.map((wordId: string) => ({ userId, wordId })),
+        skipDuplicates: true,
+      });
+    }
+
     return NextResponse.json({ gameScore, xpEarned });
   } catch (err) {
     console.error("[games/score] DB error:", err);

@@ -67,6 +67,7 @@ export interface StoryData {
   difficulty: Difficulty;
   chapter: number;
   imageEmoji: string;
+  language: string;
   words: WordData[];
   quizzes: QuizData[];
   userProgress?: {
@@ -129,7 +130,7 @@ export const BADGES: Badge[] = [
   { id: "level_10",      name: "Apprentice",            description: "Reach Level 10",                         emoji: "🎓", color: "blue" },
   { id: "level_20",      name: "Fluent Speaker",        description: "Reach Level 20",                         emoji: "💬", color: "cyan" },
   { id: "level_30",      name: "Advanced Learner",      description: "Reach Level 30",                         emoji: "🏅", color: "gold" },
-  { id: "level_50",      name: "French Master",         description: "Reach Level 50 — the pinnacle!",         emoji: "👑", color: "gold" },
+  { id: "level_50",      name: "Language Master",        description: "Reach Level 50 — the pinnacle!",         emoji: "👑", color: "gold" },
   { id: "game_10",       name: "Game On",               description: "Play 10 games",                          emoji: "🎮", color: "pink" },
   { id: "all_stories",   name: "Story Finisher",        description: "Complete all stories",                   emoji: "🏆", color: "gold" },
 ];
@@ -155,7 +156,7 @@ export const LEVEL_MILESTONES: LevelMilestone[] = [
   { level: 25, badgeId: "words_50",     title: "Vocabulary King",   reward: "Mastery tracking unlocked",   unlocksFeature: "mastery_tracking" },
   { level: 30, badgeId: "level_30",     title: "Advanced Learner",  reward: "Grammar deep-dive mode",      unlocksFeature: "grammar_mode" },
   { level: 40, badgeId: "quiz_perfect", title: "Scholar",           reward: "Leaderboard title badge",     unlocksFeature: "title_badge" },
-  { level: 50, badgeId: "level_50",     title: "French Master",     reward: "Exclusive crown avatar frame", unlocksFeature: "master_frame" },
+  { level: 50, badgeId: "level_50",     title: "Language Master",   reward: "Exclusive crown avatar frame", unlocksFeature: "master_frame" },
 ];
 
 // XP thresholds for each level (1-indexed: threshold[0] = level 1 threshold)

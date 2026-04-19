@@ -7,12 +7,13 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Flashcards — LangCraft",
-  description: "Practice French vocabulary with flashcards",
+  description: "Practice vocabulary with flashcards",
 };
 
 export default async function FlashcardsPage() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id ?? "";
+  const language = session?.user?.targetLanguage ?? "fr";
 
   let savedWords: any[] = [];
   let words: any[] = [];
@@ -21,10 +22,10 @@ export default async function FlashcardsPage() {
 
   try {
     if (userId) {
-      const savedCount = await prisma.savedWord.count({ where: { userId } });
+      const savedCount = await prisma.savedWord.count({ where: { userId, word: { language } } });
       const savedSkip = savedCount > 20 ? (perfectCount * 20) % Math.max(1, savedCount - 20 + 1) : 0;
       savedWords = await prisma.savedWord.findMany({
-        where: { userId },
+        where: { userId, word: { language } },
         include: { word: true },
         orderBy: { addedAt: "desc" },
         skip: savedSkip,
@@ -34,9 +35,9 @@ export default async function FlashcardsPage() {
     if (savedWords.length >= 4) {
       words = savedWords.map((sw: any) => sw.word);
     } else {
-      const totalWords = await prisma.word.count();
+      const totalWords = await prisma.word.count({ where: { language } });
       const dictSkip = totalWords > 20 ? (perfectCount * 20) % Math.max(1, totalWords - 20 + 1) : 0;
-      words = await prisma.word.findMany({ where: { difficulty: "BEGINNER" }, skip: dictSkip, orderBy: { createdAt: "asc" }, take: 20 });
+      words = await prisma.word.findMany({ where: { difficulty: "BEGINNER", language }, skip: dictSkip, orderBy: { createdAt: "asc" }, take: 20 });
     }
   } catch (err) {
     console.error("[flashcards] DB error:", err);

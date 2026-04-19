@@ -56,11 +56,12 @@ const voxtralCache = new Map<string, string>();
 
 async function speakViaVoxtral(
   text: string,
+  lang: string,
   volume: number,
   onEnd?: () => void,
   onError?: () => void
 ): Promise<boolean> {
-  const cacheKey = text.trim().toLowerCase();
+  const cacheKey = `${lang}:${text.trim().toLowerCase()}`;
   let blobUrl = voxtralCache.get(cacheKey);
 
   if (!blobUrl) {
@@ -68,7 +69,7 @@ async function speakViaVoxtral(
       const res = await fetch("/api/pronunciation/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text.trim() }),
+        body: JSON.stringify({ text: text.trim(), lang }),
       });
       if (!res.ok) return false;
       const blob = await res.blob();
@@ -84,8 +85,11 @@ async function speakViaVoxtral(
 
 // ─── Web Speech API (fallback for single words and Voxtral outages) ──────────
 
-const PREFERRED_FR_VOICE_FRAGMENTS = ["Hortense", "Julie", "Henri", "français", "French"];
-const PREFERRED_EN_VOICE_FRAGMENTS = ["Aria", "Jenny", "Guy", "Davis", "Sonia", "Ryan", "Neural"];
+const PREFERRED_VOICE_FRAGMENTS: Record<string, string[]> = {
+  fr: ["Hortense", "Julie", "Henri", "français", "French"],
+  es: ["Elvira", "Jorge", "español", "Spanish", "Microsoft Pablo"],
+  en: ["Aria", "Jenny", "Guy", "Davis", "Sonia", "Ryan", "Neural"],
+};
 
 const VOICE_TIERS: Array<(name: string) => boolean> = [
   (n) => n.includes("Microsoft") && n.includes("Natural"),
@@ -137,7 +141,7 @@ function pickBestVoice(voices: SpeechSynthesisVoice[], lang: string): SpeechSynt
   const prefix = lang.toLowerCase().split("-")[0];
   const candidates = voices.filter((v) => v.lang.toLowerCase().startsWith(prefix));
   if (candidates.length === 0) return null;
-  const preferred = prefix === "fr" ? PREFERRED_FR_VOICE_FRAGMENTS : PREFERRED_EN_VOICE_FRAGMENTS;
+  const preferred = PREFERRED_VOICE_FRAGMENTS[prefix] ?? PREFERRED_VOICE_FRAGMENTS["en"];
   for (const fragment of preferred) {
     const match = candidates.find((v) => v.name.includes(fragment));
     if (match) return match;
@@ -187,13 +191,9 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
 
   // Voxtral is generative — it hallucinates extra speech around single words.
   // Only use it for phrases/sentences (3+ words); Google TTS handles the rest.
-  const wordCount = text.trim().split(/\s+/).length;
-
-  if (wordCount >= 3) {
-    // 1. Mistral Voxtral — best quality for phrases and sentences
-    const voxtralOk = await speakViaVoxtral(text, volume, onEnd, onError);
-    if (voxtralOk) return;
-  }
+  // 1. Mistral Voxtral — best quality for all text (single words and phrases)
+  const voxtralOk = await speakViaVoxtral(text, lang, volume, onEnd, onError);
+  if (voxtralOk) return;
 
   // 2. Web Speech API — handles single words and acts as universal fallback
   if (!("speechSynthesis" in window)) { onError?.(); return; }
@@ -202,7 +202,35 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
   speakViaWebSpeech(text, { lang, rate, pitch, volume, onEnd, onError }, voice);
 }
 
-/** Speak French text at a natural learning pace */
+/** Map target-language code (fr/es/en/...) to a BCP-47 locale for speech synthesis */
+function toLocale(lang: string): string {
+  const prefix = lang.toLowerCase().split(/[-_]/)[0];
+  const map: Record<string, string> = {
+    fr: "fr-FR",
+    es: "es-ES",
+    en: "en-US",
+    de: "de-DE",
+    it: "it-IT",
+    pt: "pt-PT",
+    ja: "ja-JP",
+    ko: "ko-KR",
+    zh: "zh-CN",
+    ru: "ru-RU",
+  };
+  return map[prefix] ?? lang;
+}
+
+/** Speak text in the user's target language at a natural learning pace */
+export function speakTarget(
+  text: string,
+  targetLang: string,
+  rate = 0.88,
+  callbacks?: { onEnd?: () => void; onError?: () => void }
+) {
+  return speak(text, { lang: toLocale(targetLang), rate, pitch: 1.0, ...callbacks });
+}
+
+/** Speak French text at a natural learning pace (legacy — prefer speakTarget) */
 export function speakFr(
   text: string,
   rate = 0.88,

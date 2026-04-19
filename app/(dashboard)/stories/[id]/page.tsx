@@ -46,6 +46,7 @@ export default async function StoryPage({ params }: { params: { id: string } }) 
         difficulty: story.difficulty,
         chapter: story.chapter,
         imageEmoji: story.imageEmoji,
+        language: story.language,
         words: wordsWithSaved,
         quizzes: story.quizzes.map((q) => ({
           id: q.id,

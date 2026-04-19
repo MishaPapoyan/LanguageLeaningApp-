@@ -7,7 +7,7 @@ import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Leaderboard — LangCraft",
-  description: "See how you rank among other French learners",
+  description: "See how you rank among other learners",
 };
 
 export default async function LeaderboardPage() {
@@ -82,7 +82,7 @@ export default async function LeaderboardPage() {
           Leaderboard
         </h1>
         <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          Top French learners ranked by total XP earned. Keep that streak going!
+          Top learners ranked by total XP earned. Keep that streak going!
         </p>
       </div>
 

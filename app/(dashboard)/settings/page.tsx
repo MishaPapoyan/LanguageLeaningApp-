@@ -46,6 +46,7 @@ export default async function SettingsPage() {
         initialName={user?.name ?? ""}
         initialAvatar={user?.image ?? ""}
         initialNativeLang={user?.nativeLanguage ?? "en"}
+        initialTargetLang={user?.targetLanguage ?? "fr"}
         email={user?.email ?? ""}
         role={user?.role ?? "STUDENT"}
         joinDate={joinDate}

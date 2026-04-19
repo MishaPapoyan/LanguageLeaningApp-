@@ -27,6 +27,9 @@ enum GameType {
   MEMORY_PALACE
   WORD_SCRAMBLE
   FILL_BLANK
+  TRUE_FALSE
+  SPEED_TYPING
+  LISTEN_QUIZ
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
@@ -118,10 +121,13 @@ model Story {
   difficulty  Difficulty      @default(BEGINNER)
   chapter     Int
   imageEmoji  String          @default("📖")
+  language    String          @default("fr")
   quizzes     Quiz[]
   words       StoryWord[]
   progress    StoryProgress[]
   createdAt   DateTime        @default(now())
+
+  @@index([language])
 }
 
 model StoryWord {
@@ -171,9 +177,12 @@ model Word {
   category    String
   difficulty  Difficulty  @default(BEGINNER)
   imageEmoji  String      @default("📝")
+  language    String      @default("fr")
   stories     StoryWord[]
   savedBy     SavedWord[]
   createdAt   DateTime    @default(now())
+
+  @@index([language])
 }
 
 model SavedWord {

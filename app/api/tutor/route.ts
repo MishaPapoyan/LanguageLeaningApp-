@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { messages, scenario } = body as { messages: ChatMessage[]; scenario: TutorScenario };
 
-    const systemPrompt = getTutorSystemPrompt(scenario);
+    const targetLanguage = session.user.targetLanguage ?? "fr";
+    const systemPrompt = getTutorSystemPrompt(scenario, targetLanguage);
     if (!systemPrompt) {
       return new Response(JSON.stringify({ error: "Invalid scenario" }), { status: 400 });
     }
@@ -54,7 +55,8 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // New scenario — send greeting to get AI's opening message
-      apiMessages.push({ role: "user", content: "Bonjour! Let's begin." });
+      const greeting = targetLanguage === "es" ? "¡Hola! Let's begin." : "Bonjour! Let's begin.";
+      apiMessages.push({ role: "user", content: greeting });
     }
 
     const stream = await groq.chat.completions.create({

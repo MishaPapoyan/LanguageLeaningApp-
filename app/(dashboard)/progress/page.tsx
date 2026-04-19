@@ -18,7 +18,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "My Progress — LangCraft",
-  description: "Track your French learning progress and achievements",
+  description: "Track your learning progress and achievements",
 };
 
 export default async function ProgressPage() {

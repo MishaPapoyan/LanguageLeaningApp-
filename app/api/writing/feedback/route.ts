@@ -19,12 +19,14 @@ export async function POST(req: NextRequest) {
   }
 
   const { text, prompt, level } = await req.json();
+  const targetLanguage = session.user.targetLanguage ?? "fr";
+  const langName = targetLanguage === "es" ? "Spanish" : "French";
 
   if (!text || !prompt) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const systemPrompt = `You are a supportive French language teacher reviewing a student's writing exercise.
+  const systemPrompt = `You are a supportive ${langName} language teacher reviewing a student's writing exercise.
 The student's level is: ${level || "beginner"}.
 The writing prompt was: "${prompt}"
 
@@ -44,7 +46,7 @@ Be encouraging but honest. Keep feedback concise and practical. Use simple Engli
       stream: true,
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Here is my French writing:\n\n${text}` },
+        { role: "user", content: `Here is my ${langName} writing:\n\n${text}` },
       ],
     });
 

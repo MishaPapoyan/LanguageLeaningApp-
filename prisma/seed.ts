@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { frenchVocabulary } from "../data/french-vocabulary";
 import { frenchStories } from "../data/french-stories";
+import { spanishVocabulary } from "../data/spanish-vocabulary";
+import { spanishStories } from "../data/spanish-stories";
 
 const prisma = new PrismaClient();
 
@@ -22,21 +24,46 @@ async function main() {
       category: vocab.category,
       difficulty: vocab.difficulty,
       imageEmoji: vocab.imageEmoji,
+      language: "fr",
     })),
     skipDuplicates: true,
   });
 
-  // Build word map for story references
-  const allWords = await prisma.word.findMany({ select: { id: true, word: true } });
-  const wordMap: Record<string, string> = {};
-  for (const w of allWords) wordMap[w.word] = w.id;
+  // Seed Spanish vocabulary
+  console.log("🇪🇸 Seeding Spanish vocabulary...");
+  await prisma.word.createMany({
+    data: spanishVocabulary.map((vocab) => ({
+      word: vocab.word,
+      translation: vocab.translation,
+      definition: vocab.definition,
+      exampleFr: vocab.exampleFr,
+      exampleEn: vocab.exampleEn,
+      miniStory: vocab.miniStory,
+      category: vocab.category,
+      difficulty: vocab.difficulty,
+      imageEmoji: vocab.imageEmoji,
+      language: "es",
+    })),
+    skipDuplicates: true,
+  });
 
-  console.log(`✅ Seeded ${allWords.length} vocabulary words`);
+  // Build per-language word maps for story references
+  const frWords = await prisma.word.findMany({ where: { language: "fr" }, select: { id: true, word: true } });
+  const esWords = await prisma.word.findMany({ where: { language: "es" }, select: { id: true, word: true } });
+  const wordMapFr: Record<string, string> = {};
+  const wordMapEs: Record<string, string> = {};
+  for (const w of frWords) wordMapFr[w.word.toLowerCase()] = w.id;
+  for (const w of esWords) wordMapEs[w.word.toLowerCase()] = w.id;
 
-  // 2. Seed stories
+  const totalWords = await prisma.word.count();
+  console.log(`✅ Seeded ${totalWords} vocabulary words total`);
+
+  // 2. Seed stories — French
   console.log("📖 Seeding French stories...");
 
   for (const storyEntry of frenchStories) {
+    const existing = await prisma.story.findFirst({ where: { title: storyEntry.title, language: "fr" } });
+    if (existing) { console.log(`  ↷ Skipped existing: "${storyEntry.title}"`); continue; }
     const story = await prisma.story.create({
       data: {
         title: storyEntry.title,
@@ -45,6 +72,7 @@ async function main() {
         difficulty: storyEntry.difficulty,
         chapter: storyEntry.chapter,
         imageEmoji: storyEntry.imageEmoji,
+        language: "fr",
         quizzes: {
           create: storyEntry.quizzes.map((q) => ({
             question: q.question,
@@ -54,8 +82,40 @@ async function main() {
         },
         words: {
           create: storyEntry.highlightedWords
-            .filter((w) => wordMap[w])
-            .map((w) => ({ wordId: wordMap[w] })),
+            .filter((w) => wordMapFr[w.toLowerCase()])
+            .map((w) => ({ wordId: wordMapFr[w.toLowerCase()] })),
+        },
+      },
+    });
+    console.log(`  ✅ Created story: "${story.title}"`);
+  }
+
+  // Seed Spanish stories
+  console.log("📖 Seeding Spanish stories...");
+
+  for (const storyEntry of spanishStories) {
+    const existing = await prisma.story.findFirst({ where: { title: storyEntry.title, language: "es" } });
+    if (existing) { console.log(`  ↷ Skipped existing: "${storyEntry.title}"`); continue; }
+    const story = await prisma.story.create({
+      data: {
+        title: storyEntry.title,
+        description: storyEntry.description,
+        content: storyEntry.content as any,
+        difficulty: storyEntry.difficulty,
+        chapter: storyEntry.chapter,
+        imageEmoji: storyEntry.imageEmoji,
+        language: "es",
+        quizzes: {
+          create: storyEntry.quizzes.map((q) => ({
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+          })),
+        },
+        words: {
+          create: storyEntry.highlightedWords
+            .filter((w) => wordMapEs[w.toLowerCase()])
+            .map((w) => ({ wordId: wordMapEs[w.toLowerCase()] })),
         },
       },
     });
@@ -112,18 +172,21 @@ async function main() {
   console.log(`  ✅ Student: student@demo.com / demo123`);
   console.log(`  ✅ Teacher: teacher@demo.com / demo123`);
 
-  // 4. Create a demo group
-  const group = await prisma.group.create({
-    data: {
-      name: "French Beginners A",
-      teacherId: teacher.id,
-      inviteCode: "DEMO2024",
-      members: {
-        create: { userId: student.id },
+  // 4. Create a demo group (idempotent by inviteCode)
+  const existingGroup = await prisma.group.findUnique({ where: { inviteCode: "DEMO2024" } });
+  if (!existingGroup) {
+    const group = await prisma.group.create({
+      data: {
+        name: "Language Beginners A",
+        teacherId: teacher.id,
+        inviteCode: "DEMO2024",
+        members: { create: { userId: student.id } },
       },
-    },
-  });
-  console.log(`  ✅ Created class: "${group.name}"`);
+    });
+    console.log(`  ✅ Created class: "${group.name}"`);
+  } else {
+    console.log(`  ↷ Skipped existing class: "${existingGroup.name}"`);
+  }
 
   console.log("\n🎉 Seeding complete!");
   console.log("\nDemo accounts:");

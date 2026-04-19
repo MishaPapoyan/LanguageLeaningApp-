@@ -5,6 +5,12 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 type Role = "STUDENT" | "TEACHER";
+type TargetLang = "fr" | "es";
+
+const TARGET_LANGUAGES: { code: TargetLang; label: string; flag: string }[] = [
+  { code: "fr", label: "French", flag: "\u{1F1EB}\u{1F1F7}" },
+  { code: "es", label: "Spanish", flag: "\u{1F1EA}\u{1F1F8}" },
+];
 
 export function RegisterForm() {
   const router = useRouter();
@@ -12,6 +18,7 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("STUDENT");
+  const [targetLanguage, setTargetLanguage] = useState<TargetLang>("fr");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +30,7 @@ export function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role }),
+      body: JSON.stringify({ name, email, password, role, targetLanguage }),
     });
 
     if (!res.ok) {
@@ -52,7 +59,21 @@ export function RegisterForm() {
               className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${
                 role === r ? "border-violet-500 bg-violet-50 text-violet-700" : "border-zinc-200 text-zinc-500 hover:border-zinc-300"
               }`}>
-              {r === "STUDENT" ? "🎓 Student" : "👩‍🏫 Teacher"}
+              {r === "STUDENT" ? "\u{1F393} Student" : "\u{1F469}\u200D\u{1F3EB} Teacher"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">I want to learn</label>
+        <div className="grid grid-cols-2 gap-2">
+          {TARGET_LANGUAGES.map((lang) => (
+            <button key={lang.code} type="button" onClick={() => setTargetLanguage(lang.code)}
+              className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                targetLanguage === lang.code ? "border-violet-500 bg-violet-50 text-violet-700" : "border-zinc-200 text-zinc-500 hover:border-zinc-300"
+              }`}>
+              {lang.flag} {lang.label}
             </button>
           ))}
         </div>

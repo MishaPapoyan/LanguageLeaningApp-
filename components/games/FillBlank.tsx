@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { Lightbulb, Check, X } from "lucide-react";
 
@@ -28,7 +30,7 @@ function buildQuestions(words: Word[]): Question[] {
     // Build sentence with blank
     const sentence = w.exampleFr
       ? w.exampleFr.replace(new RegExp(`\\b${w.word}\\b`, "i"), "___")
-      : `___ — ${w.imageEmoji}`;
+      : `___ (${w.translation})`;
     const context = w.exampleEn || `Translation: "${w.translation}"`;
 
     // 3 distractors
@@ -44,6 +46,8 @@ async function spendXp(amount: number): Promise<boolean> {
 }
 
 export function FillBlank({ words }: { words: Word[] }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [questions]             = useState<Question[]>(() => buildQuestions(words));
   const [idx, setIdx]           = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -142,7 +146,7 @@ export function FillBlank({ words }: { words: Word[] }) {
       {/* Sentence card */}
       <div className="card" style={{ padding: "28px 24px", marginBottom: 16, textAlign: "center" }}>
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 14px" }}>
-          🇫🇷 Complete the French sentence
+          {langConfig.flag} Complete the {langConfig.label} sentence
         </p>
         <p style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", lineHeight: 1.4, margin: "0 0 10px" }}>
           {q.sentence.split("___").map((part, i, arr) => (

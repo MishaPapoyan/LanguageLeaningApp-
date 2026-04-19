@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { speak } from "@/lib/speech";
 
@@ -22,6 +24,8 @@ interface WordData {
 }
 
 export function WordDetail({ word }: { word: WordData }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [isSaved, setIsSaved] = useState(word.isSaved);
   const [saving, setSaving] = useState(false);
 
@@ -67,7 +71,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 <button
                   onClick={() => handleSpeak(word.word)}
                   className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center hover:bg-violet-100 transition-colors text-sm"
-                  title="Listen (French)"
+                  title={`Listen (${langConfig.label})`}
                 >
                   ♪
                 </button>

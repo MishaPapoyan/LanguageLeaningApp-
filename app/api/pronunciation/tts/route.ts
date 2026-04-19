@@ -15,18 +15,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing text" }, { status: 400 });
   }
 
+  // Language-specific native speaker voices
+  const VOICE_IDS: Record<string, string> = {
+    fr: "a249eaff-1b96-4ce2-a3e7-b2c9b43c4b9a", // French native
+    es: "0a4aa596-c999-4922-afae-9fb3a2d85e9e", // Spanish native
+  };
+  const langPrefix = (lang ?? "fr").split(/[-_]/)[0].toLowerCase();
+  // Use language voice if available, otherwise omit voice_id for auto-selection
+  const voiceId = VOICE_IDS[langPrefix];
+
+  const body: Record<string, unknown> = {
+    model: "voxtral-mini-tts-2603",
+    input: text,
+    response_format: "mp3",
+  };
+  if (voiceId) body.voice_id = voiceId;
+
   const res = await fetch("https://api.mistral.ai/v1/audio/speech", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model: "voxtral-mini-tts-2603",
-      input: text,
-      voice_id: "e3596645-b1af-469e-b857-f18ddedc7652", // Oliver - Neutral (en_gb)
-      response_format: "mp3",
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {

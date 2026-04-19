@@ -1,8 +1,10 @@
 "use client";
 
-import { LEARNING_PATH_META as LEARNING_PATH } from "@/data/learning-path-meta";
+import { LEARNING_PATH_META } from "@/data/learning-path-meta";
+import { LEARNING_PATH_META_ES } from "@/data/learning-path-es-meta";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 const typeColors: Record<string, string> = {
   alphabet:     "var(--gold)",
@@ -22,13 +24,59 @@ const difficultyMap: Record<string, string> = {
   culture:      "advanced",
 };
 
+const LABELS: Record<string, Record<string, string>> = {
+  fr: {
+    chapter: "Chapitre",
+    lessonsComplete: "leçons terminées",
+    chapters: "chapitres",
+    done: "Terminé",
+    completed: "Terminé",
+    upNext: "Suivant",
+    locked: "Verrouillé",
+    beginner: "débutant",
+    intermediate: "intermédiaire",
+    advanced: "avancé",
+    alphabet: "alphabet",
+    pronunciation: "prononciation",
+    vocabulary: "vocabulaire",
+    grammar: "grammaire",
+    conversation: "conversation",
+    culture: "culture",
+  },
+  es: {
+    chapter: "Capítulo",
+    lessonsComplete: "lecciones completadas",
+    chapters: "capítulos",
+    done: "Hecho",
+    completed: "Completado",
+    upNext: "Siguiente",
+    locked: "Bloqueado",
+    beginner: "principiante",
+    intermediate: "intermedio",
+    advanced: "avanzado",
+    alphabet: "alfabeto",
+    pronunciation: "pronunciación",
+    vocabulary: "vocabulario",
+    grammar: "gramática",
+    conversation: "conversación",
+    culture: "cultura",
+  },
+};
+
+function getLabel(lang: string, key: string): string {
+  return LABELS[lang]?.[key] ?? LABELS.fr[key] ?? key;
+}
+
 export default function LearnPage() {
+  const { data: session } = useSession();
+  const targetLang = session?.user?.targetLanguage ?? "fr";
+  const LEARNING_PATH = targetLang === "es" ? LEARNING_PATH_META_ES : LEARNING_PATH_META;
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("completedLessons");
+    const saved = localStorage.getItem(`completedLessons_${targetLang}`);
     if (saved) setCompletedLessons(JSON.parse(saved));
-  }, []);
+  }, [targetLang]);
 
   const isTopicUnlocked = (topic: (typeof LEARNING_PATH)[number]) => {
     if (!topic.requiredTopicId) return true;
@@ -87,7 +135,7 @@ export default function LearnPage() {
         {/* Text */}
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-            {completedLessons.length} of {totalLessons} lessons complete
+            {completedLessons.length} / {totalLessons} {getLabel(targetLang, "lessonsComplete")}
           </p>
           <div style={{ height: 6, background: "var(--surface-3)", borderRadius: 99, overflow: "hidden" }}>
             <div className="xp-bar-fill" style={{
@@ -99,7 +147,7 @@ export default function LearnPage() {
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
           <span className="badge-accent" style={{ fontSize: 11 }}>
-            {LEARNING_PATH.length} chapters
+            {LEARNING_PATH.length} {getLabel(targetLang, "chapters")}
           </span>
         </div>
       </div>
@@ -120,21 +168,21 @@ export default function LearnPage() {
                   flexShrink: 0,
                 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                    Chapter {chapterIndex + 1}
+                    {getLabel(targetLang, "chapter")} {chapterIndex + 1}
                   </span>
                   <span style={{ fontSize: 18 }}>{topic.emoji}</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: isComplete ? "var(--green)" : unlocked ? "var(--text)" : "var(--text-3)" }}>
                     {topic.title}
                   </span>
                   {isComplete && (
-                    <span className="badge-green" style={{ fontSize: 10 }}>Done</span>
+                    <span className="badge-green" style={{ fontSize: 10 }}>{getLabel(targetLang, "done")}</span>
                   )}
                   {!unlocked && (
                     <span style={{
                       fontSize: 10, fontWeight: 700, color: "var(--text-3)",
                       background: "var(--surface-3)", borderRadius: 99,
                       padding: "2px 8px", letterSpacing: "0.06em", textTransform: "uppercase",
-                    }}>Locked</span>
+                    }}>{getLabel(targetLang, "locked")}</span>
                   )}
                 </div>
                 <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -205,18 +253,18 @@ export default function LearnPage() {
                             {lesson.title}
                           </span>
                           {done && (
-                            <span className="badge-green" style={{ fontSize: 10 }}>Completed</span>
+                            <span className="badge-green" style={{ fontSize: 10 }}>{getLabel(targetLang, "completed")}</span>
                           )}
                           {isStarted && !done && (
-                            <span className="badge-accent" style={{ fontSize: 10 }}>Up next</span>
+                            <span className="badge-accent" style={{ fontSize: 10 }}>{getLabel(targetLang, "upNext")}</span>
                           )}
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <span className={`diff-${diffKey}`} style={{ fontSize: 10 }}>
-                            {diffKey}
+                            {getLabel(targetLang, diffKey)}
                           </span>
                           <span style={{ fontSize: 11, color: "var(--text-3)" }}>·</span>
-                          <span style={{ fontSize: 11, color: "var(--text-3)" }}>{lesson.type}</span>
+                          <span style={{ fontSize: 11, color: "var(--text-3)" }}>{getLabel(targetLang, lesson.type)}</span>
                         </div>
                       </div>
 

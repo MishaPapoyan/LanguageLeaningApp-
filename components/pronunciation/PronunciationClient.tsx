@@ -17,6 +17,7 @@ interface Word {
 interface Props {
   words: Word[];
   categories: string[];
+  ttsLocale?: string;
 }
 
 // ─── Waveform bar animation (CSS-only, no canvas needed) ─────────────────────
@@ -43,7 +44,7 @@ function WaveformBars({ active }: { active: boolean }) {
   );
 }
 
-export function PronunciationClient({ words, categories }: Props) {
+export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [speed, setSpeed] = useState<number>(0.7);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
@@ -72,7 +73,7 @@ export function PronunciationClient({ words, categories }: Props) {
     ? words.filter((w) => w.category === selectedCategory)
     : words;
 
-  const speakText = useCallback((text: string, lang = "fr-FR") => {
+  const speakText = useCallback((text: string, lang = ttsLocale) => {
     setPlaying(true);
     speak(text, {
       lang,
@@ -80,7 +81,7 @@ export function PronunciationClient({ words, categories }: Props) {
       onEnd: () => setPlaying(false),
       onError: () => setPlaying(false),
     });
-  }, [speed]);
+  }, [speed, ttsLocale]);
 
   const playWord = (word: Word) => {
     setCurrentWord(word);

@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { speakFr } from "@/lib/speech";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
+import { speakTarget } from "@/lib/speech";
 
 interface Word {
   id: string;
@@ -13,6 +15,8 @@ interface Word {
 }
 
 export function FlashcardGame({ words }: { words: Word[] }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [current, setCurrent] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<string[]>([]);
@@ -112,11 +116,10 @@ export function FlashcardGame({ words }: { words: Word[] }) {
             className="absolute inset-0 bg-white rounded-2xl border border-zinc-100 flex flex-col items-center justify-center bg-gradient-to-b from-violet-50/50 to-white"
             style={{ backfaceVisibility: "hidden" }}
           >
-            <span className="text-5xl mb-4">{card.imageEmoji}</span>
             <p className="text-3xl font-serif text-zinc-900">{card.word}</p>
             <p className="text-sm text-violet-500 mt-4 font-medium">Tap to reveal</p>
             <button
-              onClick={(e) => { e.stopPropagation(); speakFr(card.word); }}
+              onClick={(e) => { e.stopPropagation(); speakTarget(card.word, langConfig.code); }}
               className="mt-2 w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center hover:bg-violet-100 transition-colors text-sm"
             >
               ♪

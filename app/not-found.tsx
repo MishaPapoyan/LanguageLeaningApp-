@@ -10,10 +10,10 @@ export default function NotFound() {
         <div className="text-6xl mb-4">🗺️</div>
         <h1 className="text-4xl font-bold mb-2" style={{ color: "var(--text)" }}>404</h1>
         <p className="text-lg mb-1" style={{ color: "var(--text-2)" }}>
-          Cette page n&apos;existe pas
+          Page not found
         </p>
         <p className="text-sm mb-8" style={{ color: "var(--text-3)" }}>
-          This page doesn&apos;t exist — but your French journey does!
+          This page doesn&apos;t exist — but your learning journey does!
         </p>
         <div className="flex gap-3 justify-center">
           <Link href="/home" className="btn-primary">

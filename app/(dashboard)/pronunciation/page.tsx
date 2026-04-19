@@ -1,15 +1,22 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PronunciationClient } from "@/components/pronunciation/PronunciationClient";
+import { getLanguageConfig } from "@/data/language-config";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Pronunciation — LangCraft",
-  description: "Practice French pronunciation",
+  description: "Practice pronunciation",
 };
 
 export default async function PronunciationPage() {
+  const session = await getServerSession(authOptions);
+  const language = session?.user?.targetLanguage ?? "fr";
+  const langConfig = getLanguageConfig(language);
+
   const words = await prisma.word.findMany({
-    where: { difficulty: "BEGINNER" },
+    where: { difficulty: "BEGINNER", language },
     select: {
       id: true,
       word: true,
@@ -27,7 +34,7 @@ export default async function PronunciationPage() {
 
   return (
     <div className="animate-fade-up">
-      <PronunciationClient words={words} categories={categories} />
+      <PronunciationClient words={words} categories={categories} ttsLocale={langConfig.ttsLocale} />
     </div>
   );
 }

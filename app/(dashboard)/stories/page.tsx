@@ -1,17 +1,20 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLanguageConfig } from "@/data/language-config";
 import { Metadata } from "next";
 import { StoriesClient } from "@/components/stories/StoriesClient";
 
 export const metadata: Metadata = {
   title: "Stories — LangCraft",
-  description: "Learn French through interactive stories",
+  description: "Learn through interactive stories",
 };
 
 export default async function StoriesPage() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
+  const language = session?.user?.targetLanguage ?? "fr";
+  const langConfig = getLanguageConfig(language);
 
   let storiesData: {
     id: string; title: string; chapter: number; difficulty: string;
@@ -21,6 +24,7 @@ export default async function StoriesPage() {
 
   try {
     const stories = await prisma.story.findMany({
+      where: { language },
       orderBy: { chapter: "asc" },
       select: {
         id: true,
@@ -62,10 +66,10 @@ export default async function StoriesPage() {
           <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px" }}>
             Stories
           </h1>
-          <span style={{ fontSize: 24 }}>🇫🇷</span>
+          <span style={{ fontSize: 24 }}>{langConfig.flag}</span>
         </div>
         <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          Immerse yourself in French through rich, interactive stories. Tap highlighted words to reveal translations, then test your memory with a quiz.
+          Immerse yourself in {langConfig.label} through rich, interactive stories. Tap highlighted words to reveal translations, then test your memory with a quiz.
         </p>
       </div>
 

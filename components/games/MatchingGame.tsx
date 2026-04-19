@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 
 interface Word { id: string; word: string; translation: string; imageEmoji: string; }
@@ -15,6 +17,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function MatchingGame({ words }: { words: Word[] }) {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [frCards, setFrCards] = useState<Word[]>(() => shuffle(words));
   const [enCards, setEnCards] = useState<Word[]>(() => shuffle(words));
   const [selected, setSelected] = useState<{ col: "fr" | "en"; id: string } | null>(null);
@@ -145,12 +149,12 @@ export function MatchingGame({ words }: { words: Word[] }) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <p className="section-label mb-2">French</p>
+          <p className="section-label mb-2">{langConfig.label}</p>
           {frCards.map((w) => (
             <button key={w.id} onClick={() => handleSelect("fr", w.id)} disabled={matched.has(w.id)}
               className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150"
               style={cardStyle("fr", w.id)}>
-              {w.imageEmoji} {w.word}{matched.has(w.id) && " ✓"}
+              {w.word}{matched.has(w.id) && " ✓"}
             </button>
           ))}
         </div>

@@ -619,9 +619,9 @@ html, body {
     border-radius: 10px;
     flex-shrink: 0;
   }
-  .icon-box-sm { width: 32px; height: 32px; border-radius: 8px; }
-  .icon-box-md { width: 40px; height: 40px; border-radius: 10px; }
-  .icon-box-lg { width: 52px; height: 52px; border-radius: 14px; }
+  .icon-box-sm { width: 32px; height: 32px; border-radius: 8px; padding: 6px; }
+  .icon-box-md { width: 44px; height: 44px; border-radius: 11px; padding: 9px; }
+  .icon-box-lg { width: 60px; height: 60px; border-radius: 16px; padding: 14px; }
 
 }
 

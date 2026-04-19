@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { speakFr } from "@/lib/speech";
+import { useSession } from "next-auth/react";
+import { getLanguageConfig } from "@/data/language-config";
+import { speakTarget } from "@/lib/speech";
 import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X, Pencil } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -77,6 +79,8 @@ async function apiPatch(id: string, front: string, back: string): Promise<Custom
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MyWordsPage() {
+  const { data: session } = useSession();
+  const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [words, setWords]           = useState<CustomWord[]>([]);
   const [loading, setLoading]       = useState(true);
   const [front, setFront]           = useState("");
@@ -398,14 +402,14 @@ export default function MyWordsPage() {
             fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em",
             color: "var(--text-3)",
           }}>
-            🇫🇷 Translate this word
+            {langConfig.flag} Translate this word
           </div>
 
           <div style={{ fontSize: 52, fontWeight: 900, color: "var(--text)", marginBottom: 24, lineHeight: 1.1 }}>
             {currentQ.word.back}
           </div>
 
-          <button onClick={() => speakFr(currentQ.word.back)} style={{
+          <button onClick={() => speakTarget(currentQ.word.back, langConfig.code)} style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
             borderRadius: 99, padding: "9px 20px",
@@ -584,17 +588,17 @@ export default function MyWordsPage() {
             fontSize: 20, color: "var(--text-3)",
           }}>→</div>
 
-          {/* French input */}
+          {/* Target language input */}
           <div style={{ flex: 1 }}>
             <label style={{
               display: "block", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
               textTransform: "uppercase", color: "var(--accent)", marginBottom: 7,
-            }}>🇫🇷 French</label>
+            }}>{langConfig.flag} {langConfig.label}</label>
             <input
               type="text" value={back}
               onChange={e => setBack(e.target.value)}
               onKeyDown={e => e.key === "Enter" && front.trim() && addWord()}
-              placeholder="e.g. bonjour"
+              placeholder={langConfig.code === "es" ? "e.g. hola" : "e.g. bonjour"}
               className="input"
               style={{ width: "100%", fontSize: 15 }}
             />
@@ -688,7 +692,7 @@ export default function MyWordsPage() {
                       <input
                         value={editBack} onChange={e => setEditBack(e.target.value)}
                         onKeyDown={e => e.key === "Enter" && saveEdit()}
-                        placeholder="French"
+                        placeholder={langConfig.label}
                         className="input" style={{ width: "100%", fontSize: 13 }}
                       />
                       <div style={{ display: "flex", gap: 6 }}>
@@ -722,10 +726,10 @@ export default function MyWordsPage() {
                         </p>
                       </div>
                       <div style={{ height: 1, background: "var(--border)", margin: "0 16px" }} />
-                      {/* French word */}
+                      {/* Target language word */}
                       <div style={{ padding: "10px 16px 14px", flex: 1 }}>
                         <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: accentColor, margin: "0 0 4px" }}>
-                          🇫🇷 French
+                          {langConfig.flag} {langConfig.label}
                         </p>
                         <p style={{ fontSize: 18, fontWeight: 800, color: accentColor, margin: 0, wordBreak: "break-word" }}>
                           {word.back}
@@ -733,7 +737,7 @@ export default function MyWordsPage() {
                       </div>
                       {/* Action row */}
                       <div style={{ display: "flex", alignItems: "center", borderTop: "1px solid var(--border)", padding: "0 6px" }}>
-                        <button onClick={() => speakFr(word.back)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                        <button onClick={() => speakTarget(word.back, langConfig.code)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
                           onMouseEnter={e => e.currentTarget.style.color = accentColor}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
                         ><Volume2 size={12} /> Listen</button>

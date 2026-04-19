@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { BADGES, getXpProgress } from "@/types";
 import { DailyGoals } from "@/components/DailyGoals";
@@ -30,6 +31,8 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
+  const targetLang = (session?.user as { targetLanguage?: string })?.targetLanguage ?? "fr";
+  const langConfig = getLanguageConfig(targetLang);
 
   const dayIndex = Math.floor(Date.now() / 86_400_000) % 100;
 
@@ -97,12 +100,12 @@ export default async function HomePage() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5 p-6 md:p-8">
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-extrabold mb-1" style={{ color: "var(--text)" }}>
-              Bonjour, {firstName}! 🇫🇷
+              Hello, {firstName}! {langConfig.flag}
             </h1>
             <p className="text-sm mb-4" style={{ color: "var(--text-2)" }}>
               {progress?.streak && progress.streak > 0
                 ? `You're on a ${progress.streak}-day streak — keep it up!`
-                : "Ready to continue your French journey?"}
+                : `Ready to continue your ${langConfig.label} journey?`}
             </p>
 
             {/* XP bar */}
@@ -287,7 +290,7 @@ export default async function HomePage() {
             </div>
             <div>
               <p className="font-bold text-base" style={{ color: "var(--gc-teal-text)" }}>Continue Story</p>
-              <p className="text-xs mt-0.5" style={{ color: "var(--gc-teal-muted)" }}>Immersive French narratives</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--gc-teal-muted)" }}>Immersive {langConfig.label} narratives</p>
             </div>
           </Link>
 

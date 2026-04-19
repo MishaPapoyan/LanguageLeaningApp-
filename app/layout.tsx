@@ -12,12 +12,12 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "LangCraft — Learn French",
-  description: "Learn French through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
+  title: "LangCraft — Learn Languages",
+  description: "Learn languages through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
   metadataBase: new URL("https://langcraft.app"),
   openGraph: {
-    title: "LangCraft — Learn French",
-    description: "Learn French through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
+    title: "LangCraft — Learn Languages",
+    description: "Learn languages through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
     url: "https://langcraft.app",
     siteName: "LangCraft",
     type: "website",
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "LangCraft — Learn French",
+        alt: "LangCraft — Learn Languages",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LangCraft — Learn French",
-    description: "Learn French through stories, AI conversation, and games.",
+    title: "LangCraft — Learn Languages",
+    description: "Learn languages through stories, AI conversation, and games.",
     images: ["/og-image.png"],
   },
   robots: {

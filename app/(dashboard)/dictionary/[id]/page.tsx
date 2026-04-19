@@ -24,7 +24,13 @@ export default async function WordPage({ params }: { params: { id: string } }) {
 
   return (
     <WordDetail
-      word={{ ...word, isSaved: !!savedWord, masteryLevel: savedWord?.masteryLevel ?? 0 }}
+      word={{
+        ...word,
+        isSaved: !!savedWord,
+        masteryLevel: savedWord?.masteryLevel ?? 0,
+        quizAttempts: savedWord?.quizAttempts ?? 0,
+        quizCorrect: savedWord?.quizCorrect ?? 0,
+      }}
     />
   );
 }

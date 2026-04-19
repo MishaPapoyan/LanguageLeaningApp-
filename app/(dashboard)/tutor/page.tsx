@@ -8,7 +8,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AI Tutor — LangCraft",
-  description: "Practice French with an AI conversation partner",
+  description: "Practice with an AI conversation partner",
 };
 
 export default async function TutorPage() {
