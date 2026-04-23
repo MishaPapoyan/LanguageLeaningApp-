@@ -118,7 +118,10 @@ async function mistralTTS(text: string, lang: string): Promise<ArrayBuffer | nul
   }
   try {
     const json = await res.json();
-    if (json.audio_data) return Buffer.from(json.audio_data, "base64");
+    if (json.audio_data) {
+      const buf = Buffer.from(json.audio_data, "base64");
+      return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+    }
   } catch { /* not JSON */ }
   return null;
 }
