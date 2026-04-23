@@ -2,14 +2,61 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * TTS priority chain (server-side):
- *  1. OpenAI TTS HD  — best quality, natural pronunciation (requires OPENAI_API_KEY)
- *  2. Mistral Voxtral — native-speaker voices per language (requires MISTRAL_API_KEY)
- *  3. 503 → client falls back to Web Speech API
+ *  1. ElevenLabs eleven_multilingual_v2 — best quality, genuine native accent
+ *  2. OpenAI tts-1-hd                  — very good, natural pronunciation
+ *  3. Mistral Voxtral                  — decent, fixed binary response parsing
+ *  4. 503 → client falls back to Web Speech API
  */
 
 const CACHE_HEADERS = {
   "Cache-Control": "public, max-age=604800, immutable", // 7 days
 };
+
+// ─── ElevenLabs ───────────────────────────────────────────────────────────────
+// eleven_multilingual_v2 produces genuine native-accent output for any language.
+// Voice IDs below are ElevenLabs pre-made voices tuned for European languages.
+// You can swap these for any voice from your ElevenLabs library.
+
+const EL_VOICES: Record<string, string> = {
+  fr: "cgSgspJ2msm6clMCkdW9", // Jessica (multilingual, natural French accent)
+  es: "EXAVITQu4vr4xnSDxMaL", // Bella (multilingual, clear Spanish)
+  default: "21m00Tcm4TlvDq8ikWAM", // Rachel — neutral, excellent multilingual
+};
+
+async function elevenLabsTTS(text: string, lang: string): Promise<ArrayBuffer | null> {
+  const key = process.env.ELEVENLABS_API_KEY;
+  if (!key) return null;
+
+  const voiceId = EL_VOICES[lang] ?? EL_VOICES.default;
+
+  const res = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": key,
+        "Content-Type": "application/json",
+        Accept: "audio/mpeg",
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: {
+          stability: 0.45,        // slightly lower = more expressive/natural
+          similarity_boost: 0.80,
+          style: 0.15,            // adds natural expressiveness
+          use_speaker_boost: true,
+        },
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    console.error("[TTS/elevenlabs] error:", res.status, await res.text());
+    return null;
+  }
+  return res.arrayBuffer();
+}
 
 // ─── OpenAI TTS ───────────────────────────────────────────────────────────────
 
@@ -17,27 +64,15 @@ async function openaiTTS(text: string, lang: string): Promise<ArrayBuffer | null
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
 
-  // Best voices per language for clear educational pronunciation
-  const VOICES: Record<string, string> = {
-    fr: "nova",   // clear, warm French
-    es: "nova",   // clear Spanish
-    en: "alloy",
-  };
-  const prefix = lang.split(/[-_]/)[0].toLowerCase();
-  const voice = VOICES[prefix] ?? "nova";
-
   const res = await fetch("https://api.openai.com/v1/audio/speech", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "tts-1-hd",
       input: text,
-      voice,
+      voice: "nova",
       response_format: "mp3",
-      speed: 0.9, // slightly slower for learning
+      speed: 0.9,
     }),
   });
 
@@ -58,22 +93,17 @@ async function mistralTTS(text: string, lang: string): Promise<ArrayBuffer | nul
     fr: "a249eaff-1b96-4ce2-a3e7-b2c9b43c4b9a",
     es: "0a4aa596-c999-4922-afae-9fb3a2d85e9e",
   };
-  const prefix = lang.split(/[-_]/)[0].toLowerCase();
-  const voiceId = VOICE_IDS[prefix];
 
   const body: Record<string, unknown> = {
     model: "voxtral-mini-tts-2603",
     input: text,
     response_format: "mp3",
   };
-  if (voiceId) body.voice_id = voiceId;
+  if (VOICE_IDS[lang]) body.voice_id = VOICE_IDS[lang];
 
   const res = await fetch("https://api.mistral.ai/v1/audio/speech", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 
@@ -82,7 +112,6 @@ async function mistralTTS(text: string, lang: string): Promise<ArrayBuffer | nul
     return null;
   }
 
-  // Mistral may return binary audio or base64 JSON — handle both
   const contentType = res.headers.get("content-type") ?? "";
   if (contentType.includes("audio") || contentType.includes("octet")) {
     return res.arrayBuffer();
@@ -90,9 +119,7 @@ async function mistralTTS(text: string, lang: string): Promise<ArrayBuffer | nul
   try {
     const json = await res.json();
     if (json.audio_data) return Buffer.from(json.audio_data, "base64");
-  } catch {
-    // not JSON
-  }
+  } catch { /* not JSON */ }
   return null;
 }
 
@@ -105,23 +132,18 @@ export async function POST(req: NextRequest) {
   }
 
   const langPrefix = lang.split(/[-_]/)[0].toLowerCase();
+  const t = text.trim();
 
-  // 1. OpenAI (best quality)
-  const openaiAudio = await openaiTTS(text.trim(), langPrefix);
-  if (openaiAudio) {
-    return new NextResponse(openaiAudio, {
+  const audio =
+    (await elevenLabsTTS(t, langPrefix)) ??
+    (await openaiTTS(t, langPrefix)) ??
+    (await mistralTTS(t, langPrefix));
+
+  if (audio) {
+    return new NextResponse(audio, {
       headers: { "Content-Type": "audio/mpeg", ...CACHE_HEADERS },
     });
   }
 
-  // 2. Mistral Voxtral
-  const mistralAudio = await mistralTTS(text.trim(), langPrefix);
-  if (mistralAudio) {
-    return new NextResponse(mistralAudio, {
-      headers: { "Content-Type": "audio/mpeg", ...CACHE_HEADERS },
-    });
-  }
-
-  // 3. No server TTS available — client will use Web Speech API
   return NextResponse.json({ error: "No TTS provider available" }, { status: 503 });
 }
