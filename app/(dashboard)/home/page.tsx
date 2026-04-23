@@ -100,7 +100,7 @@ export default async function HomePage() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5 p-6 md:p-8">
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-extrabold mb-1" style={{ color: "var(--text)" }}>
-              Hello, {firstName}! {langConfig.flag}
+              {langConfig.greeting}, {firstName}! {langConfig.flag}
             </h1>
             <p className="text-sm mb-4" style={{ color: "var(--text-2)" }}>
               {progress?.streak && progress.streak > 0

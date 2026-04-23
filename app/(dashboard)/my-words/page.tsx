@@ -405,7 +405,7 @@ export default function MyWordsPage() {
             {langConfig.flag} Translate this word
           </div>
 
-          <div style={{ fontSize: 52, fontWeight: 900, color: "var(--text)", marginBottom: 24, lineHeight: 1.1 }}>
+          <div style={{ fontSize: "clamp(24px, 5vw, 36px)", fontWeight: 900, color: "var(--text)", marginBottom: 24, lineHeight: 1.2 }}>
             {currentQ.word.back}
           </div>
 
@@ -661,8 +661,9 @@ export default function MyWordsPage() {
           {/* Grid of flashcard tiles */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
             gap: 12,
+            alignItems: "start",
           }}>
             {words.map((word, idx) => {
               const hues = ["var(--accent)", "var(--teal, #14b8a6)", "var(--gold)", "#f472b6", "var(--green)"];

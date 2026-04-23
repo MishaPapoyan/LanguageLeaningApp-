@@ -7,50 +7,67 @@ interface DailyGoal {
   id: string;
   label: string;
   emoji: string;
-  target: number;
-  current: number;
+  done: boolean;
   href: string;
-}
-
-function getTodayKey() {
-  return new Date().toISOString().split("T")[0];
 }
 
 export function DailyGoals() {
   const [goals, setGoals] = useState<DailyGoal[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const key = `dailyGoals_${getTodayKey()}`;
-    const saved = localStorage.getItem(key);
-    if (saved) {
-      setGoals(JSON.parse(saved));
-    } else {
-      const fresh: DailyGoal[] = [
-        { id: "lesson",  label: "Complete a lesson",    emoji: "🎓", target: 1, current: 0, href: "/learn" },
-        { id: "review",  label: "Review words",          emoji: "🔄", target: 1, current: 0, href: "/review" },
-        { id: "practice",label: "AI tutor or writing",  emoji: "✍️", target: 1, current: 0, href: "/tutor" },
-      ];
-      setGoals(fresh);
-      localStorage.setItem(key, JSON.stringify(fresh));
-    }
+    fetch("/api/daily-goals")
+      .then((r) => r.json())
+      .then((d) => {
+        setGoals([
+          {
+            id: "stories",
+            label: "Read a story",
+            emoji: "📖",
+            done: (d.storiesRead ?? 0) >= 1,
+            href: "/stories",
+          },
+          {
+            id: "games",
+            label: "Play a game",
+            emoji: "🎮",
+            done: (d.gamesPlayed ?? 0) >= 1,
+            href: "/games",
+          },
+          {
+            id: "practice",
+            label: "AI tutor or writing",
+            emoji: "✍️",
+            done: (d.practiceCount ?? 0) >= 1,
+            href: "/tutor",
+          },
+        ]);
+        setLoading(false);
+      })
+      .catch(() => {
+        setGoals([
+          { id: "stories",  label: "Read a story",        emoji: "📖", done: false, href: "/stories" },
+          { id: "games",    label: "Play a game",          emoji: "🎮", done: false, href: "/games" },
+          { id: "practice", label: "AI tutor or writing",  emoji: "✍️", done: false, href: "/tutor" },
+        ]);
+        setLoading(false);
+      });
   }, []);
 
-  const completedCount = goals.filter((g) => g.current >= g.target).length;
+  const completedCount = goals.filter((g) => g.done).length;
   const allDone = completedCount === goals.length && goals.length > 0;
   const pct = goals.length > 0 ? (completedCount / goals.length) * 100 : 0;
 
   return (
     <div className="card p-5">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="section-label mb-0.5">Today&apos;s goals</p>
           <p className="text-sm font-semibold" style={{ color: "var(--text-2)" }}>
-            {completedCount}/{goals.length} complete
+            {loading ? "—" : `${completedCount}/${goals.length} complete`}
           </p>
         </div>
 
-        {/* Mini ring */}
         <div className="relative w-12 h-12">
           <svg width="48" height="48" className="-rotate-90 absolute inset-0">
             <circle cx="24" cy="24" r="19" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="4" />
@@ -64,57 +81,47 @@ export function DailyGoals() {
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-xs font-black" style={{ color: allDone ? "var(--green)" : "var(--accent)" }}>
-              {completedCount}
+              {loading ? "·" : completedCount}
             </span>
           </div>
         </div>
       </div>
 
       {allDone && (
-        <div
-          className="rounded-xl px-3 py-2 mb-3 text-center text-xs font-bold"
-          style={{ background: "var(--green-dim)", color: "var(--green)" }}
-        >
+        <div className="rounded-xl px-3 py-2 mb-3 text-center text-xs font-bold"
+          style={{ background: "var(--green-dim)", color: "var(--green)" }}>
           All done for today! 🎉
         </div>
       )}
 
       <div className="space-y-1.5">
-        {goals.map((goal) => {
-          const done = goal.current >= goal.target;
-          return (
-            <Link
-              key={goal.id}
-              href={goal.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
-              style={{
-                background: done ? "var(--green-dim)" : "rgba(255,255,255,0.03)",
-                border: `1px solid ${done ? "rgba(52,211,153,0.2)" : "transparent"}`,
-              }}
-            >
-              <div
-                className="w-5 h-5 rounded-md border-2 flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+        {loading
+          ? [1, 2, 3].map((i) => (
+              <div key={i} className="px-3 py-2.5 rounded-xl"
+                style={{ background: "rgba(255,255,255,0.03)", height: 40, animation: "pulse 1.5s infinite" }} />
+            ))
+          : goals.map((goal) => (
+              <Link key={goal.id} href={goal.href}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all active:scale-[0.98]"
                 style={{
-                  background: done ? "var(--green)" : "transparent",
-                  borderColor: done ? "var(--green)" : "var(--border-md)",
-                  color: "white",
-                }}
-              >
-                {done && "✓"}
-              </div>
-              <span
-                className="text-sm flex-1"
-                style={{
-                  color: done ? "var(--text-3)" : "var(--text-2)",
-                  textDecoration: done ? "line-through" : "none",
-                }}
-              >
-                {goal.label}
-              </span>
-              <span className="text-base">{goal.emoji}</span>
-            </Link>
-          );
-        })}
+                  background: goal.done ? "var(--green-dim)" : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${goal.done ? "rgba(52,211,153,0.2)" : "transparent"}`,
+                }}>
+                <div className="w-5 h-5 rounded-md border-2 flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                  style={{
+                    background: goal.done ? "var(--green)" : "transparent",
+                    borderColor: goal.done ? "var(--green)" : "var(--border-md)",
+                    color: "white",
+                  }}>
+                  {goal.done && "✓"}
+                </div>
+                <span className="text-sm flex-1"
+                  style={{ color: goal.done ? "var(--text-3)" : "var(--text-2)", textDecoration: goal.done ? "line-through" : "none" }}>
+                  {goal.label}
+                </span>
+                <span className="text-base">{goal.emoji}</span>
+              </Link>
+            ))}
       </div>
     </div>
   );

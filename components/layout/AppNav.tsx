@@ -15,17 +15,24 @@ import { t, getLocale, type TranslationKey } from "@/lib/i18n";
 
 interface ProgressData { xp: number; level: number; streak: number; }
 
+// Primary nav (shown in header)
 const NAV_LINKS: { href: string; labelKey: TranslationKey; Icon: typeof Home }[] = [
-  { href: "/home",       labelKey: "nav_home",       Icon: Home },
+  { href: "/home",    labelKey: "nav_home",    Icon: Home },
+  { href: "/stories", labelKey: "nav_stories", Icon: BookOpen },
+  { href: "/tutor",   labelKey: "nav_tutor",   Icon: MessageCircle },
+  { href: "/games",   labelKey: "nav_games",   Icon: Gamepad2 },
+  { href: "/review",  labelKey: "nav_practice", Icon: RotateCcw },
+  { href: "/writing", labelKey: "nav_writing",  Icon: PenLine },
+];
+
+// Secondary nav (shown in mobile panel + user dropdown)
+const NAV_SECONDARY: { href: string; labelKey: TranslationKey; Icon: typeof Home }[] = [
   { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
-  { href: "/stories",    labelKey: "nav_stories",    Icon: BookOpen },
-  { href: "/tutor",      labelKey: "nav_tutor",      Icon: MessageCircle },
-  { href: "/games",      labelKey: "nav_games",      Icon: Gamepad2 },
-  { href: "/review",     labelKey: "nav_practice",   Icon: RotateCcw },
-  { href: "/writing",    labelKey: "nav_writing",    Icon: PenLine },
   { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
   { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
 ];
+
+const ALL_NAV_LINKS = [...NAV_LINKS, ...NAV_SECONDARY];
 
 const TARGET_LANG_FLAGS: Record<string, string> = {
   fr: "\u{1F1EB}\u{1F1F7}",
@@ -97,9 +104,12 @@ export function AppNav() {
   const avatarInitial = userName[0]?.toUpperCase() ?? "U";
 
   const DROPDOWN_ITEMS: { href: string; labelKey: TranslationKey; Icon: typeof Settings }[] = [
-    { href: "/settings",  labelKey: "nav_settings",  Icon: Settings },
-    { href: "/progress",  labelKey: "nav_progress",  Icon: TrendingUp },
-    { href: "/analytics", labelKey: "nav_analytics", Icon: BarChart3 },
+    { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
+    { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
+    { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
+    { href: "/settings",   labelKey: "nav_settings",   Icon: Settings },
+    { href: "/progress",   labelKey: "nav_progress",   Icon: TrendingUp },
+    { href: "/analytics",  labelKey: "nav_analytics",  Icon: BarChart3 },
   ];
 
   return (
@@ -350,35 +360,39 @@ export function AppNav() {
                 </p>
               </div>
 
-              {DROPDOWN_ITEMS.map(({ href, labelKey, Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  role="menuitem"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "8px 11px",
-                    borderRadius: 9,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "var(--text-2)",
-                    textDecoration: "none",
-                    transition: "background 0.11s, color 0.11s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(128,128,128,0.09)";
-                    e.currentTarget.style.color = "var(--text)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "";
-                    e.currentTarget.style.color = "var(--text-2)";
-                  }}
-                >
-                  <Icon size={13} style={{ color: "var(--text-3)", flexShrink: 0 }} aria-hidden="true" />
-                  {t(locale, labelKey)}
-                </Link>
+              {DROPDOWN_ITEMS.map(({ href, labelKey, Icon }, i) => (
+                <div key={href}>
+                  {i === 3 && (
+                    <div style={{ height: 1, background: "var(--border)", margin: "3px 0 6px" }} />
+                  )}
+                  <Link
+                    href={href}
+                    role="menuitem"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "8px 11px",
+                      borderRadius: 9,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: "var(--text-2)",
+                      textDecoration: "none",
+                      transition: "background 0.11s, color 0.11s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "rgba(128,128,128,0.09)";
+                      e.currentTarget.style.color = "var(--text)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "";
+                      e.currentTarget.style.color = "var(--text-2)";
+                    }}
+                  >
+                    <Icon size={13} style={{ color: "var(--text-3)", flexShrink: 0 }} aria-hidden="true" />
+                    {t(locale, labelKey)}
+                  </Link>
+                </div>
               ))}
 
               <div style={{ height: 1, background: "var(--border)", margin: "3px 0" }} />
@@ -458,7 +472,7 @@ export function AppNav() {
               marginBottom: 10,
             }}
           >
-            {NAV_LINKS.map(({ href, labelKey, Icon }) => {
+            {ALL_NAV_LINKS.map(({ href, labelKey, Icon }) => {
               const active = pathname === href || pathname.startsWith(href + "/");
               return (
                 <Link

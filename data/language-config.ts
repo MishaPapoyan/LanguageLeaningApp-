@@ -7,6 +7,8 @@ export interface LanguageConfig {
   /** Voxtral/Mistral voice ID — null falls back to Web Speech */
   voxtralVoice: string | null;
   nativeName: string;
+  /** Native greeting word for the dashboard */
+  greeting: string;
 }
 
 export const SUPPORTED_LANGUAGES: LanguageConfig[] = [
@@ -17,6 +19,7 @@ export const SUPPORTED_LANGUAGES: LanguageConfig[] = [
     ttsLocale: "fr-FR",
     voxtralVoice: "fr",
     nativeName: "Français",
+    greeting: "Bonjour",
   },
   {
     code: "es",
@@ -25,6 +28,7 @@ export const SUPPORTED_LANGUAGES: LanguageConfig[] = [
     ttsLocale: "es-ES",
     voxtralVoice: "es",
     nativeName: "Español",
+    greeting: "¡Hola",
   },
 ];
 
