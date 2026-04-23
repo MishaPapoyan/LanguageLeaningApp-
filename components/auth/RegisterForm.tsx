@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Eye, EyeOff, ArrowRight, Check } from "lucide-react";
 
 type TargetLang = "fr" | "es";
@@ -49,9 +50,13 @@ export function RegisterForm() {
       return;
     }
 
-    // Temporarily store password so verify page can auto-sign-in after OTP
-    sessionStorage.setItem("__reg_pw", password);
-    router.push(`/verify?email=${encodeURIComponent(email)}`);
+    const result = await signIn("credentials", { email, password, redirect: false });
+    if (result?.error) {
+      setError("Account created but sign-in failed. Please log in.");
+      setLoading(false);
+      return;
+    }
+    router.push("/onboarding");
     router.refresh();
   };
 

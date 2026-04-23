@@ -29,8 +29,6 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    // Hardcoded OTP for dev — replace with real provider before launch
-    const DEV_OTP = "123456";
 
     const user = await prisma.user.create({
       data: {
@@ -40,8 +38,8 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role,
         targetLanguage,
-        emailOtp: DEV_OTP,
-        phoneOtp: DEV_OTP,
+        emailVerified: true,
+        phoneVerified: true,
         progress: {
           create: {
             skillTree: { vocabulary: 0, grammar: 0, speaking: 0 },

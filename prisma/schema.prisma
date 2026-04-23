@@ -30,6 +30,8 @@ enum GameType {
   TRUE_FALSE
   SPEED_TYPING
   LISTEN_QUIZ
+  SENTENCE_BUILDER
+  DIALOG_ADVENTURE
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────

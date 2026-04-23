@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones } from "lucide-react";
+import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Games — LangCraft",
@@ -122,6 +122,34 @@ const GAMES = [
     difficulty: "Advanced",
     diffColor: "#ef4444",
     xpLabel: "+35 XP",
+  },
+  {
+    href: "/games/sentence-builder",
+    gameType: "SENTENCE_BUILDER",
+    icon: AlignJustify,
+    title: "Sentence Builder",
+    desc: "Tap word tiles to assemble correct sentences — master grammar fast",
+    colorClass: "gc-teal",
+    textVar: "--gc-teal-text",
+    mutedVar: "--gc-teal-muted",
+    borderVar: "--gc-teal-border",
+    difficulty: "Intermediate",
+    diffColor: "#f59e0b",
+    xpLabel: "+30 XP",
+  },
+  {
+    href: "/games/dialog-adventure",
+    gameType: "DIALOG_ADVENTURE",
+    icon: MessagesSquare,
+    title: "Dialog Adventure",
+    desc: "Real scenarios, real conversations — café, train station, getting lost",
+    colorClass: "gc-rose",
+    textVar: "--gc-rose-text",
+    mutedVar: "--gc-rose-muted",
+    borderVar: "--gc-rose-border",
+    difficulty: "Advanced",
+    diffColor: "#ef4444",
+    xpLabel: "+40 XP",
   },
 ];
 
