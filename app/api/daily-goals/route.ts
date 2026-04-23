@@ -19,7 +19,7 @@ export async function GET() {
         where: { userId, completed: true, updatedAt: { gte: startOfDay } },
       }),
       prisma.gameScore.count({
-        where: { userId, createdAt: { gte: startOfDay } },
+        where: { userId, playedAt: { gte: startOfDay } },
       }),
       prisma.aiInteraction.count({
         where: { userId, createdAt: { gte: startOfDay } },
