@@ -6,6 +6,10 @@ import { speakTarget } from "@/lib/speech";
 
 interface Word { id: string; word: string; translation: string; }
 
+function stripDiacritics(s: string) {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -34,6 +38,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
   const [queue] = useState(() => shuffle(words).slice(0, ROUNDS));
   const [current, setCurrent] = useState(0);
   const [input, setInput] = useState("");
+  const [accentHint, setAccentHint] = useState(false);
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong" | "skip">("idle");
   const [elapsed, setElapsed] = useState(0);
@@ -83,11 +88,17 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
 
   const handleInput = (val: string) => {
     setInput(val);
+    setAccentHint(false);
     const target = queue[current].word.toLowerCase().trim();
     const typed = val.toLowerCase().trim();
     if (typed === target) {
       setStatus("correct");
       setTimeout(() => advance(true), 400);
+    } else if (stripDiacritics(typed) === stripDiacritics(target) && typed.length === target.length) {
+      // Correct word but missing accent — accept and hint
+      setAccentHint(true);
+      setStatus("correct");
+      setTimeout(() => advance(true), 900);
     }
   };
 
@@ -201,6 +212,12 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           Skip → show answer
         </button>
       </div>
+
+      {accentHint && (
+        <div style={{ marginTop: 12, padding: "10px 16px", borderRadius: 12, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", textAlign: "center" }}>
+          <span style={{ fontSize: 13, color: "#d97706" }}>✓ Correct! Remember the accent: <strong>{word.word}</strong></span>
+        </div>
+      )}
 
       {status === "skip" && (
         <div style={{ marginTop: 12, padding: "12px 16px", borderRadius: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", textAlign: "center" }}>

@@ -26,6 +26,7 @@ const NATIVE_LANGUAGES = [
   { value: "tr", label: "Turkish",    flag: "🇹🇷" },
   { value: "ja", label: "Japanese",   flag: "🇯🇵" },
   { value: "ko", label: "Korean",     flag: "🇰🇷" },
+  { value: "hy", label: "Armenian",  flag: "🇦🇲" },
   { value: "other", label: "Other",   flag: "🌍" },
 ];
 

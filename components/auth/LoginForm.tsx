@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Zap } from "lucide-react";
+import { Zap, Phone, Mail } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
+  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [email, setEmail]       = useState("");
+  const [phone, setPhone]       = useState("");
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
@@ -16,7 +18,7 @@ export function LoginForm() {
   const doSignIn = async (e: string, p: string) => {
     const result = await signIn("credentials", { email: e, password: p, redirect: false });
     if (result?.error) {
-      setError("Invalid email or password");
+      setError("Invalid credentials");
       setLoading(false);
       setDemoLoading(false);
     } else {
@@ -30,7 +32,8 @@ export function LoginForm() {
     ev.preventDefault();
     setLoading(true);
     setError("");
-    await doSignIn(email, password);
+    // For phone login, pass phone as email field — auth layer will resolve it
+    await doSignIn(loginMethod === "email" ? email : phone, password);
   };
 
   const handleDemo = async () => {
@@ -68,16 +71,48 @@ export function LoginForm() {
         <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
       </div>
 
+      {/* Toggle email / phone */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
+        {(["email", "phone"] as const).map((method) => (
+          <button
+            key={method}
+            type="button"
+            onClick={() => { setLoginMethod(method); setError(""); }}
+            style={{
+              padding: "10px 12px", borderRadius: 12,
+              border: loginMethod === method ? "2px solid var(--accent)" : "2px solid var(--border)",
+              background: loginMethod === method ? "var(--accent-dim)" : "var(--surface)",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              cursor: "pointer", transition: "all 0.15s",
+              fontSize: 13, fontWeight: 600,
+              color: loginMethod === method ? "var(--accent-2)" : "var(--text-3)",
+            }}
+          >
+            {method === "email" ? <Mail size={14} /> : <Phone size={14} />}
+            {method === "email" ? "Email" : "Phone"}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: "var(--red-dim)", color: "var(--red)" }}>
             {error}
           </div>
         )}
-        <div>
-          <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="you@example.com" required />
-        </div>
+
+        {loginMethod === "email" ? (
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="you@example.com" required />
+          </div>
+        ) : (
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Phone number</label>
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input" placeholder="+1 555 000 0000" required />
+          </div>
+        )}
+
         <div>
           <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Password</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder="Enter your password" required />

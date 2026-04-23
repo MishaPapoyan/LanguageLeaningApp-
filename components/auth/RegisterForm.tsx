@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ArrowRight, Check } from "lucide-react";
 
@@ -16,6 +15,7 @@ export function RegisterForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [targetLanguage, setTargetLanguage] = useState<TargetLang>("fr");
@@ -39,7 +39,7 @@ export function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role: "STUDENT", targetLanguage }),
+      body: JSON.stringify({ name, email, phone, password, role: "STUDENT", targetLanguage }),
     });
 
     if (!res.ok) {
@@ -49,14 +49,9 @@ export function RegisterForm() {
       return;
     }
 
-    const signInResult = await signIn("credentials", { email, password, redirect: false });
-    if (signInResult?.error) {
-      setError("Account created but sign-in failed. Please log in.");
-      setLoading(false);
-      return;
-    }
-
-    router.push("/onboarding");
+    // Temporarily store password so verify page can auto-sign-in after OTP
+    sessionStorage.setItem("__reg_pw", password);
+    router.push(`/verify?email=${encodeURIComponent(email)}`);
     router.refresh();
   };
 
@@ -143,6 +138,17 @@ export function RegisterForm() {
         <input
           type="email" value={email} onChange={(e) => setEmail(e.target.value)}
           className="input" placeholder="you@example.com" required
+        />
+      </div>
+
+      {/* Phone */}
+      <div>
+        <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
+          Phone number
+        </label>
+        <input
+          type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+          className="input" placeholder="+1 555 000 0000" required
         />
       </div>
 

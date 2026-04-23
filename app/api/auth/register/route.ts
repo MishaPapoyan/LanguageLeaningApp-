@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 const registerSchema = z.object({
   name: z.string().min(2).max(50),
   email: z.string().email(),
+  phone: z.string().min(7).max(20),
   password: z.string().min(6),
   role: z.enum(["STUDENT"]).default("STUDENT"),
   targetLanguage: z.enum(["fr", "es"]).default("fr"),
@@ -15,22 +16,32 @@ const registerSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, password, role, targetLanguage } = registerSchema.parse(body);
+    const { name, email, phone, password, role, targetLanguage } = registerSchema.parse(body);
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findFirst({
+      where: { OR: [{ email }, { phone }] },
+    });
     if (existing) {
-      return NextResponse.json({ error: "Email already in use" }, { status: 409 });
+      return NextResponse.json(
+        { error: existing.email === email ? "Email already in use" : "Phone already in use" },
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    // Hardcoded OTP for dev — replace with real provider before launch
+    const DEV_OTP = "123456";
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
+        phone,
         password: hashedPassword,
         role,
         targetLanguage,
+        emailOtp: DEV_OTP,
+        phoneOtp: DEV_OTP,
         progress: {
           create: {
             skillTree: { vocabulary: 0, grammar: 0, speaking: 0 },

@@ -30,7 +30,10 @@ export async function POST(req: NextRequest) {
 The student's level is: ${level || "beginner"}.
 The writing prompt was: "${prompt}"
 
-Provide helpful, encouraging feedback in this format:
+Start your response with EXACTLY this line (replace X with a number 1-10):
+GRADE: X/10
+
+Then provide helpful, encouraging feedback in this format:
 1. **Overall impression** — What they did well (1-2 sentences)
 2. **Corrections** — List specific grammar/spelling mistakes with corrections. Show the wrong phrase, the correct version, and explain why.
 3. **Vocabulary** — Suggest better or additional words/phrases they could use

@@ -462,14 +462,32 @@ export default function WritingPage() {
       </div>
 
       {/* Feedback */}
-      {feedback && (
-        <div className="rounded-2xl p-5 bg-emerald-50 ring-1 ring-emerald-100">
-          <h3 className="font-serif text-emerald-800 mb-3">AI Feedback</h3>
-          <div className="text-sm text-zinc-700 leading-relaxed whitespace-pre-wrap">
-            {feedback}
+      {feedback && (() => {
+        const gradeMatch = feedback.match(/^GRADE:\s*(\d+)\/10/);
+        const grade = gradeMatch ? parseInt(gradeMatch[1]) : null;
+        const bodyText = feedback.replace(/^GRADE:\s*\d+\/10\n?/, "").trimStart();
+        const gradeColor = grade === null ? "#6b7280" : grade >= 8 ? "#16a34a" : grade >= 5 ? "#d97706" : "#dc2626";
+        return (
+          <div className="rounded-2xl p-5 bg-emerald-50 ring-1 ring-emerald-100">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <h3 className="font-serif text-emerald-800">AI Feedback</h3>
+              {grade !== null && (
+                <div style={{
+                  display: "flex", alignItems: "baseline", gap: 2,
+                  background: "white", borderRadius: 12, padding: "4px 14px",
+                  border: `2px solid ${gradeColor}`,
+                }}>
+                  <span style={{ fontSize: 22, fontWeight: 800, color: gradeColor, fontFamily: "serif" }}>{grade}</span>
+                  <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>/10</span>
+                </div>
+              )}
+            </div>
+            <div className="text-sm text-zinc-700 leading-relaxed whitespace-pre-wrap">
+              {bodyText}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
