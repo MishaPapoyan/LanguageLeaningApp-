@@ -116,7 +116,7 @@ export default async function RegisterPage() {
             {[
               { icon: Zap, label: "Up and running in 60 seconds", color: "var(--gold)" },
               { icon: Star, label: "No credit card required", color: "var(--teal)" },
-              { icon: Globe, label: "Free forever — seriously", color: "var(--accent-2)" },
+              { icon: Globe, label: "French & Spanish supported", color: "var(--accent-2)" },
             ].map((item) => (
               <div
                 key={item.label}
@@ -227,7 +227,7 @@ export default async function RegisterPage() {
               lineHeight: 1.5,
             }}
           >
-            Start your free language learning journey today
+            Takes 60 seconds — no credit card needed
           </p>
 
           {/* Form */}

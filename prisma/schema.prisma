@@ -71,16 +71,21 @@ model VerificationToken {
 // ─── User ─────────────────────────────────────────────────────────────────────
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  name           String?
-  password       String?
-  image          String?
-  role           Role     @default(STUDENT)
-  nativeLanguage String   @default("en")
-  targetLanguage String   @default("fr")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  email                String   @unique
+  name                 String?
+  password             String?
+  image                String?
+  role                 Role     @default(STUDENT)
+  nativeLanguage       String   @default("en")
+  targetLanguage       String   @default("fr")
+  ageGroup             String?
+  learningGoal         String?
+  proficiencyLevel     String?
+  dailyGoalMinutes     Int?
+  onboardingCompleted  Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   accounts        Account[]
   sessions        Session[]
