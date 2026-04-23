@@ -2,12 +2,10 @@
  * Speech synthesis utility.
  *
  * Priority chain:
- *  1. Mistral Voxtral TTS — phrases/sentences (3+ words) via /api/pronunciation/tts
- *  2. Web Speech API      — single words and universal fallback
- *
- * NOTE: Google Translate TTS (translate.google.com/translate_tts) was previously
- * the second tier but uses an unofficial endpoint that Google can break at any time.
- * Removed in favour of the stable Web Speech API.
+ *  1. Server TTS (/api/pronunciation/tts)
+ *       → OpenAI tts-1-hd   if OPENAI_API_KEY is set  (best quality)
+ *       → Mistral Voxtral   if MISTRAL_API_KEY is set  (native voices)
+ *  2. Web Speech API — universal browser fallback
  */
 
 export interface SpeakOptions {
@@ -189,11 +187,9 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
   stopCurrentAudio();
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
-  // Voxtral is generative — it hallucinates extra speech around single words.
-  // Only use it for phrases/sentences (3+ words); Google TTS handles the rest.
-  // 1. Mistral Voxtral — best quality for all text (single words and phrases)
-  const voxtralOk = await speakViaVoxtral(text, lang, volume, onEnd, onError);
-  if (voxtralOk) return;
+  // 1. Server TTS (OpenAI → Mistral, whichever key is configured)
+  const serverOk = await speakViaVoxtral(text, lang, volume, onEnd, onError);
+  if (serverOk) return;
 
   // 2. Web Speech API — handles single words and acts as universal fallback
   if (!("speechSynthesis" in window)) { onError?.(); return; }
