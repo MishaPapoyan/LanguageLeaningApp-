@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify, Map } from "lucide-react";
+import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify, Map, Box } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Games — LangCraft",
@@ -164,6 +164,20 @@ const GAMES = [
     difficulty: "Advanced",
     diffColor: "#ef4444",
     xpLabel: "+50 XP",
+  },
+  {
+    href: "/games/city-3d",
+    gameType: "CITY_EXPLORER",
+    icon: Box,
+    title: "3D City Explorer",
+    desc: "Real 3D city — walk around, collect glowing word orbs, answer to keep them",
+    colorClass: "gc-violet",
+    textVar: "--gc-violet-text",
+    mutedVar: "--gc-violet-muted",
+    borderVar: "--gc-violet-border",
+    difficulty: "Advanced",
+    diffColor: "#ef4444",
+    xpLabel: "+60 XP",
   },
 ];
 
