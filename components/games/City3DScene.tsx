@@ -5,6 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Stars, Text } from "@react-three/drei";
 import * as THREE from "three";
 import Link from "next/link";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 // ── Word bank ─────────────────────────────────────────────────────────────────
 interface WordEntry {
@@ -595,6 +596,14 @@ export default function City3DGame({ targetLang }: { targetLang: string }) {
               )}
             </Suspense>
           </Canvas>
+
+          {/* Speak current word */}
+          {currentWord && (
+            <div style={{ position:"absolute", top:12, left:"50%", transform:"translateX(-50%)" }}>
+              <SpeakButton text={currentWord} lang={lang} size={15}
+                style={{ background:"rgba(0,0,0,0.55)", borderColor:"rgba(129,140,248,0.55)" }} />
+            </div>
+          )}
 
           {/* Timer digit overlay */}
           <div style={{

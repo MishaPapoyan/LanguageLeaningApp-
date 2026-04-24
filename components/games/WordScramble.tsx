@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { Lightbulb, RotateCcw } from "lucide-react";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface Word { id: string; word: string; translation: string; imageEmoji: string; }
 
@@ -207,7 +208,11 @@ export function WordScramble({ words }: { words: Word[] }) {
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px" }}>
           Unscramble the {langConfig.label} word for:
         </p>
-        <p style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", margin: 0 }}>{word.translation}</p>
+        <p style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", margin: "0 0 10px" }}>{word.translation}</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <SpeakButton text={word.word} lang={session?.user?.targetLanguage ?? "fr"} size={14} />
+          <span style={{ fontSize: 12, color: "var(--text-3)" }}>hear pronunciation</span>
+        </div>
       </div>
 
       {/* Answer slots */}

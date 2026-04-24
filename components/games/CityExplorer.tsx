@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 // ── Map constants ─────────────────────────────────────────────────────────────
 const TILE    = 40;
@@ -630,9 +631,12 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
                 <p style={{ fontSize: 11, color: "var(--text-3)", margin: "0 0 6px", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                   What does this mean in English?
                 </p>
-                <p style={{ fontSize: 30, fontWeight: 900, color: "var(--accent)", margin: 0 }}>
-                  {quiz.challenges[quiz.idx].word}
-                </p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                  <p style={{ fontSize: 30, fontWeight: 900, color: "var(--accent)", margin: 0 }}>
+                    {quiz.challenges[quiz.idx].word}
+                  </p>
+                  <SpeakButton text={quiz.challenges[quiz.idx].word} lang={lang} size={16} />
+                </div>
               </div>
 
               {/* Choices */}

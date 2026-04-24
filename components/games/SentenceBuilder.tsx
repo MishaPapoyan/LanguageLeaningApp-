@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface SentenceData {
   id: string;
@@ -206,9 +207,13 @@ export function SentenceBuilder({ targetLang }: { targetLang: string }) {
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 8px" }}>
           Build this sentence in {langLabel}:
         </p>
-        <p style={{ fontSize: 24, fontWeight: 900, color: "var(--accent)", margin: 0 }}>
+        <p style={{ fontSize: 24, fontWeight: 900, color: "var(--accent)", margin: "0 0 10px" }}>
           {sentence.english}
         </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <SpeakButton text={sentence.words.join(" ")} lang={lang} size={13} />
+          <span style={{ fontSize: 12, color: "var(--text-3)" }}>hear correct sentence</span>
+        </div>
       </div>
 
       {/* Answer area */}
