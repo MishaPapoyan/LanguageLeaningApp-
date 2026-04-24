@@ -2,481 +2,461 @@
 
 import { useRef, useState, useEffect, useCallback, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Sky, Text } from "@react-three/drei";
+import { Stars, Text } from "@react-three/drei";
 import * as THREE from "three";
 import Link from "next/link";
 
-// ── Constants ──────────────────────────────────────────────────────────────────
-const PLAYER_SPEED = 6;
-const COLLECT_DIST = 2.4;
-
-// ── Data ───────────────────────────────────────────────────────────────────────
-interface OrbData {
-  id: string;
-  pos: [number, number, number];
-  color: string;
-  fr: { word: string; right: string; wrong: [string, string, string] };
-  es: { word: string; right: string; wrong: [string, string, string] };
+// ── Word bank ─────────────────────────────────────────────────────────────────
+interface WordEntry {
+  word: string;
+  correct: string;
+  wrong: [string, string, string];
 }
 
-const ORBS: OrbData[] = [
-  { id:"o1", pos:[ 6,0.5, 4], color:"#818cf8",
-    fr:{word:"bonjour", right:"hello",   wrong:["goodbye","thanks","sorry"]},
-    es:{word:"hola",    right:"hello",   wrong:["goodbye","thanks","sorry"]} },
-  { id:"o2", pos:[-5,0.5, 7], color:"#fb923c",
-    fr:{word:"maison",  right:"house",   wrong:["car","road","tree"]},
-    es:{word:"casa",    right:"house",   wrong:["car","road","tree"]} },
-  { id:"o3", pos:[ 9,0.5,-4], color:"#34d399",
-    fr:{word:"ville",   right:"city",    wrong:["town","village","country"]},
-    es:{word:"ciudad",  right:"city",    wrong:["town","village","country"]} },
-  { id:"o4", pos:[-8,0.5,-5], color:"#f472b6",
-    fr:{word:"arbre",   right:"tree",    wrong:["flower","bush","grass"]},
-    es:{word:"árbol",   right:"tree",    wrong:["flower","bush","grass"]} },
-  { id:"o5", pos:[ 2,0.5,-10],color:"#60a5fa",
-    fr:{word:"ciel",    right:"sky",     wrong:["sun","cloud","rain"]},
-    es:{word:"cielo",   right:"sky",     wrong:["sun","cloud","rain"]} },
-  { id:"o6", pos:[-3,0.5,11], color:"#a78bfa",
-    fr:{word:"route",   right:"road",    wrong:["path","bridge","street"]},
-    es:{word:"camino",  right:"road",    wrong:["path","bridge","street"]} },
-  { id:"o7", pos:[11,0.5, 9], color:"#fbbf24",
-    fr:{word:"fleur",   right:"flower",  wrong:["leaf","fruit","seed"]},
-    es:{word:"flor",    right:"flower",  wrong:["leaf","fruit","seed"]} },
-  { id:"o8", pos:[-10,0.5,-9],color:"#f87171",
-    fr:{word:"chat",    right:"cat",     wrong:["dog","bird","fish"]},
-    es:{word:"gato",    right:"cat",     wrong:["dog","bird","fish"]} },
+const WORD_BANK: Record<"fr" | "es", WordEntry[]> = {
+  fr: [
+    { word: "bonjour",  correct: "hello",    wrong: ["goodbye",  "thanks",   "please"]    },
+    { word: "maison",   correct: "house",    wrong: ["car",      "tree",     "road"]      },
+    { word: "chien",    correct: "dog",      wrong: ["cat",      "bird",     "fish"]      },
+    { word: "rouge",    correct: "red",      wrong: ["blue",     "green",    "black"]     },
+    { word: "manger",   correct: "to eat",   wrong: ["to run",   "to sleep", "to read"]  },
+    { word: "eau",      correct: "water",    wrong: ["fire",     "air",      "earth"]     },
+    { word: "livre",    correct: "book",     wrong: ["pen",      "desk",     "chair"]     },
+    { word: "rapide",   correct: "fast",     wrong: ["slow",     "tall",     "short"]     },
+    { word: "nuit",     correct: "night",    wrong: ["day",      "morning",  "noon"]      },
+    { word: "ville",    correct: "city",     wrong: ["village",  "forest",   "beach"]     },
+    { word: "ami",      correct: "friend",   wrong: ["enemy",    "stranger", "teacher"]  },
+    { word: "soleil",   correct: "sun",      wrong: ["moon",     "star",     "cloud"]     },
+    { word: "voiture",  correct: "car",      wrong: ["bus",      "train",    "plane"]     },
+    { word: "beau",     correct: "beautiful",wrong: ["ugly",     "small",    "empty"]     },
+  ],
+  es: [
+    { word: "hola",     correct: "hello",    wrong: ["goodbye",  "thanks",   "please"]    },
+    { word: "casa",     correct: "house",    wrong: ["car",      "tree",     "road"]      },
+    { word: "perro",    correct: "dog",      wrong: ["cat",      "bird",     "fish"]      },
+    { word: "rojo",     correct: "red",      wrong: ["blue",     "green",    "black"]     },
+    { word: "comer",    correct: "to eat",   wrong: ["to run",   "to sleep", "to read"]  },
+    { word: "agua",     correct: "water",    wrong: ["fire",     "air",      "earth"]     },
+    { word: "libro",    correct: "book",     wrong: ["pen",      "desk",     "chair"]     },
+    { word: "rápido",   correct: "fast",     wrong: ["slow",     "tall",     "short"]     },
+    { word: "noche",    correct: "night",    wrong: ["day",      "morning",  "noon"]      },
+    { word: "ciudad",   correct: "city",     wrong: ["village",  "forest",   "beach"]     },
+    { word: "amigo",    correct: "friend",   wrong: ["enemy",    "stranger", "teacher"]  },
+    { word: "sol",      correct: "sun",      wrong: ["moon",     "star",     "cloud"]     },
+    { word: "coche",    correct: "car",      wrong: ["bus",      "train",    "plane"]     },
+    { word: "bonito",   correct: "beautiful",wrong: ["ugly",     "small",    "empty"]     },
+  ],
+};
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const ROUNDS = 10;
+const TARGET_COLORS = ["#818cf8", "#34d399", "#fb923c", "#f472b6"] as const;
+
+// 2×2 grid of targets facing the camera
+const BASE_POS: [number, number, number][] = [
+  [-3.0,  1.7, -10],
+  [ 3.0,  1.7, -10],
+  [-3.0, -1.5, -10],
+  [ 3.0, -1.5, -10],
 ];
 
-interface BuildingDef { x:number; z:number; w:number; d:number; h:number; color:string }
-const BUILDINGS: BuildingDef[] = [
-  { x:-8,  z:-8,  w:3, d:3, h:4, color:"#f97316" },
-  { x: 9,  z:-7,  w:4, d:3, h:6, color:"#3b82f6" },
-  { x:-9,  z: 8,  w:3, d:4, h:3, color:"#ec4899" },
-  { x: 9,  z: 9,  w:3, d:3, h:5, color:"#eab308" },
-  { x: 0,  z:-11, w:5, d:2, h:4, color:"#8b5cf6" },
-  { x: 0,  z: 12, w:4, d:2, h:3, color:"#06b6d4" },
-  { x:-13, z: 0,  w:2, d:6, h:5, color:"#f43f5e" },
-  { x: 13, z: 0,  w:2, d:5, h:4, color:"#84cc16" },
-  { x:-11, z: 11, w:3, d:3, h:2, color:"#f59e0b" },
-  { x: 11, z:-10, w:3, d:3, h:3, color:"#10b981" },
-];
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-const TREE_POS: [number, number][] = [
-  [-3,3],[3,-3],[-5,0],[5,2],[-2,-5],[4,7],[-6,-7],[7,-5],[-7,5],[6,-8],
-];
+// ── Explosion particles ────────────────────────────────────────────────────────
+function Explosion({
+  position, color, onDone,
+}: {
+  position: [number, number, number];
+  color: string;
+  onDone: () => void;
+}) {
+  const COUNT = 18;
+  const refs = useRef<(THREE.Mesh | null)[]>(Array(COUNT).fill(null));
+  const vels = useRef(
+    Array.from({ length: COUNT }, () =>
+      new THREE.Vector3(
+        (Math.random() - 0.5) * 2,
+        (Math.random() - 0.5) * 2,
+        (Math.random() - 0.5) * 2,
+      ).normalize().multiplyScalar(3 + Math.random() * 5)
+    )
+  );
+  const t = useRef(0);
+  const done = useRef(false);
 
-// ── Ground ─────────────────────────────────────────────────────────────────────
-function Ground() {
+  useFrame((_, delta) => {
+    if (done.current) return;
+    t.current += delta;
+    if (t.current > 0.7) { done.current = true; onDone(); return; }
+
+    refs.current.forEach((mesh, i) => {
+      if (!mesh) return;
+      const v = vels.current[i];
+      mesh.position.x = position[0] + v.x * t.current;
+      mesh.position.y = position[1] + v.y * t.current - 4 * t.current * t.current;
+      mesh.position.z = position[2] + v.z * t.current;
+      const alpha = Math.max(0, 1 - t.current / 0.7);
+      (mesh.material as THREE.MeshBasicMaterial).opacity = alpha;
+      mesh.scale.setScalar(alpha * 0.9 + 0.1);
+    });
+  });
+
   return (
     <>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[40, 34]} />
-        <meshLambertMaterial color="#4ade80" />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-        <planeGeometry args={[40, 3]} />
-        <meshLambertMaterial color="#94a3b8" />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-        <planeGeometry args={[3, 34]} />
-        <meshLambertMaterial color="#94a3b8" />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
-        <circleGeometry args={[3.5, 20]} />
-        <meshLambertMaterial color="#e2e8f0" />
-      </mesh>
+      {Array.from({ length: COUNT }).map((_, i) => (
+        <mesh
+          key={i}
+          ref={el => { refs.current[i] = el; }}
+          position={[...position] as [number, number, number]}
+        >
+          <sphereGeometry args={[0.1, 5, 4]} />
+          <meshBasicMaterial color={color} transparent opacity={1} />
+        </mesh>
+      ))}
     </>
   );
 }
 
-// ── Building ───────────────────────────────────────────────────────────────────
-function Building({ b }: { b: BuildingDef }) {
-  const winRows = Math.max(1, Math.floor(b.h / 1.6));
-  return (
-    <group position={[b.x, b.h / 2, b.z]}>
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[b.w, b.h, b.d]} />
-        <meshLambertMaterial color={b.color} />
-      </mesh>
-      <mesh position={[0, b.h / 2 + 0.12, 0]}>
-        <boxGeometry args={[b.w + 0.2, 0.22, b.d + 0.2]} />
-        <meshLambertMaterial color="#0f172a" />
-      </mesh>
-      {Array.from({ length: winRows }).map((_, i) => (
-        <mesh key={i} position={[0, -b.h / 2 + 0.9 + i * 1.5, b.d / 2 + 0.02]}>
-          <boxGeometry args={[b.w * 0.55, 0.65, 0.05]} />
-          <meshLambertMaterial color="#fef9c3" emissive="#fde047" emissiveIntensity={0.4} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-// ── Tree ───────────────────────────────────────────────────────────────────────
-function Tree({ x, z }: { x: number; z: number }) {
-  return (
-    <group position={[x, 0, z]}>
-      <mesh position={[0, 0.6, 0]} castShadow>
-        <cylinderGeometry args={[0.15, 0.2, 1.2, 6]} />
-        <meshLambertMaterial color="#78350f" />
-      </mesh>
-      <mesh position={[0, 1.85, 0]} castShadow>
-        <sphereGeometry args={[0.85, 7, 5]} />
-        <meshLambertMaterial color="#15803d" />
-      </mesh>
-    </group>
-  );
-}
-
-// ── Word Orb ───────────────────────────────────────────────────────────────────
-function WordOrb({
-  orb, lang, playerPosRef, collected,
+// ── Floating target panel ──────────────────────────────────────────────────────
+function ShootTarget({
+  label, isCorrect, basePos, color, driftSpeed, baseScale, isWrong, active, onShoot,
 }: {
-  orb: OrbData;
-  lang: "fr" | "es";
-  playerPosRef: React.MutableRefObject<THREE.Vector3>;
-  collected: boolean;
+  label: string;
+  isCorrect: boolean;
+  basePos: [number, number, number];
+  color: string;
+  driftSpeed: number;
+  baseScale: number;
+  isWrong: boolean;
+  active: boolean;
+  onShoot: (isCorrect: boolean, pos: [number, number, number]) => void;
 }) {
-  const meshRef  = useRef<THREE.Mesh>(null!);
-  const phase    = useRef(Math.random() * Math.PI * 2);
-  const [near, setNear] = useState(false);
-  const nearRef  = useRef(false);
+  const groupRef  = useRef<THREE.Group>(null!);
+  const fillRef   = useRef<THREE.Mesh>(null!);
+  const frameRef  = useRef<THREE.Mesh>(null!);
+  const phase     = useRef(Math.random() * Math.PI * 2);
+  const growScale = useRef(baseScale);
+  const [hovered, setHovered] = useState(false);
 
   useFrame((_, delta) => {
-    phase.current += delta;
-    if (meshRef.current) {
-      meshRef.current.position.y = 0.5 + Math.sin(phase.current * 1.4) * 0.28;
-      meshRef.current.rotation.y += delta * 1.3;
+    phase.current += delta * driftSpeed;
+
+    if (groupRef.current) {
+      // Drift: sinusoidal float
+      groupRef.current.position.x = basePos[0] + Math.sin(phase.current * 0.55) * 0.22;
+      groupRef.current.position.y = basePos[1] + Math.sin(phase.current * 0.8)  * 0.28;
+      groupRef.current.position.z = basePos[2];
+      groupRef.current.rotation.y = Math.sin(phase.current * 0.3) * 0.07;
+
+      // Grow over time (urgency mechanic)
+      growScale.current = Math.min(baseScale * 1.55, growScale.current + delta * 0.035 * driftSpeed);
+      groupRef.current.scale.setScalar(growScale.current);
     }
-    const p = playerPosRef.current;
-    const dist = Math.sqrt((p.x - orb.pos[0]) ** 2 + (p.z - orb.pos[2]) ** 2);
-    const isNear = dist < COLLECT_DIST;
-    if (isNear !== nearRef.current) {
-      nearRef.current = isNear;
-      setNear(isNear);
+
+    // Wrong-shot flash: pulse emissive red
+    if (fillRef.current) {
+      const mat = fillRef.current.material as THREE.MeshStandardMaterial;
+      if (isWrong) {
+        mat.emissive.setStyle("#ff1a1a");
+        mat.emissiveIntensity = 0.9 + Math.sin(phase.current * 18) * 0.4;
+      } else {
+        mat.emissive.setStyle(color);
+        mat.emissiveIntensity = hovered ? 0.45 : 0.12;
+      }
+    }
+    if (frameRef.current) {
+      const mat = frameRef.current.material as THREE.MeshStandardMaterial;
+      mat.emissiveIntensity = isWrong ? 0.0 : (hovered ? 1.2 : 0.55);
     }
   });
 
-  if (collected) return null;
+  const handleClick = () => {
+    if (!active) return;
+    const g = groupRef.current;
+    onShoot(isCorrect, [g.position.x, g.position.y, g.position.z]);
+  };
 
   return (
-    <group position={[orb.pos[0], 0, orb.pos[2]]}>
-      <mesh ref={meshRef} castShadow>
-        <sphereGeometry args={[0.5, 12, 10]} />
-        <meshLambertMaterial
-          color={orb.color}
-          emissive={orb.color}
-          emissiveIntensity={near ? 0.9 : 0.35}
+    <group
+      ref={groupRef}
+      position={basePos}
+      onClick={handleClick}
+      onPointerOver={() => active && setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      {/* Neon border frame */}
+      <mesh ref={frameRef}>
+        <boxGeometry args={[2.7, 1.78, 0.1]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.55}
+          roughness={0.25}
+          metalness={0.7}
         />
       </mesh>
+
+      {/* Dark fill (slightly smaller + in front) */}
+      <mesh ref={fillRef} position={[0, 0, 0.07]}>
+        <boxGeometry args={[2.46, 1.48, 0.08]} />
+        <meshStandardMaterial
+          color="#05040f"
+          emissive={color}
+          emissiveIntensity={0.12}
+          roughness={0.5}
+          metalness={0.15}
+        />
+      </mesh>
+
+      {/* Corner accent — top-left */}
+      <mesh position={[-1.2, 0.76, 0.14]}>
+        <boxGeometry args={[0.3, 0.07, 0.04]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <mesh position={[-1.2, 0.76, 0.14]}>
+        <boxGeometry args={[0.07, 0.3, 0.04]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      {/* Corner — bottom-right */}
+      <mesh position={[1.2, -0.76, 0.14]}>
+        <boxGeometry args={[0.3, 0.07, 0.04]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <mesh position={[1.2, -0.76, 0.14]}>
+        <boxGeometry args={[0.07, 0.3, 0.04]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+
+      {/* Label text */}
       <Text
-        position={[0, 2.3, 0]}
-        fontSize={0.42}
-        color="white"
-        outlineWidth={0.05}
+        position={[0, 0, 0.18]}
+        fontSize={hovered ? 0.42 : 0.38}
+        color={hovered ? "#ffffff" : color}
+        outlineWidth={0.045}
+        outlineColor="#000000"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={2.2}
+      >
+        {label}
+      </Text>
+
+      {/* Hover point-light */}
+      {hovered && <pointLight color={color} intensity={1.5} distance={4} decay={2} />}
+    </group>
+  );
+}
+
+// ── Spinning decorative gems ───────────────────────────────────────────────────
+function Gem({ pos, color, speed }: { pos: [number,number,number]; color: string; speed: number }) {
+  const ref = useRef<THREE.Mesh>(null!);
+  useFrame((s) => {
+    const t = s.clock.getElapsedTime() * speed;
+    ref.current.rotation.x = t * 0.7;
+    ref.current.rotation.y = t;
+    ref.current.position.y = pos[1] + Math.sin(t * 0.5) * 0.4;
+  });
+  return (
+    <mesh ref={ref} position={pos} castShadow>
+      <octahedronGeometry args={[0.55, 0]} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.7} roughness={0.15} metalness={0.9} />
+    </mesh>
+  );
+}
+
+// ── Arena (background / scene dressing) ───────────────────────────────────────
+function Arena({ currentWord, wordLabel }: { currentWord: string; wordLabel: string }) {
+  return (
+    <>
+      <Stars radius={90} depth={50} count={4000} factor={3} saturation={0.6} fade />
+
+      {/* Grid floor receding into distance */}
+      <gridHelper args={[80, 50, "#3b1d8a", "#1a0f40"]} position={[0, -6, -20]} />
+      <gridHelper args={[80, 50, "#3b1d8a", "#1a0f40"]} position={[0, -6, -60]} />
+
+      {/* Decorative gems at sides */}
+      <Gem pos={[-9,  1, -12]} color="#818cf8" speed={0.8} />
+      <Gem pos={[ 9,  1, -12]} color="#34d399" speed={0.65} />
+      <Gem pos={[-11, -2, -16]} color="#f472b6" speed={0.9} />
+      <Gem pos={[ 11, -2, -16]} color="#fb923c" speed={0.7} />
+
+      {/* Word to translate — glowing 3D text floating above targets */}
+      <Text
+        position={[0, 4.8, -10]}
+        fontSize={1.15}
+        color="#ffffff"
+        outlineWidth={0.06}
         outlineColor="#000000"
         anchorX="center"
         anchorY="middle"
       >
-        {orb[lang].word}
+        {currentWord}
       </Text>
-      {near && (
-        <>
-          <mesh position={[0, 0.5, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.78, 1.0, 24]} />
-            <meshBasicMaterial
-              color={orb.color}
-              transparent
-              opacity={0.5}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-          <Text
-            position={[0, 1.65, 0]}
-            fontSize={0.27}
-            color="#fbbf24"
-            outlineWidth={0.04}
-            outlineColor="#000000"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Press E
-          </Text>
-        </>
-      )}
-    </group>
-  );
-}
+      <Text
+        position={[0, 6.2, -10]}
+        fontSize={0.32}
+        color="#94a3b8"
+        outlineWidth={0.03}
+        outlineColor="#000000"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {wordLabel}
+      </Text>
 
-// ── Player ─────────────────────────────────────────────────────────────────────
-function Player({
-  keysRef,
-  playerPosRef,
-  collectedRef,
-  onCollect,
-}: {
-  keysRef: React.MutableRefObject<Set<string>>;
-  playerPosRef: React.MutableRefObject<THREE.Vector3>;
-  collectedRef: React.MutableRefObject<Set<string>>;
-  onCollect: (id: string) => void;
-}) {
-  const groupRef    = useRef<THREE.Group>(null!);
-  const camTarget   = useRef(new THREE.Vector3(0, 9, 12));
-  const onCollectRef = useRef(onCollect);
-  useEffect(() => { onCollectRef.current = onCollect; }, [onCollect]);
-
-  const wouldCollide = (x: number, z: number) =>
-    BUILDINGS.some(b => {
-      const m = 0.8;
-      return x > b.x - b.w/2 - m && x < b.x + b.w/2 + m &&
-             z > b.z - b.d/2 - m && z < b.z + b.d/2 + m;
-    });
-
-  useFrame((state, delta) => {
-    const keys = keysRef.current;
-    const pos  = playerPosRef.current;
-
-    let dx = 0, dz = 0;
-    if (keys.has("ArrowUp")    || keys.has("w") || keys.has("W")) dz -= 1;
-    if (keys.has("ArrowDown")  || keys.has("s") || keys.has("S")) dz += 1;
-    if (keys.has("ArrowLeft")  || keys.has("a") || keys.has("A")) dx -= 1;
-    if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) dx += 1;
-
-    const len = Math.sqrt(dx * dx + dz * dz);
-    if (len > 0) {
-      dx /= len; dz /= len;
-      const nx = pos.x + dx * PLAYER_SPEED * delta;
-      const nz = pos.z + dz * PLAYER_SPEED * delta;
-      if (!wouldCollide(nx, pos.z)) pos.x = nx;
-      if (!wouldCollide(pos.x, nz)) pos.z = nz;
-      pos.x = Math.max(-16, Math.min(16, pos.x));
-      pos.z = Math.max(-14, Math.min(14, pos.z));
-    }
-
-    if (groupRef.current) {
-      groupRef.current.position.x = pos.x;
-      groupRef.current.position.z = pos.z;
-      if (len > 0) {
-        const target = Math.atan2(dx, dz);
-        const curr   = groupRef.current.rotation.y;
-        const diff   = ((target - curr + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-        groupRef.current.rotation.y += diff * 0.22;
-      }
-    }
-
-    // Smooth camera follow
-    camTarget.current.set(pos.x, pos.y + 9, pos.z + 12);
-    state.camera.position.lerp(camTarget.current, 0.07);
-    state.camera.lookAt(pos.x, pos.y + 1, pos.z);
-
-    // E key → collect nearest orb
-    if (keys.has("e") || keys.has("E")) {
-      let nearestId: string | null = null;
-      let nearestDist = COLLECT_DIST;
-      ORBS.forEach(orb => {
-        if (collectedRef.current.has(orb.id)) return;
-        const d = Math.sqrt((pos.x - orb.pos[0]) ** 2 + (pos.z - orb.pos[2]) ** 2);
-        if (d < nearestDist) { nearestDist = d; nearestId = orb.id; }
-      });
-      if (nearestId) {
-        keys.delete("e"); keys.delete("E");
-        onCollectRef.current(nearestId);
-      }
-    }
-  });
-
-  return (
-    <group ref={groupRef}>
-      {/* Body */}
-      <mesh position={[0, 0.65, 0]} castShadow>
-        <capsuleGeometry args={[0.28, 0.7, 4, 8]} />
-        <meshLambertMaterial color="#6366f1" />
-      </mesh>
-      {/* Head */}
-      <mesh position={[0, 1.48, 0]} castShadow>
-        <sphereGeometry args={[0.27, 8, 7]} />
-        <meshLambertMaterial color="#fed7aa" />
-      </mesh>
-      {/* Eyes */}
-      {([-0.1, 0.1] as number[]).map((ox, i) => (
-        <mesh key={i} position={[ox, 1.52, 0.24]}>
-          <sphereGeometry args={[0.045, 5, 5]} />
-          <meshBasicMaterial color="#1e293b" />
-        </mesh>
-      ))}
-      {/* Shadow disc */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-        <circleGeometry args={[0.38, 12]} />
-        <meshBasicMaterial color="black" transparent opacity={0.18} />
-      </mesh>
-    </group>
-  );
-}
-
-// ── Scene ──────────────────────────────────────────────────────────────────────
-function GameScene({
-  lang, keysRef, playerPosRef, collectedRef, collected, onCollect,
-}: {
-  lang: "fr" | "es";
-  keysRef: React.MutableRefObject<Set<string>>;
-  playerPosRef: React.MutableRefObject<THREE.Vector3>;
-  collectedRef: React.MutableRefObject<Set<string>>;
-  collected: Set<string>;
-  onCollect: (id: string) => void;
-}) {
-  return (
-    <>
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[10, 20, 10]} intensity={1.1} castShadow
-        shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
-      <Sky sunPosition={[100, 50, 100]} />
-      <fog attach="fog" args={["#bfdbfe", 20, 60]} />
-      <Ground />
-      {BUILDINGS.map((b, i) => <Building key={i} b={b} />)}
-      {TREE_POS.map(([x, z], i) => <Tree key={i} x={x} z={z} />)}
-      {ORBS.map(orb => (
-        <WordOrb
-          key={orb.id}
-          orb={orb}
-          lang={lang}
-          playerPosRef={playerPosRef}
-          collected={collected.has(orb.id)}
-        />
-      ))}
-      <Player
-        keysRef={keysRef}
-        playerPosRef={playerPosRef}
-        collectedRef={collectedRef}
-        onCollect={onCollect}
-      />
+      {/* Lighting */}
+      <ambientLight intensity={0.22} />
+      <pointLight position={[0, 6, -4]}  color="#818cf8" intensity={2.5} distance={22} decay={2} />
+      <pointLight position={[0, -4, -8]} color="#1e1060" intensity={1.5} distance={18} decay={2} />
+      <pointLight position={[-8, 2, -8]} color="#0f4a3a" intensity={1.0} distance={14} decay={2} />
+      <pointLight position={[ 8, 2, -8]} color="#4a1030" intensity={1.0} distance={14} decay={2} />
     </>
   );
 }
 
-// ── Quiz types ─────────────────────────────────────────────────────────────────
-interface Quiz {
-  orbId: string; word: string;
-  choices: string[]; correct: string;
-  chosen: number | null;
-}
+// ── Choice type ────────────────────────────────────────────────────────────────
+interface Choice { label: string; isCorrect: boolean; color: string }
 
-// ── D-pad button ───────────────────────────────────────────────────────────────
-function DPad({ label, onPress, onRelease, center }: {
-  label: string; onPress: () => void; onRelease: () => void; center?: boolean
-}) {
-  return (
-    <button
-      onPointerDown={e => { e.preventDefault(); onPress(); }}
-      onPointerUp={e   => { e.preventDefault(); onRelease(); }}
-      onPointerLeave={() => onRelease()}
-      style={{
-        width: 48, height: 48, borderRadius: 10,
-        border: `1.5px solid ${center ? "var(--accent)" : "var(--border-md)"}`,
-        background: center ? "var(--accent-dim)" : "var(--surface-2)",
-        color: center ? "var(--accent)" : "var(--text-2)",
-        fontSize: center ? 11 : 16, fontWeight: 700,
-        cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        userSelect: "none",
-        WebkitUserSelect: "none" as const,
-        touchAction: "none",
-      }}
-    >
-      {label}
-    </button>
-  );
-}
+// ── Explosion state ────────────────────────────────────────────────────────────
+interface ExplState { pos: [number,number,number]; color: string }
 
-// ── Main export ────────────────────────────────────────────────────────────────
+// ── Main game export ───────────────────────────────────────────────────────────
 export default function City3DGame({ targetLang }: { targetLang: string }) {
   const lang = (targetLang === "es" ? "es" : "fr") as "fr" | "es";
 
-  const keysRef       = useRef(new Set<string>());
-  const playerPosRef  = useRef(new THREE.Vector3(0, 0, 0));
-  const collectedRef  = useRef(new Set<string>());
-  const quizActiveRef = useRef(false);
+  // Shuffled word list fixed at game start
+  const [words]   = useState<WordEntry[]>(() => shuffle(WORD_BANK[lang]).slice(0, ROUNDS));
 
-  const [collected, setCollected] = useState(new Set<string>());
-  const [quiz,      setQuiz]      = useState<Quiz | null>(null);
-  const [score,     setScore]     = useState(0);
-  const [finished,  setFinished]  = useState(false);
-  const [xpEarned,  setXpEarned]  = useState(0);
-  const [started,   setStarted]   = useState(false);
+  const [started,    setStarted]    = useState(false);
+  const [gameOver,   setGameOver]   = useState(false);
+  const [finished,   setFinished]   = useState(false);
+  const [round,      setRound]      = useState(0);
+  const [lives,      setLives]      = useState(3);
+  const [score,      setScore]      = useState(0);
+  const [timeLeft,   setTimeLeft]   = useState(10);
+  const [roundActive,setRoundActive]= useState(false);
+  const [choices,    setChoices]    = useState<Choice[]>([]);
+  const [wrongIdx,   setWrongIdx]   = useState<number | null>(null);
+  const [explosion,  setExplosion]  = useState<ExplState | null>(null);
+  const [xpEarned,   setXpEarned]   = useState(0);
+  const [streak,     setStreak]     = useState(0); // correct-in-a-row
 
-  useEffect(() => { collectedRef.current  = collected; }, [collected]);
-  useEffect(() => { quizActiveRef.current = !!quiz;    }, [quiz]);
+  // Round duration: gets shorter in later rounds
+  const roundTime = useCallback((r: number) => (r < 4 ? 10 : r < 7 ? 8 : 6), []);
+  // Drift speed: faster in later rounds
+  const driftSpeed = useCallback((r: number) => 1 + r * 0.2, []);
+  // Base scale: shrinks in final rounds (harder to click)
+  const baseScale  = useCallback((r: number) => (r >= 7 ? 0.82 : r >= 4 ? 0.92 : 1.0), []);
 
+  // Build choices for a round
+  const setupRound = useCallback((r: number) => {
+    if (r >= ROUNDS) { setFinished(true); return; }
+    const w = words[r];
+    const options = shuffle([
+      { label: w.correct,   isCorrect: true  },
+      { label: w.wrong[0],  isCorrect: false },
+      { label: w.wrong[1],  isCorrect: false },
+      { label: w.wrong[2],  isCorrect: false },
+    ]);
+    setChoices(options.map((o, i) => ({ ...o, color: TARGET_COLORS[i] })));
+    setTimeLeft(roundTime(r));
+    setRoundActive(true);
+  }, [words, roundTime]);
+
+  // Start first round when game starts
   useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      keysRef.current.add(e.key);
-      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) e.preventDefault();
-    };
-    const up = (e: KeyboardEvent) => keysRef.current.delete(e.key);
-    window.addEventListener("keydown", down);
-    window.addEventListener("keyup",   up);
-    return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); };
-  }, []);
+    if (started && !gameOver && !finished) setupRound(round);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [started, round]);
 
-  const handleCollect = useCallback((orbId: string) => {
-    if (quizActiveRef.current) return;
-    const orb = ORBS.find(o => o.id === orbId);
-    if (!orb) return;
-    const data = orb[lang];
-    const choices = [data.right, ...data.wrong].sort(() => Math.random() - 0.5);
-    setQuiz({ orbId, word: data.word, choices, correct: data.right, chosen: null });
-  }, [lang]);
+  // Countdown timer
+  useEffect(() => {
+    if (!roundActive || gameOver || finished) return;
+    if (timeLeft <= 0) {
+      setRoundActive(false);
+      setStreak(0);
+      setLives(prev => {
+        const nl = prev - 1;
+        if (nl <= 0) setTimeout(() => setGameOver(true), 600);
+        return Math.max(0, nl);
+      });
+      setTimeout(() => setRound(r => r + 1), 900);
+      return;
+    }
+    const id = setTimeout(() => setTimeLeft(t => t - 1), 1000);
+    return () => clearTimeout(id);
+  }, [timeLeft, roundActive, gameOver, finished]);
 
-  const handleAnswer = (idx: number) => {
-    if (!quiz || quiz.chosen !== null) return;
-    const isCorrect = quiz.choices[idx] === quiz.correct;
-    setQuiz(q => q ? { ...q, chosen: idx } : null);
+  // Handle shooting a target
+  const handleShoot = useCallback((
+    isCorrect: boolean,
+    pos: [number, number, number],
+    idx: number,
+  ) => {
+    if (!roundActive) return;
 
-    setTimeout(() => {
-      if (isCorrect) {
-        const newScore = score + 1;
-        setScore(newScore);
-        setCollected(prev => {
-          const next = new Set(prev);
-          next.add(quiz.orbId);
-          if (next.size >= ORBS.length) {
-            fetch("/api/games/score", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ gameType: "CITY_EXPLORER", score: newScore, wordsUsed: [] }),
-            }).then(r => r.json()).then(d => {
-              setXpEarned(d.xpEarned ?? 30);
-              window.dispatchEvent(new CustomEvent("xp-updated"));
-            }).catch(() => {});
-            setTimeout(() => setFinished(true), 500);
-          }
-          return next;
-        });
-      }
-      setQuiz(null);
-    }, 800);
-  };
+    if (isCorrect) {
+      setRoundActive(false);
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      // Points: base 100 + speed bonus + streak bonus
+      const speedBonus  = timeLeft >= 8 ? 60 : timeLeft >= 5 ? 30 : 0;
+      const streakBonus = newStreak >= 3 ? 50 : newStreak === 2 ? 20 : 0;
+      setScore(s => s + 100 + speedBonus + streakBonus);
+      setExplosion({ pos, color: choices[idx]?.color ?? "#ffffff" });
+      setTimeout(() => setRound(r => r + 1), 950);
+    } else {
+      setStreak(0);
+      setWrongIdx(idx);
+      setLives(prev => {
+        const nl = prev - 1;
+        if (nl <= 0) setTimeout(() => setGameOver(true), 750);
+        return Math.max(0, nl);
+      });
+      setTimeout(() => setWrongIdx(null), 700);
+    }
+  }, [roundActive, timeLeft, streak, choices]);
 
-  const dp = (k: string, on: boolean) => on ? keysRef.current.add(k) : keysRef.current.delete(k);
-  const tapE = () => { keysRef.current.add("e"); setTimeout(() => keysRef.current.delete("e"), 150); };
+  // Save score when finished
+  useEffect(() => {
+    if (!finished) return;
+    fetch("/api/games/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gameType: "CITY_EXPLORER", score, wordsUsed: [] }),
+    })
+      .then(r => r.json())
+      .then(d => { setXpEarned(d.xpEarned ?? 0); window.dispatchEvent(new CustomEvent("xp-updated")); })
+      .catch(() => {});
+  }, [finished]);
 
-  // ── Start screen ─────────────────────────────────────────────────────────────
+  // ── Start screen ──────────────────────────────────────────────────────────────
   if (!started) {
     return (
       <div style={{ maxWidth: 480, textAlign: "center" }}>
         <div className="card" style={{ padding: "44px 28px" }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>🌆</div>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>🎯</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", margin: "0 0 10px" }}>
-            3D City Explorer
+            Word Blaster 3D
           </h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", marginBottom: 24 }}>
-            Walk through a real 3D city and collect 8 glowing vocabulary orbs.
-            Answer each word correctly to keep it.
+            A word appears in the arena. Four targets float toward you with possible translations.
+            Shoot the correct one before time runs out!
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28, textAlign: "left" }}>
             {[
-              ["🕹️", "WASD or Arrow keys to walk"],
-              ["✨", "Find glowing word orbs around the city"],
-              ["💬", "Walk up and press E to collect an orb"],
-              ["🏆", "Collect all 8 words to win"],
+              ["🎯", "Click the correct translation to blast it"],
+              ["💥", "Wrong shot = −1 life · Timeout = −1 life"],
+              ["⚡", "Shoot fast for speed bonus points"],
+              ["🔥", "Chain correct answers for a streak bonus"],
+              ["📈", "Rounds get harder — targets grow, shrink & speed up"],
             ].map(([icon, txt]) => (
               <div key={txt as string} style={{ display:"flex", alignItems:"center", gap:12, padding:"9px 14px", borderRadius:10, background:"var(--surface-2)", border:"1px solid var(--border)" }}>
                 <span style={{ fontSize: 16 }}>{icon}</span>
@@ -485,7 +465,7 @@ export default function City3DGame({ targetLang }: { targetLang: string }) {
             ))}
           </div>
           <button onClick={() => setStarted(true)} className="btn-primary" style={{ width:"100%", fontSize:16, padding:"14px" }}>
-            Enter City 🌆
+            Start Blasting 🎯
           </button>
         </div>
       </div>
@@ -493,15 +473,20 @@ export default function City3DGame({ targetLang }: { targetLang: string }) {
   }
 
   // ── End screen ────────────────────────────────────────────────────────────────
-  if (finished) {
-    const pct = Math.round((score / ORBS.length) * 100);
+  if (gameOver || finished) {
+    const totalPossible = ROUNDS * (100 + 60 + 50); // rough max
+    const pct = Math.min(100, Math.round((score / (ROUNDS * 100)) * 100));
+    const emoji = score >= ROUNDS * 130 ? "🏆" : score >= ROUNDS * 80 ? "🎉" : "😤";
     return (
       <div style={{ maxWidth: 480, textAlign: "center" }}>
         <div className="card" style={{ padding: "44px 28px" }}>
-          <div style={{ fontSize: 56, marginBottom: 12 }}>{pct >= 80 ? "🏆" : "🎉"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>City Complete!</h2>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>{emoji}</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>
+            {gameOver ? "Game Over!" : "All Rounds Clear!"}
+          </h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
-            <strong style={{ color: "var(--accent)" }}>{score}/{ORBS.length}</strong> correct · {pct}%
+            Final score: <strong style={{ color: "var(--accent)", fontSize: 18 }}>{score}</strong>
+            &nbsp;· Round {Math.min(round + 1, ROUNDS)}/{ROUNDS}
           </p>
           {xpEarned > 0 && (
             <div style={{ padding:"10px 16px", borderRadius:12, background:"var(--accent-dim)", marginBottom:20, fontSize:14, fontWeight:700, color:"var(--accent)" }}>
@@ -509,129 +494,157 @@ export default function City3DGame({ targetLang }: { targetLang: string }) {
             </div>
           )}
           <div style={{ display:"flex", gap:10 }}>
-            <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex:1 }}>Play again</button>
-            <Link href="/games" className="btn-outline" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>All games</Link>
+            <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex:1 }}>
+              Play again
+            </button>
+            <Link href="/games" className="btn-outline" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none" }}>
+              All games
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
-  // ── Game view ─────────────────────────────────────────────────────────────────
+  // ── Active game ───────────────────────────────────────────────────────────────
+  const currentWord = words[round]?.word ?? "";
+  const maxTime     = roundTime(round);
+  const timerPct    = (timeLeft / maxTime) * 100;
+  const timerColor  = timeLeft <= 2 ? "#ef4444" : timeLeft <= 4 ? "#f97316" : "#818cf8";
+  const ds          = driftSpeed(round);
+  const bs          = baseScale(round);
+  const phase       = round < 4 ? "Warm up" : round < 7 ? "Heating up 🔥" : "Danger zone ⚡";
+
   return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
-      <div style={{ position:"relative", width:"100%", maxWidth:900 }}>
-        <Canvas
-          style={{ width:"100%", height:560, borderRadius:12, border:"2px solid var(--border)", display:"block" }}
-          shadows
-          gl={{ antialias: true }}
-          camera={{ position: [0, 9, 12], fov: 60 }}
-        >
-          <Suspense fallback={null}>
-            <GameScene
-              lang={lang}
-              keysRef={keysRef}
-              playerPosRef={playerPosRef}
-              collectedRef={collectedRef}
-              collected={collected}
-              onCollect={handleCollect}
-            />
-          </Suspense>
-        </Canvas>
+    <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"center" }}>
+      <div style={{ width:"100%", maxWidth:900 }}>
 
-        {/* HUD */}
-        <div style={{
-          position:"absolute", top:12, left:12,
-          padding:"8px 16px", borderRadius:10,
-          background:"rgba(0,0,0,0.55)",
-          backdropFilter:"blur(6px)",
-          display:"flex", alignItems:"center", gap:16,
-          pointerEvents:"none",
-        }}>
-          <span style={{ fontSize:13, fontWeight:700, color:"#fbbf24" }}>
-            ✨ {collected.size}/{ORBS.length} orbs
-          </span>
-          <span style={{ fontSize:13, fontWeight:700, color:"#4ade80" }}>
-            ⭐ {score} pts
-          </span>
-        </div>
-
-        {/* Controls hint */}
-        <div style={{
-          position:"absolute", bottom:12, right:12,
-          fontSize:11, color:"rgba(255,255,255,0.5)",
-          pointerEvents:"none",
-        }}>
-          WASD to move · E to collect
-        </div>
-
-        {/* Quiz overlay */}
-        {quiz && (
-          <div style={{
-            position:"absolute", inset:0, borderRadius:12,
-            background:"rgba(0,0,0,0.65)",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            padding:24,
-          }}>
-            <div style={{
-              background:"var(--surface)",
-              border:"1px solid var(--border)",
-              borderRadius:18,
-              padding:"26px 24px",
-              maxWidth:360, width:"100%",
-            }}>
-              <p style={{ fontSize:11, color:"var(--text-3)", margin:"0 0 14px", textTransform:"uppercase", letterSpacing:"0.1em" }}>
-                ✨ Orb found — what does this mean?
-              </p>
-              <div style={{ padding:"16px", borderRadius:12, background:"var(--surface-2)", border:"1px solid var(--border)", textAlign:"center", marginBottom:16 }}>
-                <p style={{ fontSize:34, fontWeight:900, color:"var(--accent)", margin:0 }}>
-                  {quiz.word}
-                </p>
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {quiz.choices.map((choice, i) => {
-                  const isChosen  = quiz.chosen === i;
-                  const isCorrect = choice === quiz.correct;
-                  let border = "var(--border-md)";
-                  let bg     = "var(--surface-2)";
-                  let color  = "var(--text)";
-                  if (quiz.chosen !== null) {
-                    if (isCorrect)     { border="var(--green)"; bg="rgba(34,197,94,0.1)";  color="var(--green)"; }
-                    else if (isChosen) { border="var(--red)";   bg="rgba(239,68,68,0.1)";  color="var(--red)"; }
-                  }
-                  return (
-                    <button key={i}
-                      onClick={() => handleAnswer(i)}
-                      disabled={quiz.chosen !== null}
-                      style={{ padding:"12px 16px", borderRadius:10, border:`1.5px solid ${border}`, background:bg, color, fontSize:14, fontWeight:700, cursor:quiz.chosen !== null ? "default" : "pointer", textAlign:"left", transition:"all 0.15s" }}
-                    >
-                      {choice}
-                    </button>
-                  );
-                })}
-              </div>
-              {quiz.chosen !== null && quiz.choices[quiz.chosen] !== quiz.correct && (
-                <p style={{ fontSize:13, color:"var(--text-2)", margin:"12px 0 0", textAlign:"center" }}>
-                  Correct answer: <strong style={{ color:"var(--green)" }}>{quiz.correct}</strong>
-                </p>
-              )}
-            </div>
+        {/* ── Top HUD bar ── */}
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8, flexWrap:"wrap" }}>
+          {/* Lives */}
+          <div style={{ display:"flex", gap:4 }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <span key={i} style={{ fontSize: 20, opacity: i < lives ? 1 : 0.2, transition:"opacity 0.3s" }}>❤️</span>
+            ))}
           </div>
-        )}
+
+          {/* Round */}
+          <span style={{ fontSize:13, fontWeight:700, color:"var(--text-2)", marginLeft:"auto" }}>
+            {phase} · Round {round + 1}/{ROUNDS}
+          </span>
+
+          {/* Streak */}
+          {streak >= 2 && (
+            <span style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>
+              🔥 ×{streak} streak
+            </span>
+          )}
+
+          {/* Score */}
+          <span style={{ fontSize:14, fontWeight:800, color:"var(--accent)" }}>
+            {score} pts
+          </span>
+        </div>
+
+        {/* ── Timer bar ── */}
+        <div style={{ width:"100%", height:6, borderRadius:4, background:"var(--surface-2)", marginBottom:10, overflow:"hidden" }}>
+          <div style={{
+            height:"100%",
+            width:`${timerPct}%`,
+            borderRadius:4,
+            background: timerColor,
+            transition:"width 1s linear, background 0.4s",
+            boxShadow:`0 0 8px ${timerColor}`,
+          }} />
+        </div>
+
+        {/* ── Canvas ── */}
+        <div style={{ position:"relative", borderRadius:14, overflow:"hidden", border:"2px solid var(--border)" }}>
+          <Canvas
+            style={{ width:"100%", height:520, display:"block", cursor:"crosshair", background:"#05040f" }}
+            gl={{ antialias:true, toneMapping:THREE.ACESFilmicToneMapping, toneMappingExposure:1.05 }}
+            camera={{ position:[0, 0, 5], fov:68 }}
+          >
+            <Suspense fallback={null}>
+              <Arena
+                currentWord={currentWord}
+                wordLabel={lang === "fr" ? "French → English" : "Spanish → English"}
+              />
+
+              {choices.map((c, i) => (
+                <ShootTarget
+                  key={`r${round}-t${i}`}
+                  label={c.label}
+                  isCorrect={c.isCorrect}
+                  basePos={BASE_POS[i]}
+                  color={c.color}
+                  driftSpeed={ds}
+                  baseScale={bs}
+                  isWrong={wrongIdx === i}
+                  active={roundActive}
+                  onShoot={(correct, pos) => handleShoot(correct, pos, i)}
+                />
+              ))}
+
+              {explosion && (
+                <Explosion
+                  position={explosion.pos}
+                  color={explosion.color}
+                  onDone={() => setExplosion(null)}
+                />
+              )}
+            </Suspense>
+          </Canvas>
+
+          {/* Timer digit overlay */}
+          <div style={{
+            position:"absolute", top:12, right:14,
+            fontSize:28, fontWeight:900,
+            color: timerColor,
+            textShadow:`0 0 12px ${timerColor}`,
+            pointerEvents:"none",
+            fontVariantNumeric:"tabular-nums",
+            lineHeight:1,
+          }}>
+            {timeLeft}s
+          </div>
+
+          {/* Hint when nearly out of time */}
+          {timeLeft <= 3 && (
+            <div style={{
+              position:"absolute", bottom:16, left:"50%", transform:"translateX(-50%)",
+              fontSize:13, fontWeight:800, color:"#ef4444",
+              textShadow:"0 0 10px #ef4444",
+              animation:"pulse 0.5s ease-in-out infinite alternate",
+              pointerEvents:"none",
+            }}>
+              ⚠️ HURRY!
+            </div>
+          )}
+        </div>
+
+        {/* ── Scoring legend ── */}
+        <div style={{ display:"flex", gap:10, marginTop:8, flexWrap:"wrap" }}>
+          {[
+            ["🎯", "Correct", "+100 pts"],
+            ["⚡", "Fast shot (≥8s left)", "+60 pts"],
+            ["🔥", "3× streak", "+50 pts"],
+          ].map(([icon, label, pts]) => (
+            <div key={label as string} style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 10px", borderRadius:8, background:"var(--surface-2)", border:"1px solid var(--border)", fontSize:12 }}>
+              <span>{icon}</span>
+              <span style={{ color:"var(--text-3)" }}>{label}</span>
+              <span style={{ fontWeight:700, color:"var(--accent)" }}>{pts}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Mobile D-pad */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 48px)", gridTemplateRows:"repeat(3, 48px)", gap:5 }}>
-        <div />
-        <DPad label="▲" onPress={() => dp("ArrowUp",true)}    onRelease={() => dp("ArrowUp",false)} />
-        <div />
-        <DPad label="◀" onPress={() => dp("ArrowLeft",true)}  onRelease={() => dp("ArrowLeft",false)} />
-        <DPad label="E"  onPress={tapE}                        onRelease={() => {}} center />
-        <DPad label="▶" onPress={() => dp("ArrowRight",true)} onRelease={() => dp("ArrowRight",false)} />
-        <div />
-        <DPad label="▼" onPress={() => dp("ArrowDown",true)}  onRelease={() => dp("ArrowDown",false)} />
-        <div />
-      </div>
+      <style>{`
+        @keyframes pulse {
+          from { opacity: 0.7; }
+          to   { opacity: 1;   }
+        }
+      `}</style>
     </div>
   );
 }

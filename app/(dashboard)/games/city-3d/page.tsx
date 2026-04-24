@@ -4,8 +4,8 @@ import dynamic from "next/dynamic";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "3D City Explorer — LangCraft",
-  description: "Walk through a real 3D city and collect vocabulary orbs",
+  title: "Word Blaster 3D — LangCraft",
+  description: "Shoot the correct translation before time runs out in a neon 3D arena",
 };
 
 // Three.js cannot run on the server — load client-only
