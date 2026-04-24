@@ -32,6 +32,7 @@ enum GameType {
   LISTEN_QUIZ
   SENTENCE_BUILDER
   DIALOG_ADVENTURE
+  CITY_EXPLORER
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
