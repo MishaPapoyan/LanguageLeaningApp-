@@ -79,9 +79,8 @@ export function SettingsClient({
       if (!res.ok) throw new Error("Failed to save");
       // Refresh session so targetLanguage/nativeLanguage is reflected immediately
       await updateSession();
-      // Force server components to re-render with new language data
-      router.refresh();
-      setSaved(true);
+      // Full reload guarantees server components re-render with new JWT cookie
+      window.location.reload();
       setTimeout(() => setSaved(false), 3000);
     } catch {
       setError(t(locale, "settings_saveError"));
