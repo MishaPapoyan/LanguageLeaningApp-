@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify, Map, Box } from "lucide-react";
+import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify, Map, Box, Home, Briefcase } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Games — LangCraft",
@@ -166,6 +166,20 @@ const GAMES = [
     xpLabel: "+50 XP",
   },
   {
+    href: "/games/immersion",
+    gameType: "IMMERSION",
+    icon: Home,
+    title: "Immersion Room",
+    desc: "Find objects in a 3D room by listening to voice commands",
+    colorClass: "gc-blue",
+    textVar: "--gc-blue-text",
+    mutedVar: "--gc-blue-muted",
+    borderVar: "--gc-blue-border",
+    difficulty: "Beginner",
+    diffColor: "#10b981",
+    xpLabel: "+40 XP",
+  },
+  {
     href: "/games/city-3d",
     gameType: "CITY_EXPLORER",
     icon: Box,
@@ -178,6 +192,20 @@ const GAMES = [
     difficulty: "Advanced",
     diffColor: "#ef4444",
     xpLabel: "+60 XP",
+  },
+  {
+    href: "/games/interview",
+    gameType: "INTERVIEW",
+    icon: Briefcase,
+    title: "Job Interview",
+    desc: "Sit across a 3D interviewer — answer their questions in French or Spanish to get hired",
+    colorClass: "gc-blue",
+    textVar: "--gc-blue-text",
+    mutedVar: "--gc-blue-muted",
+    borderVar: "--gc-blue-border",
+    difficulty: "Intermediate",
+    diffColor: "#f59e0b",
+    xpLabel: "+40 XP",
   },
 ];
 

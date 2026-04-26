@@ -33,6 +33,8 @@ enum GameType {
   SENTENCE_BUILDER
   DIALOG_ADVENTURE
   CITY_EXPLORER
+  IMMERSION
+  INTERVIEW
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────

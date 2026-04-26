@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 
 interface DailyGoal {
   id: string;
@@ -12,6 +14,8 @@ interface DailyGoal {
 }
 
 export function DailyGoals() {
+  const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const [goals, setGoals] = useState<DailyGoal[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,21 +26,21 @@ export function DailyGoals() {
         setGoals([
           {
             id: "stories",
-            label: "Read a story",
+            label: t(locale, "goals_readStory"),
             emoji: "📖",
             done: (d.storiesRead ?? 0) >= 1,
             href: "/stories",
           },
           {
             id: "games",
-            label: "Play a game",
+            label: t(locale, "goals_playGame"),
             emoji: "🎮",
             done: (d.gamesPlayed ?? 0) >= 1,
             href: "/games",
           },
           {
             id: "practice",
-            label: "AI tutor or writing",
+            label: t(locale, "goals_aiOrWriting"),
             emoji: "✍️",
             done: (d.practiceCount ?? 0) >= 1,
             href: "/tutor",
@@ -46,13 +50,13 @@ export function DailyGoals() {
       })
       .catch(() => {
         setGoals([
-          { id: "stories",  label: "Read a story",        emoji: "📖", done: false, href: "/stories" },
-          { id: "games",    label: "Play a game",          emoji: "🎮", done: false, href: "/games" },
-          { id: "practice", label: "AI tutor or writing",  emoji: "✍️", done: false, href: "/tutor" },
+          { id: "stories",  label: t(locale, "goals_readStory"),   emoji: "📖", done: false, href: "/stories" },
+          { id: "games",    label: t(locale, "goals_playGame"),     emoji: "🎮", done: false, href: "/games" },
+          { id: "practice", label: t(locale, "goals_aiOrWriting"), emoji: "✍️", done: false, href: "/tutor" },
         ]);
         setLoading(false);
       });
-  }, []);
+  }, [locale]);
 
   const completedCount = goals.filter((g) => g.done).length;
   const allDone = completedCount === goals.length && goals.length > 0;
@@ -62,9 +66,9 @@ export function DailyGoals() {
     <div className="card p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="section-label mb-0.5">Today&apos;s goals</p>
+          <p className="section-label mb-0.5">{t(locale, "goals_today")}</p>
           <p className="text-sm font-semibold" style={{ color: "var(--text-2)" }}>
-            {loading ? "—" : `${completedCount}/${goals.length} complete`}
+            {loading ? "—" : t(locale, "goals_progress", { n: completedCount.toString(), total: goals.length.toString() })}
           </p>
         </div>
 
@@ -90,7 +94,7 @@ export function DailyGoals() {
       {allDone && (
         <div className="rounded-xl px-3 py-2 mb-3 text-center text-xs font-bold"
           style={{ background: "var(--green-dim)", color: "var(--green)" }}>
-          All done for today! 🎉
+          {t(locale, "goals_allDone")}
         </div>
       )}
 

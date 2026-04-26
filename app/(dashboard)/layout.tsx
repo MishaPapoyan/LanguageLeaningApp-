@@ -45,7 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </main>
 
           {/* Right panel — only on xl+ screens, loads independently */}
-          <div className="hidden xl:block w-72 flex-shrink-0">
+          <div className="hidden xl:block w-72 flex-shrink-0 right-panel-wrapper">
             <Suspense fallback={<RightPanelSkeleton />}>
               <RightPanel />
             </Suspense>

@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Home, BookOpen, BookText, MessageCircle, Gamepad2, RotateCcw,
   BookMarked, Library, ChevronDown, Settings, BarChart3, TrendingUp,
-  LogOut, Menu, X, Flame, Zap, PenLine,
+  LogOut, Menu, X, Flame, Zap, PenLine, Users,
 } from "lucide-react";
 import { t, getLocale, type TranslationKey } from "@/lib/i18n";
 
@@ -21,8 +21,9 @@ const NAV_LINKS: { href: string; labelKey: TranslationKey; Icon: typeof Home }[]
   { href: "/stories", labelKey: "nav_stories", Icon: BookOpen },
   { href: "/tutor",   labelKey: "nav_tutor",   Icon: MessageCircle },
   { href: "/games",   labelKey: "nav_games",   Icon: Gamepad2 },
-  { href: "/review",  labelKey: "nav_practice", Icon: RotateCcw },
-  { href: "/writing", labelKey: "nav_writing",  Icon: PenLine },
+  { href: "/review",     labelKey: "nav_practice",   Icon: RotateCcw },
+  { href: "/writing",    labelKey: "nav_writing",    Icon: PenLine },
+  { href: "/community",  labelKey: "nav_community",  Icon: Users },
 ];
 
 // Secondary nav (shown in mobile panel + user dropdown)
@@ -103,7 +104,10 @@ export function AppNav() {
   const avatarIsEmoji = isEmoji(userImage);
   const avatarInitial = userName[0]?.toUpperCase() ?? "U";
 
+  const userId = (session?.user as any)?.id ?? "";
+
   const DROPDOWN_ITEMS: { href: string; labelKey: TranslationKey; Icon: typeof Settings }[] = [
+    { href: userId ? `/community/${userId}` : "/community", labelKey: "nav_myProfile",  Icon: Users },
     { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
     { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
     { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
@@ -362,7 +366,7 @@ export function AppNav() {
 
               {DROPDOWN_ITEMS.map(({ href, labelKey, Icon }, i) => (
                 <div key={href}>
-                  {i === 3 && (
+                  {(i === 1 || i === 4) && (
                     <div style={{ height: 1, background: "var(--border)", margin: "3px 0 6px" }} />
                   )}
                   <Link

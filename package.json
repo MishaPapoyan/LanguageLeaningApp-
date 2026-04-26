@@ -11,6 +11,7 @@
     "db:deploy": "prisma db push --accept-data-loss",
     "db:seed": "ts-node -P tsconfig.seed.json prisma/seed.ts",
     "db:studio": "prisma studio",
+    "build:wasm": "wasm-pack build games/immersion-wasm --target web --out-dir ../../public/wasm/immersion",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "wasm-pack": "^0.13.0",
     "@types/node": "^20.19.39",
     "@types/react": "^18",
     "@types/react-dom": "^18",

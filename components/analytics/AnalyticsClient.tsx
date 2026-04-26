@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import {
@@ -75,19 +76,15 @@ export interface AnalyticsData {
 
 type TabId = "overview" | "vocabulary" | "games" | "tutor" | "activity";
 
-const TABS: { id: TabId; label: string; emoji: string }[] = [
-  { id: "overview", label: "Overview", emoji: "📊" },
-  { id: "activity", label: "Activity", emoji: "📅" },
-  { id: "vocabulary", label: "Vocabulary", emoji: "📚" },
-  { id: "games", label: "Games", emoji: "🎮" },
-  { id: "tutor", label: "AI Tutor", emoji: "🤖" },
+const TAB_IDS: { id: TabId; key: "analytics_overview" | "analytics_activity" | "analytics_vocabulary" | "analytics_games" | "analytics_aiTutor"; emoji: string }[] = [
+  { id: "overview",   key: "analytics_overview",    emoji: "📊" },
+  { id: "activity",   key: "analytics_activity",    emoji: "📅" },
+  { id: "vocabulary", key: "analytics_vocabulary",  emoji: "📚" },
+  { id: "games",      key: "analytics_games",       emoji: "🎮" },
+  { id: "tutor",      key: "analytics_aiTutor",     emoji: "🤖" },
 ];
 
 const COLORS = ["#7c3aed", "#3b82f6", "#f43f5e", "#f59e0b", "#0ea5e9", "#06b6d4", "#ec4899", "#6366f1"];
-
-const MASTERY_LABELS: Record<number, string> = {
-  0: "New", 1: "Learning", 2: "Familiar", 3: "Practiced", 4: "Known", 5: "Mastered",
-};
 
 const GAME_LABELS: Record<string, string> = {
   FLASHCARDS: "Flashcards", MATCHING: "Matching", MEMORY_PALACE: "Memory Palace",
@@ -177,8 +174,18 @@ function getWeekNumber(date: Date): number {
 
 export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+
+  const MASTERY_LABELS: Record<number, string> = {
+    0: t(locale, "analytics_mastery_0"),
+    1: t(locale, "analytics_mastery_1"),
+    2: t(locale, "analytics_mastery_2"),
+    3: t(locale, "analytics_mastery_3"),
+    4: t(locale, "analytics_mastery_4"),
+    5: t(locale, "analytics_mastery_5"),
+  };
 
   const chartData = useMemo(() => {
     const { overview, xpBreakdown, vocabulary } = data;
@@ -239,14 +246,14 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
       {/* Tab Navigation */}
       <div className="flex gap-1 bg-white p-1 rounded-xl overflow-x-auto border border-zinc-100">
-        {TABS.map((tab) => (
+        {TAB_IDS.map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === tab.id ? "bg-violet-50 text-violet-700" : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50"
             }`}
           >
             <span>{tab.emoji}</span>
-            {tab.label}
+            {t(locale, tab.key)}
           </button>
         ))}
       </div>

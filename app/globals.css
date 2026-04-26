@@ -625,6 +625,38 @@ html, body {
 
 }
 
+/* ── Community pages: hide right panel + bleed to edges ── */
+body.hide-right-panel .right-panel-wrapper {
+  display: none !important;
+}
+
+/* Bleed out of parent px-4/px-8 + pt-8 so banner is edge-to-edge */
+.community-breakout {
+  margin-top: -2rem;   /* cancel pt-8 */
+  margin-left: -1rem;  /* cancel px-4 */
+  margin-right: -1rem;
+}
+@media (min-width: 768px) {
+  .community-breakout {
+    margin-left: -2rem; /* cancel md:px-8 */
+    margin-right: -2rem;
+  }
+}
+
+/* ── Back link ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color 0.15s;
+}
+.back-link:hover { color: var(--accent); }
+
 /* ── Responsive nav helpers ── */
 @media (max-width: 1023px) {
   .desktop-nav    { display: none !important; }
