@@ -6,6 +6,7 @@ import { RotateCcw, ChevronLeft, Volume2, BookOpen } from "lucide-react";
 import { speak } from "@/lib/speech";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 
 interface ReviewWord {
   id: string;
@@ -33,15 +34,16 @@ function calculateNext(word: ReviewWord, quality: number): ReviewWord {
   return { ...word, interval, ease, repetitions, nextReview: Date.now() + interval * 86_400_000 };
 }
 
-const RATINGS = [
-  { q: 0, label: "Forgot",  color: "var(--red)",   bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.35)" },
-  { q: 3, label: "Hard",    color: "var(--gold)",  bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.35)" },
-  { q: 4, label: "Good",    color: "var(--blue)",  bg: "rgba(96,165,250,0.1)",  border: "rgba(96,165,250,0.35)" },
-  { q: 5, label: "Easy",    color: "var(--green)", bg: "rgba(52,211,153,0.1)",  border: "rgba(52,211,153,0.35)" },
+const RATING_KEYS = [
+  { q: 0, key: "review_forgot" as const, color: "var(--red)",   bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.35)" },
+  { q: 3, key: "review_hard" as const,   color: "var(--gold)",  bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.35)" },
+  { q: 4, key: "review_good" as const,   color: "var(--blue)",  bg: "rgba(96,165,250,0.1)",  border: "rgba(96,165,250,0.35)" },
+  { q: 5, key: "review_easy" as const,   color: "var(--green)", bg: "rgba(52,211,153,0.1)",  border: "rgba(52,211,153,0.35)" },
 ];
 
 export default function ReviewPage() {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
 
   const [dueWords, setDueWords]       = useState<ReviewWord[]>([]);
@@ -94,7 +96,7 @@ export default function ReviewPage() {
     return (
       <div style={{ maxWidth: 520, margin: "0 auto", paddingTop: 80, textAlign: "center" }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>⏳</div>
-        <p style={{ color: "var(--text-3)", fontSize: 14 }}>Loading your review queue…</p>
+        <p style={{ color: "var(--text-3)", fontSize: 14 }}>{t(locale, "review_loading")}</p>
       </div>
     );
   }
@@ -107,13 +109,13 @@ export default function ReviewPage() {
         <div className="card" style={{ padding: "52px 32px" }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>{reviewed > 0 ? "🎯" : "✨"}</div>
           <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", margin: "0 0 10px" }}>
-            {reviewed > 0 ? "Session complete!" : "All caught up!"}
+            {reviewed > 0 ? t(locale, "review_sessionComplete") : t(locale, "review_allCaughtUp")}
           </h2>
 
           {reviewed > 0 ? (
             <>
               <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 28px" }}>
-                {reviewed} words reviewed · {correct} correct · {acc}% accuracy
+                {t(locale, "review_statsLine", { n: reviewed.toString(), correct: correct.toString(), pct: acc.toString() })}
               </p>
               <div style={{ height: 8, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden", marginBottom: 28 }}>
                 <div style={{
@@ -126,10 +128,10 @@ export default function ReviewPage() {
           ) : (
             <>
               <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 12px" }}>
-                Practice uses <strong style={{ color: "var(--text-2)" }}>spaced repetition</strong> — words come back right before you forget them.
+                {t(locale, "review_spacedDesc1")}
               </p>
               <p style={{ fontSize: 13, color: "var(--text-3)", margin: "0 0 28px" }}>
-                Play any game — words you practice are <strong style={{ color: "var(--accent)" }}>automatically added</strong> to your review queue. Or save words from the dictionary manually.
+                {t(locale, "review_spacedDesc2")}
               </p>
             </>
           )}
@@ -139,7 +141,7 @@ export default function ReviewPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               gap: 8, padding: "13px 0", fontSize: 14, fontWeight: 700, textDecoration: "none",
             }}>
-              <BookOpen size={15} /> Continue learning
+              <BookOpen size={15} /> {t(locale, "review_continueLearning")}
             </Link>
             <Link href="/home" style={{
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -148,7 +150,7 @@ export default function ReviewPage() {
               border: "1px solid var(--border)",
               transition: "background 0.15s",
             }}>
-              Back to home
+              {t(locale, "review_backToHome")}
             </Link>
           </div>
         </div>
@@ -175,8 +177,8 @@ export default function ReviewPage() {
             <RotateCcw size={15} color="#fff" />
           </div>
           <div>
-            <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>Practice</p>
-            <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0 }}>{dueWords.length} words due today</p>
+            <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>{t(locale, "review_practiceTitle")}</p>
+            <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0 }}>{t(locale, "review_wordsDue", { n: dueWords.length.toString() })}</p>
           </div>
         </div>
         <span style={{
@@ -234,7 +236,7 @@ export default function ReviewPage() {
 
         {!flipped ? (
           <p style={{ fontSize: 13, color: "var(--accent)", marginTop: 16, fontWeight: 600 }}>
-            Tap to reveal translation
+            {t(locale, "review_tapToReveal")}
           </p>
         ) : (
           <>
@@ -251,7 +253,7 @@ export default function ReviewPage() {
                 color: "var(--accent)", fontSize: 12, fontWeight: 700, cursor: "pointer",
               }}
             >
-              <Volume2 size={13} /> Listen
+              <Volume2 size={13} /> {t(locale, "review_listen")}
             </button>
           </>
         )}
@@ -261,10 +263,10 @@ export default function ReviewPage() {
       {flipped && (
         <>
           <p style={{ fontSize: 12, textAlign: "center", color: "var(--text-3)", marginBottom: 10 }}>
-            How well did you know it?
+            {t(locale, "review_howWell")}
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-            {RATINGS.map((r) => (
+            {RATING_KEYS.map((r) => (
               <button
                 key={r.q}
                 onClick={() => handleRate(r.q)}
@@ -279,7 +281,7 @@ export default function ReviewPage() {
                 <span style={{ fontSize: 22 }}>
                   {r.q === 0 ? "😵" : r.q === 3 ? "😬" : r.q === 4 ? "😊" : "🤩"}
                 </span>
-                <span style={{ fontSize: 11 }}>{r.label}</span>
+                <span style={{ fontSize: 11 }}>{t(locale, r.key)}</span>
               </button>
             ))}
           </div>
@@ -293,11 +295,11 @@ export default function ReviewPage() {
           background: "var(--surface-2)", border: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 16, fontSize: 13,
         }}>
-          <span style={{ color: "var(--text-3)" }}>Session:</span>
-          <span style={{ color: "var(--green)", fontWeight: 700 }}>✓ {correct} correct</span>
-          <span style={{ color: "var(--red)", fontWeight: 700 }}>✗ {reviewed - correct} missed</span>
+          <span style={{ color: "var(--text-3)" }}>{t(locale, "review_session")}</span>
+          <span style={{ color: "var(--green)", fontWeight: 700 }}>✓ {t(locale, "review_correctCount", { n: correct.toString() })}</span>
+          <span style={{ color: "var(--red)", fontWeight: 700 }}>✗ {t(locale, "review_missedCount", { n: (reviewed - correct).toString() })}</span>
           <span style={{ marginLeft: "auto", color: "var(--text-3)", fontWeight: 600 }}>
-            {Math.round((correct / reviewed) * 100)}% accuracy
+            {t(locale, "review_accuracyPct", { pct: Math.round((correct / reviewed) * 100).toString() })}
           </span>
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import { speakTarget } from "@/lib/speech";
 import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X, Pencil } from "lucide-react";
@@ -80,6 +81,7 @@ async function apiPatch(id: string, front: string, back: string): Promise<Custom
 
 export default function MyWordsPage() {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [words, setWords]           = useState<CustomWord[]>([]);
   const [loading, setLoading]       = useState(true);
@@ -182,10 +184,10 @@ export default function MyWordsPage() {
   //  RESULT SCREEN
   // ══════════════════════════════════════════════════════════════════════════
   if (mode === "result") {
-    const grade = pct === 100 ? { label: "Perfect!", color: "var(--green)", emoji: "🏆" }
-                : pct >= 70   ? { label: "Great job!", color: "var(--accent)", emoji: "🎉" }
-                : pct >= 40   ? { label: "Keep going!", color: "var(--gold)", emoji: "💪" }
-                :               { label: "Keep practicing", color: "var(--red)", emoji: "📚" };
+    const grade = pct === 100 ? { label: t(locale, "mywords_resultPerfect"), color: "var(--green)", emoji: "🏆" }
+                : pct >= 70   ? { label: t(locale, "mywords_resultGreat"), color: "var(--accent)", emoji: "🎉" }
+                : pct >= 40   ? { label: t(locale, "mywords_resultKeep"), color: "var(--gold)", emoji: "💪" }
+                :               { label: t(locale, "mywords_resultPractice"), color: "var(--red)", emoji: "📚" };
 
     return (
       <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 16px" }}>
@@ -215,7 +217,7 @@ export default function MyWordsPage() {
           <div style={{ fontSize: 40, marginBottom: 8 }}>{grade.emoji}</div>
           <h2 style={{ fontSize: 26, fontWeight: 900, color: grade.color, margin: "0 0 6px" }}>{grade.label}</h2>
           <p style={{ fontSize: 14, color: "var(--text-3)", margin: "0 0 16px" }}>
-            You answered {score} out of {questions.length} questions correctly
+            {t(locale, "mywords_answered", { score: score.toString(), total: questions.length.toString() })}
           </p>
           {xpEarned > 0 && (
             <div style={{
@@ -224,7 +226,7 @@ export default function MyWordsPage() {
               borderRadius: 99, padding: "8px 18px",
               fontSize: 15, fontWeight: 800, color: "var(--gold)",
             }}>
-              ⚡ +{xpEarned} XP earned
+              ⚡ {t(locale, "mywords_xpEarned", { xp: xpEarned.toString() })}
             </div>
           )}
 
@@ -233,12 +235,12 @@ export default function MyWordsPage() {
               flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
               gap: 8, padding: "13px 0", fontSize: 14, fontWeight: 700,
             }}>
-              <Play size={15} /> Try again
+              <Play size={15} /> {t(locale, "mywords_tryAgain")}
             </button>
             <button onClick={() => setMode("list")} className="btn-outline" style={{
               flex: 1, padding: "13px 0", fontSize: 14,
             }}>
-              Back to words
+              {t(locale, "mywords_backToWords")}
             </button>
           </div>
         </div>
@@ -264,14 +266,14 @@ export default function MyWordsPage() {
           borderRadius: 10, padding: "6px 12px", fontSize: 12, fontWeight: 600,
           color: "var(--text-2)", cursor: "pointer",
         }}>
-          <ArrowLeft size={13} /> Back
+          <ArrowLeft size={13} /> {t(locale, "mywords_back")}
         </button>
 
         <h2 style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", margin: "0 0 6px" }}>
-          Quiz setup
+          {t(locale, "mywords_quizSetup")}
         </h2>
         <p style={{ fontSize: 13, color: "var(--text-3)", margin: "0 0 28px" }}>
-          You have <strong style={{ color: "var(--accent)" }}>{words.length}</strong> words. How many do you want to quiz on?
+          {t(locale, "mywords_quizCount", { n: words.length.toString() })}
         </p>
 
         {/* Preset pills */}
@@ -303,7 +305,7 @@ export default function MyWordsPage() {
               color: quizCount === "custom" ? "var(--accent)" : "var(--text)",
               cursor: "pointer", transition: "all 0.15s",
             }}>
-            Custom
+            {t(locale, "mywords_custom")}
           </button>
         </div>
 
@@ -314,14 +316,14 @@ export default function MyWordsPage() {
               type="number" min={2} max={words.length}
               value={customCount}
               onChange={e => setCustomCount(e.target.value)}
-              placeholder={`Enter number (2–${words.length})`}
+              placeholder={t(locale, "mywords_enterNumber", { max: words.length.toString() })}
               className="input"
               style={{ width: "100%", fontSize: 15 }}
               autoFocus
             />
             {customCount && !canStart && (
               <p style={{ fontSize: 12, color: "var(--red)", margin: "8px 0 0" }}>
-                Min 2 words required
+                {t(locale, "mywords_minRequired")}
               </p>
             )}
           </div>
@@ -334,14 +336,14 @@ export default function MyWordsPage() {
             background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)",
             fontSize: 13, color: "var(--text-2)",
           }}>
-            You'll be quizzed on <strong style={{ color: "var(--accent)" }}>{resolvedCount}</strong> words
+            {t(locale, "mywords_quizOn", { n: resolvedCount.toString() })}
           </div>
         )}
 
         <button onClick={startQuiz} disabled={!canStart} className="btn-primary"
           style={{ width: "100%", padding: "14px", fontSize: 15, fontWeight: 800 }}>
           <Play size={16} style={{ display: "inline", marginRight: 8 }} />
-          Start Quiz
+          {t(locale, "mywords_startQuiz")}
         </button>
       </div>
     );
@@ -364,7 +366,7 @@ export default function MyWordsPage() {
             borderRadius: 10, padding: "6px 12px", fontSize: 12, fontWeight: 600,
             color: "var(--text-2)", cursor: "pointer",
           }}>
-            <ArrowLeft size={13} /> Exit
+            <ArrowLeft size={13} /> {t(locale, "mywords_exit")}
           </button>
 
           {/* Progress bar */}
@@ -402,7 +404,7 @@ export default function MyWordsPage() {
             fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em",
             color: "var(--text-3)",
           }}>
-            {langConfig.flag} Translate this word
+            {langConfig.flag} {t(locale, "mywords_translateWord")}
           </div>
 
           <div style={{ fontSize: "clamp(24px, 5vw, 36px)", fontWeight: 900, color: "var(--text)", marginBottom: 24, lineHeight: 1.2 }}>
@@ -416,7 +418,7 @@ export default function MyWordsPage() {
             color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer",
             transition: "all 0.15s",
           }}>
-            <Volume2 size={14} /> Listen
+            <Volume2 size={14} /> {t(locale, "mywords_listen")}
           </button>
         </div>
 
@@ -491,7 +493,7 @@ export default function MyWordsPage() {
               fontSize: 13, fontWeight: 700,
               opacity: hintUsed || selected !== null ? 0.5 : 1,
             }}>
-            💡 {hintErr ? "Not enough XP!" : hintUsed ? "Hint used (2 eliminated)" : "Hint — eliminate 2 wrong answers (5 XP)"}
+            💡 {hintErr ? t(locale, "mywords_notEnoughXp") : hintUsed ? t(locale, "mywords_hintUsed") : t(locale, "mywords_hint")}
           </button>
         </div>
       </div>
@@ -509,7 +511,7 @@ export default function MyWordsPage() {
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
             <h1 style={{ fontSize: 30, fontWeight: 900, color: "var(--text)", margin: 0, letterSpacing: "-0.5px" }}>
-              My Words
+              {t(locale, "mywords_title")}
             </h1>
             {words.length > 0 && (
               <span style={{
@@ -522,7 +524,7 @@ export default function MyWordsPage() {
             )}
           </div>
           <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
-            Build your personal vocabulary deck and quiz yourself
+            {t(locale, "mywords_subtitle")}
           </p>
         </div>
 
@@ -532,7 +534,7 @@ export default function MyWordsPage() {
             padding: "11px 22px", fontSize: 14, fontWeight: 800,
             boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
           }}>
-            <Play size={15} /> Start Quiz
+            <Play size={15} /> {t(locale, "mywords_startQuiz")}
           </button>
         )}
       </div>
@@ -560,7 +562,7 @@ export default function MyWordsPage() {
           }}>
             <Plus size={15} color="#fff" />
           </div>
-          <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>Add a new word pair</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>{t(locale, "mywords_addWordPair")}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
@@ -569,7 +571,7 @@ export default function MyWordsPage() {
             <label style={{
               display: "block", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em",
               textTransform: "uppercase", color: "var(--text-3)", marginBottom: 7,
-            }}>Your language</label>
+            }}>{t(locale, "mywords_yourLanguage")}</label>
             <input
               type="text" value={front}
               onChange={e => setFront(e.target.value)}
@@ -626,7 +628,7 @@ export default function MyWordsPage() {
 
         {words.length === 1 && (
           <p style={{ fontSize: 12, color: "var(--gold)", margin: "12px 0 0", display: "flex", alignItems: "center", gap: 5 }}>
-            ⚡ Add 1 more word to unlock the quiz
+            ⚡ {t(locale, "mywords_unlockHint")}
           </p>
         )}
       </div>
@@ -634,7 +636,7 @@ export default function MyWordsPage() {
       {/* ── Word tile grid ── */}
       {loading ? (
         <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-3)", fontSize: 14 }}>
-          Loading your words…
+          {t(locale, "mywords_loading")}
         </div>
       ) : words.length === 0 ? (
         <div style={{
@@ -644,18 +646,18 @@ export default function MyWordsPage() {
         }}>
           <div style={{ fontSize: 48, marginBottom: 14 }}>🗂️</div>
           <p style={{ fontSize: 18, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>
-            Your deck is empty
+            {t(locale, "mywords_emptyTitle")}
           </p>
           <p style={{ fontSize: 13, color: "var(--text-3)", margin: 0 }}>
-            Add your first word pair above to start building your deck
+            {t(locale, "mywords_emptyHint")}
           </p>
         </div>
       ) : (
         <>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <p className="section-label" style={{ margin: 0 }}>Word deck</p>
+            <p className="section-label" style={{ margin: 0 }}>{t(locale, "mywords_wordDeck")}</p>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-            <span style={{ fontSize: 11, color: "var(--text-3)" }}>{words.length} pairs</span>
+            <span style={{ fontSize: 11, color: "var(--text-3)" }}>{t(locale, "mywords_pairs", { n: words.length.toString() })}</span>
           </div>
 
           {/* Grid of flashcard tiles */}
@@ -703,7 +705,7 @@ export default function MyWordsPage() {
                           background: "var(--accent)", color: "#fff",
                           fontSize: 12, fontWeight: 700, cursor: "pointer",
                         }}>
-                          <Check size={12} /> Save
+                          <Check size={12} /> {t(locale, "mywords_save")}
                         </button>
                         <button onClick={() => setEditingId(null)} style={{
                           flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
@@ -711,7 +713,7 @@ export default function MyWordsPage() {
                           border: "1px solid var(--border)", background: "none",
                           color: "var(--text-3)", fontSize: 12, fontWeight: 600, cursor: "pointer",
                         }}>
-                          <X size={12} /> Cancel
+                          <X size={12} /> {t(locale, "mywords_cancel")}
                         </button>
                       </div>
                     </div>
@@ -720,7 +722,7 @@ export default function MyWordsPage() {
                       {/* Native word */}
                       <div style={{ padding: "14px 16px 10px" }}>
                         <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px" }}>
-                          Your language
+                          {t(locale, "mywords_yourLanguage")}
                         </p>
                         <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-2)", margin: 0, wordBreak: "break-word" }}>
                           {word.front}
@@ -741,17 +743,17 @@ export default function MyWordsPage() {
                         <button onClick={() => speakTarget(word.back, langConfig.code)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
                           onMouseEnter={e => e.currentTarget.style.color = accentColor}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                        ><Volume2 size={12} /> Listen</button>
+                        ><Volume2 size={12} /> {t(locale, "mywords_listen")}</button>
                         <div style={{ width: 1, height: 18, background: "var(--border)" }} />
                         <button onClick={() => startEdit(word)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
                           onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                        ><Pencil size={12} /> Edit</button>
+                        ><Pencil size={12} /> {t(locale, "mywords_edit")}</button>
                         <div style={{ width: 1, height: 18, background: "var(--border)" }} />
                         <button onClick={() => deleteWord(word.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
                           onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                        ><Trash2 size={12} /> Delete</button>
+                        ><Trash2 size={12} /> {t(locale, "mywords_delete")}</button>
                       </div>
                     </>
                   )}
@@ -780,7 +782,7 @@ export default function MyWordsPage() {
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,0.35)";
               }}
             >
-              <Play size={17} /> Quiz me on {words.length} words
+              <Play size={17} /> {t(locale, "mywords_quizMe", { n: words.length.toString() })}
             </button>
           )}
         </>

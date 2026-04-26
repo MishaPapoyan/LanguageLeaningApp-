@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Search, Flame, Zap, Users, Trophy, Star, Gamepad2, BookMarked } from "lucide-react";
+import { t, getLocale } from "@/lib/i18n";
 
 interface Learner {
   id: string;
@@ -45,7 +46,7 @@ function Avatar({ image, name, size = 44, lang }: { image: string | null; name: 
 }
 
 /* ── Podium card for top 3 ────────────────────────────── */
-function PodiumCard({ learner, rank }: { learner: Learner; rank: 1 | 2 | 3 }) {
+function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 | 3; locale: import("@/lib/i18n").Locale }) {
   const [hov, setHov] = useState(false);
   const xp = learner.progress?.xp ?? 0;
   const level = learner.progress?.level ?? 1;
@@ -98,7 +99,7 @@ function PodiumCard({ learner, rank }: { learner: Learner; rank: 1 | 2 | 3 }) {
         textAlign: "center",
       }}>
         <div style={{ fontSize: rank === 1 ? 14 : 12, fontWeight: 800, color: "var(--text)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {learner.name ?? "Learner"}
+          {learner.name ?? t(locale, "comm_learner")}
         </div>
         <div style={{ fontSize: 10, color: "var(--text-3)", marginBottom: 6, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
           {LANG_FLAGS[lang]} {LANG_LABELS[lang]}
@@ -122,7 +123,7 @@ function PodiumCard({ learner, rank }: { learner: Learner; rank: 1 | 2 | 3 }) {
 }
 
 /* ── List row for rank 4+ ─────────────────────────────── */
-function LeaderRow({ learner, rank, isYou }: { learner: Learner; rank: number; isYou: boolean }) {
+function LeaderRow({ learner, rank, isYou, locale }: { learner: Learner; rank: number; isYou: boolean; locale: import("@/lib/i18n").Locale }) {
   const [hov, setHov] = useState(false);
   const xp = learner.progress?.xp ?? 0;
   const level = learner.progress?.level ?? 1;
@@ -155,10 +156,10 @@ function LeaderRow({ learner, rank, isYou }: { learner: Learner; rank: number; i
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {learner.name ?? "Learner"}
+            {learner.name ?? t(locale, "comm_learner")}
           </span>
           <span style={{ fontSize: 12 }}>{LANG_FLAGS[lang]}</span>
-          {isYou && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "rgba(99,102,241,0.12)", padding: "1px 6px", borderRadius: 5 }}>You</span>}
+          {isYou && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "rgba(99,102,241,0.12)", padding: "1px 6px", borderRadius: 5 }}>{t(locale, "comm_you")}</span>}
         </div>
         {/* mini XP bar */}
         <div style={{ height: 4, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden", width: "100%", maxWidth: 160 }}>
@@ -188,6 +189,7 @@ function LeaderRow({ learner, rank, isYou }: { learner: Learner; rank: number; i
 ══════════════════════════════════════════════════════════ */
 export default function CommunityPage() {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const [learners, setLearners] = useState<Learner[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -237,8 +239,8 @@ export default function CommunityPage() {
             <Users size={20} color="#fff" />
           </div>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", margin: 0, lineHeight: 1.1 }}>Community</h1>
-            <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>Leaderboard · Top {learners.length} learners</p>
+            <h1 style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", margin: 0, lineHeight: 1.1 }}>{t(locale, "comm_title")}</h1>
+            <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{t(locale, "comm_subtitle", { n: learners.length.toString() })}</p>
           </div>
         </div>
 
@@ -250,7 +252,7 @@ export default function CommunityPage() {
             border: "1px solid rgba(99,102,241,0.3)", textDecoration: "none",
             transition: "all 0.15s",
           }}>
-            👤 My Profile {myRank > 0 && <span style={{ opacity: 0.7 }}>#{myRank}</span>}
+            👤 {t(locale, "comm_myProfile")} {myRank > 0 && <span style={{ opacity: 0.7 }}>#{myRank}</span>}
           </Link>
         )}
       </div>
@@ -262,7 +264,7 @@ export default function CommunityPage() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search by name…"
+            placeholder={t(locale, "comm_search")}
             style={{
               width: "100%", boxSizing: "border-box", padding: "10px 14px 10px 34px",
               borderRadius: 11, border: "1px solid var(--border-md)",
@@ -278,7 +280,7 @@ export default function CommunityPage() {
             color: langFilter === l ? "var(--accent)" : "var(--text-2)",
             transition: "all 0.15s",
           }}>
-            {l === "" ? "🌍 All" : `${LANG_FLAGS[l]} ${LANG_LABELS[l]}`}
+            {l === "" ? `🌍 ${t(locale, "comm_all")}` : `${LANG_FLAGS[l]} ${LANG_LABELS[l]}`}
           </button>
         ))}
       </div>
@@ -292,8 +294,8 @@ export default function CommunityPage() {
       ) : learners.length === 0 ? (
         <div style={{ textAlign: "center", padding: "80px 0", color: "var(--text-3)" }}>
           <Users size={48} style={{ opacity: 0.2, marginBottom: 14 }} />
-          <p style={{ fontSize: 15, fontWeight: 600 }}>No learners found</p>
-          <p style={{ fontSize: 13 }}>Try a different search or filter</p>
+          <p style={{ fontSize: 15, fontWeight: 600 }}>{t(locale, "comm_noLearners")}</p>
+          <p style={{ fontSize: 13 }}>{t(locale, "comm_noLearnersHint")}</p>
         </div>
       ) : (
         <>
@@ -302,12 +304,12 @@ export default function CommunityPage() {
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
                 <Trophy size={14} style={{ color: "#fbbf24" }} />
-                <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.09em" }}>Podium</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.09em" }}>{t(locale, "comm_podium")}</span>
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "flex-end", marginBottom: 28, padding: "0 8px" }}>
-                <PodiumCard learner={top3[1]} rank={2} />
-                <PodiumCard learner={top3[0]} rank={1} />
-                <PodiumCard learner={top3[2]} rank={3} />
+                <PodiumCard learner={top3[1]} rank={2} locale={locale} />
+                <PodiumCard learner={top3[0]} rank={1} locale={locale} />
+                <PodiumCard learner={top3[2]} rank={3} locale={locale} />
               </div>
             </>
           )}
@@ -318,7 +320,7 @@ export default function CommunityPage() {
               {!isSearching && top3.length === 3 && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
                   <Star size={13} style={{ color: "var(--text-3)" }} />
-                  <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.09em" }}>Rankings</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.09em" }}>{t(locale, "comm_rankings")}</span>
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
@@ -328,6 +330,7 @@ export default function CommunityPage() {
                     learner={l}
                     rank={isSearching ? i + 1 : i + 4}
                     isYou={l.id === myId}
+                    locale={locale}
                   />
                 ))}
               </div>

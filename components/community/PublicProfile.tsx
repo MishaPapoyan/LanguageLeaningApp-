@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import {
   Flame, Zap, Trophy, BookMarked, Gamepad2,
   Globe, Calendar, Award, TrendingUp, User, Star,
@@ -176,7 +177,7 @@ function WeekChart({ data, go }: { data: Record<string,number>; go: boolean }) {
         ))}
       </div>
       <div style={{ textAlign:"center", marginTop:8, fontSize:12, color:"var(--text-3)" }}>
-        <span style={{ fontWeight:800, color:"var(--accent-2)" }}>{total.toLocaleString()} XP</span> this week
+        <span style={{ fontWeight:800, color:"var(--accent-2)" }}>{total.toLocaleString()} XP</span>
       </div>
     </div>
   );
@@ -220,6 +221,7 @@ function Card({ title, icon, children }: { title:string; icon:React.ReactNode; c
 ═══════════════════════════════════════════════════════════════════════════ */
 export function PublicProfile({ profile, viewerUserId }: Props) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const [go, setGo] = useState(false);
   useEffect(() => { const t = setTimeout(()=>setGo(true),80); return ()=>clearTimeout(t); }, []);
 
@@ -256,7 +258,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         {/* streak */}
         {streak>0 && (
           <div style={{ position:"absolute", top:18, left:20, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(10px)", borderRadius:20, padding:"6px 14px", fontSize:13, fontWeight:700, color:"#fbbf24", border:"1px solid rgba(251,191,36,0.3)", display:"flex", alignItems:"center", gap:6 }}>
-            🔥 {streak}-day streak
+            🔥 {t(locale, "profile_dayStreak", { n: streak.toString() })}
           </div>
         )}
         {/* lang pill */}
@@ -286,7 +288,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           <div style={{ display:"flex", gap:8, paddingTop:10 }}>
             {isOwn ? (
               <Link href="/settings" style={{ display:"inline-flex", alignItems:"center", gap:7, fontSize:13, fontWeight:700, padding:"9px 18px", borderRadius:11, textDecoration:"none", background:"var(--accent)", color:"#fff", boxShadow:"0 4px 14px rgba(99,102,241,0.4)", transition:"all 0.15s" }}>
-                ✏️ Edit Profile
+                ✏️ {t(locale, "profile_editProfile")}
               </Link>
             ) : (
               <Link href="/community" style={{ display:"inline-flex", alignItems:"center", gap:7, fontSize:13, fontWeight:700, padding:"9px 18px", borderRadius:11, textDecoration:"none", background:"var(--surface-2)", color:"var(--text-2)", border:"1px solid var(--border)", transition:"all 0.15s" }}>
@@ -298,26 +300,26 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
 
         {/* name */}
         <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", marginBottom:8 }}>
-          <h1 style={{ fontSize:28, fontWeight:900, color:"var(--text)", margin:0 }}>{profile.name ?? "Learner"}</h1>
-          {isOwn && <span style={{ fontSize:11, fontWeight:800, color:"var(--accent)", background:"var(--accent-dim)", padding:"3px 10px", borderRadius:20, border:"1px solid rgba(99,102,241,0.25)" }}>You</span>}
+          <h1 style={{ fontSize:28, fontWeight:900, color:"var(--text)", margin:0 }}>{profile.name ?? t(locale, "profile_learner")}</h1>
+          {isOwn && <span style={{ fontSize:11, fontWeight:800, color:"var(--accent)", background:"var(--accent-dim)", padding:"3px 10px", borderRadius:20, border:"1px solid rgba(99,102,241,0.25)" }}>{t(locale, "profile_you")}</span>}
           {badges.length>0 && <span style={{ fontSize:11, fontWeight:800, color:lm.accent, background:"rgba(0,0,0,0.15)", padding:"3px 10px", borderRadius:20 }}>⭐ {badges.length} badges</span>}
         </div>
 
         {/* meta row */}
         <div style={{ display:"flex", flexWrap:"wrap", gap:16, marginBottom:22 }}>
-          <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Globe size={13} style={{ color:lm.accent }} /> Learning {lm.label}</span>
-          <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Calendar size={13} /> Joined {joined}</span>
-          {bestGame && <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Trophy size={13} style={{ color:"var(--gold)" }} /> Best: {GAME_LABEL[bestGame[0]]}</span>}
+          <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Globe size={13} style={{ color:lm.accent }} /> {t(locale, "profile_learning", { lang: lm.label })}</span>
+          <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Calendar size={13} /> {t(locale, "profile_joined")} {joined}</span>
+          {bestGame && <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Trophy size={13} style={{ color:"var(--gold)" }} /> {t(locale, "profile_best")} {GAME_LABEL[bestGame[0]]}</span>}
         </div>
 
         {/* ── 6 stat tiles ── */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:10 }}>
-          <StatTile icon={<Zap size={22}/>}       label="Total XP"    value={xp}                        color="var(--accent)"   go={go} delay={0}   />
-          <StatTile icon={<Star size={22}/>}       label="Level"       value={level}                     color="var(--accent-2)" go={go} delay={70}  />
-          <StatTile icon={<Flame size={22}/>}      label="Streak"      value={streak}                    color="var(--gold)"     go={go} delay={140} />
-          <StatTile icon={<Gamepad2 size={22}/>}   label="Games"       value={profile.counts.gameScores} color="#34d399"         go={go} delay={210} />
-          <StatTile icon={<BookMarked size={22}/>} label="Words"       value={profile.counts.savedWords} color="#f472b6"         go={go} delay={280} />
-          <StatTile icon={<Award size={22}/>}      label="Badges"      value={badges.length}             color="#a78bfa"         go={go} delay={350} />
+          <StatTile icon={<Zap size={22}/>}       label={t(locale, "profile_totalXp")}  value={xp}                        color="var(--accent)"   go={go} delay={0}   />
+          <StatTile icon={<Star size={22}/>}       label={t(locale, "profile_level")}    value={level}                     color="var(--accent-2)" go={go} delay={70}  />
+          <StatTile icon={<Flame size={22}/>}      label={t(locale, "profile_streak")}   value={streak}                    color="var(--gold)"     go={go} delay={140} />
+          <StatTile icon={<Gamepad2 size={22}/>}   label={t(locale, "profile_games")}    value={profile.counts.gameScores} color="#34d399"         go={go} delay={210} />
+          <StatTile icon={<BookMarked size={22}/>} label={t(locale, "profile_words")}    value={profile.counts.savedWords} color="#f472b6"         go={go} delay={280} />
+          <StatTile icon={<Award size={22}/>}      label={t(locale, "profile_badges")}   value={badges.length}             color="#a78bfa"         go={go} delay={350} />
         </div>
       </div>
 
@@ -333,7 +335,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
               <div style={{ flex:1, minWidth:160 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:12 }}>
                   <TrendingUp size={13} style={{ color:"var(--accent)" }}/>
-                  <span style={{ fontSize:13, fontWeight:800, color:"var(--text)" }}>Weekly Activity</span>
+                  <span style={{ fontSize:13, fontWeight:800, color:"var(--text)" }}>{t(locale, "profile_weeklyActivity")}</span>
                 </div>
                 <WeekChart data={wkly} go={go} />
               </div>
@@ -341,15 +343,15 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           </div>
 
           {/* Skill tree */}
-          <Card title="Skill Tree" icon={<Zap size={15}/>}>
-            <SkillBar label="Vocabulary" icon="📚" value={skill.vocabulary} go={go} delay={0}   color="#818cf8"/>
-            <SkillBar label="Grammar"    icon="✍️"  value={skill.grammar}    go={go} delay={120} color="#34d399"/>
-            <SkillBar label="Speaking"   icon="🎙️"  value={skill.speaking}   go={go} delay={240} color="#f472b6"/>
+          <Card title={t(locale, "profile_skillTree")} icon={<Zap size={15}/>}>
+            <SkillBar label={t(locale, "profile_vocabulary")} icon="📚" value={skill.vocabulary} go={go} delay={0}   color="#818cf8"/>
+            <SkillBar label={t(locale, "profile_grammar")}    icon="✍️"  value={skill.grammar}    go={go} delay={120} color="#34d399"/>
+            <SkillBar label={t(locale, "profile_speaking")}   icon="🎙️"  value={skill.speaking}   go={go} delay={240} color="#f472b6"/>
           </Card>
 
           {/* Compare — only when viewing someone else */}
           {!isOwn && (
-            <Card title="Compare with you" icon={<User size={15}/>}>
+            <Card title={t(locale, "profile_compareWith")} icon={<User size={15}/>}>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14 }}>
                 <span style={{ fontSize:13, fontWeight:700, color:"var(--accent)" }}>{vName}</span>
                 <span style={{ fontSize:12, color:"var(--text-3)" }}>vs</span>
@@ -367,14 +369,14 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         <div>
           {/* Best game scores */}
           {Object.keys(profile.bestScores).length > 0 && (
-            <Card title="Best Scores" icon={<Gamepad2 size={15}/>}>
+            <Card title={t(locale, "profile_bestScores")} icon={<Gamepad2 size={15}/>}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:12 }}>
                 {Object.entries(profile.bestScores).sort((a,b)=>b[1]-a[1]).map(([g,s])=>(
                   <GameCard key={g} game={g} score={s}/>
                 ))}
               </div>
               <div style={{ padding:"10px 14px", borderRadius:10, background:"var(--surface-3)", display:"flex", justifyContent:"space-between" }}>
-                <span style={{ fontSize:12, color:"var(--text-3)", fontWeight:600 }}>Combined</span>
+                <span style={{ fontSize:12, color:"var(--text-3)", fontWeight:600 }}>{t(locale, "profile_combined")}</span>
                 <span style={{ fontSize:14, fontWeight:900, color:"var(--accent)", fontVariantNumeric:"tabular-nums" }}>{totalScore.toLocaleString()}</span>
               </div>
             </Card>
@@ -382,7 +384,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
 
           {/* Badges */}
           {badges.length > 0 && (
-            <Card title={`Badges · ${badges.length}`} icon={<Award size={15}/>}>
+            <Card title={t(locale, "profile_badgesCount", { n: badges.length.toString() })} icon={<Award size={15}/>}>
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                 {badges.map((b,i) => <BadgeChip key={b} badge={b} delay={i*60}/>)}
               </div>
@@ -393,8 +395,8 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           {Object.keys(profile.bestScores).length === 0 && badges.length === 0 && (
             <div className="card" style={{ padding:"40px 20px", textAlign:"center" }}>
               <div style={{ fontSize:40, marginBottom:10 }}>🎮</div>
-              <p style={{ fontSize:14, fontWeight:700, color:"var(--text)", marginBottom:4 }}>No games played yet</p>
-              <p style={{ fontSize:12, color:"var(--text-3)" }}>Start playing to see scores here</p>
+              <p style={{ fontSize:14, fontWeight:700, color:"var(--text)", marginBottom:4 }}>{t(locale, "profile_noGames")}</p>
+              <p style={{ fontSize:12, color:"var(--text-3)" }}>{t(locale, "profile_noGamesHint")}</p>
             </div>
           )}
         </div>
