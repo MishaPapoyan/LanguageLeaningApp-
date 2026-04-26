@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BADGES, getXpProgress, getNextMilestone, getLevelThreshold } from "@/types";
+import { t, getLocale } from "@/lib/i18n";
 import dynamic from "next/dynamic";
 import { Zap, Flame, BookMarked, Gamepad2, BookOpen, MessageSquare, Lock, BarChart3, Target, Trophy, Mic, PenLine, TrendingUp, Layers, Link2, Puzzle } from "lucide-react";
 
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 export default async function ProgressPage() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id ?? "";
+  const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
 
   let progress = null;
   let savedWords = 0, completedStories = 0, gamePlays = 0, tutorSessions = 0;
@@ -76,21 +78,21 @@ export default async function ProgressPage() {
   const skills = [
     {
       key: "vocabulary",
-      label: "Vocabulary",
+      label: t(locale, "progress_vocabulary"),
       icon: <BookOpen size={16} />,
       color: "var(--blue)",
       dimColor: "rgba(96,165,250,0.15)",
     },
     {
       key: "grammar",
-      label: "Grammar",
+      label: t(locale, "progress_grammar"),
       icon: <PenLine size={16} />,
       color: "var(--accent-2)",
       dimColor: "var(--accent-dim)",
     },
     {
       key: "speaking",
-      label: "Speaking",
+      label: t(locale, "progress_speaking"),
       icon: <Mic size={16} />,
       color: "var(--teal)",
       dimColor: "rgba(45,212,191,0.15)",
@@ -99,7 +101,7 @@ export default async function ProgressPage() {
 
   const allTimeStats = [
     {
-      label: "Games Played",
+      label: t(locale, "progress_gamesPlayed"),
       value: gamePlays,
       icon: <Gamepad2 size={20} />,
       color: "var(--coral)",
@@ -107,7 +109,7 @@ export default async function ProgressPage() {
       dimColor: "rgba(251,113,133,0.15)",
     },
     {
-      label: "Stories Completed",
+      label: t(locale, "progress_storiesCompleted"),
       value: completedStories,
       icon: <BookOpen size={20} />,
       color: "var(--blue)",
@@ -115,7 +117,7 @@ export default async function ProgressPage() {
       dimColor: "rgba(96,165,250,0.15)",
     },
     {
-      label: "Tutor Sessions",
+      label: t(locale, "progress_tutorSessions"),
       value: tutorSessions,
       icon: <MessageSquare size={20} />,
       color: "var(--green)",
@@ -165,14 +167,14 @@ export default async function ProgressPage() {
               <span style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", lineHeight: 1 }}>
                 {xpInfo.level}
               </span>
-              <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600, marginTop: 2 }}>LEVEL</span>
+              <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600, marginTop: 2 }}>{t(locale, "progress_levelLabel")}</span>
             </div>
           </div>
           <div style={{ textAlign: "center" }}>
             <p style={{ fontSize: 11, color: "var(--text-2)", fontWeight: 500 }}>
               {xpInfo.current} / {xpInfo.needed} XP
             </p>
-            <p style={{ fontSize: 10, color: "var(--text-3)" }}>to next level</p>
+            <p style={{ fontSize: 10, color: "var(--text-3)" }}>{t(locale, "progress_toNextLevel")}</p>
           </div>
         </div>
 
@@ -194,7 +196,7 @@ export default async function ProgressPage() {
             <p style={{ fontSize: 32, fontWeight: 800, color: "var(--accent-2)", lineHeight: 1, marginBottom: 4 }}>
               {(progress?.xp ?? 0).toLocaleString()}
             </p>
-            <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>Total XP</p>
+            <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>{t(locale, "progress_totalXp")}</p>
           </div>
         </div>
 
@@ -216,7 +218,7 @@ export default async function ProgressPage() {
             <p style={{ fontSize: 32, fontWeight: 800, color: "var(--gold)", lineHeight: 1, marginBottom: 4 }}>
               {progress?.streak ?? 0}
             </p>
-            <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>Day Streak</p>
+            <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>{t(locale, "progress_dayStreak")}</p>
           </div>
         </div>
 
@@ -238,7 +240,7 @@ export default async function ProgressPage() {
             <p style={{ fontSize: 32, fontWeight: 800, color: "var(--teal)", lineHeight: 1, marginBottom: 4 }}>
               {savedWords}
             </p>
-            <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>Words Saved</p>
+            <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>{t(locale, "progress_wordsSaved")}</p>
           </div>
         </div>
       </div>
@@ -251,12 +253,8 @@ export default async function ProgressPage() {
         <p style={{
           fontSize: 10, fontWeight: 700, color: "var(--text-3)",
           textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
-        }}>
-          Weekly Activity
-        </p>
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>
-          XP This Week
-        </h2>
+        }}>{t(locale, "progress_weeklyActivity")}</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>{t(locale, "progress_xpThisWeek")}</h2>
         <WeeklyChart weeklyXp={weeklyXp} />
       </div>
 
@@ -268,12 +266,8 @@ export default async function ProgressPage() {
         <p style={{
           fontSize: 10, fontWeight: 700, color: "var(--text-3)",
           textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
-        }}>
-          Skills
-        </p>
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>
-          Skill Progress
-        </h2>
+        }}>{t(locale, "progress_skills")}</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>{t(locale, "progress_skillProgress")}</h2>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           {skills.map((skill) => {
@@ -320,12 +314,8 @@ export default async function ProgressPage() {
         <p style={{
           fontSize: 10, fontWeight: 700, color: "var(--text-3)",
           textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
-        }}>
-          Achievements
-        </p>
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>
-          Badges
-        </h2>
+        }}>{t(locale, "progress_achievements")}</p>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>{t(locale, "progress_badges")}</h2>
 
         {/* Earned */}
         {earnedBadges.length > 0 && (
@@ -334,7 +324,7 @@ export default async function ProgressPage() {
               fontSize: 11, fontWeight: 700, color: "var(--text-3)",
               textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12,
             }}>
-              Earned ({earnedBadges.length})
+              {t(locale, "progress_earnedCount", { n: String(earnedBadges.length) })}
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
               {earnedBadges.map((badge) => (
@@ -365,7 +355,7 @@ export default async function ProgressPage() {
               fontSize: 11, fontWeight: 700, color: "var(--text-3)",
               textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12,
             }}>
-              Locked ({lockedBadges.length})
+              {t(locale, "progress_lockedCount", { n: String(lockedBadges.length) })}
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
               {lockedBadges.map((badge) => (
@@ -413,15 +403,13 @@ export default async function ProgressPage() {
           <p style={{
             fontSize: 10, fontWeight: 700, color: "var(--text-3)",
             textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
-          }}>
-            Next Milestone
-          </p>
+          }}>{t(locale, "progress_nextMilestone")}</p>
           <h2 style={{
             fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 18,
             display: "flex", alignItems: "center", gap: 7,
           }}>
             <Target size={16} style={{ color: "var(--accent-2)", flexShrink: 0 }} />
-            Reach Level {nextMilestone.level}
+            {t(locale, "progress_reachLevel", { level: String(nextMilestone.level) })}
           </h2>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18 }}>
@@ -443,7 +431,7 @@ export default async function ProgressPage() {
               </p>
               {milestoneXpNeeded > 0 && (
                 <p style={{ fontSize: 11, color: "var(--text-3)" }}>
-                  {milestoneXpNeeded.toLocaleString()} XP remaining
+                  {t(locale, "progress_xpRemaining", { xp: milestoneXpNeeded.toLocaleString() })}
                 </p>
               )}
             </div>
@@ -452,7 +440,7 @@ export default async function ProgressPage() {
           {/* Progress bar toward milestone */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontSize: 11, color: "var(--text-3)" }}>Progress to Level {nextMilestone.level}</span>
+              <span style={{ fontSize: 11, color: "var(--text-3)" }}>{t(locale, "progress_progressToLevel", { level: String(nextMilestone.level) })}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-2)" }}>{milestoneXpPct}%</span>
             </div>
             <div style={{ height: 8, background: "var(--surface-3)", borderRadius: 99, overflow: "hidden" }}>
@@ -501,12 +489,8 @@ export default async function ProgressPage() {
           <p style={{
             fontSize: 10, fontWeight: 700, color: "var(--text-3)",
             textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
-          }}>
-            Recent Activity
-          </p>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>
-            Recent Games
-          </h2>
+          }}>{t(locale, "progress_recentActivity")}</p>
+          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>{t(locale, "progress_recentGames")}</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {recentGames.map((game) => (
               <div key={game.id} style={{
@@ -528,7 +512,7 @@ export default async function ProgressPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                   <span style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 500 }}>
-                    {game.score}% score
+                    {t(locale, "progress_scorePct", { pct: String(game.score) })}
                   </span>
                   <span style={{
                     fontSize: 12, fontWeight: 700, color: "var(--gold)",

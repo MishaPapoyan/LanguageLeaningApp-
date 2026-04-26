@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getXpProgress } from "@/types";
 import { unstable_cache } from "next/cache";
 import { StatsWidget } from "@/components/layout/StatsWidget";
+import { t, getLocale } from "@/lib/i18n";
 
 const MEDAL: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
@@ -80,6 +81,7 @@ const TIPS: Record<string, { tip: string; emoji: string }[]> = {
 export async function RightPanel() {
   const session = await getServerSession(authOptions);
   const currentUserId = session?.user?.id ?? "";
+  const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
   const targetLang = (session?.user as { targetLanguage?: string })?.targetLanguage ?? "fr";
   const langConfig = getLanguageConfig(targetLang);
   const tips = TIPS[targetLang] ?? TIPS["fr"];
@@ -136,9 +138,9 @@ export async function RightPanel() {
       {/* ── Leaderboard ── */}
       <div className="card p-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="section-label">Leaderboard</p>
+          <p className="section-label">{t(locale, "rp_leaderboard")}</p>
           <Link href="/leaderboard" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-            Full →
+            {t(locale, "rp_full")}
           </Link>
         </div>
 
@@ -165,7 +167,7 @@ export async function RightPanel() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold truncate" style={{ color: user.isMe ? "var(--accent)" : "var(--text)" }}>
-                  {user.isMe ? "You" : user.name}
+                  {user.isMe ? t(locale, "rp_you") : user.name}
                 </p>
               </div>
               <p className="text-xs font-bold tabular-nums flex-shrink-0" style={{ color: user.isMe ? "var(--accent)" : "var(--text-3)" }}>
@@ -195,7 +197,7 @@ export async function RightPanel() {
                   {myEntry.name[0]?.toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold" style={{ color: "var(--accent)" }}>You</p>
+                  <p className="text-xs font-semibold" style={{ color: "var(--accent)" }}>{t(locale, "rp_you")}</p>
                 </div>
                 <p className="text-xs font-bold tabular-nums flex-shrink-0" style={{ color: "var(--accent)" }}>
                   {myEntry.xp.toLocaleString()}
@@ -213,8 +215,8 @@ export async function RightPanel() {
             {(() => {
               const above = board[myEntry.rank - 2];
               const gap = above ? above.xp - myEntry.xp : 0;
-              if (myEntry.rank === 1) return <span style={{ color: "var(--green)" }}>You&apos;re #1! 🏆</span>;
-              return <><span className="font-bold" style={{ color: "var(--gold)" }}>{gap.toLocaleString()} XP</span> to pass #{myEntry.rank - 1}</>;
+              if (myEntry.rank === 1) return <span style={{ color: "var(--green)" }}>{t(locale, "rp_youreFirst")}</span>;
+              return <><span className="font-bold" style={{ color: "var(--gold)" }}>{t(locale, "rp_xpToPass", { xp: gap.toLocaleString(), n: String(myEntry.rank - 1) })}</span></>;
             })()}
           </div>
         )}
@@ -224,7 +226,7 @@ export async function RightPanel() {
       {vocabPreview.length > 0 && (
         <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="section-label">Saved words</p>
+            <p className="section-label">{t(locale, "rp_savedWords")}</p>
             <Link href="/dictionary" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
               All →
             </Link>
@@ -249,7 +251,7 @@ export async function RightPanel() {
             className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-colors"
             style={{ background: "var(--accent-dim)", color: "var(--accent)", border: "1px solid rgba(124,106,255,0.2)" }}
           >
-            Practice these →
+            {t(locale, "rp_practiceThese")}
           </Link>
         </div>
       )}
@@ -264,7 +266,7 @@ export async function RightPanel() {
       >
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">{todayTip.emoji}</span>
-          <p className="section-label">Tip of the day</p>
+          <p className="section-label">{t(locale, "rp_tipOfDay")}</p>
         </div>
         <p className="text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>
           {todayTip.tip}

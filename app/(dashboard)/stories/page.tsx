@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getLanguageConfig } from "@/data/language-config";
 import { Metadata } from "next";
 import { StoriesClient } from "@/components/stories/StoriesClient";
+import { t, getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Stories — LangCraft",
@@ -15,6 +16,7 @@ export default async function StoriesPage() {
   const userId = session?.user?.id;
   const language = session?.user?.targetLanguage ?? "fr";
   const langConfig = getLanguageConfig(language);
+  const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
 
   let storiesData: {
     id: string; title: string; chapter: number; difficulty: string;
@@ -64,12 +66,12 @@ export default async function StoriesPage() {
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px" }}>
-            Stories
+            {t(locale, "stories_title")}
           </h1>
           <span style={{ fontSize: 24 }}>{langConfig.flag}</span>
         </div>
         <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          Immerse yourself in {langConfig.label} through rich, interactive stories. Tap highlighted words to reveal translations, then test your memory with a quiz.
+          {t(locale, "stories_subtitle_tpl", { lang: langConfig.label })}
         </p>
       </div>
 

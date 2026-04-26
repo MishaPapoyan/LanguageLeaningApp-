@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getXpProgress } from "@/types";
 import { Metadata } from "next";
 import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
+import { t, getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Leaderboard — LangCraft",
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default async function LeaderboardPage() {
   const session = await getServerSession(authOptions);
   const currentUserId = session?.user?.id ?? "";
+  const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
 
   let users: { id: string; name: string | null; progress: { xp: number; level: number; streak: number } | null }[] = [];
 
@@ -79,10 +81,10 @@ export default async function LeaderboardPage() {
           display: "flex", alignItems: "center", gap: 10,
         }}>
           <Trophy size={20} style={{ color: "var(--accent-2)", flexShrink: 0 }} />
-          Leaderboard
+          {t(locale, "lb_title")}
         </h1>
         <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          Top learners ranked by total XP earned. Keep that streak going!
+          {t(locale, "lb_subtitle")}
         </p>
       </div>
 
@@ -170,7 +172,7 @@ export default async function LeaderboardPage() {
             padding: "10px 16px", gap: 8,
             borderBottom: "1px solid var(--border)",
           }}>
-            {["#", "Player", "Level", "XP", "Streak"].map((h) => (
+            {(["#", t(locale, "lb_player"), t(locale, "lb_level"), "XP", t(locale, "lb_streak")] as string[]).map((h) => (
               <span key={h} style={{
                 fontSize: 10, fontWeight: 700, color: "var(--text-3)",
                 textTransform: "uppercase", letterSpacing: "0.07em",
@@ -223,7 +225,7 @@ export default async function LeaderboardPage() {
                       {user.name}
                       {user.isCurrentUser && (
                         <span style={{ color: "var(--accent-2)", fontSize: 11, marginLeft: 5, fontWeight: 500 }}>
-                          (you)
+                          {t(locale, "lb_you")}
                         </span>
                       )}
                     </p>
@@ -237,7 +239,7 @@ export default async function LeaderboardPage() {
                     background: "var(--accent-dim)", borderRadius: 99,
                     padding: "3px 10px",
                   }}>
-                    Lv. {user.level}
+                    {t(locale, "lb_lvPrefix")} {user.level}
                   </span>
                 </div>
 
@@ -271,10 +273,10 @@ export default async function LeaderboardPage() {
         }}>
           <p style={{ fontSize: 36, marginBottom: 10 }}>◈</p>
           <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-            No learners yet
+            {t(locale, "lb_noLearners")}
           </p>
           <p style={{ fontSize: 13, color: "var(--text-2)" }}>
-            Start learning to claim the #1 spot!
+            {t(locale, "lb_noLearnersHint")}
           </p>
         </div>
       )}
@@ -295,22 +297,22 @@ export default async function LeaderboardPage() {
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
-              Your Rank — #{myRank.rank}
+              {t(locale, "lb_yourRank", { n: String(myRank.rank) })}
             </p>
             <p style={{ fontSize: 12, color: "var(--text-2)" }}>
-              Level {myRank.level} · {myRank.xp.toLocaleString()} XP
+              {t(locale, "lb_levelXp", { level: String(myRank.level), xp: myRank.xp.toLocaleString() })}
               {myRank.streak > 0 && (
                 <>
                   {" · "}
                   <Flame size={11} style={{ color: "var(--gold)", display: "inline", verticalAlign: "middle", marginRight: 2 }} />
-                  {myRank.streak}-day streak
+                  {t(locale, "lb_dayStreak", { n: String(myRank.streak) })}
                 </>
               )}
             </p>
           </div>
           <div style={{ textAlign: "right" }}>
             <p style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
-              {myRank.rank - 10} spots from top 10
+              {t(locale, "lb_spotsFromTop10", { n: String(myRank.rank - 10) })}
             </p>
           </div>
         </div>

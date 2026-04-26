@@ -220,7 +220,7 @@ export function AppNav() {
           {xpInfo && (
             <div className="stat-pill" style={{ gap: 7, paddingLeft: 10, paddingRight: 10 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-2)", whiteSpace: "nowrap" }}>
-                Lv {xpInfo.level}
+                {t(locale, "nav_lvDisplay", { n: String(xpInfo.level) })}
               </span>
               <div
                 style={{
@@ -523,13 +523,13 @@ export function AppNav() {
             >
               {progress.streak ? (
                 <span style={{ fontSize: 12, color: "var(--gold)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                  <Flame size={12} aria-hidden="true" /> {progress.streak}d streak
+                  <Flame size={12} aria-hidden="true" /> {t(locale, "nav_streakDisplay", { n: String(progress.streak) })}
                 </span>
               ) : null}
               {xpInfo && (
                 <>
                   <span style={{ fontSize: 12, color: "var(--text-3)" }}>·</span>
-                  <span style={{ fontSize: 12, color: "var(--text-2)" }}>Level {xpInfo.level}</span>
+                  <span style={{ fontSize: 12, color: "var(--text-2)" }}>{t(locale, "nav_levelDisplay", { n: String(xpInfo.level) })}</span>
                   <div style={{ flex: 1, height: 4, borderRadius: 999, background: "rgba(128,128,128,0.15)", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${xpInfo.pct}%`, background: "linear-gradient(90deg, var(--accent), var(--accent-2))", borderRadius: 999 }} />
                   </div>
