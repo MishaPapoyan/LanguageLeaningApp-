@@ -1,9 +1,11 @@
+export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { t, getLocale } from "@/lib/i18n";
 import { Metadata } from "next";
-import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify, Map, Box } from "lucide-react";
+import { Layers, Link2, Puzzle, Trophy, Zap, Target, ArrowRight, Star, Gamepad2, Shuffle, PenLine, CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify, Map, Box, Home, Briefcase } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Games — LangCraft",
@@ -166,6 +168,20 @@ const GAMES = [
     xpLabel: "+50 XP",
   },
   {
+    href: "/games/immersion",
+    gameType: "IMMERSION",
+    icon: Home,
+    title: "Immersion Room",
+    desc: "Find objects in a 3D room by listening to voice commands",
+    colorClass: "gc-blue",
+    textVar: "--gc-blue-text",
+    mutedVar: "--gc-blue-muted",
+    borderVar: "--gc-blue-border",
+    difficulty: "Beginner",
+    diffColor: "#10b981",
+    xpLabel: "+40 XP",
+  },
+  {
     href: "/games/city-3d",
     gameType: "CITY_EXPLORER",
     icon: Box,
@@ -179,11 +195,26 @@ const GAMES = [
     diffColor: "#ef4444",
     xpLabel: "+60 XP",
   },
+  {
+    href: "/games/interview",
+    gameType: "INTERVIEW",
+    icon: Briefcase,
+    title: "Job Interview",
+    desc: "Sit across a 3D interviewer — answer their questions in French or Spanish to get hired",
+    colorClass: "gc-blue",
+    textVar: "--gc-blue-text",
+    mutedVar: "--gc-blue-muted",
+    borderVar: "--gc-blue-border",
+    difficulty: "Intermediate",
+    diffColor: "#f59e0b",
+    xpLabel: "+40 XP",
+  },
 ];
 
 export default async function GamesPage() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id ?? "";
+  const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
 
   let allScores: { gameType: string; score: number; xpEarned: number; playedAt: Date }[] = [];
 
@@ -220,10 +251,10 @@ export default async function GamesPage() {
             className="text-3xl md:text-4xl font-extrabold"
             style={{ color: "var(--text)" }}
           >
-            Games
+            {t(locale, "games_title")}
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-2)" }}>
-            Play &amp; learn — earn XP for every game you finish
+            {t(locale, "games_subtitle")}
           </p>
         </div>
         <div
@@ -235,7 +266,7 @@ export default async function GamesPage() {
           }}
         >
           <Target size={15} style={{ color: "var(--gc-orange-text, #fcd34d)" }} />
-          2× XP today
+          {t(locale, "games_2xToday")}
         </div>
       </div>
 
@@ -250,10 +281,10 @@ export default async function GamesPage() {
         <Target size={28} style={{ color: "var(--gc-orange-text, #fdba74)", flexShrink: 0 }} />
         <div className="flex-1">
           <p className="font-bold text-base" style={{ color: "var(--gc-orange-text, #fdba74)" }}>
-            Daily Challenge
+            {t(locale, "games_dailyChallenge")}
           </p>
           <p className="text-sm" style={{ color: "var(--gc-orange-muted, rgba(253,186,116,0.7))" }}>
-            Complete any game today for double XP — limited time!
+            {t(locale, "games_dailyDesc")}
           </p>
         </div>
         <div
@@ -265,7 +296,7 @@ export default async function GamesPage() {
           }}
         >
           <Star size={11} />
-          2× XP today
+          {t(locale, "games_2xToday")}
         </div>
       </div>
 
@@ -342,7 +373,7 @@ export default async function GamesPage() {
                 >
                   <Trophy size={13} style={{ color: `var(${game.textVar})`, flexShrink: 0 }} />
                   <span style={{ color: `var(${game.textVar})` }}>
-                    Best: <strong>{best.score}</strong> pts · {best.xpEarned} XP earned
+                    {t(locale, "games_best")} {best.score} pts · {best.xpEarned} XP
                   </span>
                 </div>
               )}
@@ -361,7 +392,7 @@ export default async function GamesPage() {
                 }}
               >
                 <span style={{ fontSize: 13, fontWeight: 700, color: `var(${game.textVar})` }}>
-                  Play now
+                  {t(locale, "games_playNow")}
                 </span>
                 <ArrowRight size={16} style={{ color: `var(${game.textVar})` }} />
               </div>
@@ -373,7 +404,7 @@ export default async function GamesPage() {
       {/* ── Best Scores Summary ── */}
       {Object.keys(bestScores).length > 0 && (
         <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <p className="section-label mb-4">Your best scores</p>
+          <p className="section-label mb-4">{t(locale, "games_bestScores")}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {GAMES.map((game) => {
               const best = bestScores[game.gameType];
@@ -402,14 +433,14 @@ export default async function GamesPage() {
                     </p>
                     {best ? (
                       <p className="text-xs mt-0.5" style={{ color: "var(--text-2)" }}>
-                        Best:{" "}
+                        {t(locale, "games_best")}{" "}
                         <span style={{ color: `var(${game.textVar})`, fontWeight: 700 }}>
                           {best.score} pts
                         </span>
                       </p>
                     ) : (
                       <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-                        Not played yet
+                        {t(locale, "games_notPlayed")}
                       </p>
                     )}
                   </div>
@@ -440,7 +471,7 @@ export default async function GamesPage() {
                 <p className="text-xl font-extrabold" style={{ color: "#f59e0b" }}>
                   {totalXpFromGames}
                 </p>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>XP from games</p>
+                <p className="text-xs" style={{ color: "var(--text-3)" }}>{t(locale, "games_xpFromGames")}</p>
               </div>
             </div>
             <div style={{ width: 1, background: "var(--border)" }} />
@@ -450,7 +481,7 @@ export default async function GamesPage() {
                 <p className="text-xl font-extrabold" style={{ color: "var(--accent-2)" }}>
                   {totalGamesPlayed}
                 </p>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>Games played</p>
+                <p className="text-xs" style={{ color: "var(--text-3)" }}>{t(locale, "games_gamesPlayed")}</p>
               </div>
             </div>
           </div>

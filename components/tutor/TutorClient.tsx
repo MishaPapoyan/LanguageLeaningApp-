@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import { ChatMessage, TutorScenario, TutorFeedback, LEVEL_MILESTONES } from "@/types";
 import { SCENARIO_INFO } from "@/lib/scenarios";
@@ -29,6 +30,7 @@ interface Props { userLevel: number; }
 
 export function TutorClient({ userLevel }: Props) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [scenario, setScenario] = useState<TutorScenario | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -59,28 +61,26 @@ export function TutorClient({ userLevel }: Props) {
           🔒
         </div>
         <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--text)" }}>
-          AI Tutor Locked
+          {t(locale, "tutor_locked")}
         </h1>
         <p className="text-sm mb-2" style={{ color: "var(--text-2)" }}>
-          Reach <span className="font-bold" style={{ color: "var(--accent)" }}>Level {TUTOR_UNLOCK_LEVEL}</span> to
-          unlock AI conversation practice.
+          {t(locale, "tutor_reachLevel", { level: TUTOR_UNLOCK_LEVEL.toString() })}
         </p>
         <p className="text-xs mb-8" style={{ color: "var(--text-3)" }}>
-          You need <span style={{ color: "var(--gold)" }}>{xpNeeded} XP</span> total to unlock this feature.
-          Keep learning — you&apos;re at Level {userLevel}!
+          {t(locale, "tutor_xpNeeded", { xp: xpNeeded.toString(), level: userLevel.toString() })}
         </p>
 
         <div
           className="rounded-2xl p-5 mb-8 text-left"
           style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
         >
-          <p className="text-xs font-bold mb-3" style={{ color: "var(--text-3)" }}>HOW TO EARN XP FAST</p>
+          <p className="text-xs font-bold mb-3" style={{ color: "var(--text-3)" }}>{t(locale, "tutor_earnXpFast")}</p>
           <div className="space-y-2">
             {[
-              { emoji: "📖", label: "Complete a story chapter", xp: "+50 XP" },
-              { emoji: "✅", label: "Pass a quiz",              xp: "+30 XP" },
-              { emoji: "🎮", label: "Play a game",              xp: "+20 XP" },
-              { emoji: "💾", label: "Save vocabulary words",   xp: "+2 XP each" },
+              { emoji: "📖", label: t(locale, "tutor_completeChapter"), xp: "+50 XP" },
+              { emoji: "✅", label: t(locale, "tutor_passQuiz"),         xp: "+30 XP" },
+              { emoji: "🎮", label: t(locale, "tutor_playAGame"),        xp: "+20 XP" },
+              { emoji: "💾", label: t(locale, "tutor_saveWords"),        xp: "+2 XP each" },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -94,8 +94,8 @@ export function TutorClient({ userLevel }: Props) {
         </div>
 
         <div className="flex gap-3 justify-center">
-          <Link href="/learn" className="btn-primary px-6">Start Learning</Link>
-          <Link href="/games" className="btn-secondary px-6">Play Games</Link>
+          <Link href="/learn" className="btn-primary px-6">{t(locale, "tutor_startLearning")}</Link>
+          <Link href="/games" className="btn-secondary px-6">{t(locale, "tutor_playGames")}</Link>
         </div>
       </div>
     );
@@ -149,7 +149,7 @@ export function TutorClient({ userLevel }: Props) {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Désolé, une erreur s'est produite. Please try again." },
+        { role: "assistant", content: t(locale, "tutor_error") },
       ]);
     } finally {
       setStreaming(false);
@@ -190,9 +190,9 @@ export function TutorClient({ userLevel }: Props) {
     return (
       <div className="space-y-5 animate-fade-up">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>AI Tutor</h1>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>{t(locale, "tutor_title")}</h1>
           <p className="text-sm" style={{ color: "var(--text-2)" }}>
-            Choose a scenario. The AI will speak mostly {langConfig.label} — you must respond in {langConfig.label} too.
+            {t(locale, "tutor_chooseScenario", { lang: langConfig.label })}
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export function TutorClient({ userLevel }: Props) {
         >
           <span>{langConfig.flag}</span>
           <p className="text-xs" style={{ color: "var(--accent)" }}>
-            <strong>{langConfig.label} only mode.</strong> The AI will correct your grammar and insist on {langConfig.label} responses.
+            {t(locale, "tutor_langOnlyMode", { lang: langConfig.label })}
           </p>
         </div>
 
@@ -269,7 +269,7 @@ export function TutorClient({ userLevel }: Props) {
             style={{ background: "linear-gradient(135deg, rgba(124,106,255,0.3), rgba(67,56,202,0.3))", border: "1px solid rgba(124,106,255,0.3)" }}
           >
             <p className="text-5xl font-black" style={{ color: "var(--accent)" }}>+{xpEarned} XP</p>
-            <p className="text-sm mt-1" style={{ color: "var(--text-2)" }}>Session complète !</p>
+            <p className="text-sm mt-1" style={{ color: "var(--text-2)" }}>{t(locale, "tutor_sessionComplete")}</p>
           </div>
         )}
 
@@ -458,7 +458,7 @@ export function TutorClient({ userLevel }: Props) {
               <div className="w-1.5 h-1.5 rounded-full bg-white animate-typing-dot" style={{ animationDelay: "0.2s" }} />
               <div className="w-1.5 h-1.5 rounded-full bg-white animate-typing-dot" style={{ animationDelay: "0.4s" }} />
             </div>
-          ) : "Envoyer"}
+          ) : "Send"}
         </button>
       </div>
     </div>

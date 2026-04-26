@@ -20,6 +20,7 @@ export const config = {
     "/analytics/:path*",
     "/leaderboard/:path*",
     "/settings/:path*",
+    "/community/:path*",
     "/admin/:path*",
   ],
 };

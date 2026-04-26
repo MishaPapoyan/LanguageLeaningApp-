@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Home, BookOpen, BookText, MessageCircle, Gamepad2, RotateCcw,
   BookMarked, Library, ChevronDown, Settings, BarChart3, TrendingUp,
-  LogOut, Menu, X, Flame, Zap, PenLine,
+  LogOut, Menu, X, Flame, Zap, PenLine, Users,
 } from "lucide-react";
 import { t, getLocale, type TranslationKey } from "@/lib/i18n";
 
@@ -21,8 +21,9 @@ const NAV_LINKS: { href: string; labelKey: TranslationKey; Icon: typeof Home }[]
   { href: "/stories", labelKey: "nav_stories", Icon: BookOpen },
   { href: "/tutor",   labelKey: "nav_tutor",   Icon: MessageCircle },
   { href: "/games",   labelKey: "nav_games",   Icon: Gamepad2 },
-  { href: "/review",  labelKey: "nav_practice", Icon: RotateCcw },
-  { href: "/writing", labelKey: "nav_writing",  Icon: PenLine },
+  { href: "/review",     labelKey: "nav_practice",   Icon: RotateCcw },
+  { href: "/writing",    labelKey: "nav_writing",    Icon: PenLine },
+  { href: "/community",  labelKey: "nav_community",  Icon: Users },
 ];
 
 // Secondary nav (shown in mobile panel + user dropdown)
@@ -103,7 +104,10 @@ export function AppNav() {
   const avatarIsEmoji = isEmoji(userImage);
   const avatarInitial = userName[0]?.toUpperCase() ?? "U";
 
+  const userId = (session?.user as any)?.id ?? "";
+
   const DROPDOWN_ITEMS: { href: string; labelKey: TranslationKey; Icon: typeof Settings }[] = [
+    { href: userId ? `/community/${userId}` : "/community", labelKey: "nav_myProfile",  Icon: Users },
     { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
     { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
     { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
@@ -216,7 +220,7 @@ export function AppNav() {
           {xpInfo && (
             <div className="stat-pill" style={{ gap: 7, paddingLeft: 10, paddingRight: 10 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-2)", whiteSpace: "nowrap" }}>
-                Lv {xpInfo.level}
+                {t(locale, "nav_lvDisplay", { n: String(xpInfo.level) })}
               </span>
               <div
                 style={{
@@ -362,7 +366,7 @@ export function AppNav() {
 
               {DROPDOWN_ITEMS.map(({ href, labelKey, Icon }, i) => (
                 <div key={href}>
-                  {i === 3 && (
+                  {(i === 1 || i === 4) && (
                     <div style={{ height: 1, background: "var(--border)", margin: "3px 0 6px" }} />
                   )}
                   <Link
@@ -519,13 +523,13 @@ export function AppNav() {
             >
               {progress.streak ? (
                 <span style={{ fontSize: 12, color: "var(--gold)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                  <Flame size={12} aria-hidden="true" /> {progress.streak}d streak
+                  <Flame size={12} aria-hidden="true" /> {t(locale, "nav_streakDisplay", { n: String(progress.streak) })}
                 </span>
               ) : null}
               {xpInfo && (
                 <>
                   <span style={{ fontSize: 12, color: "var(--text-3)" }}>·</span>
-                  <span style={{ fontSize: 12, color: "var(--text-2)" }}>Level {xpInfo.level}</span>
+                  <span style={{ fontSize: 12, color: "var(--text-2)" }}>{t(locale, "nav_levelDisplay", { n: String(xpInfo.level) })}</span>
                   <div style={{ flex: 1, height: 4, borderRadius: 999, background: "rgba(128,128,128,0.15)", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${xpInfo.pct}%`, background: "linear-gradient(90deg, var(--accent), var(--accent-2))", borderRadius: 999 }} />
                   </div>

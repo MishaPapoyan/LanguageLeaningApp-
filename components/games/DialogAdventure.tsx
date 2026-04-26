@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 import Link from "next/link";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -302,10 +303,18 @@ export function DialogAdventure({ targetLang }: { targetLang: string }) {
   const scene = scenes[sceneIdx];
   const node  = scene?.nodes[nodeIdx];
 
+  // Shuffle choices every time a new node loads so correct answer isn't always first
+  const [shuffledChoices, setShuffledChoices] = useState<DialogChoice[]>([]);
+  useEffect(() => {
+    if (node) {
+      setShuffledChoices([...node.choices].sort(() => Math.random() - 0.5));
+    }
+  }, [sceneIdx, nodeIdx]);
+
   const handleChoice = (idx: number) => {
     if (picked !== null) return;
     setPicked(idx);
-    const choice = node.choices[idx];
+    const choice = shuffledChoices[idx];
     if (choice.correct) setScore((s) => s + 1);
   };
 
@@ -370,7 +379,7 @@ export function DialogAdventure({ targetLang }: { targetLang: string }) {
 
   if (!node) return null;
 
-  const choice = picked !== null ? node.choices[picked] : null;
+  const choice = picked !== null ? shuffledChoices[picked] : null;
   const pctDone = (nodesPlayed / totalNodes) * 100;
 
   return (
@@ -403,9 +412,12 @@ export function DialogAdventure({ targetLang }: { targetLang: string }) {
 
       {/* NPC speech bubble */}
       <div className="card" style={{ padding: "20px 22px", marginBottom: 20 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 8px" }}>
-          {node.npc}
-        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: 0 }}>
+            {node.npc}
+          </p>
+          <SpeakButton text={node.npcLine} lang={lang} size={13} />
+        </div>
         <p style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", margin: "0 0 6px", lineHeight: 1.4 }}>
           "{node.npcLine}"
         </p>
@@ -420,35 +432,38 @@ export function DialogAdventure({ targetLang }: { targetLang: string }) {
           <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-3)", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Your response:
           </p>
-          {node.choices.map((c, i) => (
-            <button
-              key={i}
-              onClick={() => handleChoice(i)}
-              style={{
-                textAlign: "left",
-                padding: "14px 18px",
-                borderRadius: 12,
-                border: "1.5px solid var(--border-md)",
-                background: "var(--surface-2)",
-                cursor: "pointer",
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--accent)";
-                e.currentTarget.style.background = "var(--accent-dim)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--border-md)";
-                e.currentTarget.style.background = "var(--surface-2)";
-              }}
-            >
-              <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: "0 0 3px" }}>
-                {c.text}
-              </p>
-              <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>
-                {c.hint}
-              </p>
-            </button>
+          {shuffledChoices.map((c, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button
+                onClick={() => handleChoice(i)}
+                style={{
+                  flex: 1,
+                  textAlign: "left",
+                  padding: "14px 18px",
+                  borderRadius: 12,
+                  border: "1.5px solid var(--border-md)",
+                  background: "var(--surface-2)",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent)";
+                  e.currentTarget.style.background = "var(--accent-dim)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-md)";
+                  e.currentTarget.style.background = "var(--surface-2)";
+                }}
+              >
+                <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", margin: "0 0 3px" }}>
+                  {c.text}
+                </p>
+                <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>
+                  {c.hint}
+                </p>
+              </button>
+              <SpeakButton text={c.text} lang={lang} size={13} />
+            </div>
           ))}
         </div>
       ) : (

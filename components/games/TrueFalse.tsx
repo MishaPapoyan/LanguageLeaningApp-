@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface Word { id: string; word: string; translation: string; }
 
@@ -32,6 +34,8 @@ function buildRounds(words: Word[], total: number): { word: Word; shownTranslati
 }
 
 export function TrueFalse({ words }: { words: Word[] }) {
+  const { data: session } = useSession();
+  const targetLang = session?.user?.targetLanguage ?? "fr";
   if (words.length < 3) {
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
@@ -153,9 +157,12 @@ export function TrueFalse({ words }: { words: Word[] }) {
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 10px" }}>
           Is this translation correct?
         </p>
-        <p style={{ fontSize: 32, fontWeight: 900, color: "var(--text)", margin: "0 0 14px", lineHeight: 1.15 }}>
-          {round.word.word}
-        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, margin: "0 0 14px" }}>
+          <p style={{ fontSize: 32, fontWeight: 900, color: "var(--text)", margin: 0, lineHeight: 1.15 }}>
+            {round.word.word}
+          </p>
+          <SpeakButton text={round.word.word} lang={targetLang} size={16} />
+        </div>
         <div style={{ width: 40, height: 2, background: "var(--border-md)", borderRadius: 999, margin: "0 auto 14px" }} />
         <p style={{ fontSize: 22, fontWeight: 700, color: status === "idle" ? "var(--accent)" : status === "correct" ? "var(--green)" : "var(--red)", margin: 0 }}>
           {round.shownTranslation}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 
 interface WritingHistoryItem {
   id: string;
@@ -138,6 +139,7 @@ const PROMPTS_ES: WritingPrompt[] = [
 
 export default function WritingPage() {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const targetLanguage = session?.user?.targetLanguage ?? "fr";
   const PROMPTS = targetLanguage === "es" ? PROMPTS_ES : PROMPTS_FR;
 
@@ -249,7 +251,7 @@ export default function WritingPage() {
                 border: "none", cursor: "pointer", transition: "all 0.15s",
               }}
             >
-              {tab === "check" ? "⚡ Check Sentence" : tab === "history" ? "📜 History" : "✍️ Prompts"}
+              {tab === "check" ? t(locale, "writing_tabCheck") : tab === "history" ? t(locale, "writing_tabHistory") : t(locale, "writing_tabPrompts")}
             </button>
           ))}
         </div>
@@ -259,7 +261,7 @@ export default function WritingPage() {
           <div style={{ maxWidth: 680 }}>
             <div style={{ padding: "16px 18px", borderRadius: 16, marginBottom: 16, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)" }}>
               <p style={{ fontSize: 13, color: "var(--text-2)", margin: 0 }}>
-                Type any sentence in <strong style={{ color: "var(--accent)" }}>{targetLanguage === "es" ? "Spanish" : "French"}</strong> and AI will check your grammar, spelling, and naturalness instantly.
+                {t(locale, "writing_checkDesc", { lang: targetLanguage === "es" ? "Spanish" : "French" })}
               </p>
             </div>
 
@@ -279,7 +281,7 @@ export default function WritingPage() {
               />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid var(--border)" }}>
                 <span style={{ fontSize: 12, color: "var(--text-3)" }}>
-                  {checkText.trim().split(/\s+/).filter(Boolean).length} words · Ctrl+Enter to check
+                  {t(locale, "writing_wordCountCtrl", { n: checkText.trim().split(/\s+/).filter(Boolean).length.toString() })}
                 </span>
                 <button
                   onClick={handleQuickCheck}
@@ -287,7 +289,7 @@ export default function WritingPage() {
                   className="btn-primary"
                   style={{ fontSize: 13, padding: "8px 18px" }}
                 >
-                  {checkLoading ? "Checking…" : "Check Grammar ⚡"}
+                  {checkLoading ? t(locale, "writing_checking") : t(locale, "writing_checkGrammar")}
                 </button>
               </div>
             </div>
@@ -295,7 +297,7 @@ export default function WritingPage() {
             {checkFeedback && (
               <div style={{ borderRadius: 16, padding: 20, background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
                 <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--green)", marginBottom: 10, marginTop: 0 }}>
-                  AI Feedback
+                  {t(locale, "writing_aiFeedback")}
                 </p>
                 <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.7, whiteSpace: "pre-wrap", margin: 0 }}>
                   {checkFeedback}
@@ -334,14 +336,14 @@ export default function WritingPage() {
         {view === "history" && (
           <div>
             {historyLoading && (
-              <p className="text-sm text-zinc-400 py-8 text-center">Loading history…</p>
+              <p className="text-sm text-zinc-400 py-8 text-center">{t(locale, "writing_loadingHistory")}</p>
             )}
             {!historyLoading && history.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-4xl mb-3">📝</div>
-                <p className="text-zinc-500 text-sm">No writing sessions yet.</p>
+                <p className="text-zinc-500 text-sm">{t(locale, "writing_noHistory")}</p>
                 <button onClick={() => setView("prompts")} className="mt-3 text-violet-600 text-sm font-medium hover:underline">
-                  Start writing →
+                  {t(locale, "writing_startWriting")}
                 </button>
               </div>
             )}
@@ -368,11 +370,11 @@ export default function WritingPage() {
                   {expandedId === item.id && (
                     <div className="border-t border-zinc-50 px-4 pb-4 space-y-3">
                       <div>
-                        <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5 mt-3">Your Writing</p>
+                        <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5 mt-3">{t(locale, "writing_yourWriting")}</p>
                         <p className="text-sm text-zinc-700 whitespace-pre-wrap bg-zinc-50 rounded-xl p-3">{item.text}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">AI Feedback</p>
+                        <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">{t(locale, "writing_aiFeedback")}</p>
                         <p className="text-sm text-zinc-700 whitespace-pre-wrap bg-emerald-50 rounded-xl p-3">{item.feedback}</p>
                       </div>
                     </div>
@@ -398,7 +400,7 @@ export default function WritingPage() {
           </svg>
         </button>
         <div>
-          <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium">Writing Practice</p>
+          <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium">{t(locale, "writing_writingPractice")}</p>
           <h1 className="font-serif text-xl text-zinc-900">{selectedPrompt.emoji} {selectedPrompt.title}</h1>
         </div>
       </div>
@@ -413,7 +415,7 @@ export default function WritingPage() {
         onClick={() => setShowHints(!showHints)}
         className="text-sm text-violet-600 hover:text-violet-700 mb-3 flex items-center gap-1 font-medium"
       >
-        {showHints ? "Hide hints" : "Show hints"}
+        {showHints ? t(locale, "writing_hideHints") : t(locale, "writing_showHints")}
         <svg className={`w-3 h-3 transition-transform ${showHints ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
@@ -421,7 +423,7 @@ export default function WritingPage() {
 
       {showHints && (
         <div className="rounded-2xl p-4 mb-4 bg-amber-50 ring-1 ring-amber-100">
-          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2">Helpful phrases</p>
+          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2">{t(locale, "writing_helpfulPhrases")}</p>
           <div className="flex flex-wrap gap-2">
             {selectedPrompt.hints.map((h, i) => (
               <span key={i} className="text-sm bg-white ring-1 ring-amber-200 rounded-lg px-2.5 py-1 text-amber-800">
@@ -429,7 +431,7 @@ export default function WritingPage() {
               </span>
             ))}
           </div>
-          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2 mt-3">Useful words</p>
+          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2 mt-3">{t(locale, "writing_usefulWords")}</p>
           <div className="flex flex-wrap gap-2">
             {selectedPrompt.sampleWords.map((w, i) => (
               <span key={i} className="text-sm bg-white ring-1 ring-amber-200 rounded-lg px-2.5 py-1 text-zinc-700">
@@ -450,13 +452,13 @@ export default function WritingPage() {
           className="w-full resize-none bg-transparent border-none outline-none text-zinc-800 placeholder:text-zinc-300 text-sm leading-relaxed"
         />
         <div className="flex items-center justify-between pt-3 border-t border-zinc-50 mt-2">
-          <span className="text-xs text-zinc-400">{text.split(/\s+/).filter(Boolean).length} words</span>
+          <span className="text-xs text-zinc-400">{t(locale, "writing_wordCount", { n: text.split(/\s+/).filter(Boolean).length.toString() })}</span>
           <button
             onClick={handleSubmit}
             disabled={!text.trim() || loading}
             className="btn-primary text-sm px-5"
           >
-            {loading ? "Analyzing..." : "Get AI Feedback"}
+            {loading ? t(locale, "writing_analyzing") : t(locale, "writing_getAiFeedback")}
           </button>
         </div>
       </div>
@@ -470,7 +472,7 @@ export default function WritingPage() {
         return (
           <div className="rounded-2xl p-5 bg-emerald-50 ring-1 ring-emerald-100">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <h3 className="font-serif text-emerald-800">AI Feedback</h3>
+              <h3 className="font-serif text-emerald-800">{t(locale, "writing_aiFeedback")}</h3>
               {grade !== null && (
                 <div style={{
                   display: "flex", alignItems: "baseline", gap: 2,

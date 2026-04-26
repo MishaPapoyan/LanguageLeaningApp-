@@ -1,6 +1,8 @@
+export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { t, getLocale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { BADGES, getXpProgress } from "@/types";
@@ -33,6 +35,7 @@ export default async function HomePage() {
   const userId = session?.user?.id;
   const targetLang = (session?.user as { targetLanguage?: string })?.targetLanguage ?? "fr";
   const langConfig = getLanguageConfig(targetLang);
+  const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
 
   const dayIndex = Math.floor(Date.now() / 86_400_000) % 100;
 
@@ -76,9 +79,9 @@ export default async function HomePage() {
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
 
   const skills = [
-    { key: "vocabulary", label: "Vocab",   icon: <BookOpen size={16} />, color: "#60a5fa" },
-    { key: "grammar",    label: "Grammar", icon: <PenLine size={16} />,  color: "var(--accent)" },
-    { key: "speaking",   label: "Speaking", icon: <Mic size={16} />,     color: "#2dd4bf" },
+    { key: "vocabulary", label: t(locale, "home_vocabSkill"),    icon: <BookOpen size={16} />, color: "#60a5fa" },
+    { key: "grammar",    label: t(locale, "home_grammarSkill"),  icon: <PenLine size={16} />,  color: "var(--accent)" },
+    { key: "speaking",   label: t(locale, "home_speakingSkill"), icon: <Mic size={16} />,      color: "#2dd4bf" },
   ];
 
   return (
@@ -104,8 +107,8 @@ export default async function HomePage() {
             </h1>
             <p className="text-sm mb-4" style={{ color: "var(--text-2)" }}>
               {progress?.streak && progress.streak > 0
-                ? `You're on a ${progress.streak}-day streak — keep it up!`
-                : `Ready to continue your ${langConfig.label} journey?`}
+                ? t(locale, "home_streakMessage", { streak: progress.streak.toString() })
+                : t(locale, "home_readyMessage", { lang: langConfig.label })}
             </p>
 
             {/* XP bar */}
@@ -116,7 +119,7 @@ export default async function HomePage() {
                   style={{ background: "var(--accent-dim)", color: "var(--accent-2)", border: "1px solid rgba(99,102,241,0.3)" }}
                 >
                   <Zap size={11} />
-                  Level {xpInfo.level}
+                  {t(locale, "home_statLevel")} {xpInfo.level}
                 </span>
                 <span className="text-xs" style={{ color: "var(--text-3)" }}>
                   {xpInfo.current} / {xpInfo.needed} XP
@@ -140,7 +143,7 @@ export default async function HomePage() {
                 </span>
                 <div>
                   <p className="text-base font-black leading-none" style={{ color: "#f59e0b" }}>{progress.streak}</p>
-                  <p className="text-[10px]" style={{ color: "var(--text-3)" }}>day streak</p>
+                  <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_dayStreak")}</p>
                 </div>
               </div>
             ) : null}
@@ -153,7 +156,7 @@ export default async function HomePage() {
               </span>
               <div>
                 <p className="text-base font-black leading-none" style={{ color: "var(--accent)" }}>{progress?.xp ?? 0}</p>
-                <p className="text-[10px]" style={{ color: "var(--text-3)" }}>total XP</p>
+                <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_totalXp")}</p>
               </div>
             </div>
           </div>
@@ -165,32 +168,32 @@ export default async function HomePage() {
 
         {/* Stats 2x2 */}
         <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <p className="section-label mb-3">Your progress</p>
+          <p className="section-label mb-3">{t(locale, "home_yourProgress")}</p>
           <div className="grid grid-cols-2 gap-2.5">
             {[
               {
-                label: "Words saved",
+                label: t(locale, "home_wordsSaved"),
                 value: savedWordCount,
                 icon: <BookMarked size={16} />,
                 color: "#60a5fa",
                 dim: "rgba(96,165,250,0.12)",
               },
               {
-                label: "Stories done",
+                label: t(locale, "home_storiesDone"),
                 value: completedStories,
                 icon: <CheckCircle2 size={16} />,
                 color: "#22c55e",
                 dim: "rgba(34,197,94,0.12)",
               },
               {
-                label: "Level",
+                label: t(locale, "home_statLevel"),
                 value: `Lv ${xpInfo.level}`,
                 icon: <Medal size={16} />,
                 color: "var(--accent-2)",
                 dim: "var(--accent-dim)",
               },
               {
-                label: "Day streak",
+                label: t(locale, "home_statDayStreak"),
                 value: progress?.streak ?? 0,
                 icon: <Flame size={16} />,
                 color: "#f59e0b",
@@ -227,24 +230,24 @@ export default async function HomePage() {
           style={{ border: "1px solid var(--border)", minHeight: 160, textDecoration: "none" }}
         >
           <div>
-            <p className="section-label mb-2">Continue learning</p>
+            <p className="section-label mb-2">{t(locale, "home_continueLearning")}</p>
             {lastStory ? (
               <>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-3xl">{lastStory.story.imageEmoji}</span>
                   <div>
                     <p className="font-bold text-sm leading-snug" style={{ color: "var(--text)" }}>{lastStory.story.title}</p>
-                    <p className="text-[11px]" style={{ color: "var(--text-3)" }}>Chapter {lastStory.story.chapter}</p>
+                    <p className="text-[11px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_chapterN", { n: lastStory.story.chapter.toString() })}</p>
                   </div>
                 </div>
                 <p className="text-xs" style={{ color: "var(--text-2)" }}>
-                  {lastStory.completed ? "Completed — read again" : "Pick up where you left off"}
+                  {lastStory.completed ? t(locale, "home_completedReadAgain") : t(locale, "home_pickUpWhere")}
                 </p>
               </>
             ) : (
               <>
-                <p className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>Learning Path</p>
-                <p className="text-sm" style={{ color: "var(--text-2)" }}>Start your first lesson</p>
+                <p className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>{t(locale, "home_learningPath")}</p>
+                <p className="text-sm" style={{ color: "var(--text-2)" }}>{t(locale, "home_startFirstLesson")}</p>
               </>
             )}
           </div>
@@ -252,7 +255,7 @@ export default async function HomePage() {
             className="self-start mt-3 flex items-center gap-1.5 text-sm font-semibold"
             style={{ color: "var(--accent)" }}
           >
-            {lastStory?.completed ? "Read again" : "Resume"}
+            {lastStory?.completed ? t(locale, "home_readAgain") : t(locale, "home_resume")}
             <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>
@@ -260,7 +263,7 @@ export default async function HomePage() {
 
       {/* ── Quick Actions bento (asymmetric) ── */}
       <div>
-        <p className="section-label mb-3">Quick actions</p>
+        <p className="section-label mb-3">{t(locale, "home_quickActions")}</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ gridAutoRows: "auto" }}>
 
           {/* Large card: Continue Story (col-span-2) */}
@@ -289,8 +292,8 @@ export default async function HomePage() {
               />
             </div>
             <div>
-              <p className="font-bold text-base" style={{ color: "var(--gc-teal-text)" }}>Continue Story</p>
-              <p className="text-xs mt-0.5" style={{ color: "var(--gc-teal-muted)" }}>Immersive {langConfig.label} narratives</p>
+              <p className="font-bold text-base" style={{ color: "var(--gc-teal-text)" }}>{t(locale, "home_continueStory")}</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--gc-teal-muted)" }}>{t(locale, "home_immersiveNarratives", { lang: langConfig.label })}</p>
             </div>
           </Link>
 
@@ -313,8 +316,8 @@ export default async function HomePage() {
               <Gamepad2 size={28} />
             </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-violet-text)" }}>Games</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-violet-muted)" }}>Play to learn</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-violet-text)" }}>{t(locale, "games_title")}</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-violet-muted)" }}>{t(locale, "home_playToLearn")}</p>
             </div>
           </Link>
 
@@ -337,8 +340,8 @@ export default async function HomePage() {
               <MessageSquare size={28} />
             </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>AI Tutor</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>Conversational practice</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>{t(locale, "tutor_title")}</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>{t(locale, "home_conversationalPractice")}</p>
             </div>
           </Link>
 
@@ -361,8 +364,8 @@ export default async function HomePage() {
               <BookMarked size={28} />
             </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>Dictionary</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>Browse all words</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>{t(locale, "nav_dictionary")}</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>{t(locale, "home_browseAllWords")}</p>
             </div>
           </Link>
 
@@ -385,8 +388,8 @@ export default async function HomePage() {
               <Brain size={28} />
             </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-green-text)" }}>Review</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-green-muted)" }}>Spaced repetition</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-green-text)" }}>{t(locale, "review_title")}</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-green-muted)" }}>{t(locale, "home_spacedRepetition")}</p>
             </div>
           </Link>
 
@@ -409,8 +412,8 @@ export default async function HomePage() {
               <PenLine size={28} />
             </span>
             <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-orange-text)" }}>My Words</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-orange-muted)" }}>Saved vocabulary</p>
+              <p className="font-bold text-sm" style={{ color: "var(--gc-orange-text)" }}>{t(locale, "nav_myWords")}</p>
+              <p className="text-[11px]" style={{ color: "var(--gc-orange-muted)" }}>{t(locale, "home_savedVocabulary")}</p>
             </div>
           </Link>
         </div>
@@ -422,7 +425,7 @@ export default async function HomePage() {
         {/* Word of the Day */}
         {recentWord ? (
           <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-            <p className="section-label mb-3">Word of the day</p>
+            <p className="section-label mb-3">{t(locale, "home_wordOfDay")}</p>
             <div className="flex items-center gap-4">
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
@@ -451,18 +454,18 @@ export default async function HomePage() {
               href={`/dictionary/${recentWord.id}`}
               className="btn-secondary mt-4 inline-flex items-center gap-1.5 text-xs px-4 py-2"
             >
-              Learn this word <ArrowRight size={12} />
+              {t(locale, "home_learnThisWord")} <ArrowRight size={12} />
             </Link>
           </div>
         ) : (
           <div className="bento p-5 flex items-center justify-center" style={{ border: "1px solid var(--border)" }}>
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>No word available today</p>
+            <p className="text-sm" style={{ color: "var(--text-3)" }}>{t(locale, "home_noWordToday")}</p>
           </div>
         )}
 
         {/* Skill Rings */}
         <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <p className="section-label mb-4">Skill rings</p>
+          <p className="section-label mb-4">{t(locale, "home_skillRings")}</p>
           <div className="flex justify-around items-center">
             {skills.map((skill) => {
               const pct = Math.max(skillTree[skill.key] ?? 0, 2);
@@ -511,9 +514,9 @@ export default async function HomePage() {
       {earnedBadges.length > 0 && (
         <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="section-label">Badges earned</p>
+            <p className="section-label">{t(locale, "home_badgesEarned")}</p>
             <Link href="/progress" className="text-xs font-semibold flex items-center gap-1" style={{ color: "var(--accent)" }}>
-              View all <ArrowRight size={12} />
+              {t(locale, "home_viewAll")} <ArrowRight size={12} />
             </Link>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">

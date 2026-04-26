@@ -1,6 +1,7 @@
+export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 // Three.js cannot run on the server — load client-only
-const City3DGame = dynamic(
+const City3DGame = nextDynamic(
   () => import("@/components/games/City3DScene"),
   { ssr: false, loading: () => (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:400 }}>

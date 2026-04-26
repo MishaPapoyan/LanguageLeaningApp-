@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/types";
+import { t, getLocale } from "@/lib/i18n";
 
 const AVATAR_EMOJIS = [
   "🧑", "👩", "👨", "🧔", "👱", "🧕", "🦸", "🧙", "🦊", "🐺",
@@ -53,7 +54,8 @@ export function SettingsClient({
   email, role, joinDate, xpInfo, streak,
   savedWordCount, completedStories, gamePlays, earnedBadges,
 }: Props) {
-  const { update: updateSession } = useSession();
+  const { data: session, update: updateSession } = useSession();
+  const locale = getLocale((session?.user as any)?.nativeLanguage);
   const router = useRouter();
   const [name, setName] = useState(initialName);
   const [avatar, setAvatar] = useState(initialAvatar || "🧑");
@@ -77,12 +79,11 @@ export function SettingsClient({
       if (!res.ok) throw new Error("Failed to save");
       // Refresh session so targetLanguage/nativeLanguage is reflected immediately
       await updateSession();
-      // Force server components to re-render with new language data
-      router.refresh();
-      setSaved(true);
+      // Full reload guarantees server components re-render with new JWT cookie
+      window.location.reload();
       setTimeout(() => setSaved(false), 3000);
     } catch {
-      setError("Failed to save. Please try again.");
+      setError(t(locale, "settings_saveError"));
     } finally {
       setSaving(false);
     }
@@ -92,13 +93,13 @@ export function SettingsClient({
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Settings</h1>
-        <p className="text-sm mt-0.5" style={{ color: "var(--text-3)" }}>Manage your profile and preferences</p>
+        <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>{t(locale, "settings_title")}</h1>
+        <p className="text-sm mt-0.5" style={{ color: "var(--text-3)" }}>{t(locale, "settings_subtitle")}</p>
       </div>
 
       {/* Profile card */}
       <div className="card p-6">
-        <p className="section-label mb-4">Profile</p>
+        <p className="section-label mb-4">{t(locale, "settings_profile")}</p>
 
         {/* Avatar + Name row */}
         <div className="flex items-center gap-4 mb-6">
@@ -118,16 +119,16 @@ export function SettingsClient({
             </div>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold mb-1" style={{ color: "var(--text)" }}>{name || "Your name"}</p>
+            <p className="text-sm font-semibold mb-1" style={{ color: "var(--text)" }}>{name || t(locale, "settings_yourName")}</p>
             <p className="text-xs" style={{ color: "var(--text-3)" }}>{email}</p>
             <div className="flex items-center gap-2 mt-1.5">
               <span
                 className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
                 style={{ background: "var(--accent-dim)", color: "var(--accent)" }}
               >
-                {role === "TEACHER" ? "Teacher" : "Student"}
+                {role === "TEACHER" ? t(locale, "settings_teacher") : t(locale, "settings_student")}
               </span>
-              <span className="text-[11px]" style={{ color: "var(--text-3)" }}>Joined {joinDate}</span>
+              <span className="text-[11px]" style={{ color: "var(--text-3)" }}>{t(locale, "settings_joined", { date: joinDate })}</span>
             </div>
           </div>
         </div>
@@ -138,7 +139,7 @@ export function SettingsClient({
             className="rounded-2xl p-4 mb-5"
             style={{ background: "var(--surface-3)", border: "1px solid var(--border)" }}
           >
-            <p className="text-xs font-semibold mb-3" style={{ color: "var(--text-3)" }}>CHOOSE AVATAR</p>
+            <p className="text-xs font-semibold mb-3" style={{ color: "var(--text-3)" }}>{t(locale, "settings_chooseAvatar")}</p>
             <div className="grid grid-cols-10 gap-1">
               {AVATAR_EMOJIS.map((emoji) => (
                 <button
@@ -161,21 +162,21 @@ export function SettingsClient({
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
-              DISPLAY NAME
+              {t(locale, "settings_displayName")}
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={50}
-              placeholder="Your display name"
+              placeholder={t(locale, "settings_displayNamePlaceholder")}
               className="input w-full"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
-              NATIVE LANGUAGE
+              {t(locale, "settings_nativeLang")}
             </label>
             <select
               value={nativeLang}
@@ -190,7 +191,7 @@ export function SettingsClient({
 
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
-              LEARNING
+              {t(locale, "settings_learning")}
             </label>
             <select
               value={targetLang}
@@ -214,23 +215,23 @@ export function SettingsClient({
             disabled={saving || !name.trim()}
             className="btn-primary px-6 disabled:opacity-50"
           >
-            {saving ? "Saving…" : saved ? "✓ Saved!" : "Save changes"}
+            {saving ? t(locale, "settings_saving") : saved ? t(locale, "settings_saved") : t(locale, "settings_save")}
           </button>
-          {saved && <span className="text-xs" style={{ color: "var(--green)" }}>Profile updated!</span>}
+          {saved && <span className="text-xs" style={{ color: "var(--green)" }}>{t(locale, "settings_profileUpdated")}</span>}
         </div>
       </div>
 
       {/* Stats overview */}
       <div className="card p-5">
-        <p className="section-label mb-4">Your Stats</p>
+        <p className="section-label mb-4">{t(locale, "settings_yourStats")}</p>
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[
-            { label: "Level",    value: `Lv ${xpInfo.level}`,   emoji: "⭐", color: "var(--accent)" },
-            { label: "Streak",   value: `${streak} days`,        emoji: "🔥", color: "var(--gold)" },
-            { label: "Words",    value: savedWordCount,          emoji: "📚", color: "var(--blue)" },
-            { label: "Stories",  value: completedStories,        emoji: "📖", color: "var(--green)" },
-            { label: "Games",    value: gamePlays,               emoji: "🎮", color: "#f472b6" },
-            { label: "XP",       value: xpInfo.current + xpInfo.needed > 0 ? `${xpInfo.current}/${xpInfo.needed}` : "—", emoji: "💎", color: "var(--accent)" },
+            { label: t(locale, "settings_level"),       value: t(locale, "settings_lvDisplay", { n: String(xpInfo.level) }),   emoji: "⭐", color: "var(--accent)" },
+            { label: t(locale, "settings_streak"),      value: t(locale, "settings_daysDisplay", { n: String(streak) }),        emoji: "🔥", color: "var(--gold)" },
+            { label: t(locale, "settings_words"),       value: savedWordCount,          emoji: "📚", color: "var(--blue)" },
+            { label: t(locale, "settings_storiesStat"), value: completedStories,        emoji: "📖", color: "var(--green)" },
+            { label: t(locale, "settings_gamesStat"),   value: gamePlays,               emoji: "🎮", color: "#f472b6" },
+            { label: t(locale, "settings_xp"),          value: xpInfo.current + xpInfo.needed > 0 ? `${xpInfo.current}/${xpInfo.needed}` : "—", emoji: "💎", color: "var(--accent)" },
           ].map((s) => (
             <div
               key={s.label}
@@ -249,8 +250,8 @@ export function SettingsClient({
         {/* XP progress bar */}
         <div>
           <div className="flex justify-between text-[10px] mb-1" style={{ color: "var(--text-3)" }}>
-            <span>Level {xpInfo.level}</span>
-            <span>{xpInfo.current} / {xpInfo.needed} XP to Level {xpInfo.level + 1}</span>
+            <span>{t(locale, "settings_levelDisplay", { n: String(xpInfo.level) })}</span>
+            <span>{t(locale, "settings_xpProgress", { current: String(xpInfo.current), needed: String(xpInfo.needed), next: String(xpInfo.level + 1) })}</span>
           </div>
           <div className="xp-bar">
             <div className="xp-bar-fill" style={{ width: `${xpInfo.pct}%` }} />
@@ -261,9 +262,9 @@ export function SettingsClient({
       {/* Badges */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-4">
-          <p className="section-label">Earned Badges</p>
+          <p className="section-label">{t(locale, "settings_earnedBadges")}</p>
           <Link href="/progress" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-            All badges →
+            {t(locale, "settings_allBadgesArrow")}
           </Link>
         </div>
         {earnedBadges.length > 0 ? (
@@ -285,20 +286,20 @@ export function SettingsClient({
         ) : (
           <div className="text-center py-6" style={{ color: "var(--text-3)" }}>
             <p className="text-2xl mb-2">🏅</p>
-            <p className="text-sm">No badges yet — keep learning to earn them!</p>
+            <p className="text-sm">{t(locale, "settings_noBadges")}</p>
           </div>
         )}
       </div>
 
       {/* Quick navigation */}
       <div className="card p-5">
-        <p className="section-label mb-3">Quick Links</p>
+        <p className="section-label mb-3">{t(locale, "settings_quickLinks")}</p>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { href: "/progress",    label: "Progress",      emoji: "📊" },
-            { href: "/analytics",   label: "Analytics",     emoji: "📈" },
-            { href: "/leaderboard", label: "Leaderboard",   emoji: "🏆" },
-            { href: "/my-words",    label: "My Words",      emoji: "📝" },
+            { href: "/progress",    label: t(locale, "nav_progress"),    emoji: "📊" },
+            { href: "/analytics",   label: t(locale, "nav_analytics"),   emoji: "📈" },
+            { href: "/leaderboard", label: t(locale, "lb_title"),        emoji: "🏆" },
+            { href: "/my-words",    label: t(locale, "nav_myWords"),     emoji: "📝" },
           ].map((item) => (
             <Link
               key={item.href}

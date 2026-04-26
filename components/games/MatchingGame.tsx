@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface Word { id: string; word: string; translation: string; imageEmoji: string; }
 
@@ -151,11 +152,14 @@ export function MatchingGame({ words }: { words: Word[] }) {
         <div className="space-y-2">
           <p className="section-label mb-2">{langConfig.label}</p>
           {frCards.map((w) => (
-            <button key={w.id} onClick={() => handleSelect("fr", w.id)} disabled={matched.has(w.id)}
-              className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150"
-              style={cardStyle("fr", w.id)}>
-              {w.word}{matched.has(w.id) && " ✓"}
-            </button>
+            <div key={w.id} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <button onClick={() => handleSelect("fr", w.id)} disabled={matched.has(w.id)}
+                className="text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150"
+                style={{ flex: 1, ...cardStyle("fr", w.id) }}>
+                {w.word}{matched.has(w.id) && " ✓"}
+              </button>
+              <SpeakButton text={w.word} lang={session?.user?.targetLanguage ?? "fr"} size={13} />
+            </div>
           ))}
         </div>
         <div className="space-y-2">

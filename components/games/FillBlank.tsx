@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { Lightbulb, Check, X } from "lucide-react";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface Word { id: string; word: string; translation: string; imageEmoji: string; exampleFr?: string; exampleEn?: string; }
 
@@ -145,9 +146,12 @@ export function FillBlank({ words }: { words: Word[] }) {
 
       {/* Sentence card */}
       <div className="card" style={{ padding: "28px 24px", marginBottom: 16, textAlign: "center" }}>
-        <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 14px" }}>
-          {langConfig.flag} Complete the {langConfig.label} sentence
-        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 14 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: 0 }}>
+            {langConfig.flag} Complete the {langConfig.label} sentence
+          </p>
+          <SpeakButton text={q.word.word} lang={session?.user?.targetLanguage ?? "fr"} size={13} />
+        </div>
         <p style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", lineHeight: 1.4, margin: "0 0 10px" }}>
           {q.sentence.split("___").map((part, i, arr) => (
             <span key={i}>
