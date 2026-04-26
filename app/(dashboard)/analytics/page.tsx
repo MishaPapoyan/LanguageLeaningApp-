@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 
 function AnalyticsSkeleton() {
   return (
@@ -20,7 +20,7 @@ function AnalyticsSkeleton() {
   );
 }
 
-const AnalyticsClient = dynamic(
+const AnalyticsClient = nextDynamic(
   () => import("@/components/analytics/AnalyticsClient"),
   { ssr: false, loading: () => <AnalyticsSkeleton /> }
 );

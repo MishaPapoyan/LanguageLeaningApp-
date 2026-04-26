@@ -4,10 +4,10 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BADGES, getXpProgress, getNextMilestone, getLevelThreshold } from "@/types";
 import { t, getLocale } from "@/lib/i18n";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { Zap, Flame, BookMarked, Gamepad2, BookOpen, MessageSquare, Lock, BarChart3, Target, Trophy, Mic, PenLine, TrendingUp, Layers, Link2, Puzzle } from "lucide-react";
 
-const WeeklyChart = dynamic(
+const WeeklyChart = nextDynamic(
   () => import("@/components/progress/WeeklyChart").then((m) => ({ default: m.WeeklyChart })),
   {
     ssr: false,

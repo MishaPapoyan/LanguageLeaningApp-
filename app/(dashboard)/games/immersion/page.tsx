@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 // WASM loader can't run on the server
-const ImmersionGame = dynamic(
+const ImmersionGame = nextDynamic(
   () => import("@/components/games/ImmersionGame"),
   {
     ssr: false,

@@ -2,9 +2,9 @@ export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 
-const InterviewGame = dynamic(
+const InterviewGame = nextDynamic(
   () => import("@/components/games/interview/InterviewGame"),
   { ssr: false }
 );
