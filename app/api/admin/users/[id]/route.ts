@@ -12,6 +12,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
   }
   try {
+    await prisma.groupMember.deleteMany({ where: { userId: params.id } });
     await prisma.user.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
   } catch (err) {
