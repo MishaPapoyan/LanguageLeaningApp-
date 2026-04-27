@@ -17,9 +17,12 @@ export async function GET() {
         email: true,
         role: true,
         createdAt: true,
+        targetLanguage: true,
+        nativeLanguage: true,
+        onboardingCompleted: true,
         progress: { select: { xp: true, level: true, streak: true, lastActive: true } },
         location: { select: { city: true, country: true, updatedAt: true } },
-        _count: { select: { savedWords: true, storyProgress: true, aiInteractions: true, gameScores: true } },
+        _count: { select: { savedWords: true, storyProgress: true, aiInteractions: true, gameScores: true, writingSessions: true, voiceSessions: true } },
       },
       orderBy: { createdAt: "desc" },
     });

@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const ADMIN_NAV = [
-  { href: "/admin",           label: "Overview",  emoji: "🏠" },
-  { href: "/admin/users",     label: "Users",     emoji: "👥" },
-  { href: "/admin/locations", label: "Locations", emoji: "📍" },
+  { href: "/admin",            label: "Overview",   emoji: "🏠" },
+  { href: "/admin/users",      label: "Users",      emoji: "👥" },
+  { href: "/admin/analytics",  label: "Analytics",  emoji: "📊" },
+  { href: "/admin/groups",     label: "Classrooms", emoji: "🏫" },
+  { href: "/admin/locations",  label: "Locations",  emoji: "📍" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
