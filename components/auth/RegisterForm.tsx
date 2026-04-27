@@ -12,6 +12,15 @@ const LANGUAGES: { code: TargetLang; label: string; flag: string; sub: string }[
   { code: "es", label: "Spanish", flag: "🇪🇸", sub: "Español" },
 ];
 
+const NATIVE_LANGUAGES = [
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "hy", label: "Armenian", flag: "🇦🇲" },
+  { code: "ru", label: "Russian", flag: "🇷🇺" },
+  { code: "de", label: "German", flag: "🇩🇪" },
+  { code: "es", label: "Spanish", flag: "🇪🇸" },
+  { code: "fr", label: "French", flag: "🇫🇷" },
+];
+
 export function RegisterForm() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -20,6 +29,7 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [targetLanguage, setTargetLanguage] = useState<TargetLang>("fr");
+  const [nativeLanguage, setNativeLanguage] = useState("en");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +50,7 @@ export function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, password, role: "STUDENT", targetLanguage }),
+      body: JSON.stringify({ name, email, phone, password, role: "STUDENT", targetLanguage, nativeLanguage }),
     });
 
     if (!res.ok) {
@@ -119,6 +129,38 @@ export function RegisterForm() {
                   <Check size={10} style={{ color: "white" }} />
                 </div>
               )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Native language */}
+      <div>
+        <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "10px" }}>
+          My language
+        </label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
+          {NATIVE_LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => setNativeLanguage(lang.code)}
+              style={{
+                padding: "10px 8px",
+                borderRadius: "12px",
+                border: nativeLanguage === lang.code ? "2px solid var(--accent)" : "2px solid var(--border)",
+                background: nativeLanguage === lang.code ? "var(--accent-dim)" : "var(--surface)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                transition: "all 0.15s",
+              }}
+            >
+              <span style={{ fontSize: "18px" }}>{lang.flag}</span>
+              <span style={{ fontSize: "12px", fontWeight: 600, color: nativeLanguage === lang.code ? "var(--accent-2)" : "var(--text)" }}>
+                {lang.label}
+              </span>
             </button>
           ))}
         </div>

@@ -11,12 +11,13 @@ const registerSchema = z.object({
   password: z.string().min(6),
   role: z.enum(["STUDENT"]).default("STUDENT"),
   targetLanguage: z.enum(["fr", "es"]).default("fr"),
+  nativeLanguage: z.string().max(10).default("en"),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, password, role, targetLanguage } = registerSchema.parse(body);
+    const { name, email, phone, password, role, targetLanguage, nativeLanguage } = registerSchema.parse(body);
 
     const existing = await prisma.user.findFirst({
       where: { OR: [{ email }, { phone }] },
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role,
         targetLanguage,
+        nativeLanguage,
         emailVerified: true,
         phoneVerified: true,
         progress: {
