@@ -25,12 +25,24 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
   const [changing, setChanging] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/users")
       .then((r) => r.json())
       .then((d) => { setUsers(d.users ?? []); setLoading(false); });
   }, []);
+
+  const deleteUser = async (userId: string) => {
+    setDeleting(userId);
+    const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+    if (res.ok) {
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+    }
+    setDeleting(null);
+    setConfirmDeleteId(null);
+  };
 
   const changeRole = async (userId: string, role: string) => {
     setChanging(userId);
@@ -93,7 +105,7 @@ export default function AdminUsersPage() {
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
           {/* Header */}
           <div
-            className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-5 py-3 text-[11px] font-bold uppercase tracking-wider"
+            className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-5 py-3 text-[11px] font-bold uppercase tracking-wider"
             style={{ background: "var(--surface-2)", color: "var(--text-3)", borderBottom: "1px solid var(--border)" }}
           >
             <span>User</span>
@@ -101,6 +113,7 @@ export default function AdminUsersPage() {
             <span>Activity</span>
             <span>Location</span>
             <span>Role</span>
+            <span></span>
           </div>
 
           {filtered.length === 0 ? (
@@ -111,7 +124,7 @@ export default function AdminUsersPage() {
             filtered.map((u, i) => (
               <div
                 key={u.id}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 items-center px-5 py-3.5"
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 items-center px-5 py-3.5"
                 style={{
                   background: "var(--surface)",
                   borderTop: i > 0 ? "1px solid var(--border)" : undefined,
@@ -179,6 +192,37 @@ export default function AdminUsersPage() {
                     <option value="TEACHER">Teacher</option>
                     <option value="ADMIN">Admin</option>
                   </select>
+                </div>
+
+                {/* Delete */}
+                <div className="flex items-center">
+                  {confirmDeleteId === u.id ? (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => deleteUser(u.id)}
+                        disabled={deleting === u.id}
+                        className="text-[11px] font-semibold px-2 py-1 rounded-lg disabled:opacity-50"
+                        style={{ background: "var(--red)", color: "#fff" }}
+                      >
+                        {deleting === u.id ? "…" : "Confirm"}
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="text-[11px] font-semibold px-2 py-1 rounded-lg"
+                        style={{ background: "var(--surface-2)", color: "var(--text-3)", border: "1px solid var(--border)" }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDeleteId(u.id)}
+                      className="text-[11px] font-semibold px-2 py-1 rounded-lg transition-colors"
+                      style={{ background: "rgba(239,68,68,0.1)", color: "var(--red)", border: "1px solid rgba(239,68,68,0.2)" }}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
             ))
