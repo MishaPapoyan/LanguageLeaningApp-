@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/types";
@@ -65,6 +66,22 @@ export function SettingsClient({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      const res = await fetch("/api/user", { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed");
+      await signOut({ callbackUrl: "/" });
+    } catch {
+      setDeleteError("Could not delete account. Please try again.");
+      setDeleting(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -287,6 +304,48 @@ export function SettingsClient({
           <div className="text-center py-6" style={{ color: "var(--text-3)" }}>
             <p className="text-2xl mb-2">🏅</p>
             <p className="text-sm">{t(locale, "settings_noBadges")}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Danger zone */}
+      <div className="card p-5" style={{ border: "1px solid rgba(239,68,68,0.25)" }}>
+        <p className="section-label mb-1" style={{ color: "var(--red)" }}>Danger Zone</p>
+        <p className="text-xs mb-4" style={{ color: "var(--text-3)" }}>
+          Permanently delete your account and all data. This cannot be undone.
+        </p>
+
+        {!confirmDelete ? (
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="btn text-sm px-4 py-2 rounded-xl font-semibold"
+            style={{ background: "rgba(239,68,68,0.1)", color: "var(--red)", border: "1px solid rgba(239,68,68,0.3)" }}
+          >
+            Delete my account
+          </button>
+        ) : (
+          <div className="rounded-xl p-4 space-y-3" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.25)" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--red)" }}>
+              Are you sure? All your progress, words, and data will be gone forever.
+            </p>
+            {deleteError && <p className="text-xs" style={{ color: "var(--red)" }}>{deleteError}</p>}
+            <div className="flex gap-3">
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="btn text-sm px-4 py-2 rounded-xl font-semibold disabled:opacity-50"
+                style={{ background: "var(--red)", color: "#fff", border: "none" }}
+              >
+                {deleting ? "Deleting…" : "Yes, delete everything"}
+              </button>
+              <button
+                onClick={() => { setConfirmDelete(false); setDeleteError(""); }}
+                className="btn text-sm px-4 py-2 rounded-xl font-semibold"
+                style={{ background: "var(--surface-2)", color: "var(--text-2)", border: "1px solid var(--border)" }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </div>
