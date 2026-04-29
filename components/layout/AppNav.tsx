@@ -210,8 +210,15 @@ export function AppNav() {
         <div style={{ display: "flex", alignItems: "center", gap: 6 }} className="stats-row">
           {progress?.streak ? (
             <div className="stat-pill">
-              <Flame size={13} style={{ color: "var(--gold)" }} aria-hidden="true" />
-              <span style={{ color: "var(--gold)", fontWeight: 700, fontSize: 12 }}>
+              <Flame size={13} style={{ color: "var(--streak)" }} aria-hidden="true" />
+              <span style={{
+                color: "var(--xp)",
+                fontWeight: 700,
+                fontSize: 13,
+                fontFamily: "var(--font-mono)",
+                fontVariantNumeric: "tabular-nums",
+                letterSpacing: "-0.01em",
+              }}>
                 {progress.streak}
               </span>
             </div>
@@ -219,34 +226,47 @@ export function AppNav() {
 
           {xpInfo && (
             <div className="stat-pill" style={{ gap: 7, paddingLeft: 10, paddingRight: 10 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-2)", whiteSpace: "nowrap" }}>
+              <span style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "var(--accent)",
+                whiteSpace: "nowrap",
+                fontFamily: "var(--font-mono)",
+                letterSpacing: "-0.01em",
+              }}>
                 {t(locale, "nav_lvDisplay", { n: String(xpInfo.level) })}
               </span>
               <div
                 style={{
-                  width: 72,
-                  height: 4,
+                  width: 64,
+                  height: 3,
                   borderRadius: 999,
                   background: "rgba(128,128,128,0.15)",
                   overflow: "hidden",
                   position: "relative",
                 }}
               >
-                <div
+                <div className="xp-bar-fill"
                   style={{
                     position: "absolute",
                     inset: 0,
                     width: `${xpInfo.pct}%`,
-                    background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
                     borderRadius: 999,
                     transition: "width 0.7s cubic-bezier(.4,0,.2,1)",
                   }}
                 />
               </div>
-              <span style={{ fontSize: 11, color: "var(--text-3)", fontVariantNumeric: "tabular-nums" }}>
+              <span style={{
+                fontSize: 12,
+                color: "var(--xp)",
+                fontFamily: "var(--font-mono)",
+                fontVariantNumeric: "tabular-nums",
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+              }}>
                 {rawXp.toLocaleString()}
               </span>
-              <Zap size={11} style={{ color: "var(--accent-2)" }} aria-hidden="true" />
+              <Zap size={11} style={{ color: "var(--xp)" }} aria-hidden="true" />
             </div>
           )}
         </div>
@@ -522,19 +542,19 @@ export function AppNav() {
               }}
             >
               {progress.streak ? (
-                <span style={{ fontSize: 12, color: "var(--gold)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                  <Flame size={12} aria-hidden="true" /> {t(locale, "nav_streakDisplay", { n: String(progress.streak) })}
+                <span style={{ fontSize: 13, color: "var(--xp)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4, fontFamily: "var(--font-mono)", letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums" }}>
+                  <Flame size={13} style={{ color: "var(--streak)" }} aria-hidden="true" /> {t(locale, "nav_streakDisplay", { n: String(progress.streak) })}
                 </span>
               ) : null}
               {xpInfo && (
                 <>
                   <span style={{ fontSize: 12, color: "var(--text-3)" }}>·</span>
-                  <span style={{ fontSize: 12, color: "var(--text-2)" }}>{t(locale, "nav_levelDisplay", { n: String(xpInfo.level) })}</span>
-                  <div style={{ flex: 1, height: 4, borderRadius: 999, background: "rgba(128,128,128,0.15)", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${xpInfo.pct}%`, background: "linear-gradient(90deg, var(--accent), var(--accent-2))", borderRadius: 999 }} />
+                  <span style={{ fontSize: 12, color: "var(--accent)", fontFamily: "var(--font-mono)", fontWeight: 600 }}>{t(locale, "nav_levelDisplay", { n: String(xpInfo.level) })}</span>
+                  <div style={{ flex: 1, height: 3, borderRadius: 999, background: "rgba(128,128,128,0.15)", overflow: "hidden" }}>
+                    <div className="xp-bar-fill" style={{ height: "100%", width: `${xpInfo.pct}%`, borderRadius: 999 }} />
                   </div>
-                  <span style={{ fontSize: 11, color: "var(--text-3)", fontVariantNumeric: "tabular-nums", display: "flex", alignItems: "center", gap: 3 }}>
-                    {rawXp.toLocaleString()} <Zap size={10} aria-hidden="true" />
+                  <span style={{ fontSize: 12, color: "var(--xp)", fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}>
+                    {rawXp.toLocaleString()} <Zap size={11} aria-hidden="true" />
                   </span>
                 </>
               )}
