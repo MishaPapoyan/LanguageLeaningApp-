@@ -108,13 +108,14 @@ function StatCard({ label, value, subtext, emoji, gradient }: {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between mb-2">
-        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-zinc-800 text-lg`}>
+        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-lg`}
+          style={{ color: "#0B0F1A" }}>
           {emoji}
         </div>
-        <span className="text-2xl font-bold text-zinc-800">{value}</span>
+        <span style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{value}</span>
       </div>
-      <p className="text-sm font-medium text-zinc-500">{label}</p>
-      {subtext && <p className="text-xs text-zinc-400 mt-0.5">{subtext}</p>}
+      <p className="text-sm font-medium" style={{ color: "var(--text-2)" }}>{label}</p>
+      {subtext && <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>{subtext}</p>}
     </div>
   );
 }
@@ -132,8 +133,8 @@ function HeatmapGrid({ data }: { data: { date: string; total: number; xp: number
             <div key={day.date} title={`${dayLabel}: ${day.total} activities, ${day.xp} XP`}
               className="w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium cursor-default transition-all hover:scale-110"
               style={{
-                backgroundColor: day.total === 0 ? "#f4f4f5" : `rgba(124, 58, 237, ${0.2 + intensity * 0.8})`,
-                color: intensity > 0.5 ? "white" : day.total > 0 ? "#4c1d95" : "#94a3b8",
+                backgroundColor: day.total === 0 ? "rgba(255,255,255,0.05)" : `rgba(99,102,241,${0.15 + intensity * 0.75})`,
+                color: intensity > 0.5 ? "#fff" : day.total > 0 ? "#818CF8" : "var(--text-3)",
               }}
             >
               {date.getDate()}
@@ -141,11 +142,11 @@ function HeatmapGrid({ data }: { data: { date: string; total: number; xp: number
           );
         })}
       </div>
-      <div className="flex items-center gap-2 mt-3 text-xs text-zinc-500">
+      <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: "var(--text-3)" }}>
         <span>Less</span>
         {[0, 0.25, 0.5, 0.75, 1].map((intensity, i) => (
           <div key={i} className="w-4 h-4 rounded-sm"
-            style={{ backgroundColor: intensity === 0 ? "#f4f4f5" : `rgba(124, 58, 237, ${0.2 + intensity * 0.8})` }}
+            style={{ backgroundColor: intensity === 0 ? "rgba(255,255,255,0.05)" : `rgba(99,102,241,${0.15 + intensity * 0.75})` }}
           />
         ))}
         <span>More</span>
@@ -158,7 +159,7 @@ function EmptyState({ emoji, message, action }: { emoji: string; message: string
   return (
     <div className="text-center py-8">
       <p className="text-4xl mb-2">{emoji}</p>
-      <p className="text-zinc-400 text-sm">{message}</p>
+      <p className="text-sm" style={{ color: "var(--text-3)" }}>{message}</p>
       {action && <Link href={action.href} className="btn-primary text-sm mt-3 inline-flex">{action.label}</Link>}
     </div>
   );
@@ -233,24 +234,29 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
   return (
     <div className="space-y-6 animate-fade-up">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-zinc-900 tracking-tight">Analytics Dashboard</h1>
-          <p className="text-zinc-500 text-sm mt-1">Deep insights into your {langConfig.label} learning journey</p>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>Analytics</h1>
+          <p style={{ fontSize: 14, color: "var(--text-2)" }}>Deep insights into your {langConfig.label} learning journey</p>
         </div>
-        <div className="text-right text-sm text-zinc-400">
-          <p>Member since {new Date(overview.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</p>
-          <p>{overview.daysSinceJoin} days on LangCraft</p>
+        <div style={{ textAlign: "right", fontSize: 13, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
+          <p>Since {new Date(overview.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</p>
+          <p>{overview.daysSinceJoin}d on LangCraft</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-white p-1 rounded-xl overflow-x-auto border border-zinc-100">
+      <div style={{ display: "flex", gap: 4, background: "var(--surface-2)", padding: 4, borderRadius: 14, overflowX: "auto", border: "1px solid var(--border)" }}>
         {TAB_IDS.map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-              activeTab === tab.id ? "bg-violet-50 text-violet-700" : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50"
-            }`}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "8px 16px", borderRadius: 10,
+              fontSize: 13, fontWeight: 500, whiteSpace: "nowrap",
+              cursor: "pointer", border: "none", transition: "all 0.15s",
+              background: activeTab === tab.id ? "var(--surface-4)" : "transparent",
+              color: activeTab === tab.id ? "var(--text)" : "var(--text-2)",
+            }}
           >
             <span>{tab.emoji}</span>
             {t(locale, tab.key)}
@@ -270,7 +276,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">XP Over Time</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>XP Over Time</h3>
               {weeklyXpData.some((w) => w.value > 0) ? (
                 <SimpleAreaChart data={weeklyXpData} height={200} color="#3b82f6" formatValue={(v) => `${v} XP`} />
               ) : (
@@ -279,7 +285,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </div>
 
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">XP Sources</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>XP Sources</h3>
               {xpPieData.length > 0 ? (
                 <div className="flex items-center gap-4">
                   <SimplePieChart data={xpPieData} size={160} innerRadius={50} />
@@ -287,8 +293,8 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                     {xpPieData.map((d) => (
                       <div key={d.name} className="flex items-center gap-2 text-sm">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                        <span className="text-zinc-500">{d.name}</span>
-                        <span className="font-medium text-zinc-800 ml-auto">{d.value}</span>
+                        <span className="text-fg-2">{d.name}</span>
+                        <span className="font-medium text-fg ml-auto">{d.value}</span>
                       </div>
                     ))}
                   </div>
@@ -301,12 +307,12 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">Skill Balance</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Skill Balance</h3>
               <SimpleRadarChart data={skillRadar} size={220} color="#3b82f6" />
             </div>
 
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">Learning Summary</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Learning Summary</h3>
               <div className="space-y-3">
                 {[
                   { label: "Words Saved", value: vocabulary.total, total: vocabulary.totalAvailable, emoji: "📚", color: "#8b5cf6" },
@@ -319,8 +325,8 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                     <span className="text-xl">{item.emoji}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-zinc-500">{item.label}</span>
-                        <span className="text-sm font-bold text-zinc-800">
+                        <span className="text-sm text-fg-2">{item.label}</span>
+                        <span className="text-sm font-bold text-fg">
                           {item.value}{item.total !== null ? ` / ${item.total}` : ""}
                         </span>
                       </div>
@@ -343,13 +349,13 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
       {activeTab === "activity" && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="font-serif font-semibold text-zinc-800 mb-1">Activity Heatmap</h3>
-            <p className="text-sm text-zinc-400 mb-4">Last 30 days</p>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4, fontFamily: "var(--font-display)" }}>Activity Heatmap</h3>
+            <p className="text-sm text-fg-3 mb-4">Last 30 days</p>
             <HeatmapGrid data={activity.heatmap} />
           </div>
 
           <div className="card">
-            <h3 className="font-serif font-semibold text-zinc-800 mb-4">Daily XP Earned</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Daily XP Earned</h3>
             {activity.daily.some((d) => d.xp > 0) ? (
               <SimpleBarChart
                 data={activity.daily.map((d) => ({
@@ -366,7 +372,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 className="font-serif font-semibold text-zinc-800 mb-4">Activity Breakdown (30 Days)</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Activity Breakdown (30 Days)</h3>
             {activity.daily.some((d) => d.games + d.stories + d.words + d.tutor > 0) ? (
               <StackedBarChart
                 data={activity.daily.map((d) => ({
@@ -412,7 +418,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">Mastery Distribution</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Mastery Distribution</h3>
               {vocabulary.total > 0 ? (
                 <SimpleBarChart
                   data={masteryData.map((d) => {
@@ -428,7 +434,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </div>
 
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">Words by Category</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Words by Category</h3>
               {categoryData.length > 0 ? (
                 <div className="space-y-2.5">
                   {categoryData.map((cat, i) => {
@@ -436,8 +442,8 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                     return (
                       <div key={cat.name}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-zinc-500">{cat.name}</span>
-                          <span className="text-sm font-medium text-zinc-800">{cat.count}</span>
+                          <span className="text-sm text-fg-2">{cat.name}</span>
+                          <span className="text-sm font-medium text-fg">{cat.count}</span>
                         </div>
                         <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
                           <div className="h-full rounded-full transition-all duration-700"
@@ -454,7 +460,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 className="font-serif font-semibold text-zinc-800 mb-4">Words Added Per Week</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Words Added Per Week</h3>
             {vocabulary.perWeek.some((w) => w.count > 0) ? (
               <SimpleBarChart
                 data={vocabulary.perWeek.map((w) => ({ label: w.week, value: w.count }))}
@@ -469,7 +475,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">By Difficulty</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>By Difficulty</h3>
               {Object.keys(vocabulary.byDifficulty).length > 0 ? (
                 <div className="space-y-3">
                   {[
@@ -483,8 +489,8 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                         <span>{diff.emoji}</span>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-zinc-500">{diff.label}</span>
-                            <span className="text-sm font-bold text-zinc-800">{count}</span>
+                            <span className="text-sm text-fg-2">{diff.label}</span>
+                            <span className="text-sm font-bold text-fg">{count}</span>
                           </div>
                           <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
                             <div className="h-full rounded-full" style={{
@@ -503,14 +509,14 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </div>
 
             <div className="card">
-              <h3 className="font-serif font-semibold text-zinc-800 mb-4">Recently Added</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Recently Added</h3>
               {vocabulary.recentWords.length > 0 ? (
                 <div className="space-y-2">
                   {vocabulary.recentWords.slice(0, 6).map((w) => (
                     <div key={w.word} className="flex items-center justify-between py-1.5 border-b border-zinc-100 last:border-0">
                       <div>
-                        <span className="text-sm font-medium text-zinc-800">{w.word}</span>
-                        <span className="text-xs text-zinc-500 ml-2">{w.category}</span>
+                        <span className="text-sm font-medium text-fg">{w.word}</span>
+                        <span className="text-xs text-fg-2 ml-2">{w.category}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         {Array.from({ length: 5 }, (_, i) => (
@@ -545,7 +551,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 <div key={type} className="card">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-2xl">{GAME_EMOJI[type]}</span>
-                    <h3 className="font-serif font-semibold text-zinc-800">{GAME_LABELS[type]}</h3>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-display)" }}>{GAME_LABELS[type]}</h3>
                   </div>
                   {stats ? (
                     <div className="space-y-2">
@@ -556,13 +562,13 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                         { label: "XP Earned", value: `${stats.totalXp} XP`, cls: "text-violet-600" },
                       ].map((row) => (
                         <div key={row.label} className="flex justify-between text-sm">
-                          <span className="text-zinc-500">{row.label}</span>
-                          <span className={`font-medium ${row.cls ?? "text-zinc-800"}`}>{row.value}</span>
+                          <span className="text-fg-2">{row.label}</span>
+                          <span className={`font-medium ${row.cls ?? "text-fg"}`}>{row.value}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-zinc-400">Not played yet</p>
+                    <p className="text-sm text-fg-3">Not played yet</p>
                   )}
                 </div>
               );
@@ -570,7 +576,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 className="font-serif font-semibold text-zinc-800 mb-4">Score Trend (Last 20 Games)</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Score Trend (Last 20 Games)</h3>
             {games.scoreTrend.length > 0 ? (
               <SimpleLineChart
                 data={games.scoreTrend.map((g) => ({
@@ -599,15 +605,15 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 className="font-serif font-semibold text-zinc-800 mb-4">Sessions by Scenario</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Sessions by Scenario</h3>
             {Object.keys(tutor.byScenario).length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
                 {Object.entries(tutor.byScenario).map(([scenario, stats]) => (
                   <div key={scenario} className="bg-zinc-50 rounded-xl p-4 text-center">
                     <span className="text-3xl">{SCENARIO_EMOJI[scenario] ?? "💬"}</span>
-                    <p className="text-sm font-medium text-zinc-800 mt-2">{SCENARIO_LABELS[scenario] ?? scenario}</p>
-                    <p className="text-2xl font-bold text-zinc-800 mt-1">{stats.count}</p>
-                    <p className="text-xs text-zinc-500">{stats.totalXp} XP earned</p>
+                    <p className="text-sm font-medium text-fg mt-2">{SCENARIO_LABELS[scenario] ?? scenario}</p>
+                    <p className="text-2xl font-bold text-fg mt-1">{stats.count}</p>
+                    <p className="text-xs text-fg-2">{stats.totalXp} XP earned</p>
                   </div>
                 ))}
               </div>
@@ -618,8 +624,8 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           {tutor.totalSessions > 0 && (
             <div className="card bg-violet-50 border-violet-100">
-              <h3 className="font-serif font-semibold text-violet-700 mb-2">Tutor Insights</h3>
-              <div className="space-y-2 text-sm text-zinc-500">
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--accent-2)", marginBottom: 8, fontFamily: "var(--font-display)" }}>Tutor Insights</h3>
+              <div className="space-y-2 text-sm text-fg-2">
                 {tutor.avgGrammarScore !== null && tutor.avgGrammarScore < 60 && (
                   <p>Your grammar score is below 60% — try the <strong>Language Teacher</strong> scenario for structured practice.</p>
                 )}

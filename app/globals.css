@@ -233,6 +233,12 @@ html, body {
 @keyframes slide-in   { from{transform:translateX(-12px);opacity:0} to{transform:translateX(0);opacity:1} }
 @keyframes xp-pop     { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
 
+/* ── Design-system color utilities (supplements Tailwind) ── */
+.text-fg   { color: var(--text); }
+.text-fg-1 { color: var(--text-1); }
+.text-fg-2 { color: var(--text-2); }
+.text-fg-3 { color: var(--text-3); }
+
 .animate-fade-up      { animation: fade-up    0.3s var(--ease) both; }
 .animate-fade-in      { animation: fade-in    0.22s var(--ease) both; }
 .animate-float        { animation: float      3s ease-in-out infinite; }
