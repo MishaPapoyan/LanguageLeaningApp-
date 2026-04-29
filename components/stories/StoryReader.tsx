@@ -72,14 +72,14 @@ export function StoryReader({ story }: Props) {
     <div className="max-w-3xl mx-auto animate-fade-up">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Link href="/stories" className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 transition-colors">
+        <Link href="/stories" style={{ width: 32, height: 32, borderRadius: 10, background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-2)" }}>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
-          <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium">Chapter {story.chapter}</p>
-          <h1 className="text-2xl font-serif text-zinc-900">{story.title}</h1>
+          <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Chapter {story.chapter}</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.015em" }}>{story.title}</h1>
         </div>
         <div className="ml-auto text-4xl">{story.imageEmoji}</div>
       </div>
@@ -87,55 +87,51 @@ export function StoryReader({ story }: Props) {
       {!showQuiz ? (
         <>
           {/* Story content */}
-          <div className="bg-white rounded-2xl border border-zinc-100 p-6 mb-6">
-            <div className="prose prose-zinc max-w-none">
-              {paragraphs.map((para: any, i: number) => (
-                <p key={i} className="mb-4 text-zinc-700 leading-relaxed text-base">
-                  {renderParagraphWithHighlights(para, handleWordClick)}
-                </p>
-              ))}
-            </div>
+          <div className="bento p-6 mb-6">
+            {paragraphs.map((para: any, i: number) => (
+              <p key={i} style={{ marginBottom: 16, color: "var(--text-1)", lineHeight: 1.75, fontSize: 16 }}>
+                {renderParagraphWithHighlights(para, handleWordClick)}
+              </p>
+            ))}
           </div>
 
           {/* Word tooltip */}
           {selectedWord && (
-            <div className="bg-white rounded-2xl border-2 border-violet-200 p-5 mb-6 animate-fade-up">
+            <div className="bento p-5 mb-6 animate-fade-up" style={{ border: "1px solid rgba(99,102,241,0.3)", boxShadow: "0 0 24px rgba(99,102,241,0.12)" }}>
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center text-2xl flex-shrink-0">
+                  <div style={{ width: 48, height: 48, borderRadius: 14, background: "var(--accent-dim)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
                     {selectedWord.imageEmoji}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xl font-serif text-zinc-900">{selectedWord.word}</span>
+                      <span style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>{selectedWord.word}</span>
                       <button
                         onClick={() => speakTarget(selectedWord.word, story.language)}
-                        className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center text-sm hover:bg-violet-100 transition-colors"
+                        style={{ width: 28, height: 28, borderRadius: 8, background: "var(--accent-dim)", color: "var(--accent-2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, border: "none", cursor: "pointer" }}
                         title="Listen"
                       >
                         ♪
                       </button>
                     </div>
-                    <p className="text-violet-600 font-medium">{selectedWord.translation}</p>
-                    <p className="text-sm text-zinc-600 mt-1">{selectedWord.definition}</p>
-                    <p className="text-sm text-zinc-500 mt-1 italic">&ldquo;{selectedWord.exampleFr}&rdquo;</p>
+                    <p style={{ color: "var(--accent-2)", fontWeight: 600, marginTop: 2 }}>{selectedWord.translation}</p>
+                    <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 4 }}>{selectedWord.definition}</p>
+                    <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 3, fontStyle: "italic" }}>&ldquo;{selectedWord.exampleFr}&rdquo;</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleSaveWord(selectedWord.id)}
                     disabled={savingWord === selectedWord.id}
-                    className={`text-sm px-3 py-1.5 rounded-full font-medium transition-all ${
-                      savedWords.has(selectedWord.id)
-                        ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                        : "btn-outline"
-                    }`}
+                    style={{
+                      fontSize: 12, padding: "6px 14px", borderRadius: 999, fontWeight: 600,
+                      background: savedWords.has(selectedWord.id) ? "var(--green-dim)" : "var(--accent-dim)",
+                      color: savedWords.has(selectedWord.id) ? "var(--green)" : "var(--accent-2)",
+                      border: `1px solid ${savedWords.has(selectedWord.id) ? "rgba(16,185,129,0.3)" : "rgba(99,102,241,0.3)"}`,
+                      cursor: "pointer",
+                    }}
                   >
-                    {savingWord === selectedWord.id
-                      ? "..."
-                      : savedWords.has(selectedWord.id)
-                      ? "Saved"
-                      : "+ Save"}
+                    {savingWord === selectedWord.id ? "..." : savedWords.has(selectedWord.id) ? "✓ Saved" : "+ Save"}
                   </button>
                   <button onClick={() => setSelectedWord(null)} className="btn-ghost text-sm px-3 py-1.5">
                     Close
@@ -146,18 +142,22 @@ export function StoryReader({ story }: Props) {
           )}
 
           {/* Vocabulary list */}
-          <div className="bg-white rounded-2xl border border-zinc-100 p-6 mb-6">
-            <h3 className="font-serif text-zinc-900 mb-3">Key Vocabulary ({story.words.length} words)</h3>
+          <div className="bento p-5 mb-6">
+            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12 }}>
+              Key Vocabulary · {story.words.length} words
+            </p>
             <div className="flex flex-wrap gap-2">
               {story.words.map((word) => (
                 <button
                   key={word.id}
                   onClick={() => setSelectedWord(word)}
-                  className={`px-3 py-1.5 rounded-xl text-sm border transition-all ${
-                    savedWords.has(word.id)
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                      : "bg-white border-zinc-200 text-zinc-700 hover:border-violet-300"
-                  }`}
+                  style={{
+                    padding: "6px 12px", borderRadius: 10, fontSize: 13, border: "1px solid",
+                    transition: "all 0.12s", cursor: "pointer",
+                    background: savedWords.has(word.id) ? "var(--green-dim)" : "var(--surface-2)",
+                    borderColor: savedWords.has(word.id) ? "rgba(16,185,129,0.3)" : "var(--border-md)",
+                    color: savedWords.has(word.id) ? "var(--green)" : "var(--text-2)",
+                  }}
                 >
                   {word.imageEmoji} {word.word}
                   {savedWords.has(word.id) && " ✓"}

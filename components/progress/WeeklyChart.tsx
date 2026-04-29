@@ -20,7 +20,7 @@ export function WeeklyChart({ weeklyXp }: Props) {
 
   if (weeks.every((w) => w.xp === 0)) {
     return (
-      <div className="text-center py-8 text-zinc-400">
+      <div className="text-center py-8" style={{ color: "var(--text-3)" }}>
         <p className="text-2xl mb-2">◈</p>
         <p className="text-sm">No XP data yet — start learning to see your weekly progress!</p>
       </div>
@@ -31,7 +31,7 @@ export function WeeklyChart({ weeklyXp }: Props) {
     <SimpleBarChart
       data={weeks.map((w) => ({ label: w.label, value: w.xp }))}
       height={200}
-      barColor="#ede9fe"
+      barColor="#6366F1"
       highlightMax
       formatValue={(v) => `${v} XP`}
     />
