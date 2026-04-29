@@ -91,68 +91,115 @@ export default async function HomePage() {
       <section
         className="bento relative overflow-hidden"
         style={{
-          minHeight: 180,
+          minHeight: 200,
           background: "radial-gradient(ellipse 80% 120% at 10% 50%, rgba(99,102,241,0.28) 0%, transparent 60%), radial-gradient(ellipse 60% 100% at 90% 40%, rgba(45,212,191,0.18) 0%, transparent 55%), var(--surface)",
           border: "1px solid var(--border-md)",
+          padding: 0,
         }}
       >
         {/* decorative blobs */}
         <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(99,102,241,0.12)", filter: "blur(40px)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: -30, right: 60, width: 160, height: 160, borderRadius: "50%", background: "rgba(45,212,191,0.10)", filter: "blur(36px)", pointerEvents: "none" }} />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5 p-6 md:p-8">
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold mb-1" style={{ color: "var(--text)" }}>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-stretch gap-0" style={{ minHeight: 200 }}>
+
+          {/* ── Left: Streak hero block ── */}
+          {progress?.streak && progress.streak > 0 ? (
+            <div
+              style={{
+                flexShrink: 0, display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center",
+                padding: "24px 32px",
+                borderRight: "1px solid var(--border)",
+                minWidth: 148,
+                background: "rgba(249,115,22,0.06)",
+              }}
+            >
+              {/* Animated SVG flame */}
+              <div className="animate-flame-dance" style={{ marginBottom: 6 }}>
+                <svg width="44" height="54" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 2C22 2 32 14 32 24C32 29.523 27.523 34 22 34C16.477 34 12 29.523 12 24C12 19 15 16 15 16C15 16 14 22 18 24C18 24 17 18 22 12C22 12 20 20 25 22C25 22 28 18 26 12C30 16 34 20 34 28C34 36.837 28.837 44 22 44C15.163 44 10 36.837 10 28C10 20 14 14 14 14C14 14 8 22 8 30C8 30 4 26 4 20C4 12 12 4 22 2Z" fill="url(#flame-grad)" filter="url(#flame-glow)"/>
+                  <defs>
+                    <linearGradient id="flame-grad" x1="22" y1="2" x2="22" y2="44" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#FBBF24"/>
+                      <stop offset="50%" stopColor="#F97316"/>
+                      <stop offset="100%" stopColor="#EF4444"/>
+                    </linearGradient>
+                    <filter id="flame-glow">
+                      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                </svg>
+              </div>
+              <p
+                style={{
+                  fontFamily: "var(--font-mono)", fontSize: 52, fontWeight: 800,
+                  color: "var(--xp)", lineHeight: 1, letterSpacing: "-0.04em",
+                  fontVariantNumeric: "tabular-nums",
+                  textShadow: "0 0 32px rgba(245,158,11,0.5)",
+                }}
+              >
+                {progress.streak}
+              </p>
+              <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginTop: 4 }}>
+                {t(locale, "home_dayStreak")}
+              </p>
+            </div>
+          ) : null}
+
+          {/* ── Right: Greeting + XP ── */}
+          <div style={{ flex: 1, padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <h1 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 6 }}>
               {langConfig.greeting}, {firstName}! {langConfig.flag}
             </h1>
-            <p className="text-sm mb-4" style={{ color: "var(--text-2)" }}>
+            <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
               {progress?.streak && progress.streak > 0
                 ? t(locale, "home_streakMessage", { streak: progress.streak.toString() })
                 : t(locale, "home_readyMessage", { lang: langConfig.label })}
             </p>
 
             {/* XP bar */}
-            <div style={{ maxWidth: 320 }}>
-              <div className="flex items-center justify-between mb-1.5">
+            <div style={{ maxWidth: 340 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                 <span
-                  className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: "var(--accent-dim)", color: "var(--accent-2)", border: "1px solid rgba(99,102,241,0.3)" }}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    fontSize: 11, fontWeight: 700,
+                    background: "var(--accent-dim)", color: "var(--accent-2)",
+                    border: "1px solid rgba(99,102,241,0.3)",
+                    borderRadius: 999, padding: "3px 10px",
+                  }}
                 >
                   <Zap size={11} />
                   {t(locale, "home_statLevel")} {xpInfo.level}
                 </span>
-                <span className="text-xs" style={{ color: "var(--text-3)" }}>
-                  {xpInfo.current} / {xpInfo.needed} XP
+                <span style={{ fontSize: 11, color: "var(--text-3)" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>{xpInfo.current}</span>
+                  {" / "}
+                  <span style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>{xpInfo.needed}</span>
+                  {" XP"}
                 </span>
               </div>
               <div className="xp-bar">
                 <div className="xp-bar-fill" style={{ width: `${xpInfo.pct}%` }} />
               </div>
             </div>
-          </div>
 
-          {/* Stat pills */}
-          <div className="flex md:flex-col gap-2.5">
-            {progress?.streak ? (
+            {/* Bottom row: total XP pill */}
+            <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 10 }}>
               <div
-                className="stat-pill"
-                style={{ background: "var(--xp-dim)", border: "1px solid rgba(245,158,11,0.28)" }}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.22)",
+                  borderRadius: 999, padding: "5px 12px",
+                }}
               >
-                <Flame size={20} style={{ color: "var(--streak)" }} />
-                <div>
-                  <p style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700, color: "var(--xp)", lineHeight: 1, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{progress.streak}</p>
-                  <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_dayStreak")}</p>
-                </div>
-              </div>
-            ) : null}
-            <div
-              className="stat-pill"
-              style={{ background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.28)" }}
-            >
-              <Zap size={18} style={{ color: "var(--accent)" }} />
-              <div>
-                <p style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700, color: "var(--accent-2)", lineHeight: 1, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{(progress?.xp ?? 0).toLocaleString()}</p>
-                <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_totalXp")}</p>
+                <Zap size={13} style={{ color: "var(--accent)" }} />
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 700, color: "var(--accent-2)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
+                  {(progress?.xp ?? 0).toLocaleString()}
+                </span>
+                <span style={{ fontSize: 10, color: "var(--text-3)" }}>{t(locale, "home_totalXp")}</span>
               </div>
             </div>
           </div>

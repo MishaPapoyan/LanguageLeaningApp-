@@ -635,8 +635,10 @@ export default function MyWordsPage() {
 
       {/* ── Word tile grid ── */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "48px 0", color: "var(--text-3)", fontSize: 14 }}>
-          {t(locale, "mywords_loading")}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton" style={{ height: 130, borderRadius: 16 }} />
+          ))}
         </div>
       ) : words.length === 0 ? (
         <div style={{
@@ -654,7 +656,7 @@ export default function MyWordsPage() {
         </div>
       ) : (
         <>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <p className="section-label" style={{ margin: 0 }}>{t(locale, "mywords_wordDeck")}</p>
             <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
             <span style={{ fontSize: 11, color: "var(--text-3)" }}>{t(locale, "mywords_pairs", { n: words.length.toString() })}</span>
@@ -663,30 +665,48 @@ export default function MyWordsPage() {
           {/* Grid of flashcard tiles */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
             gap: 12,
             alignItems: "start",
           }}>
             {words.map((word, idx) => {
-              const hues = ["var(--accent)", "var(--teal, #14b8a6)", "var(--gold)", "#f472b6", "var(--green)"];
-              const accentColor = hues[idx % hues.length];
+              // Design-system themed palette
+              const palette = [
+                { color: "var(--accent-2)", dim: "var(--accent-dim)", border: "rgba(99,102,241,0.3)", glow: "rgba(99,102,241,0.12)" },
+                { color: "var(--teal)",     dim: "var(--teal-dim)",   border: "rgba(45,212,191,0.3)", glow: "rgba(45,212,191,0.12)" },
+                { color: "var(--xp)",       dim: "var(--xp-dim)",     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)" },
+                { color: "#f472b6",         dim: "rgba(244,114,182,0.12)", border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.1)" },
+                { color: "var(--green)",    dim: "var(--green-dim)",  border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)" },
+                { color: "var(--blue)",     dim: "var(--blue-dim)",   border: "rgba(96,165,250,0.3)", glow: "rgba(96,165,250,0.12)" },
+              ];
+              const p = palette[idx % palette.length];
 
               return (
                 <div key={word.id} style={{
-                  borderRadius: 16,
+                  borderRadius: 18,
                   background: "var(--surface-2)",
-                  border: "1px solid var(--border)",
+                  border: `1px solid ${p.border}`,
                   overflow: "hidden",
                   display: "flex", flexDirection: "column",
-                  transition: "transform 0.15s, box-shadow 0.15s",
+                  transition: "transform 0.18s, box-shadow 0.18s",
                   position: "relative",
-                }}>
-                  {/* Colored top strip */}
-                  <div style={{ height: 4, background: accentColor }} />
+                  boxShadow: `0 4px 20px ${p.glow}`,
+                }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)";
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = `0 8px 32px ${p.glow}, 0 0 0 1px ${p.border}`;
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = `0 4px 20px ${p.glow}`;
+                  }}
+                >
+                  {/* Colored top accent */}
+                  <div style={{ height: 3, background: `linear-gradient(90deg, ${p.color}, ${p.color}88)` }} />
 
                   {editingId === word.id ? (
                     /* ── Edit mode ── */
-                    <div style={{ padding: "14px 14px 10px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+                    <div style={{ padding: "14px 14px 12px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
                       <input
                         autoFocus value={editFront} onChange={e => setEditFront(e.target.value)}
                         placeholder="Your language"
@@ -719,38 +739,45 @@ export default function MyWordsPage() {
                     </div>
                   ) : (
                     <>
-                      {/* Native word */}
-                      <div style={{ padding: "14px 16px 10px" }}>
-                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px" }}>
+                      {/* Card body */}
+                      <div style={{ padding: "14px 16px", flex: 1 }}>
+                        {/* Native word */}
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 3px" }}>
                           {t(locale, "mywords_yourLanguage")}
                         </p>
-                        <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-2)", margin: 0, wordBreak: "break-word" }}>
+                        <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text-2)", margin: "0 0 12px", wordBreak: "break-word", lineHeight: 1.3 }}>
                           {word.front}
                         </p>
-                      </div>
-                      <div style={{ height: 1, background: "var(--border)", margin: "0 16px" }} />
-                      {/* Target language word */}
-                      <div style={{ padding: "10px 16px 14px", flex: 1 }}>
-                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: accentColor, margin: "0 0 4px" }}>
-                          {langConfig.flag} {langConfig.label}
+
+                        {/* Separator with flag */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                          <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${p.border}, transparent)` }} />
+                          <span style={{ fontSize: 14 }}>{langConfig.flag}</span>
+                          <div style={{ flex: 1, height: 1, background: `linear-gradient(270deg, ${p.border}, transparent)` }} />
+                        </div>
+
+                        {/* Target language word */}
+                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: p.color, margin: "0 0 3px", opacity: 0.8 }}>
+                          {langConfig.label}
                         </p>
-                        <p style={{ fontSize: 18, fontWeight: 800, color: accentColor, margin: 0, wordBreak: "break-word" }}>
+                        <p style={{ fontSize: 19, fontWeight: 800, color: p.color, margin: 0, wordBreak: "break-word", lineHeight: 1.2, letterSpacing: "-0.01em" }}>
                           {word.back}
                         </p>
                       </div>
+
                       {/* Action row */}
-                      <div style={{ display: "flex", alignItems: "center", borderTop: "1px solid var(--border)", padding: "0 6px" }}>
-                        <button onClick={() => speakTarget(word.back, langConfig.code)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
-                          onMouseEnter={e => e.currentTarget.style.color = accentColor}
+                      <div style={{ display: "flex", alignItems: "center", borderTop: `1px solid ${p.border}40`, padding: "0 4px" }}>
+                        <button onClick={() => speakTarget(word.back, langConfig.code)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "color 0.12s" }}
+                          onMouseEnter={e => e.currentTarget.style.color = p.color}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
                         ><Volume2 size={12} /> {t(locale, "mywords_listen")}</button>
-                        <div style={{ width: 1, height: 18, background: "var(--border)" }} />
-                        <button onClick={() => startEdit(word)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                        <div style={{ width: 1, height: 16, background: "var(--border)" }} />
+                        <button onClick={() => startEdit(word)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "color 0.12s" }}
                           onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
                         ><Pencil size={12} /> {t(locale, "mywords_edit")}</button>
-                        <div style={{ width: 1, height: 18, background: "var(--border)" }} />
-                        <button onClick={() => deleteWord(word.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "8px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                        <div style={{ width: 1, height: 16, background: "var(--border)" }} />
+                        <button onClick={() => deleteWord(word.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "color 0.12s" }}
                           onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
                         ><Trash2 size={12} /> {t(locale, "mywords_delete")}</button>
@@ -767,19 +794,19 @@ export default function MyWordsPage() {
             <button onClick={() => setMode("setup")} style={{
               width: "100%", marginTop: 20, padding: "18px",
               borderRadius: 16, cursor: "pointer",
-              background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.06))",
-              border: "2px dashed rgba(99,102,241,0.35)",
+              background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05))",
+              border: "2px dashed rgba(99,102,241,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
               color: "var(--accent)", fontSize: 15, fontWeight: 800,
               transition: "all 0.18s",
             }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,0.15)";
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,0.14)";
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.06))";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,0.35)";
+                (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05))";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,0.3)";
               }}
             >
               <Play size={17} /> {t(locale, "mywords_quizMe", { n: words.length.toString() })}

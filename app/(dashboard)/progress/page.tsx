@@ -139,17 +139,19 @@ export default async function ProgressPage() {
       {/* ── Hero Stats Bento Grid ── */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr 1fr",
+        gridTemplateColumns: "repeat(4, 1fr)",
         gap: 12, marginBottom: 20,
       }}>
 
-        {/* Level — spans 1 col with ring */}
+        {/* Level ring — spans 1 col */}
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border)",
           borderRadius: 18, padding: "20px 16px",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
-          gridColumn: "span 1",
+          position: "relative", overflow: "hidden",
         }}>
+          {/* soft accent glow behind ring */}
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 110, height: 110, borderRadius: "50%", background: "rgba(99,102,241,0.12)", filter: "blur(20px)", pointerEvents: "none" }} />
           <div style={{ position: "relative", width: 100, height: 100 }}>
             <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
               <circle cx="50" cy="50" r="44" fill="none" stroke="var(--surface-3)" strokeWidth="7" />
@@ -158,22 +160,25 @@ export default async function ProgressPage() {
                 stroke="var(--accent)" strokeWidth="7" strokeLinecap="round"
                 strokeDasharray={levelCircumference}
                 strokeDashoffset={levelCircumference - (xpInfo.pct / 100) * levelCircumference}
-                style={{ transition: "stroke-dashoffset 1s ease" }}
+                style={{ transition: "stroke-dashoffset 1s ease", filter: "drop-shadow(0 0 6px rgba(99,102,241,0.6))" }}
               />
             </svg>
             <div style={{
               position: "absolute", inset: 0,
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             }}>
-              <span style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", lineHeight: 1 }}>
+              <span style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", lineHeight: 1, fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
                 {xpInfo.level}
               </span>
-              <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600, marginTop: 2 }}>{t(locale, "progress_levelLabel")}</span>
+              <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: "0.06em" }}>{t(locale, "progress_levelLabel")}</span>
             </div>
           </div>
           <div style={{ textAlign: "center" }}>
             <p style={{ fontSize: 11, color: "var(--text-2)", fontWeight: 500 }}>
-              {xpInfo.current} / {xpInfo.needed} XP
+              <span style={{ fontFamily: "var(--font-mono)" }}>{xpInfo.current}</span>
+              {" / "}
+              <span style={{ fontFamily: "var(--font-mono)" }}>{xpInfo.needed}</span>
+              {" XP"}
             </p>
             <p style={{ fontSize: 10, color: "var(--text-3)" }}>{t(locale, "progress_toNextLevel")}</p>
           </div>
@@ -181,9 +186,10 @@ export default async function ProgressPage() {
 
         {/* Total XP */}
         <div style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
+          background: "var(--surface)", border: "1px solid rgba(99,102,241,0.2)",
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
+          boxShadow: "0 0 0 1px rgba(99,102,241,0.06), 0 4px 20px rgba(99,102,241,0.08)",
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
@@ -203,9 +209,10 @@ export default async function ProgressPage() {
 
         {/* Streak */}
         <div style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
+          background: "var(--surface)", border: "1px solid rgba(249,115,22,0.2)",
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
+          boxShadow: "0 0 0 1px rgba(249,115,22,0.06), 0 4px 20px rgba(249,115,22,0.08)",
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
@@ -225,9 +232,10 @@ export default async function ProgressPage() {
 
         {/* Words Learned */}
         <div style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
+          background: "var(--surface)", border: "1px solid rgba(45,212,191,0.2)",
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
+          boxShadow: "0 0 0 1px rgba(45,212,191,0.06), 0 4px 20px rgba(45,212,191,0.08)",
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
@@ -270,36 +278,53 @@ export default async function ProgressPage() {
         }}>{t(locale, "progress_skills")}</p>
         <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 20 }}>{t(locale, "progress_skillProgress")}</h2>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {skills.map((skill) => {
             const val = Math.min(skillTree[skill.key] ?? 0, 100);
             return (
               <div key={skill.key}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ color: skill.color, display: "flex", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 9,
+                      background: skill.dimColor,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: skill.color,
+                    }}>
                       {skill.icon}
-                    </span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
+                    </div>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", fontFamily: "var(--font-display)" }}>
                       {skill.label}
                     </span>
                   </div>
                   <span style={{
-                    fontSize: 13, fontWeight: 800, color: skill.color,
-                    background: skill.dimColor, borderRadius: 99, padding: "2px 10px",
+                    fontSize: 13, fontWeight: 800, color: skill.color, fontFamily: "var(--font-mono)",
+                    background: skill.dimColor, borderRadius: 99, padding: "3px 12px",
+                    letterSpacing: "-0.01em",
                   }}>
                     {val}%
                   </span>
                 </div>
                 <div style={{
-                  height: 8, background: "var(--surface-3)", borderRadius: 99, overflow: "hidden",
+                  height: 9, background: "var(--surface-3)", borderRadius: 99, overflow: "visible",
+                  position: "relative",
                 }}>
                   <div style={{
                     height: "100%", borderRadius: 99,
-                    background: skill.color,
+                    background: `linear-gradient(90deg, ${skill.color}cc, ${skill.color})`,
                     width: `${Math.max(val, 1)}%`,
-                    transition: "width 1s ease",
-                  }} />
+                    transition: "width 1.1s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    boxShadow: `0 0 12px ${skill.color}66`,
+                    position: "relative", overflow: "hidden",
+                  }}>
+                    {/* shine sweep */}
+                    <div style={{
+                      position: "absolute", inset: 0,
+                      background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
+                      width: "40%",
+                      animation: "xp-shine 2.4s linear infinite",
+                    }} />
+                  </div>
                 </div>
               </div>
             );
@@ -323,28 +348,49 @@ export default async function ProgressPage() {
           <div style={{ marginBottom: 24 }}>
             <p style={{
               fontSize: 11, fontWeight: 700, color: "var(--text-3)",
-              textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12,
+              textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 14,
             }}>
               {t(locale, "progress_earnedCount", { n: String(earnedBadges.length) })}
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
-              {earnedBadges.map((badge) => (
-                <div key={badge.id} style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  background: "var(--gold-dim)", border: "1px solid rgba(245,158,11,0.25)",
-                  borderRadius: 14, padding: "12px 14px",
-                }}>
-                  <span style={{ fontSize: 28, lineHeight: 1 }}>{badge.emoji}</span>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)", marginBottom: 2 }}>
-                      {badge.name}
-                    </p>
-                    <p style={{ fontSize: 11, color: "var(--text-2)", lineHeight: 1.3 }}>
-                      {badge.description}
-                    </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+              {earnedBadges.map((badge, idx) => {
+                // cycle through accent gradients for each badge
+                const gradients = [
+                  { bg: "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.08) 100%)", border: "rgba(245,158,11,0.35)", glow: "rgba(245,158,11,0.18)", name: "var(--gold)" },
+                  { bg: "linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(129,140,248,0.08) 100%)", border: "rgba(99,102,241,0.35)", glow: "rgba(99,102,241,0.18)", name: "var(--accent-2)" },
+                  { bg: "linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(52,211,153,0.08) 100%)", border: "rgba(16,185,129,0.35)", glow: "rgba(16,185,129,0.18)", name: "var(--green)" },
+                  { bg: "linear-gradient(135deg, rgba(45,212,191,0.15) 0%, rgba(94,234,212,0.08) 100%)", border: "rgba(45,212,191,0.35)", glow: "rgba(45,212,191,0.18)", name: "var(--teal)" },
+                ];
+                const g = gradients[idx % gradients.length];
+                return (
+                  <div key={badge.id} style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    background: g.bg,
+                    border: `1px solid ${g.border}`,
+                    borderRadius: 16, padding: "14px 16px",
+                    boxShadow: `0 4px 20px ${g.glow}`,
+                    transition: "transform 0.15s, box-shadow 0.15s",
+                  }}>
+                    <div style={{
+                      width: 46, height: 46, borderRadius: 13, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${g.border}50, ${g.border}20)`,
+                      border: `1px solid ${g.border}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 24, boxShadow: `0 0 16px ${g.glow}`,
+                    }}>
+                      {badge.emoji}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: g.name, marginBottom: 3 }}>
+                        {badge.name}
+                      </p>
+                      <p style={{ fontSize: 11, color: "var(--text-2)", lineHeight: 1.4 }}>
+                        {badge.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -354,29 +400,34 @@ export default async function ProgressPage() {
           <div>
             <p style={{
               fontSize: 11, fontWeight: 700, color: "var(--text-3)",
-              textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12,
+              textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 14,
             }}>
               {t(locale, "progress_lockedCount", { n: String(lockedBadges.length) })}
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
               {lockedBadges.map((badge) => (
                 <div key={badge.id} style={{
                   display: "flex", alignItems: "center", gap: 12,
                   background: "var(--surface-3)", border: "1px solid var(--border)",
-                  borderRadius: 14, padding: "12px 14px",
-                  opacity: 0.6,
+                  borderRadius: 16, padding: "14px 16px",
+                  opacity: 0.5,
                 }}>
-                  <span style={{ fontSize: 28, lineHeight: 1, filter: "grayscale(1)" }}>
+                  <div style={{
+                    width: 46, height: 46, borderRadius: 13, flexShrink: 0,
+                    background: "var(--surface-4)", border: "1px solid var(--border-md)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 24, filter: "grayscale(1)",
+                  }}>
                     {badge.emoji}
-                  </span>
+                  </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
                       <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-2)" }}>
                         {badge.name}
                       </p>
                       <Lock size={11} style={{ color: "var(--text-3)", flexShrink: 0 }} />
                     </div>
-                    <p style={{ fontSize: 11, color: "var(--text-3)", lineHeight: 1.3 }}>
+                    <p style={{ fontSize: 11, color: "var(--text-3)", lineHeight: 1.4 }}>
                       {badge.description}
                     </p>
                   </div>
