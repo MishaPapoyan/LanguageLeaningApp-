@@ -14,14 +14,14 @@ const interTight = Inter_Tight({
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
   display: "swap",
-  variable: "--font-display",
+  variable: "--font-inter-tight",
 });
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-mono",
+  variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${interTight.variable} ${geistMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${interTight.variable} ${geistMono.variable} antialiased`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="antialiased">
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

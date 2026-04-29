@@ -146,8 +146,11 @@ export default async function LeaderboardPage() {
 
                 {/* XP */}
                 <p style={{
-                  fontSize: i === 1 ? 13 : 11, fontWeight: 700,
-                  color: i === 1 ? "var(--gold)" : "var(--accent-2)",
+                  fontSize: i === 1 ? 14 : 12, fontWeight: 700,
+                  color: i === 1 ? "var(--xp)" : "var(--accent-2)",
+                  fontFamily: "var(--font-mono)",
+                  letterSpacing: "-0.01em",
+                  fontVariantNumeric: "tabular-nums",
                 }}>
                   {user.xp.toLocaleString()} XP
                 </p>
@@ -245,19 +248,20 @@ export default async function LeaderboardPage() {
                 </div>
 
                 {/* XP */}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--xp)", fontFamily: "var(--font-mono)", letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums" }}>
                   {user.xp.toLocaleString()}
                 </span>
 
                 {/* Streak */}
                 <span style={{
                   fontSize: 12, fontWeight: 600,
-                  color: user.streak > 0 ? "var(--gold)" : "var(--text-3)",
+                  color: user.streak > 0 ? "var(--xp)" : "var(--text-3)",
                   display: "flex", alignItems: "center", gap: 3,
+                  fontFamily: "var(--font-mono)", letterSpacing: "-0.01em",
                 }}>
                   {user.streak > 0 ? (
                     <>
-                      <Flame size={12} style={{ color: "var(--gold)", flexShrink: 0 }} />
+                      <Flame size={12} style={{ color: "var(--streak)", flexShrink: 0 }} />
                       {user.streak}d
                     </>
                   ) : "—"}

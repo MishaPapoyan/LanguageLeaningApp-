@@ -194,7 +194,7 @@ export default async function ProgressPage() {
             <Zap size={20} style={{ color: "var(--accent-2)" }} />
           </div>
           <div>
-            <p style={{ fontSize: 32, fontWeight: 800, color: "var(--accent-2)", lineHeight: 1, marginBottom: 4 }}>
+            <p style={{ fontSize: 32, fontWeight: 700, color: "var(--accent-2)", lineHeight: 1, marginBottom: 4, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
               {(progress?.xp ?? 0).toLocaleString()}
             </p>
             <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>{t(locale, "progress_totalXp")}</p>
@@ -216,7 +216,7 @@ export default async function ProgressPage() {
             <Flame size={20} style={{ color: "var(--gold)" }} />
           </div>
           <div>
-            <p style={{ fontSize: 32, fontWeight: 800, color: "var(--gold)", lineHeight: 1, marginBottom: 4 }}>
+            <p style={{ fontSize: 32, fontWeight: 700, color: "var(--xp)", lineHeight: 1, marginBottom: 4, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
               {progress?.streak ?? 0}
             </p>
             <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>{t(locale, "progress_dayStreak")}</p>
@@ -238,7 +238,7 @@ export default async function ProgressPage() {
             <BookMarked size={20} style={{ color: "var(--teal)" }} />
           </div>
           <div>
-            <p style={{ fontSize: 32, fontWeight: 800, color: "var(--teal)", lineHeight: 1, marginBottom: 4 }}>
+            <p style={{ fontSize: 32, fontWeight: 700, color: "var(--teal)", lineHeight: 1, marginBottom: 4, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
               {savedWords}
             </p>
             <p style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 600 }}>{t(locale, "progress_wordsSaved")}</p>
@@ -473,7 +473,7 @@ export default async function ProgressPage() {
             }}>
               {stat.icon}
             </div>
-            <p style={{ fontSize: 28, fontWeight: 800, color: stat.color, lineHeight: 1, marginBottom: 4 }}>
+            <p style={{ fontSize: 28, fontWeight: 700, color: stat.color, lineHeight: 1, marginBottom: 4, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
               {stat.value}
             </p>
             <p style={{ fontSize: 11, color: "var(--text-2)", fontWeight: 600 }}>{stat.label}</p>

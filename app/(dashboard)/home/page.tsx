@@ -136,26 +136,22 @@ export default async function HomePage() {
             {progress?.streak ? (
               <div
                 className="stat-pill"
-                style={{ background: "rgba(245,158,11,0.14)", border: "1px solid rgba(245,158,11,0.28)" }}
+                style={{ background: "var(--xp-dim)", border: "1px solid rgba(245,158,11,0.28)" }}
               >
-                <span className="animate-streak-flame inline-flex" style={{ color: "#f59e0b" }}>
-                  <Flame size={22} />
-                </span>
+                <Flame size={20} style={{ color: "var(--streak)" }} />
                 <div>
-                  <p className="text-base font-black leading-none" style={{ color: "#f59e0b" }}>{progress.streak}</p>
+                  <p style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700, color: "var(--xp)", lineHeight: 1, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{progress.streak}</p>
                   <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_dayStreak")}</p>
                 </div>
               </div>
             ) : null}
             <div
               className="stat-pill"
-              style={{ background: "rgba(99,102,241,0.14)", border: "1px solid rgba(99,102,241,0.28)" }}
+              style={{ background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.28)" }}
             >
-              <span className="inline-flex" style={{ color: "var(--accent)" }}>
-                <Star size={20} />
-              </span>
+              <Zap size={18} style={{ color: "var(--accent)" }} />
               <div>
-                <p className="text-base font-black leading-none" style={{ color: "var(--accent)" }}>{progress?.xp ?? 0}</p>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 700, color: "var(--accent-2)", lineHeight: 1, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{(progress?.xp ?? 0).toLocaleString()}</p>
                 <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_totalXp")}</p>
               </div>
             </div>
