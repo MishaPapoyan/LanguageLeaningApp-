@@ -23,31 +23,58 @@ const SCENARIO_COLORS: Record<string, { accent: string; dim: string; gradient: s
   free:     { accent: "#34d399", dim: "rgba(52,211,153,0.15)",  gradient: "linear-gradient(135deg, #34d399, #10b981)" },
 };
 
-const avatarNames: Record<string, string> = {
-  waiter: "Pierre", traveler: "Sophie", teacher: "Mme Dubois", free: "Alex",
+// LOW-3/LOW-4: Avatar names are language-specific — match the AI persona in lib/claude.ts
+const AVATAR_NAMES: Record<string, Record<string, string>> = {
+  fr: { waiter: "Pierre",  traveler: "Sophie",  teacher: "Mme Dubois", free: "Alex"          },
+  es: { waiter: "Carlos",  traveler: "Elena",   teacher: "Sra. García", free: "Diego"         },
 };
 
-const GRAMMAR_TIPS: Record<string, string[]> = {
-  waiter: [
-    "Use «je voudrais» (I would like) to order politely.",
-    "«L'addition, s'il vous plaît» means «The bill, please».",
-    "Try «Est-ce que vous avez…?» to ask what's available.",
-  ],
-  traveler: [
-    "«Où se trouve…?» means «Where is…?» — great for directions.",
-    "Use «combien coûte» to ask how much something costs.",
-    "«Pouvez-vous m'aider?» = «Can you help me?»",
-  ],
-  teacher: [
-    "Pay attention to adjective agreement — it changes with gender.",
-    "«Depuis» + present tense expresses ongoing duration.",
-    "Subjunctive follows «il faut que» and «je veux que».",
-  ],
-  free: [
-    "Mirror the AI's sentence structures to sound natural.",
-    "Use filler words like «eh bien», «donc», «alors» for fluency.",
-    "Don't translate word-for-word; think in the language instead.",
-  ],
+// LOW-5: Grammar tips are language-specific
+const GRAMMAR_TIPS: Record<string, Record<string, string[]>> = {
+  fr: {
+    waiter: [
+      "Use «je voudrais» (I would like) to order politely.",
+      "«L'addition, s'il vous plaît» means «The bill, please».",
+      "Try «Est-ce que vous avez…?» to ask what's available.",
+    ],
+    traveler: [
+      "«Où se trouve…?» means «Where is…?» — great for directions.",
+      "Use «combien coûte» to ask how much something costs.",
+      "«Pouvez-vous m'aider?» = «Can you help me?»",
+    ],
+    teacher: [
+      "Pay attention to adjective agreement — it changes with gender.",
+      "«Depuis» + present tense expresses ongoing duration.",
+      "Subjunctive follows «il faut que» and «je veux que».",
+    ],
+    free: [
+      "Mirror the AI's sentence structures to sound natural.",
+      "Use filler words like «eh bien», «donc», «alors» for fluency.",
+      "Don't translate word-for-word; think in the language instead.",
+    ],
+  },
+  es: {
+    waiter: [
+      "Use «me gustaría» (I would like) to order politely.",
+      "«La cuenta, por favor» means «The bill, please».",
+      "Try «¿Tienen…?» to ask what's available.",
+    ],
+    traveler: [
+      "«¿Dónde está…?» means «Where is…?» — great for directions.",
+      "Use «¿Cuánto cuesta?» to ask how much something costs.",
+      "«¿Puede ayudarme?» = «Can you help me?»",
+    ],
+    teacher: [
+      "Pay attention to ser vs estar — both mean 'to be' but differ in use.",
+      "«Hace» + time + «que» expresses ongoing duration.",
+      "Subjunctive follows «es importante que» and «quiero que».",
+    ],
+    free: [
+      "Mirror the AI's sentence structures to sound natural.",
+      "Use filler words like «pues», «entonces», «bueno» for fluency.",
+      "Don't translate word-for-word; think in the language instead.",
+    ],
+  },
 };
 
 interface Props { userLevel: number; }
@@ -299,17 +326,24 @@ export function TutorClient({ userLevel }: Props) {
                 </p>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{
-                    width: 24, height: 24, borderRadius: "50%",
-                    background: colors.gradient,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 10, fontWeight: 900, color: "#fff",
-                  }}>
-                    {avatarNames[s.id]?.[0]}
-                  </div>
-                  <span style={{ fontSize: 12, color: "var(--text-3)" }}>
-                    Practice with {avatarNames[s.id]}
-                  </span>
+                  {(() => {
+                    const avatarName = (AVATAR_NAMES[langConfig.code] ?? AVATAR_NAMES.fr)[s.id] ?? "AI";
+                    return (
+                      <>
+                        <div style={{
+                          width: 24, height: 24, borderRadius: "50%",
+                          background: colors.gradient,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, fontWeight: 900, color: "#fff",
+                        }}>
+                          {avatarName[0]}
+                        </div>
+                        <span style={{ fontSize: 12, color: "var(--text-3)" }}>
+                          Practice with {avatarName}
+                        </span>
+                      </>
+                    );
+                  })()}
                 </div>
               </button>
             );
@@ -321,7 +355,8 @@ export function TutorClient({ userLevel }: Props) {
 
   const scenarioInfo = SCENARIO_INFO[scenario];
   const colors = SCENARIO_COLORS[scenario];
-  const tips = GRAMMAR_TIPS[scenario] ?? GRAMMAR_TIPS.free;
+  const langTips = GRAMMAR_TIPS[langConfig.code] ?? GRAMMAR_TIPS.fr;
+  const tips = langTips[scenario] ?? langTips.free;
   const currentTip = tips[tipIndex % tips.length];
 
   // ===== FEEDBACK PANEL =====

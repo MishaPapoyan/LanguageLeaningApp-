@@ -36,7 +36,18 @@ export async function POST(req: NextRequest) {
     void remaining; // used in header if needed later
 
     const body = await req.json();
-    const { messages, scenario } = body as { messages: ChatMessage[]; scenario: TutorScenario };
+    let { messages, scenario } = body as { messages: ChatMessage[]; scenario: TutorScenario };
+
+    // HIGH-9: Limit message history to prevent oversized payloads / prompt injection via history
+    const MAX_MESSAGES = 50;
+    const MAX_MSG_CHARS = 2000;
+    if (Array.isArray(messages)) {
+      messages = messages
+        .slice(-MAX_MESSAGES)
+        .map((m) => ({ ...m, content: String(m.content ?? "").slice(0, MAX_MSG_CHARS) }));
+    } else {
+      messages = [];
+    }
 
     const targetLanguage = session.user.targetLanguage ?? "fr";
     const systemPrompt = getTutorSystemPrompt(scenario, targetLanguage);

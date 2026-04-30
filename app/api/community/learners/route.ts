@@ -12,11 +12,15 @@ export async function GET(req: Request) {
   const lang   = searchParams.get("lang") ?? "";
 
   try {
+    // HIGH-3: Don't spread duplicate `name` keys — the spread would silently
+    // overwrite `name: { not: null }` with `name: { contains: search }`,
+    // allowing users with null names to appear in search results.
     const users = await prisma.user.findMany({
       where: {
-        name: { not: null },
+        name: search
+          ? { contains: search, mode: "insensitive" }
+          : { not: null },
         progress: { isNot: null },
-        ...(search ? { name: { contains: search, mode: "insensitive" } } : {}),
         ...(lang ? { targetLanguage: lang } : {}),
       },
       select: {

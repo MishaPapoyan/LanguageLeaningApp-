@@ -559,7 +559,7 @@ export default async function ProgressPage() {
                     {gameIcon(game.gameType)}
                   </div>
                   <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>
-                    {game.gameType.toLowerCase().replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                    {game.gameType.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
                   </span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

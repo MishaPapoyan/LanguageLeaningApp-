@@ -198,6 +198,21 @@ export default async function GamesPage() {
   const userId = session?.user?.id ?? "";
   const locale = getLocale((session?.user as any)?.nativeLanguage ?? "en");
 
+  // MED-4: Compute actual time until next UTC midnight (when daily challenge resets)
+  const nowMs = Date.now();
+  const nextMidnightMs = new Date(
+    Date.UTC(
+      new Date().getUTCFullYear(),
+      new Date().getUTCMonth(),
+      new Date().getUTCDate() + 1
+    )
+  ).getTime();
+  const msLeft = nextMidnightMs - nowMs;
+  const resetHH = Math.floor(msLeft / 3_600_000);
+  const resetMM = Math.floor((msLeft % 3_600_000) / 60_000);
+  const resetSS = Math.floor((msLeft % 60_000) / 1_000);
+  const resetIn = `${String(resetHH).padStart(2, "0")}:${String(resetMM).padStart(2, "0")}:${String(resetSS).padStart(2, "0")}`;
+
   let allScores: { gameType: string; score: number; xpEarned: number; playedAt: Date }[] = [];
 
   try {
@@ -264,7 +279,7 @@ export default async function GamesPage() {
               Daily Challenge
             </span>
             <span style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
-              Resets in 04:12:09
+              Resets in {resetIn}
             </span>
           </div>
           <p style={{ fontSize: 17, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 2, letterSpacing: "-0.01em" }}>

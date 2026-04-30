@@ -134,13 +134,22 @@ export default function OnboardingPage() {
     }
     // Final step — submit
     setSubmitting(true);
-    await fetch("/api/onboarding", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ageGroup, nativeLanguage, learningGoal, proficiencyLevel, dailyGoalMinutes }),
-    });
-    router.push("/home");
-    router.refresh();
+    try {
+      const res = await fetch("/api/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ageGroup, nativeLanguage, learningGoal, proficiencyLevel, dailyGoalMinutes }),
+      });
+      // MED-11: surface API errors instead of silently proceeding
+      if (!res.ok) {
+        console.error("[onboarding] save failed:", res.status);
+      }
+      router.push("/home");
+      router.refresh();
+    } catch (err) {
+      console.error("[onboarding] network error:", err);
+      setSubmitting(false);
+    }
   };
 
   const progress = (step / TOTAL_STEPS) * 100;
@@ -207,7 +216,7 @@ export default function OnboardingPage() {
         {/* Step heading */}
         <div style={{ marginBottom: "28px" }}>
           <h1 style={{
-            fontFamily: "serif",
+            fontFamily: "var(--font-display)",
             fontSize: "clamp(24px, 4vw, 32px)",
             color: "var(--text)",
             margin: "0 0 8px",
@@ -301,7 +310,7 @@ export default function OnboardingPage() {
               {DAILY_GOALS.map((d) => (
                 <OptionCard key={d.value} selected={dailyGoalMinutes === d.value} onClick={() => setDailyGoal(d.value)}>
                   <div style={{
-                    fontSize: "22px", fontWeight: 800, fontFamily: "serif",
+                    fontSize: "22px", fontWeight: 800, fontFamily: "var(--font-display)",
                     color: dailyGoalMinutes === d.value ? "var(--accent-2)" : "var(--text)",
                     marginBottom: "4px",
                   }}>{d.label}</div>

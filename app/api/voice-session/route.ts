@@ -15,10 +15,13 @@ export async function POST(req: Request) {
   // Award 5 XP per voice practice session (capped at 25 XP per session)
   const xpEarned = Math.min(25, Math.max(5, Math.floor(durationSec / 2)));
 
+  // HIGH-2: Use the user's actual target language, not hardcoded "fr"
+  const language = session.user.targetLanguage ?? "fr";
+
   await prisma.voiceSession.create({
     data: {
       userId: session.user.id,
-      language: "fr",
+      language,
       durationSec,
       xpEarned,
       provider: "browser-media-recorder",

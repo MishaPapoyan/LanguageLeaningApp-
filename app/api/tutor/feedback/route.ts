@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
   const userId = session.user.id;
 
   try {
-    const feedback = await analyzeTutorSession(messages);
+    // HIGH-1: Pass the user's target language so Spanish learners get Spanish feedback
+    const targetLanguage = session.user.targetLanguage ?? "fr";
+    const feedback = await analyzeTutorSession(messages, targetLanguage);
 
     await prisma.aiInteraction.create({
       data: {

@@ -31,15 +31,16 @@ export async function POST(req: Request) {
     } catch { /* ignore */ }
   }
 
+  // HIGH-6: Return success ONLY when DB write succeeds — previously returned ok:true always
   try {
     await prisma.userLocation.upsert({
       where:  { userId: session.user.id },
       update: { latitude, longitude, accuracy: accuracy ?? null, city: finalCity, country: finalCountry },
       create: { userId: session.user.id, latitude, longitude, accuracy: accuracy ?? null, city: finalCity, country: finalCountry },
     });
+    return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[user/location] DB error:", err);
+    return NextResponse.json({ error: "Failed to save location" }, { status: 503 });
   }
-
-  return NextResponse.json({ ok: true });
 }

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 const registerSchema = z.object({
   name: z.string().min(2).max(50),
@@ -52,7 +51,6 @@ export async function POST(req: NextRequest) {
       select: { id: true, email: true, name: true, role: true },
     });
 
-    revalidatePath("/admin");
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

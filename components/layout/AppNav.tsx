@@ -40,16 +40,23 @@ const TARGET_LANG_FLAGS: Record<string, string> = {
   es: "\u{1F1EA}\u{1F1F8}",
 };
 
-let _pcache: { data: ProgressData; at: number } | null = null;
+type PCache = { data: ProgressData; at: number } | null;
 
-async function fetchProgress(): Promise<ProgressData | null> {
-  if (_pcache && Date.now() - _pcache.at < 30_000) return _pcache.data;
+async function fetchProgress(
+  cacheRef: React.MutableRefObject<PCache>
+): Promise<ProgressData | null> {
+  if (cacheRef.current && Date.now() - cacheRef.current.at < 30_000) {
+    return cacheRef.current.data;
+  }
   try {
     const r = await fetch("/api/progress", { cache: "no-store" });
     const d = await r.json();
-    if (d.progress) { _pcache = { data: d.progress, at: Date.now() }; return d.progress; }
+    if (d.progress) {
+      cacheRef.current = { data: d.progress, at: Date.now() };
+      return d.progress;
+    }
   } catch { /* ignore */ }
-  return _pcache?.data ?? null;
+  return cacheRef.current?.data ?? null;
 }
 
 function isEmoji(str: string) {
@@ -59,20 +66,23 @@ function isEmoji(str: string) {
 export function AppNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const [progress, setProgress] = useState<ProgressData | null>(_pcache?.data ?? null);
+  // MED-10: use ref instead of module-level variable so each component instance
+  // has its own cache (avoids shared mutable state across renders/hot-reloads).
+  const pcacheRef = useRef<PCache>(null);
+  const [progress, setProgress] = useState<ProgressData | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const dropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchProgress().then((p) => { if (p) setProgress(p); });
+    fetchProgress(pcacheRef).then((p) => { if (p) setProgress(p); });
   }, []);
 
   useEffect(() => {
     function onXpUpdated() {
-      _pcache = null;
+      pcacheRef.current = null;
       // 700ms delay so DB write commits before we re-fetch
-      setTimeout(() => fetchProgress().then((p) => { if (p) setProgress(p); }), 700);
+      setTimeout(() => fetchProgress(pcacheRef).then((p) => { if (p) setProgress(p); }), 700);
     }
     window.addEventListener("xp-updated", onXpUpdated);
     return () => window.removeEventListener("xp-updated", onXpUpdated);

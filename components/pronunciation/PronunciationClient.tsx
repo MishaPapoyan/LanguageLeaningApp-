@@ -92,7 +92,8 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
 
   const playExample = (word: Word) => {
     setCurrentWord(word);
-    speak(word.exampleFr);
+    // LOW-7: use speakText so ttsLocale and speed are applied consistently
+    speakText(word.exampleFr);
   };
 
   // ── Recording logic ─────────────────────────────────────────────────────────

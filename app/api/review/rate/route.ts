@@ -33,7 +33,8 @@ export async function POST(req: Request) {
   // Derive masteryLevel (0–5) from repetitions for backwards compat
   const masteryLevel = Math.min(5, repetitions);
 
-  const quality: number = body.quality ?? 4;
+  // MED-1: Clamp SM-2 quality to valid range 0–5
+  const quality: number = Math.min(5, Math.max(0, Number(body.quality ?? 4)));
   const isCorrect = quality >= 3;
 
   await prisma.savedWord.update({

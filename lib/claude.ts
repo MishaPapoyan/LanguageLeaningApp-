@@ -169,13 +169,10 @@ Return this exact JSON structure:
     const text = response.choices[0]?.message?.content || "{}";
     const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     return JSON.parse(cleaned) as TutorFeedback;
-  } catch {
-    return {
-      grammarScore: 70,
-      accuracyPct: 70,
-      strengths: ["Good effort!", "Kept the conversation going"],
-      corrections: [],
-      recommendation: "Keep practicing — consistency is key!",
-    };
+  } catch (err) {
+    // MED-7: Surface the error so callers can return a proper 5xx instead of
+    // silently returning fake feedback that masks AI/network failures.
+    console.error("[analyzeTutorSession] error:", err);
+    throw err;
   }
 }

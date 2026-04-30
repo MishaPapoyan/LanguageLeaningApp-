@@ -21,10 +21,10 @@ import {
   TrendingUp,
   Zap,
   ArrowRight,
-  Volume2,
   Mic,
   CheckCircle2,
 } from "lucide-react";
+import { WordOfDayPlayer } from "@/components/home/WordOfDayPlayer";
 
 export const metadata: Metadata = {
   title: "Dashboard — Lingova",
@@ -479,13 +479,8 @@ export default async function HomePage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-xl font-bold" style={{ color: "var(--text)" }}>{recentWord.word}</p>
-                  <button
-                    aria-label="Listen to pronunciation"
-                    className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70"
-                    style={{ color: "var(--text-3)", background: "transparent", border: "none", cursor: "pointer" }}
-                  >
-                    <Volume2 size={14} />
-                  </button>
+                  {/* MED-5: wired up to speak() via client component */}
+                  <WordOfDayPlayer word={recentWord.word} ttsLocale={langConfig.ttsLocale ?? targetLang} />
                 </div>
                 <p className="text-sm font-semibold mt-0.5" style={{ color: "var(--accent-2)" }}>{recentWord.translation}</p>
                 <p className="text-xs mt-1 italic truncate" style={{ color: "var(--text-3)" }}>

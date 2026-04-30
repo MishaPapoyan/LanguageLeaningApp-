@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 /**
  * TTS priority chain (server-side):
@@ -128,13 +130,23 @@ async function mistralTTS(text: string, lang: string): Promise<ArrayBuffer | nul
 
 // ─── Handler ─────────────────────────────────────────────────────────────────
 
+const VALID_LANG_PREFIXES = new Set(["fr", "es", "en", "de", "it", "pt", "ja", "ko", "zh", "ru"]);
+
 export async function POST(req: NextRequest) {
+  // CRIT-1: Auth guard — prevents unauthenticated credit drain
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { text, lang = "fr" } = await req.json();
   if (!text?.trim()) {
     return NextResponse.json({ error: "Missing text" }, { status: 400 });
   }
 
-  const langPrefix = lang.split(/[-_]/)[0].toLowerCase();
+  const rawPrefix = lang.split(/[-_]/)[0].toLowerCase();
+  // LOW-14: Validate lang prefix, fall back to "fr" for unknown values
+  const langPrefix = VALID_LANG_PREFIXES.has(rawPrefix) ? rawPrefix : "fr";
   const t = text.trim();
 
   const audio =

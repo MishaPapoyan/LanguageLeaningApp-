@@ -233,7 +233,7 @@ async function getAnalyticsData(userId: string) {
       stories: xpFromStories,
       tutor: xpFromTutor,
       words: xpFromWords,
-      streaks: xpFromOther,
+      other: xpFromOther,
       total: xpTotal,
     },
     vocabulary: {

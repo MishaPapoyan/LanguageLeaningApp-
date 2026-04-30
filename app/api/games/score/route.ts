@@ -14,6 +14,13 @@ export async function POST(req: NextRequest) {
 
   const { gameType, score, wordsUsed }: GameScoreData = await req.json();
   const userId = session.user.id;
+
+  // Validate gameType against the Prisma enum at runtime
+  const validGameTypes = Object.values(GameType) as string[];
+  if (!gameType || !validGameTypes.includes(gameType)) {
+    return NextResponse.json({ error: "Invalid gameType" }, { status: 400 });
+  }
+
   const xpEarned = score > 0 ? XP_REWARDS.gameWin : XP_REWARDS.gamePlay;
 
   try {

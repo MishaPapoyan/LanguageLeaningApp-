@@ -6,20 +6,24 @@ export async function awardXp(
   amount: number,
   skillType?: "vocabulary" | "grammar" | "speaking"
 ) {
+  // CRIT-2: Use atomic increment to prevent race conditions.
+  // Old code read xp then wrote newXp = xp + amount — concurrent requests
+  // would both read the same value and one write would be lost.
   const progress = await prisma.progress.upsert({
     where: { userId },
     create: {
       userId,
       xp: amount,
-      level: 1,
-      streak: 1,
+      level: getLevelFromXp(amount),
+      streak: 0,
       skillTree: { vocabulary: 0, grammar: 0, speaking: 0 },
       weeklyXp: {},
     },
-    update: {},
+    update: { xp: { increment: amount } }, // atomic — safe under concurrent writes
   });
 
-  const newXp = progress.xp + amount;
+  // progress.xp is already the post-increment value from Prisma
+  const newXp = progress.xp;
   const newLevel = getLevelFromXp(newXp);
 
   // Update weekly XP
@@ -43,7 +47,6 @@ export async function awardXp(
   const updated = await prisma.progress.update({
     where: { userId },
     data: {
-      xp: newXp,
       level: newLevel,
       lastActive: new Date(),
       skillTree,
@@ -52,7 +55,7 @@ export async function awardXp(
     },
   });
 
-  return { xp: updated.xp, level: updated.level, newBadges };
+  return { xp: newXp, level: updated.level, newBadges };
 }
 
 export async function updateStreak(userId: string): Promise<number> {
@@ -61,18 +64,26 @@ export async function updateStreak(userId: string): Promise<number> {
 
   const now = new Date();
   const last = new Date(progress.lastActive);
-  const hoursSince = (now.getTime() - last.getTime()) / (1000 * 60 * 60);
+
+  // LOW-10: Compare by calendar day (UTC) to avoid midnight edge cases.
+  // Old code used hoursSince / 24 which missed activities at 23:59 vs 00:01.
+  const nowUtcDay  = Date.UTC(now.getFullYear(),  now.getMonth(),  now.getDate());
+  const lastUtcDay = Date.UTC(last.getFullYear(), last.getMonth(), last.getDate());
+  const dayDiff = Math.round((nowUtcDay - lastUtcDay) / 86_400_000);
+
+  // Keep the 36h grace period: if it's been 2 calendar days but < 36 clock hours,
+  // still count as consecutive (protects late-night → early-morning users).
+  const hoursSince = (now.getTime() - last.getTime()) / 3_600_000;
 
   let newStreak = progress.streak;
 
-  if (hoursSince < 36) {
-    // Within grace period - maintain or increment streak
-    const daysSince = Math.floor(hoursSince / 24);
-    if (daysSince >= 1) {
-      newStreak = progress.streak + 1;
-    }
+  if (dayDiff === 0) {
+    // Same calendar day — streak unchanged
+  } else if (dayDiff === 1 || (dayDiff === 2 && hoursSince < 36)) {
+    // Next day, or within grace window — increment
+    newStreak = progress.streak + 1;
   } else {
-    // Streak broken
+    // Missed more than one day — reset
     newStreak = 1;
   }
 
@@ -81,7 +92,7 @@ export async function updateStreak(userId: string): Promise<number> {
     data: { streak: newStreak, lastActive: now },
   });
 
-  // Award streak XP if new day
+  // Award streak XP if a new day was registered
   if (newStreak > progress.streak) {
     await awardXp(userId, XP_REWARDS.dailyStreak);
   }

@@ -27,21 +27,22 @@ const getLeaderboard = unstable_cache(
   { revalidate: 60, tags: ["right-panel-leaderboard"] }
 );
 
-const getUserPanelData = unstable_cache(
-  async (userId: string) => {
-    const [myProgress, savedWords] = await Promise.all([
-      prisma.progress.findUnique({ where: { userId } }),
-      prisma.savedWord.findMany({
-        where: { userId },
-        select: { word: { select: { word: true, translation: true, imageEmoji: true } } },
-        take: 100,
-      }),
-    ]);
-    return { myProgress, savedWords };
-  },
-  ["right-panel-user"],
-  { revalidate: 30, tags: ["right-panel-user"] }
-);
+const getUserPanelData = (userId: string) =>
+  unstable_cache(
+    async () => {
+      const [myProgress, savedWords] = await Promise.all([
+        prisma.progress.findUnique({ where: { userId } }),
+        prisma.savedWord.findMany({
+          where: { userId },
+          select: { word: { select: { word: true, translation: true, imageEmoji: true } } },
+          take: 100,
+        }),
+      ]);
+      return { myProgress, savedWords };
+    },
+    [`right-panel-user-${userId}`],
+    { revalidate: 30, tags: [`right-panel-user-${userId}`] }
+  )();
 
 const TIPS: Record<string, { tip: string; emoji: string }[]> = {
   fr: [

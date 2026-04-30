@@ -53,7 +53,10 @@ function playAudioUrl(
 
 // ─── Mistral Voxtral TTS ──────────────────────────────────────────────────────
 
-// Client-side blob URL cache so we don't re-request the same text
+// Client-side blob URL cache so we don't re-request the same text.
+// LOW-13: Cap at MAX_VOXTRAL_CACHE entries using FIFO eviction to prevent
+// unbounded memory growth from blob URLs accumulating over a session.
+const MAX_VOXTRAL_CACHE = 50;
 const voxtralCache = new Map<string, string>();
 
 async function speakViaVoxtral(
@@ -79,6 +82,13 @@ async function speakViaVoxtral(
       if (!res.ok) return false;
       const blob = await res.blob();
       blobUrl = URL.createObjectURL(blob);
+      // Evict oldest entry (Maps iterate in insertion order)
+      if (voxtralCache.size >= MAX_VOXTRAL_CACHE) {
+        const oldestKey = voxtralCache.keys().next().value as string;
+        const oldUrl = voxtralCache.get(oldestKey);
+        if (oldUrl) URL.revokeObjectURL(oldUrl);
+        voxtralCache.delete(oldestKey);
+      }
       voxtralCache.set(cacheKey, blobUrl);
     } catch {
       return false;
