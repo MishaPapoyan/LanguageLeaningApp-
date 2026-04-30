@@ -7,7 +7,7 @@ import { getLanguageConfig } from "@/data/language-config";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pronunciation — LangCraft",
+  title: "Pronunciation — Lingova",
   description: "Practice pronunciation",
 };
 

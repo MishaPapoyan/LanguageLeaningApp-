@@ -33,7 +33,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
 
       if (current + 1 >= words.length) {
         const score = Math.round(((isKnown ? known.length + 1 : known.length) / words.length) * 100);
-        setFinished(true); // show results immediately; don't block on fetch
+        setFinished(true);
         try {
           const res = await fetch("/api/games/score", {
             method: "POST",
@@ -52,36 +52,73 @@ export function FlashcardGame({ words }: { words: Word[] }) {
     [card, current, known, words]
   );
 
-
+  // ── Results screen ──────────────────────────────────────────────────────────
   if (finished) {
     const knownCount = known.length;
     const learnCount = words.length - knownCount;
+    const pct = Math.round((knownCount / words.length) * 100);
+
     return (
-      <div className="bg-white rounded-2xl border border-zinc-100 p-8 text-center animate-fade-up">
-        <p className="text-4xl mb-3">{knownCount >= words.length * 0.7 ? "◈" : "▤"}</p>
-        <h2 className="text-xl font-serif text-zinc-900 mb-2">Round Complete!</h2>
-        <p className="text-sm text-zinc-500 mb-6">You got through {words.length} cards</p>
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-emerald-50 rounded-xl p-4 ring-1 ring-emerald-100">
-            <p className="text-3xl font-bold text-emerald-700">{knownCount}</p>
-            <p className="text-xs text-zinc-500 mt-1">I knew it</p>
+      <div className="bento p-8 text-center animate-fade-up" style={{ maxWidth: 480, margin: "0 auto" }}>
+        <div
+          style={{
+            width: 80, height: 80, borderRadius: "50%", margin: "0 auto 20px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 36,
+            background: pct >= 70 ? "rgba(16,185,129,0.12)" : "var(--accent-dim)",
+            border: `2px solid ${pct >= 70 ? "rgba(16,185,129,0.3)" : "rgba(99,102,241,0.3)"}`,
+          }}
+        >
+          {pct >= 70 ? "◈" : "▤"}
+        </div>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", marginBottom: 6 }}>
+          Round Complete!
+        </h2>
+        <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
+          You got through {words.length} cards
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+          <div style={{
+            background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.28)",
+            borderRadius: 14, padding: "16px 12px", textAlign: "center",
+          }}>
+            <p style={{ fontSize: 32, fontWeight: 800, color: "var(--green)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>
+              {knownCount}
+            </p>
+            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>I knew it</p>
           </div>
-          <div className="bg-amber-50 rounded-xl p-4 ring-1 ring-amber-100">
-            <p className="text-3xl font-bold text-amber-700">{learnCount}</p>
-            <p className="text-xs text-zinc-500 mt-1">Still learning</p>
+          <div style={{
+            background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.28)",
+            borderRadius: 14, padding: "16px 12px", textAlign: "center",
+          }}>
+            <p style={{ fontSize: 32, fontWeight: 800, color: "var(--xp)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>
+              {learnCount}
+            </p>
+            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>Still learning</p>
           </div>
         </div>
+
         {xpEarned > 0 && (
-          <p className="text-violet-600 font-semibold mb-4">+{xpEarned} XP earned!</p>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 20,
+            background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+            borderRadius: 999, padding: "6px 16px",
+            fontSize: 14, fontWeight: 800, color: "var(--accent-2)",
+          }}>
+            ⚡ +{xpEarned} XP earned!
+          </div>
         )}
-        <div className="flex gap-3">
+
+        <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={() => { setCurrent(0); setFlipped(false); setKnown([]); setLearning([]); setFinished(false); }}
-            className="btn-primary flex-1"
+            className="btn-primary"
+            style={{ flex: 1 }}
           >
             Play again
           </button>
-          <Link href="/games" className="btn-outline flex-1 text-center">
+          <Link href="/games" className="btn-secondary" style={{ flex: 1, textAlign: "center" }}>
             Back to games
           </Link>
         </div>
@@ -89,38 +126,63 @@ export function FlashcardGame({ words }: { words: Word[] }) {
     );
   }
 
+  // ── Game screen ─────────────────────────────────────────────────────────────
   return (
-    <div>
-      {/* Progress */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex-1 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+    <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      {/* Progress bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <div style={{ flex: 1, height: 6, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden" }}>
           <div
-            className="h-full bg-violet-500 rounded-full transition-all duration-500"
-            style={{ width: `${((current) / words.length) * 100}%` }}
+            style={{
+              height: "100%", borderRadius: 999, transition: "width 0.5s ease",
+              background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+              width: `${(current / words.length) * 100}%`,
+            }}
           />
         </div>
-        <span className="text-xs font-bold text-zinc-500">{current + 1}/{words.length}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-3)", fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
+          {current + 1}/{words.length}
+        </span>
       </div>
 
-      {/* Card */}
+      {/* Card — 3D flip */}
       <div
-        className="perspective-1000 cursor-pointer mb-6"
+        style={{ perspective: "1200px", cursor: "pointer", marginBottom: 20 }}
         onClick={() => setFlipped((f) => !f)}
       >
         <div
-          className={`relative h-64 transition-all duration-500 preserve-3d ${flipped ? "rotate-y-180" : ""}`}
-          style={{ transformStyle: "preserve-3d", transition: "transform 0.4s" }}
+          style={{
+            position: "relative", height: 240,
+            transformStyle: "preserve-3d",
+            transition: "transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1)",
+            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+          }}
         >
           {/* Front */}
           <div
-            className="absolute inset-0 bg-white rounded-2xl border border-zinc-100 flex flex-col items-center justify-center bg-gradient-to-b from-violet-50/50 to-white"
-            style={{ backfaceVisibility: "hidden" }}
+            style={{
+              position: "absolute", inset: 0,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              borderRadius: 20,
+              background: "var(--surface-2)",
+              border: "1px solid var(--border-md)",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              gap: 10,
+            }}
           >
-            <p className="text-3xl font-serif text-zinc-900">{card.word}</p>
-            <p className="text-sm text-violet-500 mt-4 font-medium">Tap to reveal</p>
+            <p style={{ fontSize: 30, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
+              {card.word}
+            </p>
+            <p style={{ fontSize: 13, color: "var(--text-3)" }}>Tap to reveal</p>
             <button
               onClick={(e) => { e.stopPropagation(); speakTarget(card.word, langConfig.code); }}
-              className="mt-2 w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center hover:bg-violet-100 transition-colors text-sm"
+              style={{
+                width: 34, height: 34, borderRadius: 9,
+                background: "var(--accent-dim)", color: "var(--accent-2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                border: "1px solid rgba(99,102,241,0.25)", cursor: "pointer", fontSize: 16,
+              }}
             >
               ♪
             </button>
@@ -128,35 +190,66 @@ export function FlashcardGame({ words }: { words: Word[] }) {
 
           {/* Back */}
           <div
-            className="absolute inset-0 bg-white rounded-2xl border-2 border-violet-200 flex flex-col items-center justify-center bg-violet-50"
-            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+            style={{
+              position: "absolute", inset: 0,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              borderRadius: 20,
+              background: "linear-gradient(145deg, var(--surface-2), var(--surface-3))",
+              border: "1px solid rgba(99,102,241,0.35)",
+              boxShadow: "0 0 32px rgba(99,102,241,0.12)",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              padding: "24px",
+              gap: 8,
+            }}
           >
-            <p className="text-2xl font-serif text-violet-700">{card.translation}</p>
-            <p className="text-zinc-500 text-sm mt-2 text-center px-4 italic">&ldquo;{card.exampleFr}&rdquo;</p>
+            <p style={{ fontSize: 26, fontWeight: 800, color: "var(--accent-2)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", textAlign: "center" }}>
+              {card.translation}
+            </p>
+            <p style={{ fontSize: 13, color: "var(--text-3)", fontStyle: "italic", textAlign: "center", lineHeight: 1.5 }}>
+              &ldquo;{card.exampleFr}&rdquo;
+            </p>
           </div>
         </div>
       </div>
 
       {/* Action buttons */}
       {flipped && (
-        <div className="flex gap-3 animate-fade-up">
+        <div style={{ display: "flex", gap: 10 }} className="animate-fade-up">
           <button
             onClick={() => next(false)}
-            className="flex-1 py-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 transition-colors"
+            style={{
+              flex: 1, padding: "14px 0", borderRadius: 14,
+              background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.3)",
+              color: "var(--xp)", fontWeight: 700, fontSize: 14, cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(245,158,11,0.18)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(245,158,11,0.10)"}
           >
             Still learning
           </button>
           <button
             onClick={() => next(true)}
-            className="flex-1 py-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-medium hover:bg-emerald-100 transition-colors"
+            style={{
+              flex: 1, padding: "14px 0", borderRadius: 14,
+              background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.3)",
+              color: "var(--green)", fontWeight: 700, fontSize: 14, cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(16,185,129,0.18)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(16,185,129,0.10)"}
           >
-            I knew it!
+            I knew it! ✓
           </button>
         </div>
       )}
 
       {!flipped && (
-        <p className="text-center text-zinc-400 text-sm">Click the card to see the answer</p>
+        <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-3)" }}>
+          Click the card to see the answer
+        </p>
       )}
     </div>
   );

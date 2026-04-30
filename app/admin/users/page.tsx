@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl mb-1" style={{ color: "var(--text)" }}>Users</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>Users</h1>
       <p className="text-sm mb-6" style={{ color: "var(--text-3)" }}>{users.length} total registered users</p>
 
       {/* Filters */}

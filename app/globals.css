@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════
-   LangCraft Design System v3
+   Lingova Design System v3
    Fonts: Inter · Inter Tight (display) · Geist Mono (HUD)
    Base: Dark navy #0B0F1A · Accent: Indigo #6366F1
    ═══════════════════════════════════════════════════════════════ */
@@ -232,6 +232,7 @@ html, body {
 @keyframes bounce-in  { 0%{transform:scale(.82);opacity:0} 65%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
 @keyframes slide-in   { from{transform:translateX(-12px);opacity:0} to{transform:translateX(0);opacity:1} }
 @keyframes xp-pop     { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
+@keyframes typing-dot { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-4px);opacity:1} }
 
 /* ── Design-system color utilities (supplements Tailwind) ── */
 .text-fg   { color: var(--text); }

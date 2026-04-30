@@ -8,7 +8,7 @@ import { getLevelFromXp } from "@/types";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Tutor — LangCraft",
+  title: "AI Tutor — Lingova",
   description: "Practice with an AI conversation partner",
 };
 

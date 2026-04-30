@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { SpeedTyping } from "@/components/games/SpeedTyping";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Speed Typing — LangCraft" };
+export const metadata: Metadata = { title: "Speed Typing — Lingova" };
 
 export default async function SpeedTypingPage() {
   const session = await getServerSession(authOptions);

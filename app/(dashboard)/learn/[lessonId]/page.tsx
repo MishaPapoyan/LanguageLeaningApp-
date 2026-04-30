@@ -30,8 +30,8 @@ export default function LessonPage() {
   if (!lesson) {
     return (
       <div className="max-w-3xl text-center py-20">
-        <p className="text-2xl mb-3 text-zinc-300">◈</p>
-        <h1 className="text-xl font-serif text-zinc-900">Lesson not found</h1>
+        <p style={{ fontSize: 24, marginBottom: 12, color: "var(--text-3)" }}>◈</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>Lesson not found</h1>
         <Link href="/learn" className="btn-primary mt-4 inline-flex">Back to Learning Path</Link>
       </div>
     );
@@ -40,7 +40,6 @@ export default function LessonPage() {
   const exercises = lesson.exercises;
   const exercise = exercises[currentExercise];
 
-  // Strip punctuation that shouldn't penalise the learner (¿ ¡ . , ? !)
   function normalize(s: string) {
     return s.toLowerCase().trim().replace(/^[¿¡]+/, "").replace(/[.!?,;¿¡]+$/, "").trim();
   }
@@ -83,43 +82,56 @@ export default function LessonPage() {
     return idx < all.length - 1 ? all[idx + 1] : null;
   };
 
-  // ── LEARN PHASE ──
+  // ── LEARN PHASE ──────────────────────────────────────────────────────────────
   if (phase === "learn") {
     return (
       <div className="max-w-3xl">
-        <div className="flex items-center gap-3 mb-6">
-          <Link href="/learn" className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+          <Link href="/learn" style={{
+            width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+            background: "var(--surface-2)", border: "1px solid var(--border)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--text-2)",
+          }}>
+            <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <div>
-            <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium">{lesson.topicTitle}</p>
-            <h1 className="text-xl font-serif text-zinc-900">{lesson.title}</h1>
+            <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{lesson.topicTitle}</p>
+            <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>{lesson.title}</h1>
           </div>
         </div>
 
         <div className="space-y-5">
           {lesson.content.map((section, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-zinc-100 p-6">
-              <h2 className="font-serif text-lg text-zinc-900 mb-2">{section.heading}</h2>
-              <p className="text-zinc-600 text-sm leading-relaxed mb-4">{section.body}</p>
+            <div key={i} style={{ background: "var(--surface-2)", borderRadius: 18, border: "1px solid var(--border-md)", padding: "22px 24px" }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", marginBottom: 8 }}>{section.heading}</h2>
+              <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.7, marginBottom: 16 }}>{section.body}</p>
 
               {section.table && (
-                <div className="overflow-x-auto mb-4">
-                  <table className="w-full text-sm">
+                <div style={{ overflowX: "auto", marginBottom: 16 }}>
+                  <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
                     <thead>
-                      <tr className="border-b border-zinc-100">
+                      <tr style={{ borderBottom: "1px solid var(--border)" }}>
                         {section.table.columns.map((col, j) => (
-                          <th key={j} className="text-left py-2 px-3 text-zinc-400 font-medium">{col}</th>
+                          <th key={j} style={{
+                            textAlign: "left", paddingBottom: 8, paddingLeft: 8,
+                            fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                            letterSpacing: "0.07em", color: "var(--text-3)",
+                          }}>{col}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {section.table.rows.map((row, j) => (
-                        <tr key={j} className="border-b border-zinc-50">
+                        <tr key={j} style={{ borderBottom: "1px solid var(--border)" }}>
                           {row.map((cell, k) => (
-                            <td key={k} className={`py-2 px-3 ${k === 0 ? "font-semibold text-violet-600" : "text-zinc-700"}`}>
+                            <td key={k} style={{
+                              padding: "9px 8px",
+                              color: k === 0 ? "var(--accent-2)" : "var(--text-2)",
+                              fontWeight: k === 0 ? 700 : 400,
+                            }}>
                               {cell}
                             </td>
                           ))}
@@ -131,20 +143,27 @@ export default function LessonPage() {
               )}
 
               {section.examples && section.examples.length > 0 && (
-                <div className="space-y-2 mb-4">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                   {section.examples.map((ex, j) => (
-                    <div key={j} className="flex gap-3 bg-violet-50 rounded-xl px-4 py-2.5">
-                      <span className="font-semibold text-violet-600 text-sm min-w-0">{ex.fr}</span>
-                      <span className="text-zinc-400 text-sm">— {ex.en}</span>
+                    <div key={j} style={{
+                      display: "flex", gap: 12, alignItems: "baseline",
+                      background: "var(--accent-dim)", borderRadius: 10,
+                      padding: "9px 14px", border: "1px solid rgba(99,102,241,0.2)",
+                    }}>
+                      <span style={{ fontWeight: 700, color: "var(--accent-2)", fontSize: 13 }}>{ex.fr}</span>
+                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>— {ex.en}</span>
                     </div>
                   ))}
                 </div>
               )}
 
               {section.tip && (
-                <div className="bg-amber-50 ring-1 ring-amber-100 rounded-xl p-3 mt-3">
-                  <p className="text-sm text-amber-800">
-                    <span className="font-semibold">Tip:</span> {section.tip}
+                <div style={{
+                  background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.22)",
+                  borderRadius: 12, padding: "12px 14px", marginTop: 12,
+                }}>
+                  <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>
+                    <span style={{ fontWeight: 700, color: "rgba(245,158,11,0.9)" }}>Tip: </span>{section.tip}
                   </p>
                 </div>
               )}
@@ -154,7 +173,8 @@ export default function LessonPage() {
 
         <button
           onClick={() => { setPhase("practice"); setCurrentExercise(0); setAnswers({}); setShowResult({}); setScore(0); }}
-          className="btn-primary w-full py-3.5 mt-6 text-base"
+          className="btn-primary w-full"
+          style={{ marginTop: 24, padding: "14px" }}
         >
           Practice What You Learned ({exercises.length} questions)
         </button>
@@ -162,65 +182,86 @@ export default function LessonPage() {
     );
   }
 
-  // ── PRACTICE PHASE ──
+  // ── PRACTICE PHASE ───────────────────────────────────────────────────────────
   if (phase === "practice" && exercise) {
     const answered = showResult[currentExercise];
     const userAnswer = answers[currentExercise];
-    const isCorrect = userAnswer?.toLowerCase().trim() === exercise.answer.toLowerCase().trim();
+    const isCorrect = normalize(userAnswer ?? "") === normalize(exercise.answer);
 
     return (
       <div className="max-w-2xl">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <Link href="/learn" className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <Link href="/learn" style={{
+              width: 32, height: 32, borderRadius: 10,
+              background: "var(--surface-2)", border: "1px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "var(--text-2)",
+            }}>
+              <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </Link>
-            <span className="text-xs font-medium text-zinc-400">{currentExercise + 1} / {exercises.length}</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
+              {currentExercise + 1} / {exercises.length}
+            </span>
           </div>
-          <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+          <div style={{ height: 6, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden" }}>
             <div
-              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-500"
-              style={{ width: `${((currentExercise + 1) / exercises.length) * 100}%` }}
+              style={{
+                height: "100%", borderRadius: 999, transition: "width 0.5s ease",
+                background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+                width: `${((currentExercise + 1) / exercises.length) * 100}%`,
+              }}
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-zinc-100 p-6">
-          <h2 className="font-serif text-lg text-zinc-900 mb-6">{exercise.question}</h2>
+        <div style={{ background: "var(--surface-2)", borderRadius: 18, border: "1px solid var(--border-md)", padding: "22px 24px" }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", marginBottom: 20 }}>{exercise.question}</h2>
 
           {/* Multiple choice */}
           {exercise.type === "multiple-choice" && exercise.options && (
-            <div className="space-y-3">
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {exercise.options.map((opt) => {
                 const selected = userAnswer === opt;
                 const correct = opt === exercise.answer;
-                let cls = "border border-zinc-200 bg-white hover:border-violet-300 text-zinc-700";
-                if (answered && correct) cls = "border-2 border-emerald-400 bg-emerald-50 text-emerald-700";
-                else if (answered && selected && !correct) cls = "border-2 border-rose-400 bg-rose-50 text-rose-700";
+
+                let bg = "var(--surface-3)";
+                let border = "var(--border)";
+                let color = "var(--text-2)";
+
+                if (answered && correct)            { bg = "rgba(16,185,129,0.10)"; border = "rgba(16,185,129,0.4)"; color = "var(--green)"; }
+                else if (answered && selected)      { bg = "rgba(239,68,68,0.10)";  border = "rgba(239,68,68,0.4)";  color = "var(--red)"; }
 
                 return (
                   <button
                     key={opt}
                     onClick={() => !answered && handleAnswer(opt)}
                     disabled={!!answered}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all active:scale-[0.98] ${cls}`}
+                    style={{
+                      width: "100%", textAlign: "left", padding: "12px 16px",
+                      borderRadius: 12, border: `1px solid ${border}`,
+                      background: bg, color, fontSize: 13, fontWeight: 500,
+                      cursor: answered ? "default" : "pointer", transition: "all 0.12s",
+                    }}
                   >
                     {opt}
+                    {answered && correct && " ✓"}
+                    {answered && selected && !correct && " ✗"}
                   </button>
                 );
               })}
             </div>
           )}
 
-          {/* Fill in the blank */}
+          {/* Fill in the blank / translate */}
           {(exercise.type === "fill-blank" || exercise.type === "translate") && (
             <div>
               {exercise.hint && !answered && (
-                <p className="text-xs text-zinc-400 mb-3">Hint: {exercise.hint}</p>
+                <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 10 }}>Hint: {exercise.hint}</p>
               )}
-              <div className="flex gap-3">
+              <div style={{ display: "flex", gap: 10 }}>
                 <input
                   type="text"
                   value={fillInput}
@@ -235,16 +276,22 @@ export default function LessonPage() {
                   <button
                     onClick={() => fillInput.trim() && handleAnswer(fillInput)}
                     disabled={!fillInput.trim()}
-                    className="btn-primary px-5"
+                    className="btn-primary"
+                    style={{ padding: "0 20px" }}
                   >
                     Check
                   </button>
                 )}
               </div>
               {answered && (
-                <div className={`mt-3 p-3 rounded-xl text-sm ${isCorrect ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                <div style={{
+                  marginTop: 12, padding: "10px 14px", borderRadius: 12, fontSize: 13,
+                  background: isCorrect ? "rgba(16,185,129,0.10)" : "rgba(239,68,68,0.10)",
+                  border: `1px solid ${isCorrect ? "rgba(16,185,129,0.35)" : "rgba(239,68,68,0.35)"}`,
+                  color: isCorrect ? "var(--green)" : "var(--red)",
+                }}>
                   {isCorrect ? (
-                    <span>Correct!</span>
+                    <span>Correct! ✓</span>
                   ) : (
                     <span>The answer is: <strong>{exercise.answer}</strong></span>
                   )}
@@ -254,7 +301,7 @@ export default function LessonPage() {
           )}
 
           {answered && (
-            <button onClick={nextExercise} className="btn-primary w-full py-3 mt-6">
+            <button onClick={nextExercise} className="btn-primary w-full" style={{ marginTop: 20, padding: "13px" }}>
               {currentExercise < exercises.length - 1 ? "Next Question" : "See Results"}
             </button>
           )}
@@ -263,57 +310,76 @@ export default function LessonPage() {
     );
   }
 
-  // ── DONE PHASE ──
+  // ── DONE PHASE ───────────────────────────────────────────────────────────────
   const pct = Math.round((score / exercises.length) * 100);
   const nextLesson = getNextLesson();
+  const pctColor = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--xp)" : "var(--red)";
 
   return (
-    <div className="max-w-2xl text-center">
-      <div className="bg-white rounded-2xl border border-zinc-100 p-10">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-2xl mx-auto mb-4">
+    <div className="max-w-2xl animate-fade-up" style={{ textAlign: "center" }}>
+      <div style={{ background: "var(--surface-2)", borderRadius: 20, border: "1px solid var(--border-md)", padding: "40px 32px" }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: 18, margin: "0 auto 16px",
+          background: "linear-gradient(135deg, var(--accent), #4338ca)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 26, color: "#fff",
+        }}>
           {pct >= 80 ? "◈" : pct >= 50 ? "▤" : "△"}
         </div>
-        <h1 className="text-2xl font-serif text-zinc-900 mb-1">Lesson Complete!</h1>
-        <p className="text-zinc-400 text-sm mb-6">{lesson.title}</p>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>
+          Lesson Complete!
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>{lesson.title}</p>
 
-        <div className="inline-flex items-center gap-6 bg-zinc-50 rounded-2xl px-8 py-4 mb-6">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-violet-600">{score}/{exercises.length}</p>
-            <p className="text-xs text-zinc-400 mt-1">Correct</p>
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 24,
+          background: "var(--surface-3)", borderRadius: 16, padding: "16px 28px",
+          marginBottom: 24, border: "1px solid var(--border)",
+        }}>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: 28, fontWeight: 800, color: "var(--accent-2)", fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
+              {score}/{exercises.length}
+            </p>
+            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>Correct</p>
           </div>
-          <div className="w-px h-10 bg-zinc-200" />
-          <div className="text-center">
-            <p className={`text-3xl font-bold ${pct >= 80 ? "text-emerald-600" : pct >= 50 ? "text-amber-600" : "text-rose-600"}`}>
+          <div style={{ width: 1, height: 40, background: "var(--border-md)" }} />
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: 28, fontWeight: 800, color: pctColor, fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
               {pct}%
             </p>
-            <p className="text-xs text-zinc-400 mt-1">Score</p>
+            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>Score</p>
           </div>
           {xpEarned > 0 && (
             <>
-              <div className="w-px h-10 bg-zinc-200" />
-              <div className="text-center">
-                <p className="text-3xl font-bold text-violet-600">+{xpEarned}</p>
-                <p className="text-xs text-zinc-400 mt-1">XP Earned</p>
+              <div style={{ width: 1, height: 40, background: "var(--border-md)" }} />
+              <div style={{ textAlign: "center" }}>
+                <p style={{ fontSize: 28, fontWeight: 800, color: "var(--accent-2)", fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
+                  +{xpEarned}
+                </p>
+                <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>XP Earned</p>
               </div>
             </>
           )}
         </div>
 
-        <div className="flex flex-col gap-3 max-w-xs mx-auto">
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 280, margin: "0 auto" }}>
           {pct < 80 && (
             <button
               onClick={() => { setPhase("learn"); setCurrentExercise(0); setAnswers({}); setShowResult({}); setScore(0); setFillInput(""); }}
-              className="btn-outline w-full py-3"
+              className="btn-secondary w-full"
+              style={{ padding: "12px" }}
             >
               Review Lesson
             </button>
           )}
           {nextLesson && (
-            <Link href={`/learn/${nextLesson.id}`} className="btn-primary w-full py-3">
+            <Link href={`/learn/${nextLesson.id}`} className="btn-primary w-full" style={{ padding: "12px", textAlign: "center" }}>
               Next: {nextLesson.title}
             </Link>
           )}
-          <Link href="/learn" className="btn-ghost w-full py-3">Back to Learning Path</Link>
+          <Link href="/learn" className="btn-ghost w-full" style={{ padding: "12px", textAlign: "center" }}>
+            Back to Learning Path
+          </Link>
         </div>
       </div>
     </div>

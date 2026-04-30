@@ -38,7 +38,7 @@ export default function AdminLocationsPage() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl mb-1" style={{ color: "var(--text)" }}>User Locations</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>User Locations</h1>
       <p className="text-sm mb-6" style={{ color: "var(--text-3)" }}>
         {locations.length} user{locations.length !== 1 ? "s" : ""} sharing location
       </p>

@@ -69,7 +69,7 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl mb-1" style={{ color: "var(--text)" }}>Analytics</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>Analytics</h1>
       <p className="text-sm mb-8" style={{ color: "var(--text-3)" }}>
         Platform-wide engagement and learning statistics
       </p>
@@ -85,7 +85,7 @@ export default async function AdminAnalyticsPage() {
         ].map((s) => (
           <div key={s.label} className="rounded-2xl p-4" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p className="text-xl mb-1.5">{s.emoji}</p>
-            <p className="text-xl font-bold font-serif" style={{ color: "var(--text)" }}>{s.value.toLocaleString()}</p>
+            <p style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-mono)", letterSpacing: "-0.03em", fontVariantNumeric: "tabular-nums" }}>{s.value.toLocaleString()}</p>
             <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>{s.label}</p>
           </div>
         ))}

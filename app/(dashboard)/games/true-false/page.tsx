@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TrueFalse } from "@/components/games/TrueFalse";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "True or False — LangCraft" };
+export const metadata: Metadata = { title: "True or False — Lingova" };
 
 export default async function TrueFalsePage() {
   const session = await getServerSession(authOptions);

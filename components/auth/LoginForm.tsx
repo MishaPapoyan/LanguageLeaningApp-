@@ -39,7 +39,7 @@ export function LoginForm() {
   const handleDemo = async () => {
     setDemoLoading(true);
     setError("");
-    await doSignIn("demo@langcraft.app", "demo123");
+    await doSignIn("demo@lingova.app", "demo123");
   };
 
   return (

@@ -6,7 +6,7 @@ import { FillBlank } from "@/components/games/FillBlank";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Fill in the Blank — LangCraft" };
+export const metadata: Metadata = { title: "Fill in the Blank — Lingova" };
 
 export default async function FillBlankPage() {
   const session = await getServerSession(authOptions);

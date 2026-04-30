@@ -7,7 +7,7 @@ import { unstable_cache } from "next/cache";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dictionary — LangCraft",
+  title: "Dictionary — Lingova",
   description: "Browse and save vocabulary",
 };
 

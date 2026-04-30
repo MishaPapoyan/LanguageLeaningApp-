@@ -183,7 +183,7 @@ export function AppNav() {
             }}
             className="hidden-xs"
           >
-            LangCraft
+            Lingova
             <span style={{ fontSize: 14 }}>{flag}</span>
           </span>
         </Link>

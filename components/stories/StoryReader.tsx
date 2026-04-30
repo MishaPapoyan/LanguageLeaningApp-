@@ -243,50 +243,73 @@ interface QuizProps {
 
 function Quiz({ quizzes, quizAnswers, setQuizAnswers, submitted, onSubmit, score, xpEarned, storyId }: QuizProps) {
   return (
-    <div className="space-y-6 animate-fade-up">
-      <h2 className="text-xl font-serif text-zinc-900">Comprehension Quiz</h2>
+    <div className="space-y-5 animate-fade-up">
+      <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>
+        Comprehension Quiz
+      </h2>
 
       {score !== null && (
-        <div className={`bg-white rounded-2xl border-2 text-center p-6 ${score >= 70 ? "border-emerald-300 bg-emerald-50" : "border-rose-300 bg-rose-50"}`}>
-          <p className="text-4xl mb-2">{score >= 70 ? "◈" : "▤"}</p>
-          <p className="text-2xl font-bold text-zinc-800">{score}%</p>
-          <p className="text-zinc-600 mt-1">
+        <div
+          style={{
+            borderRadius: 18, padding: "24px", textAlign: "center",
+            background: score >= 70 ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)",
+            border: `2px solid ${score >= 70 ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
+            boxShadow: score >= 70 ? "0 4px 24px rgba(16,185,129,0.1)" : "0 4px 24px rgba(239,68,68,0.1)",
+          }}
+        >
+          <p style={{ fontSize: 36, marginBottom: 8 }}>{score >= 70 ? "◈" : "▤"}</p>
+          <p style={{ fontSize: 28, fontWeight: 800, color: score >= 70 ? "var(--green)" : "var(--red)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>
+            {score}%
+          </p>
+          <p style={{ color: "var(--text-2)", marginTop: 4, fontSize: 14 }}>
             {score === 100 ? "Perfect score!" : score >= 70 ? "Well done!" : "Keep practicing!"}
           </p>
           {xpEarned > 0 && (
-            <p className="text-violet-600 font-medium mt-2">+{xpEarned} XP earned!</p>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10,
+              background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+              borderRadius: 999, padding: "5px 14px",
+              fontSize: 13, fontWeight: 800, color: "var(--accent-2)",
+            }}>
+              ⚡ +{xpEarned} XP earned!
+            </div>
           )}
-          <Link href="/stories" className="btn-primary mt-4 inline-block">
-            Back to Stories
-          </Link>
+          <div style={{ marginTop: 16 }}>
+            <Link href="/stories" className="btn-primary">
+              Back to Stories
+            </Link>
+          </div>
         </div>
       )}
 
       {quizzes.map((quiz, qi) => (
-        <div key={quiz.id} className="bg-white rounded-2xl border border-zinc-100 p-5">
-          <p className="font-medium text-zinc-800 mb-3">
+        <div key={quiz.id} style={{
+          borderRadius: 16, padding: "18px 20px",
+          background: "var(--surface-2)", border: "1px solid var(--border)",
+        }}>
+          <p style={{ fontWeight: 600, color: "var(--text)", marginBottom: 12, fontSize: 14 }}>
             {qi + 1}. {quiz.question}
           </p>
-          <div className="space-y-2">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {quiz.options.map((option, oi) => {
               const isSelected = quizAnswers[qi] === oi;
               const isCorrect = quiz.answer === oi;
-              let cls = "w-full text-left px-4 py-3 rounded-xl border text-sm transition-all ";
+
+              let bg = "var(--surface-3)";
+              let border = "var(--border)";
+              let color = "var(--text-2)";
 
               if (!submitted) {
-                cls += isSelected
-                  ? "border-violet-400 bg-violet-50 text-violet-700"
-                  : "border-zinc-200 hover:border-zinc-300 text-zinc-700";
+                if (isSelected) { bg = "var(--accent-dim)"; border = "rgba(99,102,241,0.5)"; color = "var(--accent-2)"; }
               } else {
-                if (isCorrect) cls += "border-emerald-400 bg-emerald-50 text-emerald-700";
-                else if (isSelected && !isCorrect) cls += "border-rose-400 bg-rose-50 text-rose-700";
-                else cls += "border-zinc-200 text-zinc-400";
+                if (isCorrect)               { bg = "rgba(16,185,129,0.10)"; border = "rgba(16,185,129,0.4)"; color = "var(--green)"; }
+                else if (isSelected)         { bg = "rgba(239,68,68,0.10)";  border = "rgba(239,68,68,0.4)";  color = "var(--red)"; }
+                else                         { bg = "var(--surface-3)"; border = "var(--border)"; color = "var(--text-3)"; }
               }
 
               return (
                 <button
                   key={oi}
-                  className={cls}
                   onClick={() => {
                     if (!submitted) {
                       const next = [...quizAnswers];
@@ -295,6 +318,13 @@ function Quiz({ quizzes, quizAnswers, setQuizAnswers, submitted, onSubmit, score
                     }
                   }}
                   disabled={submitted}
+                  style={{
+                    width: "100%", textAlign: "left", padding: "11px 14px",
+                    borderRadius: 11, border: `1px solid ${border}`,
+                    background: bg, color, fontSize: 13, fontWeight: 500,
+                    cursor: submitted ? "default" : "pointer",
+                    transition: "all 0.12s",
+                  }}
                 >
                   {String.fromCharCode(65 + oi)}. {option}
                   {submitted && isCorrect && " ✓"}
@@ -310,7 +340,8 @@ function Quiz({ quizzes, quizAnswers, setQuizAnswers, submitted, onSubmit, score
         <button
           onClick={onSubmit}
           disabled={quizAnswers.length < quizzes.length}
-          className="btn-primary w-full py-3"
+          className="btn-primary w-full"
+          style={{ padding: "13px" }}
         >
           Submit Quiz
         </button>

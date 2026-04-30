@@ -241,7 +241,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
         </div>
         <div style={{ textAlign: "right", fontSize: 13, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
           <p>Since {new Date(overview.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</p>
-          <p>{overview.daysSinceJoin}d on LangCraft</p>
+          <p>{overview.daysSinceJoin}d on Lingova</p>
         </div>
       </div>
 
@@ -331,7 +331,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                         </span>
                       </div>
                       {item.total !== null && (
-                        <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-3)" }}>
                           <div className="h-full rounded-full transition-all duration-700"
                             style={{ width: `${Math.min(100, (item.value / item.total) * 100)}%`, backgroundColor: item.color }} />
                         </div>
@@ -445,7 +445,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                           <span className="text-sm text-fg-2">{cat.name}</span>
                           <span className="text-sm font-medium text-fg">{cat.count}</span>
                         </div>
-                        <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                        <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-3)" }}>
                           <div className="h-full rounded-full transition-all duration-700"
                             style={{ width: `${(cat.count / maxCount) * 100}%`, backgroundColor: COLORS[i % COLORS.length] }} />
                         </div>
@@ -492,7 +492,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                             <span className="text-sm text-fg-2">{diff.label}</span>
                             <span className="text-sm font-bold text-fg">{count}</span>
                           </div>
-                          <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                          <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-3)" }}>
                             <div className="h-full rounded-full" style={{
                               width: `${vocabulary.total > 0 ? (count / vocabulary.total) * 100 : 0}%`,
                               backgroundColor: diff.color,
@@ -513,14 +513,14 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
               {vocabulary.recentWords.length > 0 ? (
                 <div className="space-y-2">
                   {vocabulary.recentWords.slice(0, 6).map((w) => (
-                    <div key={w.word} className="flex items-center justify-between py-1.5 border-b border-zinc-100 last:border-0">
+                    <div key={w.word} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--border)" }}>
                       <div>
                         <span className="text-sm font-medium text-fg">{w.word}</span>
                         <span className="text-xs text-fg-2 ml-2">{w.category}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                         {Array.from({ length: 5 }, (_, i) => (
-                          <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < w.mastery ? "bg-emerald-500" : "bg-zinc-200"}`} />
+                          <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: i < w.mastery ? "var(--green)" : "var(--surface-3)" }} />
                         ))}
                       </div>
                     </div>
@@ -556,14 +556,14 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   {stats ? (
                     <div className="space-y-2">
                       {[
-                        { label: "Played", value: stats.played },
-                        { label: "Avg Score", value: `${Math.round(stats.totalScore / stats.played)}%` },
-                        { label: "Best Score", value: `${stats.bestScore}%`, cls: "text-emerald-600" },
-                        { label: "XP Earned", value: `${stats.totalXp} XP`, cls: "text-violet-600" },
+                        { label: "Played", value: stats.played, color: undefined },
+                        { label: "Avg Score", value: `${Math.round(stats.totalScore / stats.played)}%`, color: undefined },
+                        { label: "Best Score", value: `${stats.bestScore}%`, color: "var(--green)" },
+                        { label: "XP Earned", value: `${stats.totalXp} XP`, color: "var(--accent-2)" },
                       ].map((row) => (
-                        <div key={row.label} className="flex justify-between text-sm">
+                        <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
                           <span className="text-fg-2">{row.label}</span>
-                          <span className={`font-medium ${row.cls ?? "text-fg"}`}>{row.value}</span>
+                          <span style={{ fontWeight: 600, color: row.color ?? "var(--text)" }}>{row.value}</span>
                         </div>
                       ))}
                     </div>
@@ -609,7 +609,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             {Object.keys(tutor.byScenario).length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
                 {Object.entries(tutor.byScenario).map(([scenario, stats]) => (
-                  <div key={scenario} className="bg-zinc-50 rounded-xl p-4 text-center">
+                  <div key={scenario} style={{ background: "var(--surface-3)", borderRadius: 14, padding: "16px 12px", textAlign: "center" }}>
                     <span className="text-3xl">{SCENARIO_EMOJI[scenario] ?? "💬"}</span>
                     <p className="text-sm font-medium text-fg mt-2">{SCENARIO_LABELS[scenario] ?? scenario}</p>
                     <p className="text-2xl font-bold text-fg mt-1">{stats.count}</p>
@@ -623,7 +623,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           {tutor.totalSessions > 0 && (
-            <div className="card bg-violet-50 border-violet-100">
+            <div className="card" style={{ background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)" }}>
               <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--accent-2)", marginBottom: 8, fontFamily: "var(--font-display)" }}>Tutor Insights</h3>
               <div className="space-y-2 text-sm text-fg-2">
                 {tutor.avgGrammarScore !== null && tutor.avgGrammarScore < 60 && (
@@ -645,7 +645,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
       )}
 
       <div className="text-center pt-4 pb-8">
-        <Link href="/progress" className="text-sm text-violet-600 hover:underline">
+        <Link href="/progress" style={{ fontSize: 13, color: "var(--accent-2)" }}>
           View badges & skill tree on Progress page
         </Link>
       </div>

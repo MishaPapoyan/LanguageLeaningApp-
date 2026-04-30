@@ -6,7 +6,7 @@ import nextDynamic from "next/dynamic";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Immersion Room — LangCraft",
+  title: "Immersion Room — Lingova",
   description: "Find objects in a 3D room by listening to voice commands",
 };
 

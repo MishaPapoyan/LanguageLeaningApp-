@@ -124,8 +124,8 @@ export default async function LandingPage() {
               background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
               display: "flex", alignItems: "center", justifyContent: "center",
               color: "white", fontWeight: 700, fontSize: "11px", letterSpacing: "0.05em", flexShrink: 0,
-            }}>LC</div>
-            <span style={{ fontFamily: "serif", fontSize: "18px", color: "var(--text)", fontWeight: 500 }}>LangCraft</span>
+            }}>LG</div>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", color: "var(--text)", fontWeight: 800, letterSpacing: "-0.02em" }}>Lingova</span>
             <span style={{ fontSize: "15px", lineHeight: 1 }}>{"\u{1F30D}"}</span>
           </Link>
 
@@ -402,8 +402,8 @@ export default async function LandingPage() {
               background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
               display: "flex", alignItems: "center", justifyContent: "center",
               color: "white", fontWeight: 700, fontSize: "8px",
-            }}>LC</div>
-            <span>© 2026 LangCraft. All rights reserved.</span>
+            }}>LG</div>
+            <span>© 2026 Lingova. All rights reserved.</span>
           </div>
           <div style={{ display: "flex", gap: "20px" }}>
             <Link href="/login" style={{ color: "var(--text-3)", textDecoration: "none" }}>Log in</Link>

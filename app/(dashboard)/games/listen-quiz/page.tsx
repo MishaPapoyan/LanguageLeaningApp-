@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ListenQuiz } from "@/components/games/ListenQuiz";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Listen & Choose — LangCraft" };
+export const metadata: Metadata = { title: "Listen & Choose — Lingova" };
 
 export default async function ListenQuizPage() {
   const session = await getServerSession(authOptions);

@@ -7,7 +7,7 @@ import { SettingsClient } from "@/components/settings/SettingsClient";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Settings — LangCraft",
+  title: "Settings — Lingova",
   description: "Manage your profile and preferences",
 };
 

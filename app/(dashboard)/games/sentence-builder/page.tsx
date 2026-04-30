@@ -6,7 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sentence Builder — LangCraft",
+  title: "Sentence Builder — Lingova",
   description: "Arrange word tiles into correct sentences",
 };
 

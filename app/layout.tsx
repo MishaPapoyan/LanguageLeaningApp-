@@ -19,28 +19,28 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "LangCraft — Learn Languages",
-  description: "Learn languages through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
-  metadataBase: new URL("https://langcraft.app"),
+  title: "Lingova — Learn Languages",
+  description: "Every goal. Every age. Every language. Learn through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
+  metadataBase: new URL("https://lingova.app"),
   openGraph: {
-    title: "LangCraft — Learn Languages",
-    description: "Learn languages through stories, AI conversation, and games. Interactive lessons, vocabulary games, and an AI tutor in your pocket.",
-    url: "https://langcraft.app",
-    siteName: "LangCraft",
+    title: "Lingova — Learn Languages",
+    description: "Every goal. Every age. Every language. Learn through stories, AI conversation, and games.",
+    url: "https://lingova.app",
+    siteName: "Lingova",
     type: "website",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "LangCraft — Learn Languages",
+        alt: "Lingova — Every goal. Every age. Every language.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LangCraft — Learn Languages",
-    description: "Learn languages through stories, AI conversation, and games.",
+    title: "Lingova — Learn Languages",
+    description: "Every goal. Every age. Every language.",
     images: ["/og-image.png"],
   },
   robots: {

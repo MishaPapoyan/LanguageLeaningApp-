@@ -161,8 +161,8 @@ function VerifyForm() {
             background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "white", fontWeight: 700, fontSize: 10,
-          }}>LC</div>
-          <span style={{ fontFamily: "serif", fontSize: 16, fontWeight: 500 }}>LangCraft</span>
+          }}>LG</div>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em" }}>Lingova</span>
         </div>
 
         {/* Header */}

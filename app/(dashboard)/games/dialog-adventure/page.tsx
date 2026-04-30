@@ -6,7 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dialog Adventure — LangCraft",
+  title: "Dialog Adventure — Lingova",
   description: "Live scripted conversations in real-world scenarios",
 };
 

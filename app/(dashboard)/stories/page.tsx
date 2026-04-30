@@ -8,7 +8,7 @@ import { StoriesClient } from "@/components/stories/StoriesClient";
 import { t, getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Stories — LangCraft",
+  title: "Stories — Lingova",
   description: "Learn through interactive stories",
 };
 

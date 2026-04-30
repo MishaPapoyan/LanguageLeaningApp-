@@ -5,7 +5,7 @@ import nextDynamic from "next/dynamic";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Word Blaster 3D — LangCraft",
+  title: "Word Blaster 3D — Lingova",
   description: "Shoot the correct translation before time runs out in a neon 3D arena",
 };
 

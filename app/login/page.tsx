@@ -155,17 +155,18 @@ export default async function LoginPage() {
                 flexShrink: 0,
               }}
             >
-              LC
+              LG
             </div>
             <span
               style={{
-                fontFamily: "serif",
+                fontFamily: "var(--font-display)",
                 fontSize: "18px",
                 color: "var(--text)",
-                fontWeight: 500,
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
               }}
             >
-              LangCraft
+              Lingova
             </span>
           </Link>
 

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Games — LangCraft",
+  title: "Games — Lingova",
   description: "Practice vocabulary with fun games",
 };
 

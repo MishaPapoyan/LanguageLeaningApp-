@@ -313,19 +313,29 @@ export default function WritingPage() {
               <button
                 key={p.id}
                 onClick={() => { setSelectedPrompt(p); setText(""); setFeedback(null); }}
-                className="w-full text-left flex items-center gap-4 bg-white rounded-2xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all group"
+                style={{
+                  width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 16,
+                  background: "var(--surface-2)", borderRadius: 16, padding: "18px 20px",
+                  border: "1px solid var(--border-md)", cursor: "pointer", transition: "all 0.15s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.4)"; (e.currentTarget as HTMLElement).style.background = "var(--surface-3)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-md)"; (e.currentTarget as HTMLElement).style.background = "var(--surface-2)"; }}
               >
-                <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-105 transition-transform">
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                  background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22,
+                }}>
                   {p.emoji}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h2 className="font-serif text-lg text-zinc-900">{p.title}</h2>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>{p.title}</h2>
                     <span className={p.level === "beginner" ? "badge-green" : "badge-blue"}>{p.level}</span>
                   </div>
-                  <p className="text-sm text-zinc-500">{p.prompt}</p>
+                  <p style={{ fontSize: 13, color: "var(--text-3)", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{p.prompt}</p>
                 </div>
-                <svg className="w-5 h-5 text-zinc-300 group-hover:text-violet-400 group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: 18, height: 18, color: "var(--text-3)", flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -336,46 +346,46 @@ export default function WritingPage() {
         {view === "history" && (
           <div>
             {historyLoading && (
-              <p className="text-sm text-zinc-400 py-8 text-center">{t(locale, "writing_loadingHistory")}</p>
+              <p style={{ fontSize: 13, color: "var(--text-3)", padding: "32px 0", textAlign: "center" }}>{t(locale, "writing_loadingHistory")}</p>
             )}
             {!historyLoading && history.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-4xl mb-3">📝</div>
-                <p className="text-zinc-500 text-sm">{t(locale, "writing_noHistory")}</p>
-                <button onClick={() => setView("prompts")} className="mt-3 text-violet-600 text-sm font-medium hover:underline">
+              <div style={{ textAlign: "center", padding: "48px 0" }}>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>📝</div>
+                <p style={{ fontSize: 13, color: "var(--text-3)" }}>{t(locale, "writing_noHistory")}</p>
+                <button onClick={() => setView("prompts")} style={{ marginTop: 12, fontSize: 13, fontWeight: 600, color: "var(--accent-2)", background: "none", border: "none", cursor: "pointer" }}>
                   {t(locale, "writing_startWriting")}
                 </button>
               </div>
             )}
             <div className="space-y-3">
               {history.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+                <div key={item.id} style={{ background: "var(--surface-2)", borderRadius: 16, border: "1px solid var(--border)", overflow: "hidden" }}>
                   <button
                     onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                    className="w-full text-left p-4 flex items-center justify-between gap-3"
+                    style={{ width: "100%", textAlign: "left", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "none", border: "none", cursor: "pointer" }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                         <span className={item.level === "beginner" ? "badge-green" : "badge-blue"}>{item.level}</span>
-                        <span className="text-xs text-zinc-400">
+                        <span style={{ fontSize: 12, color: "var(--text-3)" }}>
                           {new Date(item.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-zinc-600 truncate">{item.prompt}</p>
+                      <p style={{ fontSize: 13, color: "var(--text-2)", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{item.prompt}</p>
                     </div>
-                    <svg className={`w-4 h-4 text-zinc-400 flex-shrink-0 transition-transform ${expandedId === item.id ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style={{ width: 16, height: 16, color: "var(--text-3)", flexShrink: 0, transform: expandedId === item.id ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                   {expandedId === item.id && (
-                    <div className="border-t border-zinc-50 px-4 pb-4 space-y-3">
+                    <div style={{ borderTop: "1px solid var(--border)", padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
                       <div>
-                        <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5 mt-3">{t(locale, "writing_yourWriting")}</p>
-                        <p className="text-sm text-zinc-700 whitespace-pre-wrap bg-zinc-50 rounded-xl p-3">{item.text}</p>
+                        <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6, marginTop: 14 }}>{t(locale, "writing_yourWriting")}</p>
+                        <p style={{ fontSize: 13, color: "var(--text-2)", whiteSpace: "pre-wrap", background: "var(--surface-3)", borderRadius: 12, padding: "12px 14px" }}>{item.text}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">{t(locale, "writing_aiFeedback")}</p>
-                        <p className="text-sm text-zinc-700 whitespace-pre-wrap bg-emerald-50 rounded-xl p-3">{item.feedback}</p>
+                        <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>{t(locale, "writing_aiFeedback")}</p>
+                        <p style={{ fontSize: 13, color: "var(--text-2)", whiteSpace: "pre-wrap", background: "rgba(16,185,129,0.07)", borderRadius: 12, padding: "12px 14px", border: "1px solid rgba(16,185,129,0.18)" }}>{item.feedback}</p>
                       </div>
                     </div>
                   )}
@@ -392,49 +402,56 @@ export default function WritingPage() {
   return (
     <div className="max-w-3xl">
       {/* Back + title */}
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => setSelectedPrompt(null)}
-          className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <button
+          onClick={() => setSelectedPrompt(null)}
+          style={{
+            width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+            background: "var(--surface-2)", border: "1px solid var(--border)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--text-2)", cursor: "pointer",
+          }}
+        >
+          <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <div>
-          <p className="text-[11px] text-zinc-400 uppercase tracking-wider font-medium">{t(locale, "writing_writingPractice")}</p>
-          <h1 className="font-serif text-xl text-zinc-900">{selectedPrompt.emoji} {selectedPrompt.title}</h1>
+          <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{t(locale, "writing_writingPractice")}</p>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>{selectedPrompt.emoji} {selectedPrompt.title}</h1>
         </div>
       </div>
 
       {/* Prompt card */}
-      <div className="rounded-2xl p-4 bg-violet-50 ring-1 ring-violet-100 mb-4">
-        <p className="text-sm text-violet-800">{selectedPrompt.prompt}</p>
+      <div style={{ borderRadius: 14, padding: "14px 16px", background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)", marginBottom: 16 }}>
+        <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>{selectedPrompt.prompt}</p>
       </div>
 
       {/* Hints toggle */}
       <button
         onClick={() => setShowHints(!showHints)}
-        className="text-sm text-violet-600 hover:text-violet-700 mb-3 flex items-center gap-1 font-medium"
+        style={{ fontSize: 13, color: "var(--accent-2)", fontWeight: 600, display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", marginBottom: 12 }}
       >
         {showHints ? t(locale, "writing_hideHints") : t(locale, "writing_showHints")}
-        <svg className={`w-3 h-3 transition-transform ${showHints ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg style={{ width: 12, height: 12, transform: showHints ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {showHints && (
-        <div className="rounded-2xl p-4 mb-4 bg-amber-50 ring-1 ring-amber-100">
-          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2">{t(locale, "writing_helpfulPhrases")}</p>
-          <div className="flex flex-wrap gap-2">
+        <div style={{ borderRadius: 14, padding: "14px 16px", marginBottom: 16, background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)" }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(245,158,11,0.9)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{t(locale, "writing_helpfulPhrases")}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {selectedPrompt.hints.map((h, i) => (
-              <span key={i} className="text-sm bg-white ring-1 ring-amber-200 rounded-lg px-2.5 py-1 text-amber-800">
+              <span key={i} style={{ fontSize: 12, background: "var(--surface-2)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "4px 10px", color: "var(--text-2)" }}>
                 {h}
               </span>
             ))}
           </div>
-          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2 mt-3">{t(locale, "writing_usefulWords")}</p>
-          <div className="flex flex-wrap gap-2">
+          <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(245,158,11,0.9)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8, marginTop: 12 }}>{t(locale, "writing_usefulWords")}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {selectedPrompt.sampleWords.map((w, i) => (
-              <span key={i} className="text-sm bg-white ring-1 ring-amber-200 rounded-lg px-2.5 py-1 text-zinc-700">
+              <span key={i} style={{ fontSize: 12, background: "var(--surface-2)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "4px 10px", color: "var(--text-2)" }}>
                 {w}
               </span>
             ))}
@@ -443,20 +460,25 @@ export default function WritingPage() {
       )}
 
       {/* Writing area */}
-      <div className="bg-white rounded-2xl border border-zinc-100 p-5 mb-4">
+      <div style={{ background: "var(--surface-2)", borderRadius: 16, border: "1px solid var(--border-md)", padding: "18px 20px", marginBottom: 16 }}>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={`Write in ${targetLanguage === "es" ? "Spanish" : "French"} here...`}
           rows={8}
-          className="w-full resize-none bg-transparent border-none outline-none text-zinc-800 placeholder:text-zinc-300 text-sm leading-relaxed"
+          style={{
+            width: "100%", boxSizing: "border-box", resize: "none",
+            background: "transparent", border: "none", outline: "none",
+            fontSize: 15, color: "var(--text)", lineHeight: 1.7, fontFamily: "inherit",
+          }}
         />
-        <div className="flex items-center justify-between pt-3 border-t border-zinc-50 mt-2">
-          <span className="text-xs text-zinc-400">{t(locale, "writing_wordCount", { n: text.split(/\s+/).filter(Boolean).length.toString() })}</span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid var(--border)", marginTop: 8 }}>
+          <span style={{ fontSize: 12, color: "var(--text-3)" }}>{t(locale, "writing_wordCount", { n: text.split(/\s+/).filter(Boolean).length.toString() })}</span>
           <button
             onClick={handleSubmit}
             disabled={!text.trim() || loading}
-            className="btn-primary text-sm px-5"
+            className="btn-primary"
+            style={{ fontSize: 13, padding: "8px 20px" }}
           >
             {loading ? t(locale, "writing_analyzing") : t(locale, "writing_getAiFeedback")}
           </button>
@@ -468,25 +490,25 @@ export default function WritingPage() {
         const gradeMatch = feedback.match(/^GRADE:\s*(\d+)\/10/);
         const grade = gradeMatch ? parseInt(gradeMatch[1]) : null;
         const bodyText = feedback.replace(/^GRADE:\s*\d+\/10\n?/, "").trimStart();
-        const gradeColor = grade === null ? "#6b7280" : grade >= 8 ? "#16a34a" : grade >= 5 ? "#d97706" : "#dc2626";
+        const gradeColor = grade === null ? "var(--text-3)" : grade >= 8 ? "var(--green)" : grade >= 5 ? "var(--xp)" : "var(--red)";
         return (
-          <div className="rounded-2xl p-5 bg-emerald-50 ring-1 ring-emerald-100">
+          <div style={{ borderRadius: 16, padding: "20px", background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.22)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <h3 className="font-serif text-emerald-800">{t(locale, "writing_aiFeedback")}</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--green)", fontFamily: "var(--font-display)" }}>{t(locale, "writing_aiFeedback")}</h3>
               {grade !== null && (
                 <div style={{
                   display: "flex", alignItems: "baseline", gap: 2,
-                  background: "white", borderRadius: 12, padding: "4px 14px",
+                  background: "var(--surface-2)", borderRadius: 10, padding: "4px 12px",
                   border: `2px solid ${gradeColor}`,
                 }}>
-                  <span style={{ fontSize: 22, fontWeight: 800, color: gradeColor, fontFamily: "serif" }}>{grade}</span>
-                  <span style={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}>/10</span>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: gradeColor, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>{grade}</span>
+                  <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 600 }}>/10</span>
                 </div>
               )}
             </div>
-            <div className="text-sm text-zinc-700 leading-relaxed whitespace-pre-wrap">
+            <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
               {bodyText}
-            </div>
+            </p>
           </div>
         );
       })()}

@@ -7,7 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Memory Palace — LangCraft",
+  title: "Memory Palace — Lingova",
   description: "Learn words through spatial memory",
 };
 
@@ -31,8 +31,8 @@ export default async function MemoryPalacePage() {
   return (
     <div className="max-w-2xl animate-fade-up">
       <div className="mb-6">
-        <h1 className="text-2xl font-serif text-zinc-900">Memory Palace</h1>
-        <p className="text-sm text-zinc-500 mt-1">Place vocabulary words around a virtual café — click objects to reveal their names</p>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>Memory Palace</h1>
+        <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 4 }}>Place vocabulary words around a virtual café — click objects to reveal their names</p>
       </div>
       <ErrorBoundary label="Memory Palace">
         <MemoryPalace words={words as any} />

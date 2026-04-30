@@ -46,9 +46,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {/* Desktop sidebar */}
         <aside className="admin-sidebar">
           <div style={{ padding: "20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #7c6aff, #5b4fcf)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 900 }}>LC</div>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #7c6aff, #5b4fcf)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 900 }}>LG</div>
             <div>
-              <p style={{ fontSize: 12, fontWeight: 800, color: "var(--text)", margin: 0 }}>LangCraft</p>
+              <p style={{ fontSize: 12, fontWeight: 800, color: "var(--text)", margin: 0 }}>Lingova</p>
               <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent)", margin: 0 }}>Admin</p>
             </div>
           </div>

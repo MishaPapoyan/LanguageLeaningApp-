@@ -73,7 +73,7 @@ export default async function AdminOverview() {
   return (
     <div>
       <AdminAutoRefresh />
-      <h1 className="font-serif text-3xl mb-1" style={{ color: "var(--text)" }}>Overview</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>Overview</h1>
       <p className="text-sm mb-8" style={{ color: "var(--text-3)" }}>
         {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
       </p>
@@ -84,7 +84,7 @@ export default async function AdminOverview() {
           const inner = (
             <div className="rounded-2xl p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
               <p className="text-2xl mb-2">{s.emoji}</p>
-              <p className="text-2xl font-bold font-serif" style={{ color: "var(--text)" }}>{s.value}</p>
+              <p style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-mono)", letterSpacing: "-0.03em", fontVariantNumeric: "tabular-nums" }}>{s.value}</p>
               <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>{s.label}</p>
             </div>
           );

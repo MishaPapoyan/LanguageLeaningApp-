@@ -6,7 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "City Explorer — LangCraft",
+  title: "City Explorer — Lingova",
   description: "Explore a 2D city and talk to NPCs in your target language",
 };
 

@@ -16,10 +16,10 @@ export default function DashboardError({
   return (
     <div className="max-w-md mx-auto text-center py-20">
       <div className="text-5xl mb-4">😵</div>
-      <h2 className="text-xl font-serif font-bold text-zinc-800 mb-2">
+      <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 8 }}>
         Something went wrong
       </h2>
-      <p className="text-zinc-500 mb-6 text-sm">
+      <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
         {error.message || "An unexpected error occurred. Please try again."}
       </p>
       <div className="flex gap-3 justify-center">

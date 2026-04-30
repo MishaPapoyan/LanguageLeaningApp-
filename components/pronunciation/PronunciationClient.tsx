@@ -62,7 +62,6 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Clear old recording when switching words
   useEffect(() => {
     setRecordedUrl(null);
     setMicError(null);
@@ -138,7 +137,6 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
       recorder.start();
       setRecording(true);
 
-      // Auto-stop after 8s
       autoStopRef.current = setTimeout(() => {
         if (recorder.state === "recording") recorder.stop();
       }, 8000);
@@ -162,19 +160,25 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
   return (
     <>
       {/* Tip */}
-      <div className="flex items-start gap-3 bg-violet-50 rounded-xl p-4 mb-6 ring-1 ring-violet-100">
-        <span className="text-lg">♪</span>
-        <p className="text-sm text-violet-800">
-          <span className="font-semibold">How to practice:</span> Click a word to hear it, then hit{" "}
-          <span className="font-semibold">Record</span> to compare your pronunciation.
+      <div style={{
+        display: "flex", alignItems: "flex-start", gap: 12,
+        background: "var(--accent-dim)", borderRadius: 14, padding: "14px 16px",
+        marginBottom: 24, border: "1px solid rgba(99,102,241,0.2)",
+      }}>
+        <span style={{ fontSize: 18 }}>♪</span>
+        <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>
+          <span style={{ fontWeight: 700, color: "var(--text)" }}>How to practice:</span> Click a word to hear it, then hit{" "}
+          <span style={{ fontWeight: 700 }}>Record</span> to compare your pronunciation.
         </p>
       </div>
 
       {/* Controls */}
-      <div className="bg-white rounded-2xl border border-zinc-100 p-5 mb-6">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-[11px] font-medium text-zinc-400 uppercase tracking-wider mb-1">Category</label>
+      <div style={{ background: "var(--surface-2)", borderRadius: 16, border: "1px solid var(--border-md)", padding: "18px 20px", marginBottom: 24 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 16 }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
+              Category
+            </label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -186,16 +190,16 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               ))}
             </select>
           </div>
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-[11px] font-medium text-zinc-400 uppercase tracking-wider mb-1">
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
               Speed: {speed <= 0.5 ? "Slow" : speed <= 0.75 ? "Normal" : "Fast"}
             </label>
             <input
               type="range" min={0.3} max={1.0} step={0.1} value={speed}
               onChange={(e) => setSpeed(parseFloat(e.target.value))}
-              className="w-full accent-violet-500"
+              style={{ width: "100%", accentColor: "var(--accent)" }}
             />
-            <div className="flex justify-between text-[11px] text-zinc-400 mt-0.5">
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>
               <span>Slow</span><span>Fast</span>
             </div>
           </div>
@@ -204,51 +208,63 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
 
       {/* Currently selected word + recording panel */}
       {currentWord && (
-        <div className="bg-white rounded-2xl border-2 border-violet-200 p-5 mb-6">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-violet-50 flex items-center justify-center text-3xl flex-shrink-0">
+        <div style={{
+          background: "var(--surface-2)", borderRadius: 16, padding: "18px 20px", marginBottom: 24,
+          border: "1px solid rgba(99,102,241,0.35)", boxShadow: "0 0 24px rgba(99,102,241,0.1)",
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+              background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28,
+            }}>
               {currentWord.imageEmoji}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-2xl font-serif text-zinc-900">{currentWord.word}</p>
-                {playing && <span className="text-violet-600 text-xs animate-pulse font-medium">Playing…</span>}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <p style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
+                  {currentWord.word}
+                </p>
+                {playing && (
+                  <span style={{ fontSize: 11, color: "var(--accent-2)", fontWeight: 600, animation: "pulse 1s infinite" }}>
+                    Playing…
+                  </span>
+                )}
               </div>
-              <p className="text-violet-600 font-medium">{currentWord.translation}</p>
-              <p className="text-sm text-zinc-500 mt-1 italic">&ldquo;{currentWord.exampleFr}&rdquo;</p>
-              <p className="text-xs text-zinc-400">{currentWord.exampleEn}</p>
+              <p style={{ fontSize: 14, color: "var(--accent-2)", fontWeight: 600, marginTop: 2 }}>{currentWord.translation}</p>
+              <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 4, fontStyle: "italic" }}>&ldquo;{currentWord.exampleFr}&rdquo;</p>
+              <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>{currentWord.exampleEn}</p>
             </div>
 
             {/* Playback buttons */}
-            <div className="flex flex-col gap-2 flex-shrink-0">
-              <button onClick={() => speakText(currentWord.word)} className="btn-primary text-sm px-3 py-2" disabled={playing}>
-                <Volume2 size={14} className="inline mr-1" />Word
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+              <button onClick={() => speakText(currentWord.word)} className="btn-primary" style={{ fontSize: 13, padding: "7px 14px" }} disabled={playing}>
+                <Volume2 size={14} style={{ display: "inline", marginRight: 4 }} />Word
               </button>
-              <button onClick={() => speakText(currentWord.exampleFr)} className="btn-outline text-sm px-3 py-2" disabled={playing}>
-                <Volume2 size={14} className="inline mr-1" />Example
+              <button onClick={() => speakText(currentWord.exampleFr)} className="btn-secondary" style={{ fontSize: 13, padding: "7px 14px" }} disabled={playing}>
+                <Volume2 size={14} style={{ display: "inline", marginRight: 4 }} />Example
               </button>
             </div>
           </div>
 
           {/* Recording row */}
-          <div className="mt-4 pt-4 border-t border-zinc-100">
-            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-3">
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
               🎙 Your pronunciation
             </p>
 
             {micError && (
-              <p className="text-xs text-red-500 mb-2">{micError}</p>
+              <p style={{ fontSize: 12, color: "var(--red)", marginBottom: 8 }}>{micError}</p>
             )}
 
-            <div className="flex items-center gap-3 flex-wrap">
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               {!recording ? (
                 <button
                   onClick={startRecording}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
                   style={{
-                    background: "rgba(239,68,68,0.1)",
-                    border: "1px solid rgba(239,68,68,0.3)",
-                    color: "#ef4444",
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "8px 16px", borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.3)", color: "var(--red)",
                   }}
                 >
                   <Mic size={15} /> Record yourself
@@ -256,11 +272,10 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               ) : (
                 <button
                   onClick={stopRecording}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
                   style={{
-                    background: "rgba(239,68,68,0.15)",
-                    border: "1px solid rgba(239,68,68,0.4)",
-                    color: "#ef4444",
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "8px 16px", borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", color: "var(--red)",
                     animation: "pulse 1s infinite",
                   }}
                 >
@@ -269,20 +284,19 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               )}
 
               {recording && (
-                <div className="flex items-center gap-2">
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <WaveformBars active={true} />
-                  <span className="text-xs text-red-500 font-medium">Recording…</span>
+                  <span style={{ fontSize: 12, color: "var(--red)", fontWeight: 600 }}>Recording…</span>
                 </div>
               )}
 
               {recordedUrl && !recording && (
                 <button
                   onClick={playRecording}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
                   style={{
-                    background: "rgba(99,102,241,0.1)",
-                    border: "1px solid rgba(99,102,241,0.3)",
-                    color: "var(--accent)",
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "8px 16px", borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)", color: "var(--accent-2)",
                   }}
                 >
                   <Play size={13} /> Play back
@@ -290,21 +304,17 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               )}
 
               {xpAwarded && (
-                <span
-                  className="text-xs font-bold px-2.5 py-1 rounded-full"
-                  style={{
-                    background: "rgba(52,211,153,0.1)",
-                    border: "1px solid rgba(52,211,153,0.3)",
-                    color: "var(--green)",
-                  }}
-                >
+                <span style={{
+                  fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 999,
+                  background: "rgba(16,185,129,0.10)", border: "1px solid rgba(16,185,129,0.3)", color: "var(--green)",
+                }}>
                   +{xpAwarded} XP
                 </span>
               )}
             </div>
 
             {recordedUrl && !recording && (
-              <p className="text-xs text-zinc-400 mt-2">
+              <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 8 }}>
                 Compare: does it sound like the native pronunciation above?
               </p>
             )}
@@ -313,49 +323,69 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
       )}
 
       {/* Word list */}
-      <div className="space-y-2">
-        {filtered.map((word) => (
-          <div
-            key={word.id}
-            className={`bg-white rounded-2xl border p-4 flex items-center gap-3 cursor-pointer transition-all hover:shadow-sm ${
-              currentWord?.id === word.id ? "border-violet-300 bg-violet-50/30" : "border-zinc-100 hover:border-zinc-200"
-            }`}
-            onClick={() => playWord(word)}
-          >
-            <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-xl flex-shrink-0">
-              {word.imageEmoji}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-zinc-800">{word.word}</span>
-                <span className="text-sm text-violet-600">{word.translation}</span>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {filtered.map((word) => {
+          const isActive = currentWord?.id === word.id;
+          return (
+            <div
+              key={word.id}
+              style={{
+                background: isActive ? "var(--surface-3)" : "var(--surface-2)",
+                borderRadius: 16, border: `1px solid ${isActive ? "rgba(99,102,241,0.35)" : "var(--border)"}`,
+                padding: "12px 16px", display: "flex", alignItems: "center", gap: 12,
+                cursor: "pointer", transition: "all 0.12s",
+              }}
+              onClick={() => playWord(word)}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                background: "var(--surface-3)", border: "1px solid var(--border)",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
+              }}>
+                {word.imageEmoji}
               </div>
-              <p className="text-[11px] text-zinc-400 truncate mt-0.5">{word.exampleFr}</p>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{word.word}</span>
+                  <span style={{ fontSize: 13, color: "var(--accent-2)" }}>{word.translation}</span>
+                </div>
+                <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{word.exampleFr}</p>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); playWord(word); }}
+                  style={{
+                    width: 32, height: 32, borderRadius: 9,
+                    background: "var(--accent-dim)", color: "var(--accent-2)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    border: "1px solid rgba(99,102,241,0.2)", cursor: "pointer",
+                  }}
+                  title="Listen to word"
+                >
+                  <Volume2 size={14} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); playExample(word); }}
+                  style={{
+                    width: 32, height: 32, borderRadius: 9,
+                    background: "var(--surface-3)", color: "var(--text-2)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    border: "1px solid var(--border)", cursor: "pointer", fontSize: 13,
+                  }}
+                  title="Listen to example"
+                >
+                  ◈
+                </button>
+              </div>
             </div>
-            <div className="flex gap-1 flex-shrink-0">
-              <button
-                onClick={(e) => { e.stopPropagation(); playWord(word); }}
-                className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center hover:bg-violet-100 transition-colors"
-                title="Listen to word"
-              >
-                <Volume2 size={14} />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); playExample(word); }}
-                className="w-8 h-8 rounded-lg bg-zinc-50 text-zinc-500 flex items-center justify-center hover:bg-zinc-100 transition-colors text-sm"
-                title="Listen to example"
-              >
-                ◈
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-16 text-zinc-400">
-          <p className="text-2xl mb-2">♪</p>
-          <p>No words found in this category</p>
+        <div style={{ textAlign: "center", padding: "64px 0", color: "var(--text-3)" }}>
+          <p style={{ fontSize: 24, marginBottom: 8 }}>♪</p>
+          <p style={{ fontSize: 14 }}>No words found in this category</p>
         </div>
       )}
     </>

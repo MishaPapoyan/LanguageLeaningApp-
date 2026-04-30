@@ -181,9 +181,9 @@ export default function OnboardingPage() {
               background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
               display: "flex", alignItems: "center", justifyContent: "center",
               color: "white", fontWeight: 700, fontSize: "10px",
-            }}>LC</div>
-            <span style={{ fontFamily: "serif", fontSize: "16px", color: "var(--text)", fontWeight: 500 }}>
-              LangCraft
+            }}>LG</div>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", color: "var(--text)", fontWeight: 800, letterSpacing: "-0.02em" }}>
+              Lingova
             </span>
           </div>
           <span style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 600 }}>

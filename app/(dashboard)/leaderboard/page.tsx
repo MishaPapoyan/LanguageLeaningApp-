@@ -8,7 +8,7 @@ import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
 import { t, getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Leaderboard — LangCraft",
+  title: "Leaderboard — Lingova",
   description: "See how you rank among other learners",
 };
 

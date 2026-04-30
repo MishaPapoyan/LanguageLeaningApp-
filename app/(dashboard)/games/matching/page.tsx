@@ -7,7 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Matching Game — LangCraft",
+  title: "Matching Game — Lingova",
   description: "Match words with their English translations",
 };
 
@@ -47,8 +47,8 @@ export default async function MatchingPage() {
   return (
     <div className="max-w-2xl animate-fade-up">
       <div className="mb-6">
-        <h1 className="text-2xl font-serif text-zinc-900">Word Matching</h1>
-        <p className="text-sm text-zinc-500 mt-1">Match each word to its English translation</p>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>Word Matching</h1>
+        <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 4 }}>Match each word to its English translation</p>
       </div>
       <ErrorBoundary label="Word Matching">
         <MatchingGame words={words.slice(0, 6) as any} />

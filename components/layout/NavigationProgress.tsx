@@ -47,8 +47,8 @@ export function NavigationProgress() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 h-[2px]">
       <div
-        className="h-full bg-violet-500 transition-all duration-300 ease-out"
-        style={{ width: `${progress}%`, opacity: loading ? 1 : 0 }}
+        className="h-full transition-all duration-300 ease-out"
+        style={{ background: "var(--accent)", width: `${progress}%`, opacity: loading ? 1 : 0 }}
       />
     </div>
   );

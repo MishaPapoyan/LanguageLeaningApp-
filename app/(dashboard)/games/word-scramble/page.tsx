@@ -6,7 +6,7 @@ import { WordScramble } from "@/components/games/WordScramble";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Word Scramble — LangCraft" };
+export const metadata: Metadata = { title: "Word Scramble — Lingova" };
 
 export default async function WordScramblePage() {
   const session = await getServerSession(authOptions);

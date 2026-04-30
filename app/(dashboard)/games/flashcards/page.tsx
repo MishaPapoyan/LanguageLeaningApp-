@@ -7,7 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Flashcards — LangCraft",
+  title: "Flashcards — Lingova",
   description: "Practice vocabulary with flashcards",
 };
 
@@ -48,8 +48,8 @@ export default async function FlashcardsPage() {
   return (
     <div className="max-w-2xl animate-fade-up">
       <div className="mb-6">
-        <h1 className="text-2xl font-serif text-zinc-900">Flashcards</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>Flashcards</h1>
+        <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 4 }}>
           {savedWords.length >= 4 ? "Practicing your saved words" : "Practicing beginner vocabulary"}
         </p>
       </div>
