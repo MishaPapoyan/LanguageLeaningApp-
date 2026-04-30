@@ -15,15 +15,14 @@ import { t, getLocale, type TranslationKey } from "@/lib/i18n";
 
 interface ProgressData { xp: number; level: number; streak: number; }
 
-// Primary nav (shown in header)
+// Primary nav (shown in header) — max 6
 const NAV_LINKS: { href: string; labelKey: TranslationKey; Icon: typeof Home }[] = [
-  { href: "/home",    labelKey: "nav_home",    Icon: Home },
-  { href: "/stories", labelKey: "nav_stories", Icon: BookOpen },
-  { href: "/tutor",   labelKey: "nav_tutor",   Icon: MessageCircle },
-  { href: "/games",   labelKey: "nav_games",   Icon: Gamepad2 },
-  { href: "/review",     labelKey: "nav_practice",   Icon: RotateCcw },
-  { href: "/writing",    labelKey: "nav_writing",    Icon: PenLine },
-  { href: "/community",  labelKey: "nav_community",  Icon: Users },
+  { href: "/home",    labelKey: "nav_home",     Icon: Home },
+  { href: "/stories", labelKey: "nav_stories",  Icon: BookOpen },
+  { href: "/games",   labelKey: "nav_games",    Icon: Gamepad2 },
+  { href: "/tutor",   labelKey: "nav_tutor",    Icon: MessageCircle },
+  { href: "/writing", labelKey: "nav_writing",  Icon: PenLine },
+  { href: "/review",  labelKey: "nav_practice", Icon: RotateCcw },
 ];
 
 // Secondary nav (shown in mobile panel + user dropdown)
@@ -31,6 +30,7 @@ const NAV_SECONDARY: { href: string; labelKey: TranslationKey; Icon: typeof Home
   { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
   { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
   { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
+  { href: "/community",  labelKey: "nav_community",  Icon: Users },
 ];
 
 const ALL_NAV_LINKS = [...NAV_LINKS, ...NAV_SECONDARY];
@@ -111,6 +111,7 @@ export function AppNav() {
     { href: "/learn",      labelKey: "nav_learn",      Icon: BookText },
     { href: "/dictionary", labelKey: "nav_dictionary", Icon: Library },
     { href: "/my-words",   labelKey: "nav_myWords",    Icon: BookMarked },
+    { href: "/community",  labelKey: "nav_community",  Icon: Users },
     { href: "/settings",   labelKey: "nav_settings",   Icon: Settings },
     { href: "/progress",   labelKey: "nav_progress",   Icon: TrendingUp },
     { href: "/analytics",  labelKey: "nav_analytics",  Icon: BarChart3 },
@@ -169,7 +170,7 @@ export function AppNav() {
               boxShadow: "0 0 12px rgba(99,102,241,0.4)",
             }}
           >
-            LC
+            LG
           </span>
           <span
             style={{

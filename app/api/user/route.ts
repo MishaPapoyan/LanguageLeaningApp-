@@ -9,6 +9,8 @@ export async function DELETE() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
+    // Delete GroupMember rows first (no DB-level cascade on this join table)
+    await prisma.groupMember.deleteMany({ where: { userId: session.user.id } });
     await prisma.user.delete({ where: { id: session.user.id } });
     return NextResponse.json({ ok: true });
   } catch (err) {

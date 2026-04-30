@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 const GAMES = [
+  // ── Vocabulary ──────────────────────────────────────────────────
   {
     href: "/games/flashcards",
     gameType: "FLASHCARDS",
@@ -24,8 +25,19 @@ const GAMES = [
     title: "Flashcards",
     desc: "Flip cards, test recall, build memory through spaced repetition",
     theme: "#6366F1",
-    difficulty: "Easy",
-    tag: "Recall",
+    difficulty: "A1",
+    category: "vocabulary",
+    xp: 20,
+  },
+  {
+    href: "/games/true-false",
+    gameType: "TRUE_FALSE",
+    icon: CheckSquare,
+    title: "True or False",
+    desc: "Is the translation correct? Quick-fire judgement rounds",
+    theme: "#F59E0B",
+    difficulty: "A1",
+    category: "vocabulary",
     xp: 20,
   },
   {
@@ -35,8 +47,30 @@ const GAMES = [
     title: "Word Match",
     desc: "Match target language words to English translations against the clock",
     theme: "#10B981",
-    difficulty: "Medium",
-    tag: "Speed",
+    difficulty: "A2",
+    category: "vocabulary",
+    xp: 30,
+  },
+  {
+    href: "/games/word-scramble",
+    gameType: "WORD_SCRAMBLE",
+    icon: Shuffle,
+    title: "Word Scramble",
+    desc: "Unscramble jumbled vocabulary words — race against your brain",
+    theme: "#F43F5E",
+    difficulty: "A2",
+    category: "vocabulary",
+    xp: 25,
+  },
+  {
+    href: "/games/speed-typing",
+    gameType: "SPEED_TYPING",
+    icon: Keyboard,
+    title: "Speed Typing",
+    desc: "See the meaning, type the word — train muscle memory fast",
+    theme: "#EC4899",
+    difficulty: "B1",
+    category: "vocabulary",
     xp: 30,
   },
   {
@@ -46,21 +80,11 @@ const GAMES = [
     title: "Memory Palace",
     desc: "Place words in virtual rooms — spatial memory that never fades",
     theme: "#8B5CF6",
-    difficulty: "Hard",
-    tag: "Structure",
+    difficulty: "B2",
+    category: "vocabulary",
     xp: 50,
   },
-  {
-    href: "/games/word-scramble",
-    gameType: "WORD_SCRAMBLE",
-    icon: Shuffle,
-    title: "Word Scramble",
-    desc: "Unscramble jumbled vocabulary words — race against your brain",
-    theme: "#F43F5E",
-    difficulty: "Medium",
-    tag: "Speed",
-    xp: 25,
-  },
+  // ── Grammar ─────────────────────────────────────────────────────
   {
     href: "/games/fill-blank",
     gameType: "FILL_BLANK",
@@ -68,42 +92,9 @@ const GAMES = [
     title: "Fill the Blank",
     desc: "Complete sentences — context makes vocabulary stick",
     theme: "#14B8A6",
-    difficulty: "Medium",
-    tag: "Grammar",
+    difficulty: "A2",
+    category: "grammar",
     xp: 25,
-  },
-  {
-    href: "/games/true-false",
-    gameType: "TRUE_FALSE",
-    icon: CheckSquare,
-    title: "True or False",
-    desc: "Is the translation correct? Quick-fire judgement rounds",
-    theme: "#F59E0B",
-    difficulty: "Easy",
-    tag: "Recall",
-    xp: 20,
-  },
-  {
-    href: "/games/speed-typing",
-    gameType: "SPEED_TYPING",
-    icon: Keyboard,
-    title: "Speed Typing",
-    desc: "See the meaning, type the word — train muscle memory fast",
-    theme: "#EC4899",
-    difficulty: "Medium",
-    tag: "Recall",
-    xp: 30,
-  },
-  {
-    href: "/games/listen-quiz",
-    gameType: "LISTEN_QUIZ",
-    icon: Headphones,
-    title: "Listen & Choose",
-    desc: "Hear the word spoken — pick the right translation from 4",
-    theme: "#06B6D4",
-    difficulty: "Hard",
-    tag: "Listening",
-    xp: 35,
   },
   {
     href: "/games/sentence-builder",
@@ -112,10 +103,34 @@ const GAMES = [
     title: "Sentence Builder",
     desc: "Tap word tiles to assemble correct sentences — master grammar fast",
     theme: "#0EA5E9",
-    difficulty: "Medium",
-    tag: "Grammar",
+    difficulty: "B1",
+    category: "grammar",
     xp: 30,
   },
+  // ── Listening ───────────────────────────────────────────────────
+  {
+    href: "/games/immersion",
+    gameType: "IMMERSION",
+    icon: Home,
+    title: "Immersion Room",
+    desc: "Find objects in a 3D room by listening to voice commands",
+    theme: "#D946EF",
+    difficulty: "A2",
+    category: "listening",
+    xp: 40,
+  },
+  {
+    href: "/games/listen-quiz",
+    gameType: "LISTEN_QUIZ",
+    icon: Headphones,
+    title: "Listen & Choose",
+    desc: "Hear the word spoken — pick the right translation from 4",
+    theme: "#06B6D4",
+    difficulty: "B1",
+    category: "listening",
+    xp: 35,
+  },
+  // ── Immersive ───────────────────────────────────────────────────
   {
     href: "/games/dialog-adventure",
     gameType: "DIALOG_ADVENTURE",
@@ -123,8 +138,19 @@ const GAMES = [
     title: "Dialog Adventure",
     desc: "Real scenarios, real conversations — café, train station, getting lost",
     theme: "#F97316",
-    difficulty: "Hard",
-    tag: "Scenario",
+    difficulty: "B1",
+    category: "immersive",
+    xp: 40,
+  },
+  {
+    href: "/games/interview",
+    gameType: "INTERVIEW",
+    icon: Briefcase,
+    title: "Job Interview",
+    desc: "Sit across a 3D interviewer — answer in French or Spanish to get hired",
+    theme: "#3B82F6",
+    difficulty: "B2",
+    category: "immersive",
     xp: 40,
   },
   {
@@ -134,20 +160,9 @@ const GAMES = [
     title: "City Explorer",
     desc: "Walk a 2D city, find NPCs, answer their challenges — the full RPG experience",
     theme: "#84CC16",
-    difficulty: "Hard",
-    tag: "Culture",
+    difficulty: "B2",
+    category: "immersive",
     xp: 50,
-  },
-  {
-    href: "/games/immersion",
-    gameType: "IMMERSION",
-    icon: Home,
-    title: "Immersion Room",
-    desc: "Find objects in a 3D room by listening to voice commands",
-    theme: "#D946EF",
-    difficulty: "Easy",
-    tag: "Listening",
-    xp: 40,
   },
   {
     href: "/games/city-3d",
@@ -156,27 +171,26 @@ const GAMES = [
     title: "Word Blaster 3D",
     desc: "Shoot the correct translation in a neon 3D arena — grow, shrink, speed up each round",
     theme: "#6366F1",
-    difficulty: "Hard",
-    tag: "Speed",
+    difficulty: "C1",
+    category: "immersive",
     xp: 60,
-  },
-  {
-    href: "/games/interview",
-    gameType: "INTERVIEW",
-    icon: Briefcase,
-    title: "Job Interview",
-    desc: "Sit across a 3D interviewer — answer their questions in French or Spanish to get hired",
-    theme: "#3B82F6",
-    difficulty: "Medium",
-    tag: "Scenario",
-    xp: 40,
   },
 ];
 
+const CATEGORIES = [
+  { key: "vocabulary", label: "Vocabulary", emoji: "📚", color: "#6366F1" },
+  { key: "grammar",    label: "Grammar",    emoji: "✏️", color: "#14B8A6" },
+  { key: "listening",  label: "Listening",  emoji: "🎧", color: "#06B6D4" },
+  { key: "immersive",  label: "Immersive",  emoji: "🌍", color: "#F97316" },
+];
+
 const DIFF_COLOR: Record<string, string> = {
-  Easy: "#10B981",
-  Medium: "#F59E0B",
-  Hard: "#EF4444",
+  A1: "#10B981",
+  A2: "#22C55E",
+  B1: "#F59E0B",
+  B2: "#F97316",
+  C1: "#EF4444",
+  C2: "#DC2626",
 };
 
 export default async function GamesPage() {
@@ -324,66 +338,98 @@ export default async function GamesPage() {
         </div>
       )}
 
-      {/* Game Cards Grid */}
-      <div className="games-grid" style={{ marginBottom: 32 }}>
-        {GAMES.map((game) => {
-          const best = bestScores[game.gameType];
-          const GameIcon = game.icon;
-          const diffColor = DIFF_COLOR[game.difficulty] ?? "#F59E0B";
+      {/* Game Categories */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 32, marginBottom: 32 }}>
+        {CATEGORIES.map((cat) => {
+          const catGames = GAMES.filter((g) => g.category === cat.key);
           return (
-            <Link
-              href={game.href}
-              key={game.href}
-              className="game-card-v2"
-              style={{ "--t": game.theme, textDecoration: "none" } as React.CSSProperties}
-            >
-              <div className="gc-aura" />
-              <div className="gc-sheen" />
-
-              <div className="gc-head">
-                <div className="gc-icon">
-                  <GameIcon size={20} style={{ color: "#fff" }} />
-                </div>
-                <span style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  padding: "3px 9px",
-                  borderRadius: 999,
-                  background: `${diffColor}20`,
-                  border: `1px solid ${diffColor}40`,
-                  color: diffColor,
+            <div key={cat.key}>
+              {/* Category header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 9, fontSize: 16,
+                  background: `${cat.color}18`, border: `1px solid ${cat.color}35`,
+                  display: "grid", placeItems: "center", flexShrink: 0,
                 }}>
-                  {game.difficulty}
+                  {cat.emoji}
+                </div>
+                <h2 style={{
+                  fontSize: 16, fontWeight: 800, color: "var(--text)",
+                  fontFamily: "var(--font-display)", letterSpacing: "-0.01em",
+                }}>
+                  {cat.label}
+                </h2>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: "var(--text-3)",
+                  background: "var(--surface-3)", borderRadius: 999,
+                  padding: "2px 8px",
+                }}>
+                  {catGames.length}
                 </span>
               </div>
 
-              <div className="gc-foot">
-                <div className="gc-name">{game.title}</div>
-                <div className="gc-row">
-                  <span className="gc-tag">{game.tag}</span>
-                  <span className="gc-xp">+{game.xp} XP</span>
-                </div>
-                {best && (
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                    marginTop: 8,
-                    fontSize: 11,
-                    color: "var(--text-3)",
-                    fontFamily: "var(--font-mono)",
-                  }}>
-                    <Trophy size={11} style={{ color: game.theme, flexShrink: 0 }} />
-                    <span style={{ color: game.theme, fontWeight: 600 }}>{best.score.toLocaleString()}</span>
-                    <span>pts best</span>
-                  </div>
-                )}
-              </div>
+              {/* Cards row */}
+              <div className="games-grid">
+                {catGames.map((game) => {
+                  const best = bestScores[game.gameType];
+                  const GameIcon = game.icon;
+                  const diffColor = DIFF_COLOR[game.difficulty] ?? "#F59E0B";
+                  return (
+                    <Link
+                      href={game.href}
+                      key={game.href}
+                      className="game-card-v2"
+                      style={{ "--t": game.theme, textDecoration: "none" } as React.CSSProperties}
+                    >
+                      <div className="gc-aura" />
+                      <div className="gc-sheen" />
 
-              <div className="gc-corner" aria-hidden="true">↗</div>
-            </Link>
+                      <div className="gc-head">
+                        <div className="gc-icon">
+                          <GameIcon size={20} style={{ color: "#fff" }} />
+                        </div>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, letterSpacing: "0.06em",
+                          textTransform: "uppercase", padding: "3px 9px",
+                          borderRadius: 999,
+                          background: `${diffColor}20`,
+                          border: `1px solid ${diffColor}40`,
+                          color: diffColor,
+                        }}>
+                          {game.difficulty}
+                        </span>
+                      </div>
+
+                      <div className="gc-foot">
+                        <div className="gc-name">{game.title}</div>
+                        <div className="gc-row">
+                          <span className="gc-xp">+{game.xp} XP</span>
+                        </div>
+                        {best ? (
+                          <div style={{
+                            display: "flex", alignItems: "center", gap: 5,
+                            marginTop: 8, fontSize: 11,
+                            color: "var(--text-3)", fontFamily: "var(--font-mono)",
+                          }}>
+                            <Trophy size={11} style={{ color: game.theme, flexShrink: 0 }} />
+                            <span style={{ color: game.theme, fontWeight: 600 }}>
+                              {best.score.toLocaleString()}
+                            </span>
+                            <span>best</span>
+                          </div>
+                        ) : (
+                          <div style={{ marginTop: 8, fontSize: 11, color: "var(--text-3)" }}>
+                            Not played yet
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="gc-corner" aria-hidden="true">↗</div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </div>

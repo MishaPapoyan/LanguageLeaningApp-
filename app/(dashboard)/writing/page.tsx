@@ -495,16 +495,31 @@ export default function WritingPage() {
           <div style={{ borderRadius: 16, padding: "20px", background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.22)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--green)", fontFamily: "var(--font-display)" }}>{t(locale, "writing_aiFeedback")}</h3>
-              {grade !== null && (
-                <div style={{
-                  display: "flex", alignItems: "baseline", gap: 2,
-                  background: "var(--surface-2)", borderRadius: 10, padding: "4px 12px",
-                  border: `2px solid ${gradeColor}`,
-                }}>
-                  <span style={{ fontSize: 20, fontWeight: 800, color: gradeColor, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>{grade}</span>
-                  <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 600 }}>/10</span>
-                </div>
-              )}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {grade !== null && (
+                  <div style={{
+                    display: "flex", alignItems: "baseline", gap: 2,
+                    background: "var(--surface-2)", borderRadius: 10, padding: "4px 12px",
+                    border: `2px solid ${gradeColor}`,
+                  }}>
+                    <span style={{ fontSize: 20, fontWeight: 800, color: gradeColor, fontFamily: "var(--font-mono)", letterSpacing: "-0.02em" }}>{grade}</span>
+                    <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 600 }}>/10</span>
+                  </div>
+                )}
+                {/* Rewrite button — clears feedback so the user can revise */}
+                <button
+                  onClick={() => { setFeedback(null); setText(""); setShowHints(false); }}
+                  style={{
+                    fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 9,
+                    background: "var(--surface-2)", border: "1px solid var(--border-md)",
+                    color: "var(--text-2)", cursor: "pointer", transition: "border-color 0.12s",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent-2)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--text-2)"; }}
+                >
+                  ↺ Rewrite
+                </button>
+              </div>
             </div>
             <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
               {bodyText}

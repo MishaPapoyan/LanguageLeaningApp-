@@ -46,9 +46,10 @@ function WaveformBars({ active }: { active: boolean }) {
 
 export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [speed, setSpeed] = useState<number>(0.7);
+  const [speed, setSpeed] = useState<number>(0.85);
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
-  const [playing, setPlaying] = useState(false);
+  const [ttsStatus, setTtsStatus] = useState<"idle" | "loading" | "playing">("idle");
+  const playing = ttsStatus !== "idle";
 
   // ── Recording state ─────────────────────────────────────────────────────────
   const [recording, setRecording] = useState(false);
@@ -73,12 +74,14 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
     : words;
 
   const speakText = useCallback((text: string, lang = ttsLocale) => {
-    setPlaying(true);
+    setTtsStatus("loading");
     speak(text, {
       lang,
       rate: speed,
-      onEnd: () => setPlaying(false),
-      onError: () => setPlaying(false),
+      onLoading: () => setTtsStatus("loading"),
+      onPlaying: () => setTtsStatus("playing"),
+      onEnd:     () => setTtsStatus("idle"),
+      onError:   () => setTtsStatus("idle"),
     });
   }, [speed, ttsLocale]);
 
@@ -190,17 +193,35 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               ))}
             </select>
           </div>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
-              Speed: {speed <= 0.5 ? "Slow" : speed <= 0.75 ? "Normal" : "Fast"}
+          <div>
+            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+              Speed
             </label>
-            <input
-              type="range" min={0.3} max={1.0} step={0.1} value={speed}
-              onChange={(e) => setSpeed(parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: "var(--accent)" }}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>
-              <span>Slow</span><span>Fast</span>
+            <div style={{ display: "flex", gap: 6 }}>
+              {([
+                { label: "0.75×", value: 0.75 },
+                { label: "1×",    value: 1.0  },
+                { label: "1.25×", value: 1.25 },
+              ] as const).map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setSpeed(s.value)}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    fontFamily: "var(--font-mono)",
+                    border: `1px solid ${speed === s.value ? "var(--accent)" : "var(--border)"}`,
+                    background: speed === s.value ? "var(--accent-dim)" : "var(--surface-3)",
+                    color: speed === s.value ? "var(--accent-2)" : "var(--text-2)",
+                    cursor: "pointer",
+                    transition: "all 0.12s",
+                  }}
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -225,7 +246,12 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                 <p style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
                   {currentWord.word}
                 </p>
-                {playing && (
+                {ttsStatus === "loading" && (
+                  <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
+                    Loading…
+                  </span>
+                )}
+                {ttsStatus === "playing" && (
                   <span style={{ fontSize: 11, color: "var(--accent-2)", fontWeight: 600, animation: "pulse 1s infinite" }}>
                     Playing…
                   </span>

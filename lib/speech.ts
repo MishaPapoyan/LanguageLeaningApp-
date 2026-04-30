@@ -14,6 +14,10 @@ export interface SpeakOptions {
   rate?: number;
   pitch?: number;
   volume?: number;
+  /** Called as soon as the fetch starts (before audio is ready) */
+  onLoading?: () => void;
+  /** Called the moment audio begins playing */
+  onPlaying?: () => void;
   onEnd?: () => void;
   onError?: () => void;
 }
@@ -56,6 +60,8 @@ async function speakViaVoxtral(
   text: string,
   lang: string,
   volume: number,
+  onLoading?: () => void,
+  onPlaying?: () => void,
   onEnd?: () => void,
   onError?: () => void
 ): Promise<boolean> {
@@ -63,6 +69,7 @@ async function speakViaVoxtral(
   let blobUrl = voxtralCache.get(cacheKey);
 
   if (!blobUrl) {
+    onLoading?.();
     try {
       const res = await fetch("/api/pronunciation/tts", {
         method: "POST",
@@ -78,6 +85,7 @@ async function speakViaVoxtral(
     }
   }
 
+  onPlaying?.();
   return playAudioUrl(blobUrl, volume, onEnd, onError);
 }
 
@@ -180,6 +188,8 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
     rate = 0.88,
     pitch = 1.0,
     volume = 0.95,
+    onLoading,
+    onPlaying,
     onEnd,
     onError,
   } = options;
@@ -187,8 +197,8 @@ export async function speak(text: string, options: SpeakOptions = {}): Promise<v
   stopCurrentAudio();
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
-  // 1. Server TTS (OpenAI → Mistral, whichever key is configured)
-  const serverOk = await speakViaVoxtral(text, lang, volume, onEnd, onError);
+  // 1. Server TTS (ElevenLabs → OpenAI → Mistral, whichever key is configured)
+  const serverOk = await speakViaVoxtral(text, lang, volume, onLoading, onPlaying, onEnd, onError);
   if (serverOk) return;
 
   // 2. Web Speech API — handles single words and acts as universal fallback
@@ -221,7 +231,7 @@ export function speakTarget(
   text: string,
   targetLang: string,
   rate = 0.88,
-  callbacks?: { onEnd?: () => void; onError?: () => void }
+  callbacks?: { onLoading?: () => void; onPlaying?: () => void; onEnd?: () => void; onError?: () => void }
 ) {
   return speak(text, { lang: toLocale(targetLang), rate, pitch: 1.0, ...callbacks });
 }
