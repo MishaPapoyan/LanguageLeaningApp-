@@ -10,6 +10,7 @@ import {
   CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify,
   Map, Box, Home, Briefcase, Flame, Gamepad2,
   Network, Search, Clock, Mic, BookOpen, Radio, Mic2,
+  Plane, Stethoscope, ShoppingBag,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -140,7 +141,7 @@ const GAMES = [
     desc: "Real scenarios, real conversations — café, train station, getting lost",
     theme: "#F97316",
     difficulty: "B1",
-    category: "immersive",
+    category: "grammar",
     xp: 40,
   },
   {
@@ -176,6 +177,39 @@ const GAMES = [
     category: "immersive",
     xp: 60,
   },
+  {
+    href: "/games/airport",
+    gameType: "AIRPORT",
+    icon: Plane,
+    title: "Airport",
+    desc: "Check in, pass security and board your flight — real conversations at every step",
+    theme: "#0EA5E9",
+    difficulty: "B1",
+    category: "immersive",
+    xp: 40,
+  },
+  {
+    href: "/games/doctor-office",
+    gameType: "DOCTOR_OFFICE",
+    icon: Stethoscope,
+    title: "Doctor's Office",
+    desc: "Describe your symptoms, understand the diagnosis and pick up your prescription",
+    theme: "#10B981",
+    difficulty: "B1",
+    category: "immersive",
+    xp: 40,
+  },
+  {
+    href: "/games/market-bazaar",
+    gameType: "MARKET_BAZAAR",
+    icon: ShoppingBag,
+    title: "Market Bazaar",
+    desc: "Browse stalls, ask prices and haggle with vendors at the local market",
+    theme: "#F59E0B",
+    difficulty: "A2",
+    category: "immersive",
+    xp: 35,
+  },
   // ── New Games v2 ──────────────────────────────────────────────
   {
     href: "/games/word-association",
@@ -185,7 +219,7 @@ const GAMES = [
     desc: "Tap all words related to the target word before the timer runs out",
     theme: "#14B8A6",
     difficulty: "A2",
-    category: "vocabulary",
+    category: "grammar",
     xp: 35,
   },
   {
