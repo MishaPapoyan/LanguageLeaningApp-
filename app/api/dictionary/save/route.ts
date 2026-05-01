@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { awardXp } from "@/lib/gamification";
 import { XP_REWARDS } from "@/types";
+import { getWordById } from "@/data/dictionary-words";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -18,6 +19,27 @@ export async function POST(req: NextRequest) {
     if (remove) {
       await prisma.savedWord.deleteMany({ where: { userId, wordId } });
       return NextResponse.json({ saved: false });
+    }
+
+    // Ensure the Word record exists in DB (hardcoded words are not seeded)
+    const hardcoded = getWordById(wordId);
+    if (hardcoded) {
+      await prisma.word.upsert({
+        where: { id: wordId },
+        create: {
+          id: wordId,
+          word: hardcoded.word,
+          translation: hardcoded.translation,
+          definition: hardcoded.definition,
+          exampleFr: hardcoded.exampleFr,
+          exampleEn: hardcoded.exampleEn,
+          category: hardcoded.category,
+          difficulty: hardcoded.difficulty as any,
+          imageEmoji: hardcoded.imageEmoji,
+          language: hardcoded.language,
+        },
+        update: {},
+      });
     }
 
     const saved = await prisma.savedWord.upsert({

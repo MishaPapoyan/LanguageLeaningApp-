@@ -1,32 +1,35 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { WordDetail } from "@/components/dictionary/WordDetail";
+import { getWordById } from "@/data/dictionary-words";
 
 export default async function WordPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id ?? "";
 
-  let word = null;
+  // Look up from hardcoded dictionary first
+  const hardcoded = getWordById(params.id);
+  if (!hardcoded) notFound();
+
+  // Check if this user has saved the word (optional — graceful on DB error)
   let savedWord = null;
-
   try {
-    [word, savedWord] = await Promise.all([
-      prisma.word.findUnique({ where: { id: params.id } }),
-      userId ? prisma.savedWord.findUnique({ where: { userId_wordId: { userId, wordId: params.id } } }) : null,
-    ]);
-  } catch (err) {
-    console.error("[word page] DB error:", err);
+    if (userId) {
+      savedWord = await prisma.savedWord.findUnique({
+        where: { userId_wordId: { userId, wordId: params.id } },
+      });
+    }
+  } catch {
+    // DB unavailable — just show unsaved state
   }
-
-  if (!word) notFound();
 
   return (
     <WordDetail
       word={{
-        ...word,
+        ...hardcoded,
         isSaved: !!savedWord,
         masteryLevel: savedWord?.masteryLevel ?? 0,
         quizAttempts: savedWord?.quizAttempts ?? 0,
