@@ -33,6 +33,20 @@ enum GameType {
   SENTENCE_BUILDER
   DIALOG_ADVENTURE
   CITY_EXPLORER
+  IMMERSION
+  INTERVIEW
+  // New games — v2
+  WORD_ASSOCIATION
+  ERROR_DETECTIVE
+  TENSE_CHALLENGE
+  DICTATION
+  SPEED_LISTENING
+  ACCENT_CHALLENGE
+  STORY_AUDIO
+  AIRPORT
+  DOCTOR_OFFICE
+  MARKET_BAZAAR
+  HOTEL
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
