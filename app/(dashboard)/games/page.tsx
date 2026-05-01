@@ -297,6 +297,13 @@ const CATEGORIES = [
   { key: "immersive",  label: "Immersive",  emoji: "🌍", color: "#F97316" },
 ];
 
+const CAT_DESC: Record<string, string> = {
+  vocabulary: "Build your word bank — translations, spellings and recall under pressure",
+  grammar:    "Conjugations, tenses, sentence structure and conversation patterns",
+  listening:  "Train your ear for real speech speed, accents and comprehension",
+  immersive:  "Full role-play in airports, markets, clinics and 3D arenas",
+};
+
 const DIFF_COLOR: Record<string, string> = {
   A1: "#10B981",
   A2: "#22C55E",
@@ -353,150 +360,135 @@ export default async function GamesPage() {
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 4px" }}>
 
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "-0.022em", color: "var(--text)", marginBottom: 4 }}>
-          {t(locale, "games_title")}
-        </h1>
-        <p style={{ fontSize: 14, color: "var(--text-2)" }}>
-          {t(locale, "games_subtitle")}
-        </p>
+      {/* ── Page header ── */}
+      <div style={{ marginBottom: 22, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 10px", borderRadius: 999, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.22)", marginBottom: 10 }}>
+            <Gamepad2 size={11} style={{ color: "var(--accent)" }} />
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.07em", textTransform: "uppercase" }}>24 Games · 4 Categories</span>
+          </div>
+          <h1 style={{ fontSize: 34, fontWeight: 900, fontFamily: "var(--font-display)", letterSpacing: "-0.025em", color: "var(--text)", lineHeight: 1.08, marginBottom: 6 }}>
+            {t(locale, "games_title")}
+          </h1>
+          <p style={{ fontSize: 14, color: "var(--text-2)" }}>
+            {t(locale, "games_subtitle")}
+          </p>
+        </div>
+
+        {/* Stats pills — only when user has played */}
+        {totalGamesPlayed > 0 && (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", paddingTop: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 13px", borderRadius: 12, background: "var(--xp-dim)", border: "1px solid rgba(245,158,11,0.22)" }}>
+              <Zap size={13} style={{ color: "var(--xp)" }} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--xp)", fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}>
+                {totalXpFromGames.toLocaleString()}
+              </span>
+              <span style={{ fontSize: 11, color: "var(--text-3)" }}>XP earned</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 13px", borderRadius: 12, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.22)" }}>
+              <Trophy size={13} style={{ color: "var(--accent)" }} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)", fontFamily: "var(--font-mono)", letterSpacing: "-0.01em" }}>
+                {totalGamesPlayed}
+              </span>
+              <span style={{ fontSize: 11, color: "var(--text-3)" }}>played</span>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Daily Challenge banner */}
-      <div className="daily-banner" style={{ marginBottom: 28, display: "flex", alignItems: "center", gap: 20 }}>
-        <div style={{
-          width: 64,
-          height: 64,
-          borderRadius: 16,
-          background: "linear-gradient(135deg, #F59E0B, #F97316)",
-          display: "grid",
-          placeItems: "center",
-          flexShrink: 0,
-        }}>
-          <Flame size={28} style={{ color: "#0B0F1A" }} />
+      {/* ── Category nav pills ── */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 28 }}>
+        {CATEGORIES.map((cat) => {
+          const n = GAMES.filter((g) => g.category === cat.key).length;
+          const played = GAMES.filter((g) => g.category === cat.key && bestScores[g.gameType]).length;
+          return (
+            <a key={cat.key} href={`#${cat.key}`} className="cat-pill">
+              <span style={{ fontSize: 15 }}>{cat.emoji}</span>
+              <span>{cat.label}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 999, background: played > 0 ? `${cat.color}22` : "var(--surface-3)", color: played > 0 ? cat.color : "var(--text-3)" }}>
+                {played > 0 ? `${played}/${n}` : n}
+              </span>
+            </a>
+          );
+        })}
+      </div>
+
+      {/* ── Daily Challenge banner ── */}
+      <div className="daily-banner" style={{ marginBottom: 36, display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ width: 54, height: 54, borderRadius: 14, background: "linear-gradient(135deg, #F59E0B, #F97316)", display: "grid", placeItems: "center", flexShrink: 0 }}>
+          <Flame size={24} className="animate-flame-dance" style={{ color: "#0B0F1A" }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              padding: "3px 9px",
-              borderRadius: 999,
-              background: "rgba(245,158,11,0.18)",
-              border: "1px solid rgba(245,158,11,0.35)",
-              color: "#F59E0B",
-            }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "2px 8px", borderRadius: 999, background: "rgba(245,158,11,0.18)", border: "1px solid rgba(245,158,11,0.35)", color: "#F59E0B" }}>
               Daily Challenge
             </span>
-            <span style={{ fontSize: 12, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
+            <span style={{ fontSize: 11, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
               Resets in {resetIn}
             </span>
           </div>
-          <p style={{ fontSize: 17, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 2, letterSpacing: "-0.01em" }}>
+          <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 1, letterSpacing: "-0.012em" }}>
             Word Blaster 3D — Hard mode
           </p>
-          <p style={{ fontSize: 13, color: "var(--text-2)" }}>
+          <p style={{ fontSize: 12, color: "var(--text-2)" }}>
             Clear 30 targets, lose no more than 2 lives.
           </p>
         </div>
-        <div style={{ textAlign: "right", flexShrink: 0, marginRight: 4 }}>
-          <div style={{ fontSize: 26, fontWeight: 700, color: "var(--xp)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-            +500
-          </div>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)" }}>
-            XP reward
-          </div>
+        <div style={{ textAlign: "right", flexShrink: 0 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--xp)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>+500</div>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)" }}>XP reward</div>
         </div>
-        <Link
-          href="/games/city-3d"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            padding: "10px 20px",
-            borderRadius: 12,
-            background: "linear-gradient(135deg, #F59E0B, #F97316)",
-            color: "#0B0F1A",
-            fontWeight: 700,
-            fontSize: 14,
-            textDecoration: "none",
-            flexShrink: 0,
-            fontFamily: "var(--font-display)",
-            letterSpacing: "-0.01em",
-            boxShadow: "0 0 24px rgba(245,158,11,0.35)",
-          }}
-        >
-          Start →
+        <Link href="/games/city-3d" style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: 11, background: "linear-gradient(135deg, #F59E0B, #F97316)", color: "#0B0F1A", fontWeight: 700, fontSize: 13, textDecoration: "none", flexShrink: 0, fontFamily: "var(--font-display)", letterSpacing: "-0.01em", boxShadow: "0 0 20px rgba(245,158,11,0.35)", whiteSpace: "nowrap" }}>
+          Play →
         </Link>
       </div>
 
-      {/* Stats row (if played before) */}
-      {totalGamesPlayed > 0 && (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          marginBottom: 24,
-        }}>
-          <div className="bento" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(245,158,11,0.15)", display: "grid", placeItems: "center", flexShrink: 0 }}>
-              <Zap size={18} style={{ color: "var(--xp)" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--xp)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-                {totalXpFromGames.toLocaleString()}
-              </div>
-              <div style={{ fontSize: 12, color: "var(--text-3)" }}>XP from games</div>
-            </div>
-          </div>
-          <div className="bento" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(99,102,241,0.15)", display: "grid", placeItems: "center", flexShrink: 0 }}>
-              <Gamepad2 size={18} style={{ color: "var(--accent)" }} />
-            </div>
-            <div>
-              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--accent)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-                {totalGamesPlayed}
-              </div>
-              <div style={{ fontSize: 12, color: "var(--text-3)" }}>Games played</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Game Categories */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 32, marginBottom: 32 }}>
+      {/* ── Category sections ── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 44, marginBottom: 40 }}>
         {CATEGORIES.map((cat) => {
           const catGames = GAMES.filter((g) => g.category === cat.key);
+          const playedCount = catGames.filter((g) => bestScores[g.gameType]).length;
           return (
-            <div key={cat.key}>
+            <div key={cat.key} id={cat.key}>
+
               {/* Category header */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: 9, fontSize: 16,
-                  background: `${cat.color}18`, border: `1px solid ${cat.color}35`,
-                  display: "grid", placeItems: "center", flexShrink: 0,
-                }}>
-                  {cat.emoji}
+              <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 18 }}>
+                {/* Left accent bar */}
+                <div style={{ width: 3, height: 44, borderRadius: 3, background: cat.color, marginRight: 14, flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                    <span style={{ fontSize: 18, lineHeight: 1 }}>{cat.emoji}</span>
+                    <h2 style={{ fontSize: 19, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.018em" }}>
+                      {cat.label}
+                    </h2>
+                    {playedCount > 0 ? (
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999, background: `${cat.color}1A`, border: `1px solid ${cat.color}33`, color: cat.color }}>
+                        {playedCount}/{catGames.length} played
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 999, background: "var(--surface-3)", color: "var(--text-3)" }}>
+                        {catGames.length} games
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: 12, color: "var(--text-3)", lineHeight: 1.45 }}>
+                    {CAT_DESC[cat.key]}
+                  </p>
                 </div>
-                <h2 style={{
-                  fontSize: 16, fontWeight: 800, color: "var(--text)",
-                  fontFamily: "var(--font-display)", letterSpacing: "-0.01em",
-                }}>
-                  {cat.label}
-                </h2>
-                <span style={{
-                  fontSize: 11, fontWeight: 600, color: "var(--text-3)",
-                  background: "var(--surface-3)", borderRadius: 999,
-                  padding: "2px 8px",
-                }}>
-                  {catGames.length}
-                </span>
+                {/* Progress bar (right) */}
+                {playedCount > 0 && (
+                  <div style={{ width: 72, flexShrink: 0, marginLeft: 16 }}>
+                    <div style={{ height: 4, borderRadius: 3, background: "var(--surface-3)", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${(playedCount / catGames.length) * 100}%`, background: cat.color, borderRadius: 3 }} />
+                    </div>
+                    <p style={{ fontSize: 10, color: "var(--text-3)", marginTop: 3, textAlign: "right", fontFamily: "var(--font-mono)" }}>
+                      {Math.round((playedCount / catGames.length) * 100)}%
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {/* Cards row */}
+              {/* 3-column game grid */}
               <div className="games-grid">
                 {catGames.map((game) => {
                   const best = bestScores[game.gameType];
@@ -507,52 +499,41 @@ export default async function GamesPage() {
                       href={game.href}
                       key={game.href}
                       className="game-card-v2"
-                      style={{ "--t": game.theme, textDecoration: "none" } as React.CSSProperties}
+                      style={{ "--t": game.theme, textDecoration: "none", minHeight: 196, display: "flex", flexDirection: "column" } as React.CSSProperties}
                     >
                       <div className="gc-aura" />
                       <div className="gc-sheen" />
+                      <div className="gc-arrow">↗</div>
 
-                      <div className="gc-head">
+                      {/* Icon + difficulty badge */}
+                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14, position: "relative", zIndex: 1 }}>
                         <div className="gc-icon">
-                          <GameIcon size={20} style={{ color: "#fff" }} />
+                          <GameIcon size={18} style={{ color: "#fff" }} />
                         </div>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, letterSpacing: "0.06em",
-                          textTransform: "uppercase", padding: "3px 9px",
-                          borderRadius: 999,
-                          background: `${diffColor}20`,
-                          border: `1px solid ${diffColor}40`,
-                          color: diffColor,
-                        }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", padding: "3px 8px", borderRadius: 999, background: `${diffColor}1A`, border: `1px solid ${diffColor}40`, color: diffColor }}>
                           {game.difficulty}
                         </span>
                       </div>
 
-                      <div className="gc-foot">
+                      {/* Title + description */}
+                      <div style={{ flex: 1, marginBottom: 14, position: "relative", zIndex: 1 }}>
                         <div className="gc-name">{game.title}</div>
-                        <div className="gc-row">
-                          <span className="gc-xp">+{game.xp} XP</span>
-                        </div>
-                        {best ? (
-                          <div style={{
-                            display: "flex", alignItems: "center", gap: 5,
-                            marginTop: 8, fontSize: 11,
-                            color: "var(--text-3)", fontFamily: "var(--font-mono)",
-                          }}>
-                            <Trophy size={11} style={{ color: game.theme, flexShrink: 0 }} />
-                            <span style={{ color: game.theme, fontWeight: 600 }}>
-                              {best.score.toLocaleString()}
-                            </span>
-                            <span>best</span>
-                          </div>
-                        ) : (
-                          <div style={{ marginTop: 8, fontSize: 11, color: "var(--text-3)" }}>
-                            Not played yet
-                          </div>
-                        )}
+                        <div className="gc-desc" style={{ marginTop: 4 }}>{game.desc}</div>
                       </div>
 
-                      <div className="gc-corner" aria-hidden="true">↗</div>
+                      {/* XP + best score row */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
+                        <span className="gc-xp">+{game.xp} XP</span>
+                        {best ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontFamily: "var(--font-mono)" }}>
+                            <Trophy size={10} style={{ color: game.theme, flexShrink: 0 }} />
+                            <span style={{ color: game.theme, fontWeight: 700 }}>{best.score}%</span>
+                            <span style={{ color: "var(--text-3)" }}>best</span>
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: 10, color: "var(--text-3)" }}>Not played</span>
+                        )}
+                      </div>
                     </Link>
                   );
                 })}
@@ -562,85 +543,51 @@ export default async function GamesPage() {
         })}
       </div>
 
-      {/* Best Scores */}
-      {Object.keys(bestScores).length > 0 && (
-        <div className="bento" style={{ padding: "20px 24px" }}>
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)" }}>
-              Best Scores
-            </p>
-            <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2 }}>Your personal bests · all time</p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
-            {GAMES.filter(g => bestScores[g.gameType]).map((game) => {
-              const best = bestScores[game.gameType];
-              const GameIcon = game.icon;
-              return (
-                <div
-                  key={game.gameType}
-                  style={{
-                    padding: "12px 14px",
-                    borderRadius: 12,
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <div style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 8,
-                      background: `${game.theme}20`,
-                      display: "grid",
-                      placeItems: "center",
-                      flexShrink: 0,
-                    }}>
-                      <GameIcon size={14} style={{ color: game.theme }} />
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", lineHeight: 1.2 }}>
-                      {game.title}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "var(--font-mono)", color: game.theme, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-                    {best!.score.toLocaleString()}
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 2 }}>
-                    {best!.xpEarned} XP earned
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* ── Coming soon: Hotel ── */}
+      <div style={{ borderRadius: 16, padding: "16px 20px", border: "1px dashed var(--border-md)", background: "var(--surface-2)", display: "flex", alignItems: "center", gap: 14, marginBottom: 8 }}>
+        <div style={{ width: 42, height: 42, borderRadius: 11, background: "var(--surface-3)", display: "grid", placeItems: "center", flexShrink: 0 }}>
+          <span style={{ fontSize: 22 }}>🏨</span>
         </div>
-      )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 1 }}>Hotel — Coming in Phase 4</p>
+          <p style={{ fontSize: 12, color: "var(--text-3)" }}>Navigate check-in, room service and concierge in your target language</p>
+        </div>
+        <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "var(--surface-3)", color: "var(--text-3)", letterSpacing: "0.07em", textTransform: "uppercase", flexShrink: 0 }}>
+          Soon
+        </span>
+      </div>
 
-      {/* CSS for games grid + daily banner */}
+      {/* ── CSS ── */}
       <style>{`
         .games-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 14px;
         }
-        @media (max-width: 1024px) {
-          .games-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 768px) {
+        @media (max-width: 860px) {
           .games-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (max-width: 480px) {
+        @media (max-width: 500px) {
           .games-grid { grid-template-columns: 1fr; }
         }
-        .daily-banner {
-          background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(99,102,241,0.10));
-          border: 1px solid rgba(245,158,11,0.35);
-          border-radius: 16px;
-          padding: 20px 24px;
-          box-shadow: 0 0 0 1px rgba(245,158,11,0.15), 0 0 48px rgba(245,158,11,0.12);
-          animation: pulseGlow 2.4s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+        .cat-pill {
+          display: inline-flex; align-items: center; gap: 7px;
+          padding: 7px 14px; border-radius: 999px;
+          background: var(--surface-2); border: 1px solid var(--border);
+          font-size: 13px; font-weight: 600; color: var(--text-2);
+          text-decoration: none; transition: all 0.18s var(--ease);
+          white-space: nowrap;
         }
-        @keyframes pulseGlow {
-          0%,100% { box-shadow: 0 0 0 1px rgba(245,158,11,0.15), 0 0 48px rgba(245,158,11,0.12); }
-          50%      { box-shadow: 0 0 0 1px rgba(245,158,11,0.40), 0 0 72px rgba(245,158,11,0.25); }
+        .cat-pill:hover {
+          background: var(--surface-3); color: var(--text);
+          border-color: var(--border-md); transform: translateY(-1px);
+        }
+        .daily-banner {
+          background: linear-gradient(135deg, rgba(245,158,11,0.10), rgba(249,115,22,0.06));
+          border: 1px solid rgba(245,158,11,0.28);
+          border-radius: 18px;
+          padding: 18px 22px;
+          animation: pulse-glow 2.6s cubic-bezier(0.32, 0.72, 0, 1) infinite;
         }
       `}</style>
     </div>
