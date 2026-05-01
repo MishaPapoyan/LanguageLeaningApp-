@@ -60,7 +60,7 @@ interface Chal { word: string; right: string; wrong: [string, string] }
 interface NPC {
   id: string; name: string; emoji: string
   tx: number; ty: number; color: string; greeting: string
-  fr: Chal[]; es: Chal[]
+  fr: Chal[]; es: Chal[]; en: Chal[]
 }
 
 const NPCS: NPC[] = [
@@ -78,6 +78,11 @@ const NPCS: NPC[] = [
       { word: "pan",     right: "bread",  wrong: ["cake",   "rice"]   },
       { word: "agua",    right: "water",  wrong: ["milk",   "wine"]   },
     ],
+    en: [
+      { word: "beverage",  right: "a drink",    wrong: ["a food",   "a snack"]  },
+      { word: "brew",      right: "to make tea/coffee", wrong: ["to cook", "to bake"] },
+      { word: "sip",       right: "to drink slowly", wrong: ["to gulp", "to pour"] },
+    ],
   },
   {
     id: "vendor", name: "Sofia", emoji: "🧑‍🌾", tx: 17, ty: 2,
@@ -92,6 +97,11 @@ const NPCS: NPC[] = [
       { word: "manzana", right: "apple",  wrong: ["pear",   "grape"]  },
       { word: "dinero",  right: "money",  wrong: ["coin",   "bank"]   },
       { word: "precio",  right: "price",  wrong: ["cost",   "sale"]   },
+    ],
+    en: [
+      { word: "bargain",  right: "a good deal",  wrong: ["expensive",  "discount"]  },
+      { word: "vendor",   right: "a seller",     wrong: ["a buyer",    "a customer"] },
+      { word: "receipt",  right: "proof of purchase", wrong: ["an invoice", "a coupon"] },
     ],
   },
   {
@@ -108,6 +118,11 @@ const NPCS: NPC[] = [
       { word: "billete", right: "ticket",     wrong: ["passport", "visa"]    },
       { word: "llegar",  right: "to arrive",  wrong: ["to leave", "to wait"] },
     ],
+    en: [
+      { word: "itinerary", right: "a travel plan",  wrong: ["a ticket",   "a passport"] },
+      { word: "depart",    right: "to leave",       wrong: ["to arrive",  "to board"]   },
+      { word: "luggage",   right: "bags/suitcases", wrong: ["cargo",      "freight"]    },
+    ],
   },
   {
     id: "ranger", name: "Luna", emoji: "🌿", tx: 17, ty: 10,
@@ -123,6 +138,11 @@ const NPCS: NPC[] = [
       { word: "flor",    right: "flower",  wrong: ["grass",   "leaf"]   },
       { word: "correr",  right: "to run",  wrong: ["to walk", "to fly"] },
     ],
+    en: [
+      { word: "foliage",  right: "leaves of plants", wrong: ["branches", "roots"]    },
+      { word: "meadow",   right: "a grassy field",   wrong: ["a forest", "a desert"] },
+      { word: "wander",   right: "to walk freely",   wrong: ["to sprint", "to rest"] },
+    ],
   },
   {
     id: "musician", name: "Diego", emoji: "🎵", tx: 8, ty: 3,
@@ -137,6 +157,11 @@ const NPCS: NPC[] = [
       { word: "feliz",   right: "happy",    wrong: ["sad",     "angry"]   },
       { word: "música",  right: "music",    wrong: ["dance",   "art"]     },
       { word: "amar",    right: "to love",  wrong: ["to hate", "to fear"] },
+    ],
+    en: [
+      { word: "elated",   right: "very happy",  wrong: ["bored",     "anxious"]   },
+      { word: "melody",   right: "a tune",      wrong: ["a rhythm",  "a lyric"]   },
+      { word: "cherish",  right: "to treasure", wrong: ["to ignore", "to forget"] },
     ],
   },
 ];
@@ -171,7 +196,7 @@ interface Quiz {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export function CityExplorer({ targetLang }: { targetLang: string }) {
-  const lang = (targetLang === "es" ? "es" : "fr") as "fr" | "es";
+  const lang = (["fr","es","en"].includes(targetLang) ? targetLang : "fr") as "fr" | "es" | "en";
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysRef   = useRef(new Set<string>());

@@ -30,6 +30,14 @@ const TENSE_MAP_ES: Record<string, string[]> = {
   C2: ["condicional compuesto", "subjuntivo imperfecto", "futuro perfecto"],
 };
 
+const TENSE_MAP_EN: Record<string, string[]> = {
+  A2: ["simple past", "going to future"],
+  B1: ["present perfect", "past continuous", "simple future (will)"],
+  B2: ["past perfect", "present perfect continuous", "second conditional"],
+  C1: ["third conditional", "past perfect continuous", "future perfect"],
+  C2: ["mixed conditionals", "future perfect continuous", "inverted conditionals"],
+};
+
 const FALLBACK: Record<string, TenseQuestion[]> = {
   fr: [
     { sourceSentence: "Je mange une pomme.", targetTense: "Passé composé", correctAnswer: "J'ai mangé une pomme.", conjugationExplanation: "Use avoir + past participle for passé composé with manger.", stepByStep: ["Infinitive: manger", "Remove -er: mang-", "Add past participle ending: mangé", "Add avoir auxiliary: j'ai", "Result: j'ai mangé une pomme"] },
@@ -40,6 +48,11 @@ const FALLBACK: Record<string, TenseQuestion[]> = {
     { sourceSentence: "Como una manzana.", targetTense: "Pretérito indefinido", correctAnswer: "Comí una manzana.", conjugationExplanation: "Regular -er verb preterite: replace -er with -í for yo.", stepByStep: ["Infinitive: comer", "Remove -er: com-", "Add preterite ending for yo: -í", "Result: comí una manzana"] },
     { sourceSentence: "Ella trabaja en la oficina.", targetTense: "Pretérito imperfecto", correctAnswer: "Ella trabajaba en la oficina.", conjugationExplanation: "Regular -ar verb imperfect: replace -ar with -aba for ella.", stepByStep: ["Infinitive: trabajar", "Remove -ar: trabaj-", "Add imperfect ending for ella: -aba", "Result: ella trabajaba en la oficina"] },
   ],
+  en: [
+    { sourceSentence: "I eat an apple every day.", targetTense: "Simple past", correctAnswer: "I ate an apple.", conjugationExplanation: "'Eat' is an irregular verb. Past tense is 'ate'.", stepByStep: ["Verb: eat (irregular)", "Simple past of 'eat': ate", "Remove frequency phrase 'every day'", "Result: I ate an apple"] },
+    { sourceSentence: "She works at the office.", targetTense: "Present perfect", correctAnswer: "She has worked at the office.", conjugationExplanation: "Present perfect = has/have + past participle. 'Worked' is the regular past participle.", stepByStep: ["Subject: she → use 'has'", "Past participle of 'work': worked", "Result: She has worked at the office"] },
+    { sourceSentence: "We go to the market.", targetTense: "Simple future (will)", correctAnswer: "We will go to the market.", conjugationExplanation: "Simple future with 'will': subject + will + base verb.", stepByStep: ["Add 'will' after subject", "Keep base form 'go'", "Result: We will go to the market"] },
+  ],
 };
 
 export async function GET(req: NextRequest) {
@@ -49,7 +62,9 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const language = searchParams.get("language") ?? session.user.targetLanguage ?? "fr";
   const level    = searchParams.get("level") ?? "B1";
-  const tenseList = language === "es" ? (TENSE_MAP_ES[level] ?? TENSE_MAP_ES.B1) : (TENSE_MAP[level] ?? TENSE_MAP.B1);
+  const tenseList = language === "es" ? (TENSE_MAP_ES[level] ?? TENSE_MAP_ES.B1)
+                  : language === "en" ? (TENSE_MAP_EN[level] ?? TENSE_MAP_EN.B1)
+                  : (TENSE_MAP[level] ?? TENSE_MAP.B1);
   const targetTense = tenseList[Math.floor(Math.random() * tenseList.length)];
 
   try {

@@ -40,6 +40,20 @@ const SENTENCES: Record<string, SentenceData[]> = {
     { id: "es11", english: "The dog runs fast",         words: ["El", "perro", "corre", "rápido"],       distractors: ["gato", "come"] },
     { id: "es12", english: "I live in Madrid",          words: ["Vivo", "en", "Madrid"],                 distractors: ["Barcelona", "como"] },
   ],
+  en: [
+    { id: "en1",  english: "Put the words in order",   words: ["The", "cat", "sits", "on", "the", "mat"],        distractors: ["runs", "under"] },
+    { id: "en2",  english: "She works every day",       words: ["She", "works", "every", "day"],                  distractors: ["play", "night"] },
+    { id: "en3",  english: "They are playing football", words: ["They", "are", "playing", "football"],            distractors: ["is", "basketball"] },
+    { id: "en4",  english: "I have two brothers",       words: ["I", "have", "two", "brothers"],                  distractors: ["sister", "three"] },
+    { id: "en5",  english: "We went to the market",     words: ["We", "went", "to", "the", "market"],             distractors: ["school", "come"] },
+    { id: "en6",  english: "He is reading a book",      words: ["He", "is", "reading", "a", "book"],              distractors: ["write", "magazine"] },
+    { id: "en7",  english: "The train arrives at noon",  words: ["The", "train", "arrives", "at", "noon"],         distractors: ["leaves", "midnight"] },
+    { id: "en8",  english: "Can you help me please",    words: ["Can", "you", "help", "me", "please"],            distractors: ["could", "them"] },
+    { id: "en9",  english: "I would like some coffee",  words: ["I", "would", "like", "some", "coffee"],          distractors: ["want", "tea"] },
+    { id: "en10", english: "She is taller than him",    words: ["She", "is", "taller", "than", "him"],            distractors: ["shorter", "her"] },
+    { id: "en11", english: "The children are playing",  words: ["The", "children", "are", "playing"],             distractors: ["sleeping", "is"] },
+    { id: "en12", english: "It is raining outside",     words: ["It", "is", "raining", "outside"],               distractors: ["snowing", "are"] },
+  ],
 };
 
 function shuffle<T>(arr: T[]): T[] {
@@ -52,8 +66,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function SentenceBuilder({ targetLang }: { targetLang: string }) {
-  const lang = targetLang === "es" ? "es" : "fr";
-  const langLabel = lang === "es" ? "Spanish" : "French";
+  const lang = (["fr","es","en"].includes(targetLang) ? targetLang : "fr") as "fr" | "es" | "en";
+  const langLabel = lang === "es" ? "Spanish" : lang === "en" ? "English" : "French";
   const allSentences = SENTENCES[lang];
   const ROUNDS = allSentences.length;
 

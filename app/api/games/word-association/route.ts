@@ -25,6 +25,15 @@ const FALLBACK: Record<string, Record<string, { targetWord: string; words: strin
       { targetWord: "viaje", words: ["pasaporte","dormir","maleta","cocina","aeropuerto","sueño","billete","estudio","hotel","montaña","mapa","nube","itinerario","música","frontera","bosque"], correctIndices: [0,2,4,6,8,10,12,14] },
     ],
   },
+  en: {
+    A1: [
+      { targetWord: "kitchen", words: ["oven","library","spoon","freedom","pan","bookshelf","chef","sad","recipe","mountain","chair","sun","table","flower","knife","tree"], correctIndices: [0,2,4,6,8,12,14] },
+      { targetWord: "family", words: ["father","cloud","mother","plane","brother","bank","sister","desert","cousin","music","uncle","aunt","dog","cat","garden","bird"], correctIndices: [0,2,4,6,8,10,11] },
+    ],
+    B1: [
+      { targetWord: "travel", words: ["passport","sleep","suitcase","kitchen","airport","dream","ticket","study","hotel","mountain","map","cloud","itinerary","music","border","forest"], correctIndices: [0,2,4,6,8,10,12,14] },
+    ],
+  },
 };
 
 function getFallback(language: string, level: string) {

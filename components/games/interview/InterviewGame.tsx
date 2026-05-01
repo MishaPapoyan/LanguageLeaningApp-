@@ -18,7 +18,9 @@ export default function InterviewGame({ language }: { language: string }) {
 
     if (state.phase === "intro") {
       speakingRef.current = true;
-      const greeting = language === "es" ? "Buenos días, siéntese por favor." : "Bonjour, asseyez-vous je vous en prie.";
+      const greeting = language === "es" ? "Buenos días, siéntese por favor."
+                     : language === "en" ? "Good morning, please take a seat."
+                     : "Bonjour, asseyez-vous je vous en prie.";
       speak(greeting).finally(() => {
         speakingRef.current = false;
         // Auto-advance to first question after greeting

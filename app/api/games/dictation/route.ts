@@ -25,6 +25,11 @@ const FALLBACK: Record<string, string[]> = {
     "El gato come pan.", "Ella va al mercado esta mañana.", "Nos gusta mucho el café.",
     "Hace buen tiempo hoy.", "Los niños juegan en el jardín.", "Compré leche ayer.",
   ],
+  en: [
+    "The cat is sitting on the mat.", "She goes to the market every morning.", "We really enjoy our morning coffee.",
+    "The weather is beautiful today.", "The children are playing in the garden.", "I bought some milk yesterday.",
+    "He has been working here for three years.", "They will arrive at the station at noon.",
+  ],
 };
 
 export async function GET(req: NextRequest) {

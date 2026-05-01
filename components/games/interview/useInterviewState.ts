@@ -15,6 +15,53 @@ export interface Question {
 }
 
 const QUESTIONS: Record<string, Question[]> = {
+  en: [
+    {
+      id: "intro",
+      question: "Good morning! Could you please introduce yourself?",
+      answers: [
+        { text: "My name is Alex Johnson and I'm excited to be here today.", correct: true },
+        { text: "I'd like a coffee, please.", correct: false },
+        { text: "The weather is very nice today.", correct: false },
+      ],
+    },
+    {
+      id: "experience",
+      question: "Could you tell us about your professional experience?",
+      answers: [
+        { text: "I have three years of experience in digital marketing.", correct: true },
+        { text: "I have never really worked before.", correct: false },
+        { text: "I mostly enjoy watching television.", correct: false },
+      ],
+    },
+    {
+      id: "motivation",
+      question: "Why do you want to work here?",
+      answers: [
+        { text: "I admire your company's commitment to innovation.", correct: true },
+        { text: "Because I need money as quickly as possible.", correct: false },
+        { text: "I honestly have no idea why I applied.", correct: false },
+      ],
+    },
+    {
+      id: "strengths",
+      question: "What would you say are your main strengths?",
+      answers: [
+        { text: "I am organised, creative, and work well in a team.", correct: true },
+        { text: "I often arrive late in the morning.", correct: false },
+        { text: "I don't have any particular qualities.", correct: false },
+      ],
+    },
+    {
+      id: "questions",
+      question: "Do you have any questions for us?",
+      answers: [
+        { text: "Yes — when would I be able to start if selected?", correct: true },
+        { text: "No, I have absolutely no questions at all.", correct: false },
+        { text: "Can I leave now, please?", correct: false },
+      ],
+    },
+  ],
   fr: [
     {
       id: "intro",
@@ -136,7 +183,7 @@ export interface InterviewState {
 }
 
 export function useInterviewState(language: string): InterviewState {
-  const lang = language === "es" ? "es" : "fr";
+  const lang = (["fr","es","en"].includes(language) ? language : "fr") as "fr" | "es" | "en";
 
   const questions = useMemo(() =>
     QUESTIONS[lang].map((q) => ({ ...q, answers: shuffle(q.answers) })),

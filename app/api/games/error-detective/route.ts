@@ -26,6 +26,11 @@ const FALLBACK: Record<string, SentenceData[]> = {
     { sentence: "Ayer, yo fui a la tienda y he comprar pan.", segments: ["Ayer,", "yo fui", "a la tienda", "y", "he", "comprar", "pan."], errorIndex: 5, correction: "comprado", explanation: "After 'haber' auxiliary, use the past participle (-ado/-ido), not the infinitive.", grammarRule: "Pretérito perfecto: haber + participio", options: ["comprado", "comprará", "compraba", "comprando"] },
     { sentence: "Ella tiene muchos de amigos en su clase.", segments: ["Ella", "tiene muchos", "de amigos", "en", "su clase."], errorIndex: 2, correction: "amigos", explanation: "'Muchos' directly precedes the noun. No 'de' is needed (unlike French 'beaucoup de').", grammarRule: "Cuantificadores en español", options: ["amigos", "los amigos", "un amigo", "unos amigos"] },
   ],
+  en: [
+    { sentence: "She don't like eating vegetables.", segments: ["She", "don't", "like", "eating vegetables."], errorIndex: 1, correction: "doesn't", explanation: "Third-person singular (she/he/it) uses 'doesn't', not 'don't'.", grammarRule: "Subject-verb agreement", options: ["doesn't", "don't", "didn't", "won't"] },
+    { sentence: "Yesterday I have seen a great film.", segments: ["Yesterday", "I", "have seen", "a great film."], errorIndex: 2, correction: "saw", explanation: "'Yesterday' signals simple past, not present perfect. Use 'saw' instead of 'have seen'.", grammarRule: "Simple past vs present perfect", options: ["saw", "have seen", "had seen", "was seeing"] },
+    { sentence: "He is more taller than his brother.", segments: ["He", "is", "more taller", "than his brother."], errorIndex: 2, correction: "taller", explanation: "Don't use 'more' with short adjectives that already take '-er'. Say 'taller', not 'more taller'.", grammarRule: "Comparative adjectives", options: ["taller", "more tall", "most tall", "tallest"] },
+  ],
 };
 
 function getFallbackSet(language: string): SentenceData[] {

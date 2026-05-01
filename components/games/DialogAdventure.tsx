@@ -32,6 +32,131 @@ interface Scene {
 // ─── Scenes data ─────────────────────────────────────────────────────────────
 
 const SCENES: Record<string, Scene[]> = {
+  en: [
+    {
+      id: "en-cafe",
+      title: "At the Coffee Shop",
+      emoji: "☕",
+      setting: "You walk into a busy coffee shop in London. The barista greets you.",
+      nodes: [
+        {
+          id: "n1",
+          npc: "Barista",
+          npcLine: "Hi there! What can I get for you today?",
+          npcTranslation: "Friendly greeting — they want your order.",
+          choices: [
+            { text: "A large latte, please.", hint: "Polite order with 'please'.", correct: true,  response: "Coming right up! One large latte for you." },
+            { text: "Give me all the coffee.", hint: "Demanding — not polite.", correct: false, response: "Ha! I like your style, but let's start with one! 😄" },
+            { text: "I don't drink coffee.", hint: "Odd reply to a coffee shop greeting.", correct: false, response: "We also have tea and juice — what would you like?" },
+          ],
+        },
+        {
+          id: "n2",
+          npc: "Barista",
+          npcLine: "Would you like anything to eat with that?",
+          npcTranslation: "Offering a snack alongside your drink.",
+          choices: [
+            { text: "Yes, a blueberry muffin please.", hint: "Polite food order.", correct: true,  response: "Great choice! Freshly baked this morning." },
+            { text: "No, I hate food.", hint: "Strange and rude response.", correct: false, response: "Oh… okay then. Enjoy your latte! 😬" },
+            { text: "Just bring me everything on the menu.", hint: "Unreasonable request.", correct: false, response: "That would be quite a lot! 😂" },
+          ],
+        },
+        {
+          id: "n3",
+          npc: "Barista",
+          npcLine: "That's six pounds fifty, please.",
+          npcTranslation: "Telling you the total cost.",
+          choices: [
+            { text: "Here you go. Keep the change!", hint: "Paying and leaving a tip.", correct: true,  response: "Thank you so much! Enjoy your coffee! ☕" },
+            { text: "That's way too expensive!", hint: "Complaining about the price.", correct: false, response: "London prices, I'm afraid! 😅" },
+            { text: "I have no money at all.", hint: "Can't pay.", correct: false, response: "Oh dear… would you like to wash some dishes? 😂" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "en-hotel",
+      title: "Checking into a Hotel",
+      emoji: "🏨",
+      setting: "You arrive at a hotel in Edinburgh. The receptionist is at the front desk.",
+      nodes: [
+        {
+          id: "n1",
+          npc: "Receptionist",
+          npcLine: "Good evening! Do you have a reservation?",
+          npcTranslation: "Asking if you booked in advance.",
+          choices: [
+            { text: "Yes, I have a booking under the name Smith.", hint: "Giving your name for the reservation.", correct: true,  response: "Wonderful, I'll look that up for you." },
+            { text: "I don't know what a reservation is.", hint: "Confused response.", correct: false, response: "It's a booking — did you book online or by phone?" },
+            { text: "No, I'll just sleep here in the lobby.", hint: "Silly response.", correct: false, response: "I'm afraid that's not quite how it works! 😅" },
+          ],
+        },
+        {
+          id: "n2",
+          npc: "Receptionist",
+          npcLine: "How many nights will you be staying?",
+          npcTranslation: "Asking about the length of your stay.",
+          choices: [
+            { text: "Three nights, please.", hint: "Clear answer about your stay.", correct: true,  response: "Perfect. I'll put you in room 204 on the second floor." },
+            { text: "I'll stay until you ask me to leave.", hint: "Vague, unhelpful answer.", correct: false, response: "We'll need a number of nights for billing… 😄" },
+            { text: "What is a night?", hint: "Very confused response.", correct: false, response: "It's… the dark part of the day. 12 hours? 😮" },
+          ],
+        },
+        {
+          id: "n3",
+          npc: "Receptionist",
+          npcLine: "Here's your key card. Breakfast is served from 7am.",
+          npcTranslation: "Giving you your room key and info about breakfast.",
+          choices: [
+            { text: "Thank you! Could you tell me where the lift is?", hint: "Polite follow-up question.", correct: true,  response: "Of course! It's just round the corner on the left." },
+            { text: "I don't like key cards.", hint: "Unhelpful complaint.", correct: false, response: "Unfortunately that's all we have — enjoy your stay! 🗝️" },
+            { text: "What is breakfast?", hint: "Very confused response.", correct: false, response: "The morning meal... eggs, toast, coffee? 😄" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "en-directions",
+      title: "Asking for Directions",
+      emoji: "🗺️",
+      setting: "You're lost in Manchester. You stop a friendly local for help.",
+      nodes: [
+        {
+          id: "n1",
+          npc: "Local",
+          npcLine: "You look a bit lost — can I help you?",
+          npcTranslation: "Offering to help you find your way.",
+          choices: [
+            { text: "Yes please! How do I get to the train station?", hint: "Polite request for directions.", correct: true,  response: "Sure! Go straight on and turn left at the traffic lights." },
+            { text: "No, I'm a ghost.", hint: "Very strange response.", correct: false, response: "A ghost who asks directions — that's a first! 👻" },
+            { text: "I'm looking for the internet.", hint: "Confused response.", correct: false, response: "You'll find that on your phone… 📱😄" },
+          ],
+        },
+        {
+          id: "n2",
+          npc: "Local",
+          npcLine: "Is this your first time in Manchester?",
+          npcTranslation: "Making friendly conversation.",
+          choices: [
+            { text: "Yes, it's a fantastic city!", hint: "Positive, friendly reply.", correct: true,  response: "It is! You should visit the Northern Quarter — it's brilliant." },
+            { text: "No, I was born here but I forgot everything.", hint: "Odd response.", correct: false, response: "That's... quite the memory problem! 😄" },
+            { text: "I have no idea where I am.", hint: "Confused but honest response.", correct: false, response: "You're in Manchester! City of music and football! ⚽" },
+          ],
+        },
+        {
+          id: "n3",
+          npc: "Local",
+          npcLine: "Would you like me to walk you to the station?",
+          npcTranslation: "Offering to guide you personally.",
+          choices: [
+            { text: "That's so kind of you, thank you!", hint: "Grateful, polite acceptance.", correct: true,  response: "My pleasure! It's just a five-minute walk." },
+            { text: "No, strangers scare me.", hint: "Unhelpful, slightly rude.", correct: false, response: "Fair enough! Just follow the signs then. 😊" },
+            { text: "How much do you charge?", hint: "Odd — locals don't charge for directions.", correct: false, response: "Nothing at all — just being friendly! 😄" },
+          ],
+        },
+      ],
+    },
+  ],
   fr: [
     {
       id: "fr-cafe",
@@ -288,7 +413,7 @@ const SCENES: Record<string, Scene[]> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function DialogAdventure({ targetLang }: { targetLang: string }) {
-  const lang = targetLang === "es" ? "es" : "fr";
+  const lang = (["fr","es","en"].includes(targetLang) ? targetLang : "fr") as "fr" | "es" | "en";
   const scenes = SCENES[lang];
 
   const [sceneIdx, setSceneIdx] = useState(0);
