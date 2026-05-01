@@ -83,6 +83,7 @@ export function TutorClient({ userLevel }: Props) {
   const { data: session } = useSession();
   const locale = getLocale((session?.user as any)?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+  const avatarNames = AVATAR_NAMES[langConfig.code] ?? AVATAR_NAMES.fr;
   const [scenario, setScenario] = useState<TutorScenario | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
