@@ -123,7 +123,7 @@ export async function RightPanel() {
   const skillTree = (myProgress?.skillTree as Record<string, number>) ?? {};
 
   return (
-    <aside className="space-y-4 sticky top-20">
+    <aside className="space-y-4 sticky top-20 self-start p-4">
 
       {/* ── My Stats ── */}
       {myProgress && xpInfo && (
