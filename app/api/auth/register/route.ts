@@ -9,7 +9,7 @@ const registerSchema = z.object({
   phone: z.string().min(7).max(20),
   password: z.string().min(6),
   role: z.enum(["STUDENT"]).default("STUDENT"),
-  targetLanguage: z.enum(["fr", "es"]).default("fr"),
+  targetLanguage: z.enum(["fr", "es", "en"]).default("fr"),
   nativeLanguage: z.string().max(10).default("en"),
 });
 
