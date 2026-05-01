@@ -102,7 +102,8 @@ export function TutorClient({ userLevel }: Props) {
   useEffect(() => {
     if (!scenario) return;
     const interval = setInterval(() => {
-      const tips = GRAMMAR_TIPS[scenario] ?? GRAMMAR_TIPS.free;
+      const langTips = GRAMMAR_TIPS[langConfig.code] ?? GRAMMAR_TIPS.fr;
+      const tips = langTips[scenario] ?? langTips.free;
       setTipIndex((i) => (i + 1) % tips.length);
     }, 30_000);
     return () => clearInterval(interval);
