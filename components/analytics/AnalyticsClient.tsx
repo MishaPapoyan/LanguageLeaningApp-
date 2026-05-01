@@ -33,7 +33,7 @@ export interface AnalyticsData {
     stories: number;
     tutor: number;
     words: number;
-    streaks: number;
+    other: number;
     total: number;
   };
   vocabulary: {
@@ -196,7 +196,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
       { name: "Stories", value: xpBreakdown.stories, color: "#3b82f6" },
       { name: "AI Tutor", value: xpBreakdown.tutor, color: "#8b5cf6" },
       { name: "Words", value: xpBreakdown.words, color: "#10b981" },
-      { name: "Streaks & Other", value: xpBreakdown.streaks, color: "#f59e0b" },
+      { name: "Streaks & Other", value: xpBreakdown.other, color: "#f59e0b" },
     ].filter((d) => d.value > 0);
 
     const skillRadar = [
