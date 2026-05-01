@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff, ArrowRight, Check } from "lucide-react";
 
-type TargetLang = "fr" | "es";
+type TargetLang = "fr" | "es" | "en";
 
 const LANGUAGES: { code: TargetLang; label: string; flag: string; sub: string }[] = [
-  { code: "fr", label: "French", flag: "🇫🇷", sub: "Français" },
+  { code: "fr", label: "French",  flag: "🇫🇷", sub: "Français" },
   { code: "es", label: "Spanish", flag: "🇪🇸", sub: "Español" },
+  { code: "en", label: "English", flag: "🇬🇧", sub: "English" },
 ];
 
 const NATIVE_LANGUAGES = [
@@ -88,7 +89,7 @@ export function RegisterForm() {
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "10px" }}>
           I want to learn
         </label>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}

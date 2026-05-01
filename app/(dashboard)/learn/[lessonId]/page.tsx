@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { getLessonById, getAllLessons } from "@/data/learning-path";
 import { getLessonByIdEs, getAllLessonsEs } from "@/data/learning-path-es";
+import { getLessonByIdEn, getAllLessonsEn } from "@/data/learning-path-en";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -12,7 +13,9 @@ export default function LessonPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const targetLang = session?.user?.targetLanguage ?? "fr";
-  const lesson = targetLang === "es" ? getLessonByIdEs(lessonId) : getLessonById(lessonId);
+  const lesson = targetLang === "es" ? getLessonByIdEs(lessonId)
+               : targetLang === "en" ? getLessonByIdEn(lessonId)
+               : getLessonById(lessonId);
   const [phase, setPhase] = useState<"learn" | "practice" | "done">("learn");
   const [currentExercise, setCurrentExercise] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -77,7 +80,9 @@ export default function LessonPage() {
   };
 
   const getNextLesson = () => {
-    const all = targetLang === "es" ? getAllLessonsEs() : getAllLessons();
+    const all = targetLang === "es" ? getAllLessonsEs()
+              : targetLang === "en" ? getAllLessonsEn()
+              : getAllLessons();
     const idx = all.findIndex((l) => l.id === lesson.id);
     return idx < all.length - 1 ? all[idx + 1] : null;
   };
