@@ -16,8 +16,8 @@ interface Learner {
   _count: { gameScores: number; savedWords: number };
 }
 
-const LANG_FLAGS: Record<string, string> = { fr: "🇫🇷", es: "🇪🇸" };
-const LANG_LABELS: Record<string, string> = { fr: "French", es: "Spanish" };
+const LANG_FLAGS:  Record<string, string> = { fr: "🇫🇷", es: "🇪🇸", en: "🇬🇧" };
+const LANG_LABELS: Record<string, string> = { fr: "French", es: "Spanish", en: "English" };
 const LANG_GRADIENT: Record<string, string> = {
   fr: "linear-gradient(135deg,#1e3a8a,#3730a3)",
   es: "linear-gradient(135deg,#7c2d12,#b45309)",
@@ -184,6 +184,59 @@ function LeaderRow({ learner, rank, isYou, locale }: { learner: Learner; rank: n
   );
 }
 
+interface MonthlyEntry {
+  rank: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  targetLanguage: string;
+  level: number;
+  streak: number;
+  monthlyXp: number;
+}
+
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function MonthlyTopCard({ entry, myId }: { entry: MonthlyEntry; myId: string }) {
+  const isMe = entry.userId === myId;
+  const medals: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+      borderRadius: 14,
+      background: isMe ? "var(--accent-dim)" : entry.rank <= 3 ? "var(--surface-3)" : "var(--surface-2)",
+      border: `1px solid ${isMe ? "rgba(99,102,241,0.3)" : entry.rank === 1 ? "rgba(251,191,36,0.3)" : "var(--border)"}`,
+    }}>
+      <span style={{ minWidth: 24, textAlign: "center", fontSize: 14 }}>
+        {medals[entry.rank] ?? `#${entry.rank}`}
+      </span>
+      <div style={{
+        width: 32, height: 32, borderRadius: "50%",
+        background: "linear-gradient(135deg,#7c6aff,#4338ca)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 13, fontWeight: 900, color: "#fff", flexShrink: 0,
+      }}>
+        {entry.name[0]?.toUpperCase()}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: isMe ? "var(--accent)" : "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {entry.name} {isMe && <span style={{ fontSize: 10, color: "var(--accent)" }}>(you)</span>}
+        </p>
+        <p style={{ fontSize: 11, color: "var(--text-3)" }}>
+          {LANG_FLAGS[entry.targetLanguage]} Lv {entry.level}
+          {entry.streak > 0 && ` · 🔥${entry.streak}`}
+        </p>
+      </div>
+      <div style={{ textAlign: "right", flexShrink: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 800, color: entry.rank === 1 ? "#fbbf24" : "var(--text)" }}>
+          ⚡ {entry.monthlyXp.toLocaleString()}
+        </p>
+        <p style={{ fontSize: 10, color: "var(--text-3)" }}>XP this month</p>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════ */
@@ -194,6 +247,8 @@ export default function CommunityPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [langFilter, setLangFilter] = useState("");
+  const [monthly, setMonthly] = useState<MonthlyEntry[]>([]);
+  const [monthLabel, setMonthLabel] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const myId = (session?.user as any)?.id ?? "";
@@ -217,6 +272,19 @@ export default function CommunityPage() {
   }, [debouncedSearch, langFilter]);
 
   useEffect(() => { fetchLearners(); }, [fetchLearners]);
+
+  useEffect(() => {
+    fetch("/api/community/monthly")
+      .then(r => r.json())
+      .then(d => {
+        setMonthly(d.monthly ?? []);
+        if (d.month) {
+          const dt = new Date(d.month);
+          setMonthLabel(MONTH_NAMES[dt.getMonth()] + " " + dt.getFullYear());
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const isSearching = !!debouncedSearch || !!langFilter;
   const top3 = isSearching ? [] : learners.slice(0, 3);
@@ -257,6 +325,44 @@ export default function CommunityPage() {
         )}
       </div>
 
+      {/* ── Monthly Clever Student ── */}
+      {monthly.length > 0 && (
+        <div style={{
+          borderRadius: 20, padding: "20px 20px 16px",
+          marginBottom: 8,
+          background: "linear-gradient(135deg,rgba(251,191,36,0.12),rgba(251,191,36,0.04))",
+          border: "1px solid rgba(251,191,36,0.3)",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <span style={{ fontSize: 22 }}>🏅</span>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 900, color: "#fbbf24", margin: 0 }}>
+                Clever Student of the Month
+              </p>
+              <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0 }}>
+                {monthLabel} · ranked by XP earned this month
+              </p>
+            </div>
+            {monthly[0] && (
+              <div style={{ marginLeft: "auto", textAlign: "center" }}>
+                <div style={{ fontSize: 28 }}>🥇</div>
+                <p style={{ fontSize: 11, fontWeight: 800, color: "#fbbf24", margin: 0 }}>
+                  {monthly[0].name}
+                </p>
+                <p style={{ fontSize: 10, color: "var(--text-3)", margin: 0 }}>
+                  ⚡ {monthly[0].monthlyXp.toLocaleString()} XP
+                </p>
+              </div>
+            )}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {monthly.map(entry => (
+              <MonthlyTopCard key={entry.userId} entry={entry} myId={myId} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Search + filter ── */}
       <div style={{ display: "flex", gap: 8, margin: "20px 0", flexWrap: "wrap" }}>
         <div style={{ position: "relative", flex: 1, minWidth: 180 }}>
@@ -272,7 +378,7 @@ export default function CommunityPage() {
             }}
           />
         </div>
-        {(["", "fr", "es"] as const).map(l => (
+        {(["", "fr", "es", "en"] as const).map(l => (
           <button key={l} onClick={() => setLangFilter(l)} style={{
             padding: "9px 14px", borderRadius: 11, fontSize: 12, fontWeight: 700, cursor: "pointer",
             border: `1px solid ${langFilter === l ? "var(--accent)" : "var(--border-md)"}`,

@@ -30,6 +30,15 @@ export const SUPPORTED_LANGUAGES: LanguageConfig[] = [
     nativeName: "Español",
     greeting: "¡Hola",
   },
+  {
+    code: "en",
+    label: "English",
+    flag: "🇬🇧",
+    ttsLocale: "en-GB",
+    voxtralVoice: null,
+    nativeName: "English",
+    greeting: "Hello",
+  },
 ];
 
 export const LANGUAGE_MAP: Record<string, LanguageConfig> = Object.fromEntries(

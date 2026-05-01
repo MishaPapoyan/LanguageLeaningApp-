@@ -30,8 +30,22 @@ const LANGUAGES = [
 interface XpInfo { level: number; current: number; needed: number; pct: number; }
 
 const TARGET_LANGUAGES = [
-  { code: "fr", label: "French", flag: "🇫🇷" },
-  { code: "es", label: "Spanish", flag: "🇪🇸" },
+  { code: "fr", label: "French",  nativeName: "Français", flag: "🇫🇷" },
+  { code: "es", label: "Spanish", nativeName: "Español",  flag: "🇪🇸" },
+  { code: "en", label: "English", nativeName: "English",  flag: "🇬🇧" },
+];
+
+const NATIVE_LANGUAGES = [
+  { code: "en", label: "English",    flag: "🇬🇧" },
+  { code: "hy", label: "Armenian",   flag: "🇦🇲" },
+  { code: "ru", label: "Russian",    flag: "🇷🇺" },
+  { code: "de", label: "German",     flag: "🇩🇪" },
+  { code: "es", label: "Spanish",    flag: "🇪🇸" },
+  { code: "it", label: "Italian",    flag: "🇮🇹" },
+  { code: "pt", label: "Portuguese", flag: "🇵🇹" },
+  { code: "zh", label: "Chinese",    flag: "🇨🇳" },
+  { code: "ja", label: "Japanese",   flag: "🇯🇵" },
+  { code: "ar", label: "Arabic",     flag: "🇸🇦" },
 ];
 
 interface Props {
@@ -200,25 +214,49 @@ export function SettingsClient({
               onChange={(e) => setNativeLang(e.target.value)}
               className="input w-full"
             >
-              {LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>{l.label}</option>
+              {NATIVE_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
               ))}
             </select>
           </div>
 
+          {/* Target language — flag card picker */}
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
+            <label className="block text-xs font-semibold mb-2" style={{ color: "var(--text-3)" }}>
               {t(locale, "settings_learning")}
             </label>
-            <select
-              value={targetLang}
-              onChange={(e) => setTargetLang(e.target.value)}
-              className="input w-full"
-            >
-              {TARGET_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
-              ))}
-            </select>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
+              {TARGET_LANGUAGES.map((l) => {
+                const active = targetLang === l.code;
+                return (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setTargetLang(l.code)}
+                    style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                      padding: "12px 8px", borderRadius: 14, cursor: "pointer",
+                      background: active ? "var(--accent-dim)" : "var(--surface-2)",
+                      border: `2px solid ${active ? "var(--accent)" : "var(--border)"}`,
+                      transition: "all 0.15s",
+                      boxShadow: active ? "0 0 0 3px rgba(124,106,255,0.15)" : "none",
+                    }}
+                  >
+                    <span style={{ fontSize: 28, lineHeight: 1 }}>{l.flag}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: active ? "var(--accent)" : "var(--text)" }}>
+                      {l.label}
+                    </span>
+                    <span style={{ fontSize: 10, color: "var(--text-3)" }}>{l.nativeName}</span>
+                    {active && (
+                      <span style={{
+                        fontSize: 9, fontWeight: 800, color: "var(--accent)",
+                        background: "rgba(124,106,255,0.15)", padding: "1px 6px", borderRadius: 99,
+                      }}>✓ Selected</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
