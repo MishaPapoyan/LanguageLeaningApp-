@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { WordScramble } from "@/components/games/WordScramble";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Word Scramble — Lingova" };
@@ -30,6 +31,11 @@ export default async function WordScramblePage() {
       words = await prisma.word.findMany({ where: { difficulty: "BEGINNER", language }, skip: dictSkip, orderBy: { createdAt: "asc" }, take: 20 });
     }
   } catch (e) { console.error(e); }
+
+  // Fallback to hardcoded dictionary if DB returned nothing
+  if (words.length < 4) {
+    words = getWordsByLanguage(language).slice(0, 20);
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MatchingGame } from "@/components/games/MatchingGame";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -42,6 +43,11 @@ export default async function MatchingPage() {
   } catch (err) {
     console.error("[matching] DB error:", err);
     words = [];
+  }
+
+  // Fallback to hardcoded dictionary if DB returned nothing
+  if (words.length < 4) {
+    words = getWordsByLanguage(language).slice(0, 8);
   }
 
   return (

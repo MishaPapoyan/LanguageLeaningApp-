@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MemoryPalace } from "@/components/games/MemoryPalace";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,12 +22,19 @@ export default async function MemoryPalacePage() {
   const dictSkip = totalWords > 8 ? (perfectCount * 8) % Math.max(1, totalWords - 8 + 1) : 0;
 
   // Get kitchen/home words for the memory palace
-  const words = await prisma.word.findMany({
-    where: { category: { in: ["food", "travel", "places", "greetings"] }, language },
+  let words: any[] = await prisma.word.findMany({
+    where: { category: { in: ["food", "travel", "places", "greetings", "Food & Drink", "Travel", "Greetings", "Home"] }, language },
     skip: dictSkip,
     orderBy: { createdAt: "asc" },
     take: 8,
-  });
+  }).catch(() => []);
+
+  if (words.length < 4) {
+    const all = getWordsByLanguage(language);
+    const palaceCategories = ["Food & Drink", "Travel", "Greetings", "Home"];
+    words = all.filter((w) => palaceCategories.includes(w.category)).slice(0, 8);
+    if (words.length < 4) words = all.slice(0, 8);
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TrueFalse } from "@/components/games/TrueFalse";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "True or False — Lingova" };
@@ -28,6 +29,10 @@ export default async function TrueFalsePage() {
       words = await prisma.word.findMany({ where: { language }, take: 40, orderBy: { createdAt: "asc" } });
     }
   } catch { words = []; }
+
+  if (words.length < 6) {
+    words = getWordsByLanguage(language).slice(0, 40);
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

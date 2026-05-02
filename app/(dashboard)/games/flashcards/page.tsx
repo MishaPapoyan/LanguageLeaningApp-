@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FlashcardGame } from "@/components/games/FlashcardGame";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -43,6 +44,11 @@ export default async function FlashcardsPage() {
   } catch (err) {
     console.error("[flashcards] DB error:", err);
     words = [];
+  }
+
+  // Fallback to hardcoded dictionary if DB returned nothing
+  if (words.length < 4) {
+    words = getWordsByLanguage(language).slice(0, 20);
   }
 
   return (

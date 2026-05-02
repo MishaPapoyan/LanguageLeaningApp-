@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ListenQuiz } from "@/components/games/ListenQuiz";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Listen & Choose — Lingova" };
@@ -28,6 +29,10 @@ export default async function ListenQuizPage() {
       words = await prisma.word.findMany({ where: { language }, take: 40, orderBy: { createdAt: "asc" } });
     }
   } catch { words = []; }
+
+  if (words.length < 8) {
+    words = getWordsByLanguage(language).slice(0, 40);
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

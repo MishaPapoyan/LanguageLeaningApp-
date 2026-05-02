@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SpeedTyping } from "@/components/games/SpeedTyping";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Speed Typing — Lingova" };
@@ -30,6 +31,10 @@ export default async function SpeedTypingPage() {
       words = all.filter((w: any) => !w.word.includes(" "));
     }
   } catch { words = []; }
+
+  if (words.length < 6) {
+    words = getWordsByLanguage(language).filter((w) => !w.word.includes(" ")).slice(0, 50);
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">

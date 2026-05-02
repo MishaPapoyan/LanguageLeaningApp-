@@ -163,7 +163,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
           ))}
         </div>
         <div className="space-y-2">
-          <p className="section-label mb-2">English</p>
+          <p className="section-label mb-2">{langConfig.code === "en" ? "Meaning" : "English"}</p>
           {enCards.map((w) => (
             <button key={w.id} onClick={() => handleSelect("en", w.id)} disabled={matched.has(w.id)}
               className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150"

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FillBlank } from "@/components/games/FillBlank";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getWordsByLanguage } from "@/data/dictionary-words";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Fill in the Blank — Lingova" };
@@ -30,6 +31,11 @@ export default async function FillBlankPage() {
       words = await prisma.word.findMany({ where: { language }, skip: dictSkip, orderBy: { createdAt: "asc" }, take: 30, select: { id: true, word: true, translation: true, imageEmoji: true, exampleFr: true, exampleEn: true } });
     }
   } catch (e) { console.error(e); }
+
+  // Fallback to hardcoded dictionary if DB returned nothing
+  if (words.length < 4) {
+    words = getWordsByLanguage(language).slice(0, 30);
+  }
 
   return (
     <div className="max-w-2xl animate-fade-up">
