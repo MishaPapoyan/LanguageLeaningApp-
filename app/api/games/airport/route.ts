@@ -124,6 +124,69 @@ const FALLBACK: Record<string, object> = {
       },
     ],
   },
+  en: {
+    venue: "airport",
+    title: "At the Airport",
+    emoji: "✈️",
+    setting: "You've arrived at Heathrow Airport to catch your flight to New York. The check-in agent greets you at the desk.",
+    nodes: [
+      {
+        id: "n1",
+        npc: "Check-in Agent",
+        npcLine: "Good morning! Could I see your passport and booking reference, please?",
+        npcTranslation: "A polite request — 'Could I see…?' is more formal than 'Can I see…?'",
+        choices: [
+          { text: "Of course, here you are. I also have my boarding pass on my phone.", hint: "", correct: true,  feedback: "Perfect! Let me just check your details." },
+          { text: "I don't have my passport with me.", hint: "", correct: false, feedback: "Unfortunately you can't fly without a valid passport." },
+          { text: "Why do you need to see it?", hint: "", correct: false, feedback: "Passport checks are required for all international flights." },
+        ],
+      },
+      {
+        id: "n2",
+        npc: "Check-in Agent",
+        npcLine: "Do you have any luggage to check in today?",
+        npcTranslation: "'Check in' (luggage) = hand it to the airline to store in the hold.",
+        choices: [
+          { text: "Yes, I have one suitcase to check in, please.", hint: "", correct: true,  feedback: "Great — please place it on the belt. It's 18 kg, well within the limit!" },
+          { text: "No, I'm only travelling with hand luggage.", hint: "", correct: true,  feedback: "No problem — head straight through to security." },
+          { text: "I'm not sure what I have.", hint: "", correct: false, feedback: "You'll need to check before proceeding — excess baggage fees can be costly!" },
+        ],
+      },
+      {
+        id: "n3",
+        npc: "Security Officer",
+        npcLine: "Please remove your shoes, belt, and any liquids, and place them in the tray.",
+        npcTranslation: "'Please remove…' is a polite imperative used in formal/public settings.",
+        choices: [
+          { text: "Of course — here's my bag and my laptop in a separate tray.", hint: "", correct: true,  feedback: "Thank you — you can collect your belongings on the other side." },
+          { text: "Do I really have to take my shoes off?", hint: "", correct: false, feedback: "Yes — it's a security requirement for all passengers." },
+          { text: "I'd rather not — I'm in a hurry.", hint: "", correct: false, feedback: "I'm afraid this is mandatory. We'll be as quick as we can." },
+        ],
+      },
+      {
+        id: "n4",
+        npc: "Gate Agent",
+        npcLine: "Good afternoon! Could you present your boarding pass and passport, please?",
+        npcTranslation: "'Present' here means 'show'. A formal, professional word choice.",
+        choices: [
+          { text: "Certainly, here they are. I'm in seat 22B.", hint: "", correct: true,  feedback: "Welcome aboard! Enjoy your flight to New York." },
+          { text: "I think I left my boarding pass at check-in.", hint: "", correct: false, feedback: "You'll need to go back to the desk — boarding can't proceed without it." },
+          { text: "Can I upgrade to business class?", hint: "", correct: false, feedback: "Upgrades are handled at check-in, not at the gate. I'm afraid it's too late." },
+        ],
+      },
+      {
+        id: "n5",
+        npc: "Flight Attendant",
+        npcLine: "The flight has been delayed by forty minutes. Is there anything I can get you while you wait?",
+        npcTranslation: "'Is there anything I can get you?' — a polite offer, very common in service contexts.",
+        choices: [
+          { text: "Yes, please — a glass of water would be great, thank you.", hint: "", correct: true,  feedback: "Of course! I'll bring that right away." },
+          { text: "No thank you, I'm fine for now.", hint: "", correct: true,  feedback: "Not a problem. Just let me know if you need anything." },
+          { text: "This is unacceptable! I want a full refund.", hint: "", correct: false, feedback: "I understand your frustration — please speak with our customer service team." },
+        ],
+      },
+    ],
+  },
 };
 
 // ── GET ───────────────────────────────────────────────────────────────────────

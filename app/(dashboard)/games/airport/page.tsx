@@ -19,7 +19,7 @@ export default async function AirportPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Airport</h1>
         <p className="text-sm mt-1" style={{ color: "var(--text-2)" }}>
-          Check in, pass security, and board your flight — all in {language === "fr" ? "French" : "Spanish"}
+          Check in, pass security, and board your flight — all in {language === "fr" ? "French" : language === "es" ? "Spanish" : "English"}
         </p>
       </div>
       <VenueConversation venue="airport" language={language} level={level} />

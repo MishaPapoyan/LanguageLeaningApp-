@@ -25,8 +25,9 @@ const SCENARIO_COLORS: Record<string, { accent: string; dim: string; gradient: s
 
 // LOW-3/LOW-4: Avatar names are language-specific — match the AI persona in lib/claude.ts
 const AVATAR_NAMES: Record<string, Record<string, string>> = {
-  fr: { waiter: "Pierre",  traveler: "Sophie",  teacher: "Mme Dubois", free: "Alex"          },
-  es: { waiter: "Carlos",  traveler: "Elena",   teacher: "Sra. García", free: "Diego"         },
+  fr: { waiter: "Pierre",  traveler: "Sophie",  teacher: "Mme Dubois",  free: "Alex"     },
+  es: { waiter: "Carlos",  traveler: "Elena",   teacher: "Sra. García", free: "Diego"    },
+  en: { waiter: "Tom",     traveler: "Emma",    teacher: "Ms. Johnson", free: "James"    },
 };
 
 // LOW-5: Grammar tips are language-specific
@@ -73,6 +74,28 @@ const GRAMMAR_TIPS: Record<string, Record<string, string[]>> = {
       "Mirror the AI's sentence structures to sound natural.",
       "Use filler words like «pues», «entonces», «bueno» for fluency.",
       "Don't translate word-for-word; think in the language instead.",
+    ],
+  },
+  en: {
+    waiter: [
+      "Use 'I'd like…' or 'Could I have…' to order politely.",
+      "'Could I get the bill, please?' is the natural way to ask to pay.",
+      "Try 'What do you recommend?' to sound like a native speaker.",
+    ],
+    traveler: [
+      "'Excuse me, how do I get to…?' is the standard way to ask directions.",
+      "Use 'Is it far?' or 'How long does it take?' when asking about distance.",
+      "'Could you say that again, please?' is polite when you didn't understand.",
+    ],
+    teacher: [
+      "Articles (a, an, the) are essential — 'a' before consonant sounds, 'an' before vowel sounds.",
+      "Use present perfect ('I have done') for recent actions, simple past ('I did') for finished ones.",
+      "Word order matters: Subject + Verb + Object ('She reads books', not 'She books reads').",
+    ],
+    free: [
+      "Use contractions (I'm, you're, it's) to sound more natural in conversation.",
+      "Filler words like 'well', 'you know', 'actually' help you sound fluent.",
+      "Don't be afraid to ask: 'What does … mean?' — native speakers love explaining.",
     ],
   },
 };

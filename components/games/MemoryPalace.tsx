@@ -28,6 +28,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [savedFromResults, setSavedFromResults] = useState<Set<string>>(new Set());
 
   const assignments: Record<string, Word> = {};
   const usedWords = words.slice(0, PALACE_OBJECTS.length);
@@ -48,14 +49,37 @@ export function MemoryPalace({ words }: { words: Word[] }) {
     setQuizMode(true);
   };
 
+  const handleSaveFromResults = (wordId: string) => {
+    setSavedFromResults(prev => new Set([...prev, wordId]));
+    try {
+      const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+      if (!seen.includes(wordId)) {
+        localStorage.setItem("langcraft_seen_words", JSON.stringify([...seen, wordId]));
+      }
+    } catch {}
+    fetch("/api/dictionary/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wordId }),
+    }).catch(() => {});
+  };
+
   const handleSubmitQuiz = async () => {
     let correct = 0;
+    const correctWordIds: string[] = [];
     for (const [objId, answer] of Object.entries(quizAnswers)) {
       const word = assignments[objId];
       if (word && answer.toLowerCase().trim() === word.word.toLowerCase()) {
         correct++;
+        correctWordIds.push(word.id);
       }
     }
+    // Mark correctly-answered words as "seen" in localStorage
+    try {
+      const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+      const merged = [...new Set([...seen, ...correctWordIds])];
+      localStorage.setItem("langcraft_seen_words", JSON.stringify(merged));
+    } catch {}
     const score = Math.round((correct / usedWords.length) * 100);
     setQuizSubmitted(true);
 
@@ -244,7 +268,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                 }}
               >
                 <span style={{ fontSize: 28 }}>{obj.emoji}</span>
-                <div>
+                <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 12, color: "var(--text-3)" }}>{word.translation}</p>
                   <p style={{ fontSize: 15, fontWeight: 700, color: correct ? "var(--green)" : "var(--red)" }}>
                     {answer || "(blank)"} {correct ? "✓" : "✗"}
@@ -255,6 +279,21 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                     </p>
                   )}
                 </div>
+                {correct && !savedFromResults.has(word.id) && (
+                  <button
+                    onClick={() => handleSaveFromResults(word.id)}
+                    style={{
+                      padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap",
+                      background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+                      color: "var(--accent-2)", cursor: "pointer",
+                    }}
+                  >
+                    + Save
+                  </button>
+                )}
+                {savedFromResults.has(word.id) && (
+                  <span style={{ fontSize: 11, color: "var(--green)", fontWeight: 700, whiteSpace: "nowrap" }}>Saved ✓</span>
+                )}
               </div>
             );
           })}

@@ -135,6 +135,69 @@ const FALLBACK: Record<string, object> = {
       },
     ],
   },
+  en: {
+    venue: "doctor-office",
+    title: "At the Doctor's",
+    emoji: "🏥",
+    setting: "You're feeling unwell and have an appointment with Dr. Patel at a GP surgery in London. The receptionist greets you at the front desk.",
+    nodes: [
+      {
+        id: "n1",
+        npc: "Receptionist",
+        npcLine: "Good morning! Do you have an appointment today?",
+        npcTranslation: "'Do you have an appointment?' — standard phrase when arriving at a clinic.",
+        choices: [
+          { text: "Yes, I have an appointment at three o'clock with Dr. Patel.", hint: "", correct: true,  feedback: "Perfect — please take a seat. The doctor will be with you shortly." },
+          { text: "No, but I need to see a doctor right now.", hint: "", correct: false, feedback: "Without an appointment you may have to wait several hours, I'm afraid." },
+          { text: "I'm not sure — my friend booked it for me.", hint: "", correct: false, feedback: "Could I take your name? I'll check the system for you." },
+        ],
+      },
+      {
+        id: "n2",
+        npc: "Dr. Patel",
+        npcLine: "Hello! Come in and have a seat. What seems to be the problem today?",
+        npcTranslation: "'What seems to be the problem?' is the classic opening question a doctor uses.",
+        choices: [
+          { text: "I've had a sore throat and a high temperature for the past two days.", hint: "", correct: true,  feedback: "I see — let me take a look. Can you open your mouth wide for me?" },
+          { text: "Actually, I feel perfectly fine now.", hint: "", correct: false, feedback: "That's good to hear! But let's have a quick check since you're here." },
+          { text: "I want some antibiotics, please.", hint: "", correct: false, feedback: "I'll need to examine you first before prescribing anything." },
+        ],
+      },
+      {
+        id: "n3",
+        npc: "Dr. Patel",
+        npcLine: "How long have you been feeling this way? And have you taken anything for it?",
+        npcTranslation: "'How long have you been…?' uses present perfect — for situations that started in the past and continue now.",
+        choices: [
+          { text: "Since yesterday evening. I haven't taken anything yet.", hint: "", correct: true,  feedback: "Right, let me examine you properly." },
+          { text: "I can't really remember.", hint: "", correct: false, feedback: "Try to think — it really helps me make an accurate diagnosis." },
+          { text: "I've been taking a lot of paracetamol.", hint: "", correct: false, feedback: "How much exactly? It's important not to exceed the recommended dose." },
+        ],
+      },
+      {
+        id: "n4",
+        npc: "Dr. Patel",
+        npcLine: "You have a throat infection. I'm going to prescribe antibiotics. Are you allergic to penicillin?",
+        npcTranslation: "'I'm going to prescribe…' — 'going to' expresses a definite future intention.",
+        choices: [
+          { text: "No, I don't have any known allergies.", hint: "", correct: true,  feedback: "Good. Take one tablet three times a day with food, and finish the full course." },
+          { text: "Yes, I'm allergic to penicillin.", hint: "", correct: true,  feedback: "Thank you for telling me — I'll prescribe an alternative instead." },
+          { text: "I'm not sure.", hint: "", correct: false, feedback: "It's really important to find out — please check your medical records." },
+        ],
+      },
+      {
+        id: "n5",
+        npc: "Pharmacist",
+        npcLine: "Hello! Do you have a prescription to collect?",
+        npcTranslation: "'To collect a prescription' — British English for picking up medicine from a pharmacy.",
+        choices: [
+          { text: "Yes, here's my prescription. It's for amoxicillin.", hint: "", correct: true,  feedback: "Lovely — just give me two minutes and I'll have that ready for you." },
+          { text: "No, I just need some cold and flu tablets.", hint: "", correct: true,  feedback: "Of course — those are on aisle three. Do you need any advice on dosage?" },
+          { text: "The doctor gave me a prescription but I've lost it.", hint: "", correct: false, feedback: "I'm sorry, but we can't dispense medication without a valid prescription." },
+        ],
+      },
+    ],
+  },
 };
 
 // ── GET ───────────────────────────────────────────────────────────────────────

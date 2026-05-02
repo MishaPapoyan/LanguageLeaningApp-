@@ -50,6 +50,11 @@ export function WordScramble({ words }: { words: Word[] }) {
   const [hintUsed, setHintUsed] = useState(false);
   const [hintErr, setHintErr]   = useState(false);
   const [revealed, setRevealed] = useState(0); // how many letters revealed by hint
+  const [savePrompt, setSavePrompt] = useState<Word | null>(null);
+
+  // always mirrors score so handleSaveWord reads the post-increment value
+  const scoreRef = useRef(0);
+  scoreRef.current = score;
 
   const word = words[round];
 
@@ -85,7 +90,14 @@ export function WordScramble({ words }: { words: Word[] }) {
       if (attempt === word.word.toLowerCase()) {
         setStatus("correct");
         setScore(s => s + 1);
-        setTimeout(advance, 700);
+        try {
+          const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+          if (!seen.includes(word.id)) {
+            setTimeout(() => setSavePrompt(word), 700);
+          } else {
+            setTimeout(advance, 700);
+          }
+        } catch { setTimeout(advance, 700); }
       } else {
         setStatus("wrong");
         setTimeout(() => {
@@ -147,9 +159,49 @@ export function WordScramble({ words }: { words: Word[] }) {
         if (newTyped.join("").toLowerCase() === word.word.toLowerCase()) {
           setStatus("correct");
           setScore(s => s + 1);
-          setTimeout(advance, 700);
+          try {
+            const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+            if (!seen.includes(word.id)) {
+              setTimeout(() => setSavePrompt(word), 700);
+            } else {
+              setTimeout(advance, 700);
+            }
+          } catch { setTimeout(advance, 700); }
         }
       }
+    }
+  };
+
+  const handleSaveWord = (wordId: string, doSave: boolean) => {
+    // Mark as seen so prompt only fires once ever
+    try {
+      const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+      if (!seen.includes(wordId)) {
+        localStorage.setItem("langcraft_seen_words", JSON.stringify([...seen, wordId]));
+      }
+    } catch {}
+    setSavePrompt(null);
+    if (doSave) {
+      fetch("/api/dictionary/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wordId }),
+      }).catch(() => {});
+    }
+    // Advance — use scoreRef.current (post-increment value)
+    const next = round + 1;
+    if (next >= ROUNDS) {
+      setFinished(true);
+      fetch("/api/games/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameType: "WORD_SCRAMBLE", score: scoreRef.current, wordsUsed: words.slice(0, ROUNDS).map(w => w.id) }),
+      }).then(r => r.json()).then(d => {
+        setXpEarned(d.xpEarned ?? 10);
+        window.dispatchEvent(new CustomEvent("xp-updated"));
+      }).catch(() => {});
+    } else {
+      setRound(r => r + 1);
     }
   };
 
@@ -277,6 +329,52 @@ export function WordScramble({ words }: { words: Word[] }) {
           Skip →
         </button>
       </div>
+
+      {/* Save-word prompt overlay */}
+      {savePrompt && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 50,
+          background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+        }}>
+          <div className="animate-fade-up" style={{
+            background: "var(--surface-2)", borderRadius: 24,
+            border: "1px solid rgba(99,102,241,0.35)",
+            padding: "32px 28px", maxWidth: 320, width: "100%",
+            textAlign: "center",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.12)",
+          }}>
+            <div style={{ fontSize: 44, marginBottom: 6 }}>{savePrompt.imageEmoji || "⭐"}</div>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent-2)", marginBottom: 10 }}>
+              First time!
+            </p>
+            <p style={{ fontSize: 26, fontWeight: 900, color: "var(--text)", marginBottom: 4, fontFamily: "var(--font-display)" }}>
+              {savePrompt.word}
+            </p>
+            <p style={{ fontSize: 14, color: "var(--text-3)", marginBottom: 20 }}>
+              {savePrompt.translation}
+            </p>
+            <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
+              Save this word to your dictionary?
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => handleSaveWord(savePrompt.id, true)} className="btn-primary" style={{ flex: 1 }}>
+                ✓ Save
+              </button>
+              <button
+                onClick={() => handleSaveWord(savePrompt.id, false)}
+                style={{
+                  flex: 1, padding: "10px 16px", borderRadius: 12,
+                  background: "var(--surface-3)", border: "1px solid var(--border)",
+                  color: "var(--text-3)", cursor: "pointer", fontSize: 14, fontWeight: 600,
+                }}
+              >
+                Skip
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

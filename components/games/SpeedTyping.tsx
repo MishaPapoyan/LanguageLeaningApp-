@@ -45,6 +45,13 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
   const [finished, setFinished] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [savePrompt, setSavePrompt] = useState<Word | null>(null);
+
+  // mirrors score so handleSaveWord reads post-increment value
+  const scoreRef = useRef(0);
+  scoreRef.current = score;
+  const currentRef = useRef(current);
+  currentRef.current = current;
 
   useEffect(() => {
     if (finished) return;
@@ -93,12 +100,62 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
     const typed = val.toLowerCase().trim();
     if (typed === target) {
       setStatus("correct");
-      setTimeout(() => advance(true), 400);
+      try {
+        const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+        if (!seen.includes(queue[current].id)) {
+          setTimeout(() => setSavePrompt(queue[current]), 400);
+        } else {
+          setTimeout(() => advance(true), 400);
+        }
+      } catch { setTimeout(() => advance(true), 400); }
     } else if (stripDiacritics(typed) === stripDiacritics(target) && typed.length === target.length) {
       // Correct word but missing accent — accept and hint
       setAccentHint(true);
       setStatus("correct");
-      setTimeout(() => advance(true), 900);
+      try {
+        const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+        if (!seen.includes(queue[current].id)) {
+          setTimeout(() => setSavePrompt(queue[current]), 900);
+        } else {
+          setTimeout(() => advance(true), 900);
+        }
+      } catch { setTimeout(() => advance(true), 900); }
+    }
+  };
+
+  const handleSaveWord = (wordId: string, doSave: boolean) => {
+    try {
+      const seen: string[] = JSON.parse(localStorage.getItem("langcraft_seen_words") ?? "[]");
+      if (!seen.includes(wordId)) {
+        localStorage.setItem("langcraft_seen_words", JSON.stringify([...seen, wordId]));
+      }
+    } catch {}
+    setSavePrompt(null);
+    if (doSave) {
+      fetch("/api/dictionary/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wordId }),
+      }).catch(() => {});
+    }
+    // Reproduce advance(true) using refs (avoids stale closure)
+    setScore(s => s + 1);
+    const nextIdx = currentRef.current + 1;
+    if (nextIdx >= ROUNDS) {
+      setFinished(true);
+      const finalScore = scoreRef.current + 1; // pre-increment value + 1
+      fetch("/api/games/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameType: "SPEED_TYPING", score: finalScore, wordsUsed: queue.map(w => w.id) }),
+      }).then(r => r.json()).then(d => {
+        setXpEarned(d.xpEarned ?? 10);
+        window.dispatchEvent(new CustomEvent("xp-updated"));
+      }).catch(() => {});
+    } else {
+      setCurrent(nextIdx);
+      setInput("");
+      setStatus("idle");
     }
   };
 
@@ -159,7 +216,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
       {/* Card */}
       <div className="card" style={{ padding: "36px 28px", textAlign: "center", marginBottom: 20, border: `2px solid ${borderColor}`, transition: "border-color 0.2s" }}>
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 10px" }}>
-          Type the {targetLang === "es" ? "Spanish" : "French"} word for:
+          Type the {targetLang === "es" ? "Spanish" : targetLang === "en" ? "English" : "French"} word for:
         </p>
         <p style={{ fontSize: 36, fontWeight: 900, color: "var(--accent)", margin: "0 0 6px", lineHeight: 1.1 }}>
           {word.translation}
@@ -179,7 +236,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           value={input}
           onChange={(e) => handleInput(e.target.value)}
           disabled={status === "correct"}
-          placeholder={`Type in ${targetLang === "es" ? "Spanish" : "French"}…`}
+          placeholder={`Type in ${targetLang === "es" ? "Spanish" : targetLang === "en" ? "English" : "French"}…`}
           autoCapitalize="none"
           autoComplete="off"
           spellCheck={false}
@@ -222,6 +279,52 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
       {status === "skip" && (
         <div style={{ marginTop: 12, padding: "12px 16px", borderRadius: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", textAlign: "center" }}>
           <span style={{ fontSize: 14, color: "var(--red)" }}>Answer: <strong>{word.word}</strong></span>
+        </div>
+      )}
+
+      {/* Save-word prompt overlay */}
+      {savePrompt && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 50,
+          background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+        }}>
+          <div className="animate-fade-up" style={{
+            background: "var(--surface-2)", borderRadius: 24,
+            border: "1px solid rgba(99,102,241,0.35)",
+            padding: "32px 28px", maxWidth: 320, width: "100%",
+            textAlign: "center",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.12)",
+          }}>
+            <div style={{ fontSize: 44, marginBottom: 6 }}>⭐</div>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent-2)", marginBottom: 10 }}>
+              First time!
+            </p>
+            <p style={{ fontSize: 26, fontWeight: 900, color: "var(--text)", marginBottom: 4, fontFamily: "var(--font-display)" }}>
+              {savePrompt.word}
+            </p>
+            <p style={{ fontSize: 14, color: "var(--text-3)", marginBottom: 20 }}>
+              {savePrompt.translation}
+            </p>
+            <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
+              Save this word to your dictionary?
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => handleSaveWord(savePrompt.id, true)} className="btn-primary" style={{ flex: 1 }}>
+                ✓ Save
+              </button>
+              <button
+                onClick={() => handleSaveWord(savePrompt.id, false)}
+                style={{
+                  flex: 1, padding: "10px 16px", borderRadius: 12,
+                  background: "var(--surface-3)", border: "1px solid var(--border)",
+                  color: "var(--text-3)", cursor: "pointer", fontSize: 14, fontWeight: 600,
+                }}
+              >
+                Skip
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

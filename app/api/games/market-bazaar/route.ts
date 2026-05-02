@@ -135,6 +135,69 @@ const FALLBACK: Record<string, object> = {
       },
     ],
   },
+  en: {
+    venue: "market-bazaar",
+    title: "At the Market",
+    emoji: "🛒",
+    setting: "You're exploring a busy weekend market in Borough Market, London. Stalls sell fresh produce, street food, and handmade crafts. A great chance to practise everyday English!",
+    nodes: [
+      {
+        id: "n1",
+        npc: "Fruit Seller",
+        npcLine: "Morning! These strawberries just came in — gorgeous today. Would you like to try one?",
+        npcTranslation: "'Would you like to…?' — a polite offer. More natural than 'Do you want to…?'",
+        choices: [
+          { text: "Yes please, I'll take a punnet. How much are they?", hint: "", correct: true,  feedback: "Three pounds fifty a punnet — bargain! Here you go." },
+          { text: "No thanks — I'm allergic to strawberries.", hint: "", correct: true,  feedback: "Oh, that's a shame! We've got lovely raspberries too — fancy those?" },
+          { text: "Give me everything on the stall.", hint: "", correct: false, feedback: "Ha! I like your style — but that might cost you a fortune! 😄" },
+        ],
+      },
+      {
+        id: "n2",
+        npc: "Fruit Seller",
+        npcLine: "That'll be three pounds fifty, please. Have you got anything smaller?",
+        npcTranslation: "'Have you got anything smaller?' = Do you have a smaller note/coin? Very common in markets.",
+        choices: [
+          { text: "Here you are — exact change.", hint: "", correct: true,  feedback: "Perfect, cheers! Enjoy the strawberries." },
+          { text: "Sorry, I've only got a twenty.", hint: "", correct: true,  feedback: "No worries — I can break that for you." },
+          { text: "That seems too expensive. I won't pay.", hint: "", correct: false, feedback: "I'm afraid that's the going rate for fresh Borough Market produce!" },
+        ],
+      },
+      {
+        id: "n3",
+        npc: "Cheese Vendor",
+        npcLine: "Hello there! Are you looking for anything in particular, or just browsing?",
+        npcTranslation: "'Just browsing' — a very common phrase meaning you're looking without intending to buy yet.",
+        choices: [
+          { text: "I'm looking for a good cheese for a dinner party tonight.", hint: "", correct: true,  feedback: "Ooh, perfect — try this aged cheddar. It goes beautifully with red wine." },
+          { text: "Just browsing for now, thanks.", hint: "", correct: true,  feedback: "Of course — take your time. Give me a shout if you need anything!" },
+          { text: "I only eat processed cheese slices.", hint: "", correct: false, feedback: "Ha — we might struggle to help you there! These are all artisan cheeses." },
+        ],
+      },
+      {
+        id: "n4",
+        npc: "Cheese Vendor",
+        npcLine: "This cheddar is aged eighteen months — it's got a lovely sharp flavour. Fancy a taste?",
+        npcTranslation: "'Fancy a taste?' — casual British English for 'Would you like to try some?'",
+        choices: [
+          { text: "Yes please! Oh, that's delicious — I'll take a wedge.", hint: "", correct: true,  feedback: "Brilliant choice! Shall I wrap it up for you?" },
+          { text: "No thank you — I'm vegan.", hint: "", correct: true,  feedback: "No problem at all — we actually have a lovely cashew cheese over here." },
+          { text: "I'd rather taste it at home first before buying.", hint: "", correct: false, feedback: "I'm afraid we can't send samples home — that's what the tasting is for! 😄" },
+        ],
+      },
+      {
+        id: "n5",
+        npc: "Flower Stall",
+        npcLine: "Hi! These sunflowers are going for a fiver a bunch today — they won't last long!",
+        npcTranslation: "'Going for a fiver' = selling for £5. 'They won't last long' = they'll sell out quickly.",
+        choices: [
+          { text: "I'll take two bunches — one for my mum and one for the table.", hint: "", correct: true,  feedback: "Lovely! That's a tenner please. She'll be thrilled!" },
+          { text: "Could you do them for four pounds? I'm a regular here.", hint: "", correct: true,  feedback: "Go on then — four fifty and we'll call it a deal!" },
+          { text: "I don't really like flowers.", hint: "", correct: false, feedback: "Fair enough! But sunflowers always bring a smile — just saying! 🌻" },
+        ],
+      },
+    ],
+  },
 };
 
 // ── GET ───────────────────────────────────────────────────────────────────────
