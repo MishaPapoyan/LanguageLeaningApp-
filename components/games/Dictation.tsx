@@ -9,6 +9,7 @@ import { Play, RefreshCw, Loader2, Volume2, Snail, ChevronRight } from "lucide-r
 const ACCENT_CHARS: Record<string, string[]> = {
   fr: ["é","è","ê","ë","à","â","ù","û","ü","ô","î","ï","ç","œ","É","È","Ê","À","Â","Ç"],
   es: ["á","é","í","ó","ú","ñ","ü","¿","¡","Á","É","Í","Ó","Ú","Ñ"],
+  en: [],
 };
 
 function normalize(s: string) {
@@ -43,7 +44,7 @@ export function Dictation({ language, level }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const blobUrlRef = useRef<string | null>(null);
-  const accentChars = ACCENT_CHARS[langConfig.code] ?? ACCENT_CHARS.fr;
+  const accentChars = ACCENT_CHARS[langConfig.code] ?? [];
   const TOTAL = 8;
 
   const loadGame = useCallback(async () => {

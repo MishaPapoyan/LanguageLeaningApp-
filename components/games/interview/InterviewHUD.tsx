@@ -11,7 +11,7 @@ interface InterviewHUDProps {
 
 export default function InterviewHUD({ state, onRepeat, onRestart }: InterviewHUDProps) {
   const { phase, round, score, total, currentQuestion, language, selectedAnswer, onAnswer } = state;
-  const flag = language === "es" ? "🇪🇸" : "🇫🇷";
+  const flag = language === "es" ? "🇪🇸" : language === "en" ? "🇬🇧" : "🇫🇷";
   const [flash, setFlash] = useState<string | null>(null);
   const [questionVisible, setQuestionVisible] = useState(false);
   const [answersVisible, setAnswersVisible] = useState(false);
@@ -47,10 +47,10 @@ export default function InterviewHUD({ state, onRepeat, onRestart }: InterviewHU
   const resultEmoji = pct >= 0.8 ? "🎉" : pct >= 0.6 ? "😅" : "😔";
   const resultTitle =
     pct >= 0.8
-      ? language === "es" ? "¡Está contratado!" : "Vous êtes engagé !"
+      ? language === "es" ? "¡Está contratado!" : language === "en" ? "You're hired!" : "Vous êtes engagé !"
       : pct >= 0.6
-      ? language === "es" ? "Casi… quizás la próxima vez" : "Presque… peut-être la prochaine fois"
-      : language === "es" ? "Sigue practicando" : "Continuez à pratiquer";
+      ? language === "es" ? "Casi… quizás la próxima vez" : language === "en" ? "Close… maybe next time!" : "Presque… peut-être la prochaine fois"
+      : language === "es" ? "Sigue practicando" : language === "en" ? "Keep practising!" : "Continuez à pratiquer";
 
   return (
     <>
@@ -101,7 +101,7 @@ export default function InterviewHUD({ state, onRepeat, onRestart }: InterviewHU
           padding: "11px 24px", zIndex: 10, pointerEvents: "none",
           color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 600,
         }}>
-          {flag} {language === "es" ? "El entrevistador está listo para comenzar…" : "L'entretien va commencer…"}
+          {flag} {language === "es" ? "El entrevistador está listo para comenzar…" : language === "en" ? "The interviewer is ready to begin…" : "L'entretien va commencer…"}
         </div>
       )}
 
@@ -249,7 +249,7 @@ export default function InterviewHUD({ state, onRepeat, onRestart }: InterviewHU
               {resultTitle}
             </h2>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "0 0 28px" }}>
-              {flag} {language === "es" ? "Entrevista completada" : "Entretien terminé"} 💼
+              {flag} {language === "es" ? "Entrevista completada" : language === "en" ? "Interview complete" : "Entretien terminé"} 💼
             </p>
 
             {/* Score breakdown */}

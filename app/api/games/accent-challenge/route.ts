@@ -19,6 +19,11 @@ const ACCENT_VOICES: Record<string, Array<{ region: string; label: string; flag:
     { region: "mexico",  label: "Mexican Spanish",   flag: "🇲🇽", voiceId: "21m00Tcm4TlvDq8ikWAM" },
     { region: "arg",     label: "Argentine Spanish", flag: "🇦🇷", voiceId: "cgSgspJ2msm6clMCkdW9" },
   ],
+  en: [
+    { region: "british",    label: "British English",    flag: "🇬🇧", voiceId: "cgSgspJ2msm6clMCkdW9" },
+    { region: "american",   label: "American English",   flag: "🇺🇸", voiceId: "21m00Tcm4TlvDq8ikWAM" },
+    { region: "australian", label: "Australian English", flag: "🇦🇺", voiceId: "EXAVITQu4vr4xnSDxMaL" },
+  ],
 };
 
 const WORD_LEVELS: Record<string, Record<string, string[]>> = {
@@ -31,6 +36,11 @@ const WORD_LEVELS: Record<string, Record<string, string[]>> = {
     "A2": ["gracias","casa","coche","comer","agua","rojo","pequeño","grande","hola","bien"],
     "B1": ["paraguas","equilibrio","murciélago","ciempiés","ferrocarril","desarrollar"],
     "B2": ["desenvolvimiento","circunstancia","extraordinario","vulnerabilidad"],
+  },
+  en: {
+    "A2": ["hello","water","house","table","happy","money","friend","travel","school","green"],
+    "B1": ["thorough","thought","though","through","weather","whether","colonel","iron","sword"],
+    "B2": ["worcestershire","leicestershire","bourgeois","entrepreneurship","pronunciation","Wednesday"],
   },
 };
 

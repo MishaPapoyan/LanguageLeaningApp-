@@ -12,7 +12,7 @@ interface GameHUDProps {
 export default function GameHUD({ state, onRepeat, onRestart }: GameHUDProps) {
   const { phase, round, score, vocab, currentTask, language } = state;
   const total = vocab.length;
-  const flag = language === "es" ? "🇪🇸" : "🇫🇷";
+  const flag = language === "es" ? "🇪🇸" : language === "en" ? "🇬🇧" : "🇫🇷";
   const [visible, setVisible] = useState(false);
   const [flashColor, setFlashColor] = useState<string | null>(null);
 
@@ -41,9 +41,9 @@ export default function GameHUD({ state, onRepeat, onRestart }: GameHUDProps) {
 
   const responseText =
     phase === "correct"
-      ? language === "es" ? "¡Perfecto! 👍" : "Parfait ! 👍"
+      ? language === "es" ? "¡Perfecto! 👍" : language === "en" ? "Perfect! 👍" : "Parfait ! 👍"
       : phase === "wrong"
-      ? language === "es" ? "No, no… 🙈" : "Non, non… 🙈"
+      ? language === "es" ? "No, no… 🙈" : language === "en" ? "Not quite… 🙈" : "Non, non… 🙈"
       : null;
 
   const isComplete = phase === "complete";
@@ -193,7 +193,7 @@ export default function GameHUD({ state, onRepeat, onRestart }: GameHUDProps) {
               onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,214,128,0.22)")}
               onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,214,128,0.12)")}
             >
-              🔊 Répéter
+              🔊 {language === "en" ? "Repeat" : language === "es" ? "Repetir" : "Répéter"}
             </button>
           )}
         </div>
@@ -230,10 +230,10 @@ export default function GameHUD({ state, onRepeat, onRestart }: GameHUDProps) {
                 margin: "0 0 8px", lineHeight: 1.2,
               }}
             >
-              {language === "es" ? "¡Très bien !" : "Très bien !"}
+              {language === "es" ? "¡Muy bien!" : language === "en" ? "Well done!" : "Très bien !"}
             </h2>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "0 0 24px" }}>
-              {language === "es" ? "Completaste el café" : "Vous avez terminé le café"} ☕
+              {language === "es" ? "Completaste el café" : language === "en" ? "You finished the café!" : "Vous avez terminé le café"} ☕
             </p>
 
             {/* Score */}
@@ -315,7 +315,7 @@ export default function GameHUD({ state, onRepeat, onRestart }: GameHUDProps) {
             fontWeight: 600,
           }}
         >
-          {flag} {language === "es" ? "Un camarero se acerca…" : "Un serveur s'approche…"}
+          {flag} {language === "es" ? "Un camarero se acerca…" : language === "en" ? "A waiter approaches…" : "Un serveur s'approche…"}
         </div>
       )}
     </>
