@@ -25,6 +25,10 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { WordOfDayPlayer } from "@/components/home/WordOfDayPlayer";
+import { TodayPlan } from "@/components/home/TodayPlan";
+import { StreakShields } from "@/components/home/StreakShields";
+import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Dashboard — Lingova",
@@ -40,15 +44,23 @@ export default async function HomePage() {
   const dayIndex = Math.floor(Date.now() / 86_400_000) % 100;
 
   let progress = null, savedWordCount = 0, completedStories = 0, recentWord = null, lastStory = null;
+  let onboardingCompleted = true; // default true so returning users see nothing
 
   if (userId) {
     try {
+      const userRow = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { onboardingCompleted: true },
+      });
+      onboardingCompleted = userRow?.onboardingCompleted ?? true;
+
       [progress, savedWordCount, completedStories, recentWord, lastStory] = await Promise.all([
         prisma.progress.findUnique({ where: { userId } }),
         prisma.savedWord.count({ where: { userId } }),
         prisma.storyProgress.count({ where: { userId, completed: true } }),
         prisma.word.findFirst({
-          skip: dayIndex,
+          where: { language: targetLang },
+          skip: dayIndex % 100,
           orderBy: { id: "asc" },
           select: { id: true, word: true, translation: true, exampleFr: true, imageEmoji: true },
         }),
@@ -64,7 +76,8 @@ export default async function HomePage() {
   } else {
     try {
       recentWord = await prisma.word.findFirst({
-        skip: dayIndex,
+        where: { language: targetLang },
+        skip: dayIndex % 100,
         orderBy: { id: "asc" },
         select: { id: true, word: true, translation: true, exampleFr: true, imageEmoji: true },
       });
@@ -86,6 +99,15 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 animate-fade-up">
+
+      {/* ── Onboarding modal (fires once for new users) ── */}
+      {!onboardingCompleted && (
+        <OnboardingModal
+          targetLang={targetLang}
+          langLabel={langConfig.label}
+          langFlag={langConfig.flag}
+        />
+      )}
 
       {/* ── Hero bento ── */}
       <section
@@ -145,6 +167,7 @@ export default async function HomePage() {
               <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginTop: 4 }}>
                 {t(locale, "home_dayStreak")}
               </p>
+              <StreakShields shields={progress.streakShields ?? 0} />
             </div>
           ) : null}
 
@@ -205,6 +228,11 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Today's Plan ── */}
+      <Suspense fallback={null}>
+        <TodayPlan targetLang={targetLang} />
+      </Suspense>
 
       {/* ── Bento row: Stats / Daily Goals / Continue Learning ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

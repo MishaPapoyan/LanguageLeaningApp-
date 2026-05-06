@@ -49,21 +49,22 @@ const WORD_BANK: Record<Lang, WordEntry[]> = {
     { word: "coche",    correct: "car",      wrong: ["bus",      "train",    "plane"]     },
     { word: "bonito",   correct: "beautiful",wrong: ["ugly",     "small",    "empty"]     },
   ],
+  // English: word = hint shown in 3D space, correct = English word to shoot
   en: [
-    { word: "hello",      correct: "a greeting",     wrong: ["a goodbye",   "a thanks",      "a question"]   },
-    { word: "house",      correct: "a place to live",wrong: ["a vehicle",   "a tree",        "a road"]       },
-    { word: "dog",        correct: "an animal",      wrong: ["a plant",     "a vegetable",   "a fruit"]      },
-    { word: "red",        correct: "a color",        wrong: ["a number",    "a shape",       "a sound"]      },
-    { word: "to eat",     correct: "consume food",   wrong: ["run fast",    "go to sleep",   "read a book"] },
-    { word: "water",      correct: "a liquid",       wrong: ["a fire",      "the air",       "the earth"]    },
-    { word: "book",       correct: "for reading",    wrong: ["for writing", "for sitting",   "for cooking"] },
-    { word: "fast",       correct: "quick speed",    wrong: ["slow speed",  "tall height",   "short length"]},
-    { word: "night",      correct: "when it's dark", wrong: ["midday",      "morning",       "noon"]         },
-    { word: "city",       correct: "a large town",   wrong: ["a village",   "a forest",      "a beach"]      },
-    { word: "friend",     correct: "someone close",  wrong: ["an enemy",    "a stranger",    "a teacher"]    },
-    { word: "sun",        correct: "in the sky",     wrong: ["the moon",    "a star",        "a cloud"]      },
-    { word: "car",        correct: "a vehicle",      wrong: ["a bus",       "a train",       "a plane"]      },
-    { word: "beautiful",  correct: "very pretty",    wrong: ["very ugly",   "very small",    "very empty"]   },
+    { word: "👋 a greeting",          correct: "hello",     wrong: ["goodbye",   "thanks",    "please"]   },
+    { word: "🏠 you live here",        correct: "house",     wrong: ["car",       "school",    "park"]     },
+    { word: "🐶 a pet that barks",     correct: "dog",       wrong: ["cat",       "bird",      "fish"]     },
+    { word: "🔴 the color of fire",    correct: "red",       wrong: ["blue",      "green",     "black"]    },
+    { word: "🍽️ what you do at dinner",correct: "eat",       wrong: ["run",       "sleep",     "read"]     },
+    { word: "💧 you drink this",       correct: "water",     wrong: ["fire",      "sand",      "stone"]    },
+    { word: "📖 you read this",        correct: "book",      wrong: ["pen",       "desk",      "chair"]    },
+    { word: "⚡ opposite of slow",     correct: "fast",      wrong: ["tall",      "short",     "heavy"]    },
+    { word: "🌙 opposite of day",      correct: "night",     wrong: ["morning",   "noon",      "evening"]  },
+    { word: "🏙️ a big place of people",correct: "city",      wrong: ["village",   "forest",    "beach"]    },
+    { word: "🤝 a close companion",    correct: "friend",    wrong: ["enemy",     "stranger",  "boss"]     },
+    { word: "☀️ shines in the sky",    correct: "sun",       wrong: ["moon",      "star",      "cloud"]    },
+    { word: "🚗 a road vehicle",       correct: "car",       wrong: ["bus",       "train",     "plane"]    },
+    { word: "😍 very nice to look at", correct: "beautiful", wrong: ["ugly",      "small",     "empty"]    },
   ],
 };
 
@@ -587,7 +588,7 @@ export default function City3DGame({ targetLang }: { targetLang: string }) {
             <Suspense fallback={null}>
               <Arena
                 currentWord={currentWord}
-                wordLabel={lang === "fr" ? "French → English" : lang === "es" ? "Spanish → English" : "English vocabulary"}
+                wordLabel={lang === "fr" ? "French → English" : lang === "es" ? "Spanish → English" : "Hint → English word"}
               />
 
               {choices.map((c, i) => (

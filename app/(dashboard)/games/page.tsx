@@ -10,7 +10,7 @@ import {
   CheckSquare, Keyboard, Headphones, MessagesSquare, AlignJustify,
   Map, Box, Home, Briefcase, Flame, Gamepad2,
   Network, Search, Clock, Mic, BookOpen, Radio, Mic2,
-  Plane, Stethoscope, ShoppingBag,
+  Plane, Stethoscope, ShoppingBag, Hotel,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -209,6 +209,17 @@ const GAMES = [
     difficulty: "A2",
     category: "immersive",
     xp: 35,
+  },
+  {
+    href: "/games/hotel",
+    gameType: "HOTEL",
+    icon: Hotel,
+    title: "Hotel",
+    desc: "Check in, order room service, and handle requests at a hotel",
+    theme: "#8B5CF6",
+    difficulty: "B1",
+    category: "immersive",
+    xp: 40,
   },
   // ── New Games v2 ──────────────────────────────────────────────
   {

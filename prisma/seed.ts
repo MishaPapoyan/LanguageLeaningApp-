@@ -4,6 +4,8 @@ import { frenchVocabulary } from "../data/french-vocabulary";
 import { frenchStories } from "../data/french-stories";
 import { spanishVocabulary } from "../data/spanish-vocabulary";
 import { spanishStories } from "../data/spanish-stories";
+import { englishVocabulary } from "../data/english-vocabulary";
+import { englishStories } from "../data/english-stories";
 
 const prisma = new PrismaClient();
 
@@ -47,13 +49,34 @@ async function main() {
     skipDuplicates: true,
   });
 
+  // Seed English vocabulary
+  console.log("🇬🇧 Seeding English vocabulary...");
+  await prisma.word.createMany({
+    data: englishVocabulary.map((vocab) => ({
+      word: vocab.word,
+      translation: vocab.translation,
+      definition: vocab.definition,
+      exampleFr: vocab.exampleFr,
+      exampleEn: vocab.exampleEn,
+      miniStory: vocab.miniStory,
+      category: vocab.category,
+      difficulty: vocab.difficulty,
+      imageEmoji: vocab.imageEmoji,
+      language: "en",
+    })),
+    skipDuplicates: true,
+  });
+
   // Build per-language word maps for story references
   const frWords = await prisma.word.findMany({ where: { language: "fr" }, select: { id: true, word: true } });
   const esWords = await prisma.word.findMany({ where: { language: "es" }, select: { id: true, word: true } });
+  const enWords = await prisma.word.findMany({ where: { language: "en" }, select: { id: true, word: true } });
   const wordMapFr: Record<string, string> = {};
   const wordMapEs: Record<string, string> = {};
+  const wordMapEn: Record<string, string> = {};
   for (const w of frWords) wordMapFr[w.word.toLowerCase()] = w.id;
   for (const w of esWords) wordMapEs[w.word.toLowerCase()] = w.id;
+  for (const w of enWords) wordMapEn[w.word.toLowerCase()] = w.id;
 
   const totalWords = await prisma.word.count();
   console.log(`✅ Seeded ${totalWords} vocabulary words total`);
@@ -116,6 +139,38 @@ async function main() {
           create: storyEntry.highlightedWords
             .filter((w) => wordMapEs[w.toLowerCase()])
             .map((w) => ({ wordId: wordMapEs[w.toLowerCase()] })),
+        },
+      },
+    });
+    console.log(`  ✅ Created story: "${story.title}"`);
+  }
+
+  // Seed English stories
+  console.log("📖 Seeding English stories...");
+
+  for (const storyEntry of englishStories) {
+    const existing = await prisma.story.findFirst({ where: { title: storyEntry.title, language: "en" } });
+    if (existing) { console.log(`  ↷ Skipped existing: "${storyEntry.title}"`); continue; }
+    const story = await prisma.story.create({
+      data: {
+        title: storyEntry.title,
+        description: storyEntry.description,
+        content: storyEntry.content as any,
+        difficulty: storyEntry.difficulty,
+        chapter: storyEntry.chapter,
+        imageEmoji: storyEntry.imageEmoji,
+        language: "en",
+        quizzes: {
+          create: storyEntry.quizzes.map((q) => ({
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+          })),
+        },
+        words: {
+          create: storyEntry.highlightedWords
+            .filter((w) => wordMapEn[w.toLowerCase()])
+            .map((w) => ({ wordId: wordMapEn[w.toLowerCase()] })),
         },
       },
     });

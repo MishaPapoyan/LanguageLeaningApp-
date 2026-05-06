@@ -66,7 +66,6 @@ export async function updateStreak(userId: string): Promise<number> {
   const last = new Date(progress.lastActive);
 
   // LOW-10: Compare by calendar day (UTC) to avoid midnight edge cases.
-  // Old code used hoursSince / 24 which missed activities at 23:59 vs 00:01.
   const nowUtcDay  = Date.UTC(now.getFullYear(),  now.getMonth(),  now.getDate());
   const lastUtcDay = Date.UTC(last.getFullYear(), last.getMonth(), last.getDate());
   const dayDiff = Math.round((nowUtcDay - lastUtcDay) / 86_400_000);
@@ -76,6 +75,8 @@ export async function updateStreak(userId: string): Promise<number> {
   const hoursSince = (now.getTime() - last.getTime()) / 3_600_000;
 
   let newStreak = progress.streak;
+  let shieldUsed = false;
+  let newShields = progress.streakShields ?? 0;
 
   if (dayDiff === 0) {
     // Same calendar day — streak unchanged
@@ -83,21 +84,47 @@ export async function updateStreak(userId: string): Promise<number> {
     // Next day, or within grace window — increment
     newStreak = progress.streak + 1;
   } else {
-    // Missed more than one day — reset
-    newStreak = 1;
+    // Missed more than one day — use a shield if available, otherwise reset
+    if (newShields > 0) {
+      newShields -= 1;
+      shieldUsed = true;
+      // Keep the current streak — shield absorbed the break
+      // But don't increment (they didn't actually play yesterday)
+    } else {
+      newStreak = 1;
+    }
+  }
+
+  // Award a shield every 7-day streak milestone (7, 14, 21 …)
+  const isNowAt = newStreak % 7;
+  if (!shieldUsed && newStreak > progress.streak && isNowAt === 0 && newStreak > 0) {
+    newShields = Math.min(newShields + 1, 3); // cap at 3 shields
   }
 
   await prisma.progress.update({
     where: { userId },
-    data: { streak: newStreak, lastActive: now },
+    data: { streak: newStreak, streakShields: newShields, lastActive: now },
   });
 
-  // Award streak XP if a new day was registered
-  if (newStreak > progress.streak) {
+  // Award streak XP if a new day was registered (not shield-saved days)
+  if (!shieldUsed && newStreak > progress.streak) {
     await awardXp(userId, XP_REWARDS.dailyStreak);
   }
 
   return newStreak;
+}
+
+/** Consume one streak shield manually (called from API route when user taps "Use shield"). */
+export async function useStreakShield(userId: string): Promise<{ ok: boolean; shields: number }> {
+  const progress = await prisma.progress.findUnique({ where: { userId } });
+  if (!progress || (progress.streakShields ?? 0) === 0) return { ok: false, shields: 0 };
+
+  const updated = await prisma.progress.update({
+    where: { userId },
+    data: { streakShields: { decrement: 1 } },
+  });
+
+  return { ok: true, shields: updated.streakShields ?? 0 };
 }
 
 async function checkBadges(
