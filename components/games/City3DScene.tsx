@@ -14,7 +14,9 @@ interface WordEntry {
   wrong: [string, string, string];
 }
 
-const WORD_BANK: Record<"fr" | "es", WordEntry[]> = {
+type Lang = "fr" | "es" | "en";
+
+const WORD_BANK: Record<Lang, WordEntry[]> = {
   fr: [
     { word: "bonjour",  correct: "hello",    wrong: ["goodbye",  "thanks",   "please"]    },
     { word: "maison",   correct: "house",    wrong: ["car",      "tree",     "road"]      },
@@ -46,6 +48,22 @@ const WORD_BANK: Record<"fr" | "es", WordEntry[]> = {
     { word: "sol",      correct: "sun",      wrong: ["moon",     "star",     "cloud"]     },
     { word: "coche",    correct: "car",      wrong: ["bus",      "train",    "plane"]     },
     { word: "bonito",   correct: "beautiful",wrong: ["ugly",     "small",    "empty"]     },
+  ],
+  en: [
+    { word: "hello",      correct: "a greeting",     wrong: ["a goodbye",   "a thanks",      "a question"]   },
+    { word: "house",      correct: "a place to live",wrong: ["a vehicle",   "a tree",        "a road"]       },
+    { word: "dog",        correct: "an animal",      wrong: ["a plant",     "a vegetable",   "a fruit"]      },
+    { word: "red",        correct: "a color",        wrong: ["a number",    "a shape",       "a sound"]      },
+    { word: "to eat",     correct: "consume food",   wrong: ["run fast",    "go to sleep",   "read a book"] },
+    { word: "water",      correct: "a liquid",       wrong: ["a fire",      "the air",       "the earth"]    },
+    { word: "book",       correct: "for reading",    wrong: ["for writing", "for sitting",   "for cooking"] },
+    { word: "fast",       correct: "quick speed",    wrong: ["slow speed",  "tall height",   "short length"]},
+    { word: "night",      correct: "when it's dark", wrong: ["midday",      "morning",       "noon"]         },
+    { word: "city",       correct: "a large town",   wrong: ["a village",   "a forest",      "a beach"]      },
+    { word: "friend",     correct: "someone close",  wrong: ["an enemy",    "a stranger",    "a teacher"]    },
+    { word: "sun",        correct: "in the sky",     wrong: ["the moon",    "a star",        "a cloud"]      },
+    { word: "car",        correct: "a vehicle",      wrong: ["a bus",       "a train",       "a plane"]      },
+    { word: "beautiful",  correct: "very pretty",    wrong: ["very ugly",   "very small",    "very empty"]   },
   ],
 };
 
@@ -330,7 +348,7 @@ interface ExplState { pos: [number,number,number]; color: string }
 
 // ── Main game export ───────────────────────────────────────────────────────────
 export default function City3DGame({ targetLang }: { targetLang: string }) {
-  const lang = (targetLang === "es" ? "es" : "fr") as "fr" | "es";
+  const lang = (targetLang === "es" ? "es" : targetLang === "en" ? "en" : "fr") as Lang;
 
   // Shuffled word list fixed at game start
   const [words]   = useState<WordEntry[]>(() => shuffle(WORD_BANK[lang]).slice(0, ROUNDS));
@@ -569,7 +587,7 @@ export default function City3DGame({ targetLang }: { targetLang: string }) {
             <Suspense fallback={null}>
               <Arena
                 currentWord={currentWord}
-                wordLabel={lang === "fr" ? "French → English" : "Spanish → English"}
+                wordLabel={lang === "fr" ? "French → English" : lang === "es" ? "Spanish → English" : "English vocabulary"}
               />
 
               {choices.map((c, i) => (

@@ -31,6 +31,7 @@ interface Props { profile: ProfileData; viewerUserId: string; }
 const LANG: Record<string, { label: string; flag: string; grad: string; accent: string }> = {
   fr: { label: "French",  flag: "🇫🇷", grad: "linear-gradient(135deg,#0f1b6b 0%,#2d1d8a 40%,#5b21b6 100%)", accent: "#818cf8" },
   es: { label: "Spanish", flag: "🇪🇸", grad: "linear-gradient(135deg,#7c2d12 0%,#b45309 50%,#d97706 100%)", accent: "#fbbf24" },
+  en: { label: "English", flag: "🇬🇧", grad: "linear-gradient(135deg,#0c1e3a 0%,#155e75 50%,#0e7490 100%)", accent: "#22d3ee" },
 };
 const GAME_LABEL: Record<string, string> = {
   MATCHING:"Matching", WORD_SCRAMBLE:"Scramble", FILL_BLANK:"Fill Blank",

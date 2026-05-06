@@ -24,6 +24,13 @@ const VOCAB: Record<string, VocabItem[]> = {
     { id: "azucar",    word: "azúcar",     instruction: "¿Tiene azúcar?" },
     { id: "cuenta",    word: "la cuenta",  instruction: "La cuenta, por favor" },
   ],
+  en: [
+    { id: "coffee",    word: "coffee",     instruction: "Could I have a coffee, please?" },
+    { id: "water",     word: "water",      instruction: "I'd like a glass of water, please" },
+    { id: "croissant", word: "croissant",  instruction: "A croissant, please" },
+    { id: "sugar",     word: "sugar",      instruction: "Do you have any sugar?" },
+    { id: "bill",      word: "the bill",   instruction: "The bill, please" },
+  ],
 };
 
 export interface GameState {
@@ -43,8 +50,8 @@ export interface GameState {
 }
 
 export function useGameState(language: string): GameState {
-  const lang = language === "es" ? "es" : "fr";
-  const vocab = useMemo(() => VOCAB[lang], [lang]);
+  const lang = language === "es" ? "es" : language === "en" ? "en" : "fr";
+  const vocab = useMemo(() => VOCAB[lang] ?? VOCAB.fr, [lang]);
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);

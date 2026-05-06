@@ -20,6 +20,7 @@ type AnswerState = "idle" | "correct" | "near" | "wrong";
 const ACCENT_CHARS: Record<string, string[]> = {
   fr: ["é","è","ê","ë","à","â","ù","û","ü","ô","î","ï","ç","œ","æ","É","È","Ê","À","Â","Ç"],
   es: ["á","é","í","ó","ú","ñ","ü","¿","¡","Á","É","Í","Ó","Ú","Ñ"],
+  en: [],
 };
 
 function normalize(s: string) {
@@ -56,7 +57,7 @@ export function TenseChallenge({ language, level }: Props) {
   const [showSteps, setShowSteps]   = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const accentChars = ACCENT_CHARS[langConfig.code] ?? ACCENT_CHARS.fr;
+  const accentChars = ACCENT_CHARS[langConfig.code] ?? [];
   const TOTAL = 8;
 
   const loadGame = useCallback(async () => {

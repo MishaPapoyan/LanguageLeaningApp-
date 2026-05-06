@@ -13,17 +13,35 @@ const SCRIPT_TYPES: Record<string, string> = {
   C2: "academic lecture or documentary excerpt, sophisticated language",
 };
 
-const FALLBACK = {
-  transcript: "Bonjour et bienvenue sur Radio Météo. Voici la météo pour ce week-end. Samedi, il fera beau dans tout le pays avec des températures autour de vingt degrés. Dimanche, des nuages arriveront par l'ouest et des pluies sont possibles l'après-midi. Les températures resteront douces pour la saison. Pensez à prendre votre parapluie dimanche. Bonne journée à tous.",
-  contentType: "weather forecast",
-  questions: [
-    { question: "What will the weather be like on Saturday?", options: ["Rainy", "Sunny", "Cloudy", "Snowy"], correctIndex: 1 },
-    { question: "What temperature is expected on Saturday?", options: ["10 degrees", "15 degrees", "20 degrees", "25 degrees"], correctIndex: 2 },
-    { question: "What will happen Sunday afternoon?", options: ["Sun and heat", "Snow and ice", "Clouds and possible rain", "Strong winds"], correctIndex: 2 },
-    { question: "What does the forecast suggest you bring on Sunday?", options: ["Sunscreen", "An umbrella", "A hat", "A jacket"], correctIndex: 1 },
-    { question: "Overall, how are temperatures described?", options: ["Very cold", "Freezing", "Very hot", "Mild for the season"], correctIndex: 3 },
-  ],
+const COMMON_QUESTIONS = [
+  { question: "What will the weather be like on Saturday?", options: ["Rainy", "Sunny", "Cloudy", "Snowy"], correctIndex: 1 },
+  { question: "What temperature is expected on Saturday?", options: ["10 degrees", "15 degrees", "20 degrees", "25 degrees"], correctIndex: 2 },
+  { question: "What will happen Sunday afternoon?", options: ["Sun and heat", "Snow and ice", "Clouds and possible rain", "Strong winds"], correctIndex: 2 },
+  { question: "What does the forecast suggest you bring on Sunday?", options: ["Sunscreen", "An umbrella", "A hat", "A jacket"], correctIndex: 1 },
+  { question: "Overall, how are temperatures described?", options: ["Very cold", "Freezing", "Very hot", "Mild for the season"], correctIndex: 3 },
+];
+
+const FALLBACK_BY_LANG: Record<string, { transcript: string; contentType: string; questions: typeof COMMON_QUESTIONS }> = {
+  fr: {
+    transcript: "Bonjour et bienvenue sur Radio Météo. Voici la météo pour ce week-end. Samedi, il fera beau dans tout le pays avec des températures autour de vingt degrés. Dimanche, des nuages arriveront par l'ouest et des pluies sont possibles l'après-midi. Les températures resteront douces pour la saison. Pensez à prendre votre parapluie dimanche. Bonne journée à tous.",
+    contentType: "weather forecast",
+    questions: COMMON_QUESTIONS,
+  },
+  es: {
+    transcript: "Buenos días y bienvenidos a Radio Tiempo. Aquí está el pronóstico para este fin de semana. El sábado hará buen tiempo en todo el país, con temperaturas alrededor de veinte grados. El domingo llegarán nubes desde el oeste y son posibles lluvias por la tarde. Las temperaturas se mantendrán suaves para la estación. No olviden llevar el paraguas el domingo. ¡Buen día a todos!",
+    contentType: "weather forecast",
+    questions: COMMON_QUESTIONS,
+  },
+  en: {
+    transcript: "Good morning and welcome to Weather Radio. Here is the forecast for this weekend. On Saturday, it will be sunny across the whole country, with temperatures around twenty degrees. On Sunday, clouds will arrive from the west and rain is possible in the afternoon. Temperatures will remain mild for the season. Remember to take your umbrella on Sunday. Have a good day, everyone.",
+    contentType: "weather forecast",
+    questions: COMMON_QUESTIONS,
+  },
 };
+
+function getFallback(lang: string) {
+  return FALLBACK_BY_LANG[lang] ?? FALLBACK_BY_LANG.fr;
+}
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -78,13 +96,13 @@ Requirements:
     const data = JSON.parse(raw);
 
     if (!data.transcript || !Array.isArray(data.questions) || data.questions.length < 4) {
-      return NextResponse.json(FALLBACK);
+      return NextResponse.json(getFallback(language));
     }
 
     return NextResponse.json(data);
   } catch (err) {
     console.error("[speed-listening GET]", err);
-    return NextResponse.json(FALLBACK);
+    return NextResponse.json(getFallback(language));
   }
 }
 

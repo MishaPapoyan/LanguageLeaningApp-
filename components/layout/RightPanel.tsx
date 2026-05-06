@@ -77,6 +77,22 @@ const TIPS: Record<string, { tip: string; emoji: string }[]> = {
     { tip: "Start with presente, pretérito, and futuro. Master those three tenses first.", emoji: "⏳" },
     { tip: "Repetition spaced over days beats cramming. Even 10 minutes daily beats 2 hours once a week.", emoji: "🗓️" },
   ],
+  en: [
+    { tip: "Speak out loud every word you learn — even alone. Your mouth needs practice too.", emoji: "🗣️" },
+    { tip: "English spelling is irregular. Learn each word's sound separately from its spelling.", emoji: "🔤" },
+    { tip: "Learn phrases, not just words. \"I'd like to\" is more useful than \"like\" alone.", emoji: "💬" },
+    { tip: "English uses tons of phrasal verbs (\"give up\", \"look after\"). Treat them as single units.", emoji: "🏷️" },
+    { tip: "Watch English YouTube with subtitles — your ear adapts faster than any exercise.", emoji: "📺" },
+    { tip: "\"False friends\" exist between English and your native tongue. Watch out for them.", emoji: "⚠️" },
+    { tip: "The 1000 most common English words cover ~85% of everyday conversation.", emoji: "📊" },
+    { tip: "Ask locals to slow down — \"Could you say that again, more slowly please?\"", emoji: "🐌" },
+    { tip: "Stress matters: REcord (noun) vs reCORD (verb). Learn word stress patterns.", emoji: "🔗" },
+    { tip: "Read graded readers in English — perfect vocab level, real grammar.", emoji: "📖" },
+    { tip: "\"A\" vs \"the\" trips up most learners. Master articles by reading lots of English.", emoji: "🤔" },
+    { tip: "Immersion beats memorization. Change your phone language to English today.", emoji: "📱" },
+    { tip: "Start with present simple, present continuous, and past simple. Master those first.", emoji: "⏳" },
+    { tip: "Repetition spaced over days beats cramming. Even 10 minutes daily beats 2 hours once a week.", emoji: "🗓️" },
+  ],
 };
 
 export async function RightPanel() {
