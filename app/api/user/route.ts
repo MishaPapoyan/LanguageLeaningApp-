@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json();
   const { name, image, nativeLanguage, targetLanguage } = body;
 
-  const SUPPORTED_TARGET_LANGUAGES = ["fr", "es"];
+  const SUPPORTED_TARGET_LANGUAGES = ["fr", "es", "en"];
   const data: Record<string, string> = {};
   if (typeof name === "string" && name.trim()) data.name = name.trim().slice(0, 50);
   if (typeof image === "string" && image.length > 0) {
