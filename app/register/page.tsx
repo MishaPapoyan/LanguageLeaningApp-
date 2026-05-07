@@ -116,7 +116,7 @@ export default async function RegisterPage() {
             {[
               { icon: Zap, label: "Up and running in 60 seconds", color: "var(--gold)" },
               { icon: Star, label: "No credit card required", color: "var(--teal)" },
-              { icon: Globe, label: "French & Spanish supported", color: "var(--accent-2)" },
+              { icon: Globe, label: "French, Spanish & English supported", color: "var(--accent-2)" },
             ].map((item) => (
               <div
                 key={item.label}

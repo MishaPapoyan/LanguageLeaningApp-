@@ -130,7 +130,7 @@ export default async function AdminAnalyticsPage() {
                     {u.xp.toLocaleString()} XP
                   </p>
                   <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                    {u.user.targetLanguage === "fr" ? "🇫🇷" : "🇪🇸"}
+                    {u.user.targetLanguage === "fr" ? "🇫🇷" : u.user.targetLanguage === "en" ? "🇬🇧" : "🇪🇸"}
                   </p>
                 </div>
               </div>

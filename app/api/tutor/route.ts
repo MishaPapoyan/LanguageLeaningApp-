@@ -66,7 +66,9 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // New scenario — send greeting to get AI's opening message
-      const greeting = targetLanguage === "es" ? "¡Hola! Let's begin." : "Bonjour! Let's begin.";
+      const greeting = targetLanguage === "es" ? "¡Hola! Let's begin."
+                     : targetLanguage === "en" ? "Hello! Let's begin."
+                     : "Bonjour! Let's begin.";
       apiMessages.push({ role: "user", content: greeting });
     }
 

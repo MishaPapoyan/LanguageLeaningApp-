@@ -600,7 +600,7 @@ export default function MyWordsPage() {
               type="text" value={back}
               onChange={e => setBack(e.target.value)}
               onKeyDown={e => e.key === "Enter" && front.trim() && addWord()}
-              placeholder={langConfig.code === "es" ? "e.g. hola" : "e.g. bonjour"}
+              placeholder={langConfig.code === "es" ? "e.g. hola" : langConfig.code === "en" ? "e.g. hello" : "e.g. bonjour"}
               className="input"
               style={{ width: "100%", fontSize: 15 }}
             />

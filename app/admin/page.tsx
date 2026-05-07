@@ -4,20 +4,20 @@ import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
 
 export const dynamic = "force-dynamic";
 
-const LANG_FLAG: Record<string, string> = { fr: "🇫🇷", es: "🇪🇸" };
+const LANG_FLAG: Record<string, string> = { fr: "🇫🇷", es: "🇪🇸", en: "🇬🇧" };
 
 export default async function AdminOverview() {
   let d = {
     userCount: 0, locationCount: 0, activeToday: 0, activeWeek: 0,
     totalXp: 0, aiCount: 0, gameCount: 0, writeCount: 0,
     groupCount: 0, studentCount: 0, teacherCount: 0, adminCount: 0,
-    frCount: 0, esCount: 0,
+    frCount: 0, esCount: 0, enCount: 0,
     recentUsers: [] as any[],
     recentGames: [] as any[],
   };
 
   try {
-    const [uc, lc, at, aw, xpAgg, aiC, gameC, writeC, groupC, sc, tc, ac, frC, esC, ru, rg] = await Promise.all([
+    const [uc, lc, at, aw, xpAgg, aiC, gameC, writeC, groupC, sc, tc, ac, frC, esC, enC, ru, rg] = await Promise.all([
       prisma.user.count(),
       prisma.userLocation.count(),
       prisma.progress.count({ where: { lastActive: { gte: new Date(Date.now() - 86400000) } } }),
@@ -32,6 +32,7 @@ export default async function AdminOverview() {
       prisma.user.count({ where: { role: "ADMIN" } }),
       prisma.user.count({ where: { targetLanguage: "fr" } }),
       prisma.user.count({ where: { targetLanguage: "es" } }),
+      prisma.user.count({ where: { targetLanguage: "en" } }),
       prisma.user.findMany({
         take: 6, orderBy: { createdAt: "desc" },
         select: {
@@ -52,7 +53,7 @@ export default async function AdminOverview() {
       userCount: uc, locationCount: lc, activeToday: at, activeWeek: aw,
       totalXp: xpAgg._sum.xp ?? 0, aiCount: aiC, gameCount: gameC, writeCount: writeC,
       groupCount: groupC, studentCount: sc, teacherCount: tc, adminCount: ac,
-      frCount: frC, esCount: esC,
+      frCount: frC, esCount: esC, enCount: enC,
       recentUsers: ru, recentGames: rg,
     };
   } catch (err) {
@@ -125,6 +126,7 @@ export default async function AdminOverview() {
           {[
             { lang: "French",  count: d.frCount, flag: "🇫🇷", color: "#3b82f6" },
             { lang: "Spanish", count: d.esCount, flag: "🇪🇸", color: "#f59e0b" },
+            { lang: "English", count: d.enCount, flag: "🇬🇧", color: "#22d3ee" },
           ].map((l) => (
             <div key={l.lang} className="mb-3 last:mb-0">
               <div className="flex justify-between text-xs mb-1">

@@ -22,6 +22,7 @@ const CACHE_HEADERS = {
 const EL_VOICES: Record<string, string> = {
   fr: "cgSgspJ2msm6clMCkdW9", // Jessica (multilingual, natural French accent)
   es: "EXAVITQu4vr4xnSDxMaL", // Bella (multilingual, clear Spanish)
+  en: "21m00Tcm4TlvDq8ikWAM", // Rachel (neutral English)
   default: "21m00Tcm4TlvDq8ikWAM", // Rachel — neutral, excellent multilingual
 };
 

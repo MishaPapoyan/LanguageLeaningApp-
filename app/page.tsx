@@ -99,7 +99,7 @@ export default async function LandingPage() {
 
   const pillars = [
     { label: "No credit card required", icon: Check },
-    { label: "French & Spanish", icon: Globe2 },
+    { label: "French, Spanish & English", icon: Globe2 },
     { label: "AI-powered learning", icon: BrainCircuit },
     { label: "Personalised path", icon: Sparkles },
   ];

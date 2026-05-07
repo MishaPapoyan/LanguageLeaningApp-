@@ -149,7 +149,7 @@ const GAMES = [
     gameType: "INTERVIEW",
     icon: Briefcase,
     title: "Job Interview",
-    desc: "Sit across a 3D interviewer — answer in French or Spanish to get hired",
+    desc: "Sit across a 3D interviewer — answer in your target language to get hired",
     theme: "#3B82F6",
     difficulty: "B2",
     category: "immersive",
