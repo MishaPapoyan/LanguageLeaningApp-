@@ -200,6 +200,20 @@ const FALLBACK: Record<string, object> = {
   },
 };
 
+// ── Shuffle choices in all nodes so the correct answer isn't always first ──────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function shuffleChoices(data: any): any {
+  if (!data?.nodes) return data;
+  return {
+    ...data,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nodes: data.nodes.map((node: any) => ({
+      ...node,
+      choices: [...node.choices].sort(() => Math.random() - 0.5),
+    })),
+  };
+}
+
 // ── GET ───────────────────────────────────────────────────────────────────────
 
 export async function GET(req: Request) {

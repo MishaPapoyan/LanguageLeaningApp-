@@ -64,6 +64,7 @@ export default function LessonPage() {
       const updated = [...new Set([...completedLessons, lesson.id])];
       setCompletedLessons(updated);
       localStorage.setItem(`completedLessons_${targetLang}`, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent("lesson-completed"));
       fetch("/api/learn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

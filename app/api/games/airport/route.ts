@@ -189,6 +189,20 @@ const FALLBACK: Record<string, object> = {
   },
 };
 
+// ── Shuffle choices in all nodes so the correct answer isn't always first ──────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function shuffleChoices(data: any): any {
+  if (!data?.nodes) return data;
+  return {
+    ...data,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nodes: data.nodes.map((node: any) => ({
+      ...node,
+      choices: [...node.choices].sort(() => Math.random() - 0.5),
+    })),
+  };
+}
+
 // ── GET ───────────────────────────────────────────────────────────────────────
 
 export async function GET(req: Request) {
@@ -233,10 +247,10 @@ Use natural ${language} appropriate for ${level} level. Keep NPC lines concise.`
     const raw = completion.choices[0].message.content ?? "{}";
     const data = JSON.parse(raw);
     if (!data.nodes?.length) throw new Error("empty");
-    return NextResponse.json(data);
+    return NextResponse.json(shuffleChoices(data));
   } catch {
     const fallback = FALLBACK[language] ?? FALLBACK.fr;
-    return NextResponse.json(fallback);
+    return NextResponse.json(shuffleChoices(fallback));
   }
 }
 

@@ -246,9 +246,9 @@ export default function LearnPage() {
     }
   }, [LEARNING_PATH, PHASES, shownCelebrations, targetLang]);
 
-  // listen for lesson completions from other tabs / lesson pages
+  // listen for lesson completions + re-sync when tab regains focus (e.g. navigating back from lesson)
   useEffect(() => {
-    const handler = () => {
+    const sync = () => {
       const saved = localStorage.getItem(`completedLessons_${targetLang}`);
       if (saved) {
         const arr = JSON.parse(saved) as string[];
@@ -256,8 +256,12 @@ export default function LearnPage() {
         checkCelebrations(arr);
       }
     };
-    window.addEventListener("lesson-completed", handler);
-    return () => window.removeEventListener("lesson-completed", handler);
+    window.addEventListener("lesson-completed", sync);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      window.removeEventListener("lesson-completed", sync);
+      document.removeEventListener("visibilitychange", sync);
+    };
   }, [targetLang, checkCelebrations]);
 
   const isTopicUnlocked = (topic: (typeof LEARNING_PATH)[number]) => {
@@ -287,13 +291,33 @@ export default function LearnPage() {
       {modal && <CelebrationModal modal={modal} onClose={() => setModal(null)} />}
 
       {/* ── Header ── */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px", marginBottom: 4 }}>
-          Learn
-        </h1>
-        <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          Work through lessons at your own pace. Complete a chapter to unlock the next.
-        </p>
+      <div style={{ marginBottom: 28, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px", marginBottom: 4 }}>
+            Learn
+          </h1>
+          <p style={{ color: "var(--text-2)", fontSize: 14 }}>
+            Work through lessons at your own pace. Complete a chapter to unlock the next.
+          </p>
+        </div>
+        {completedLessons.length > 0 && (
+          <button
+            onClick={() => {
+              if (!confirm("Reset all progress? This cannot be undone.")) return;
+              localStorage.removeItem(`completedLessons_${targetLang}`);
+              setCompletedLessons([]);
+            }}
+            style={{
+              fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8, flexShrink: 0,
+              background: "transparent", border: "1px solid var(--border)",
+              color: "var(--text-3)", cursor: "pointer", transition: "all 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = "var(--red)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.4)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "var(--text-3)"; e.currentTarget.style.borderColor = "var(--border)"; }}
+          >
+            Reset progress
+          </button>
+        )}
       </div>
 
       {/* ── Progress Overview ── */}

@@ -182,15 +182,17 @@ export function FlashcardGame({ words }: { words: Word[] }) {
             position: "absolute", inset: 0, backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden", transform: "rotateY(180deg)",
             borderRadius: 20,
-            background: chosen === card.translation
-              ? "linear-gradient(145deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))"
-              : "linear-gradient(145deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04))",
-            border: `1px solid ${chosen === card.translation ? "rgba(16,185,129,0.4)" : "rgba(239,68,68,0.35)"}`,
+            background: chosen === null
+              ? "var(--surface-2)"
+              : chosen === card.translation
+                ? "linear-gradient(145deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))"
+                : "linear-gradient(145deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04))",
+            border: `1px solid ${chosen === null ? "var(--border-md)" : chosen === card.translation ? "rgba(16,185,129,0.4)" : "rgba(239,68,68,0.35)"}`,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             padding: "24px", gap: 8,
           }}>
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: chosen === card.translation ? "var(--green)" : "var(--red)" }}>
-              {chosen === card.translation ? "✓ Correct!" : "✗ Not quite"}
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: chosen === null ? "var(--text-3)" : chosen === card.translation ? "var(--green)" : "var(--red)" }}>
+              {chosen === null ? "" : chosen === card.translation ? "✓ Correct!" : "✗ Not quite"}
             </p>
             <p style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", textAlign: "center" }}>
               {card.translation}

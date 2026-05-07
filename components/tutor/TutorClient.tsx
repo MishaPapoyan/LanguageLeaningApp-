@@ -115,6 +115,7 @@ export function TutorClient({ userLevel }: Props) {
   const [xpEarned, setXpEarned] = useState(0);
   const [sessionEnded, setSessionEnded] = useState(false);
   const [tipIndex, setTipIndex] = useState(0);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -254,8 +255,9 @@ export function TutorClient({ userLevel }: Props) {
   };
 
   const endSession = async () => {
-    if (!scenario || messages.length < 2) return;
+    if (!scenario || messages.length < 2 || loadingFeedback) return;
     setSessionEnded(true);
+    setLoadingFeedback(true);
     try {
       const res = await fetch("/api/tutor/feedback", {
         method: "POST",
@@ -271,6 +273,8 @@ export function TutorClient({ userLevel }: Props) {
         strengths: ["Great effort!"], corrections: [],
         recommendation: "Keep practicing!",
       });
+    } finally {
+      setLoadingFeedback(false);
     }
   };
 
@@ -383,6 +387,40 @@ export function TutorClient({ userLevel }: Props) {
   const langTips = GRAMMAR_TIPS[langConfig.code] ?? GRAMMAR_TIPS.fr;
   const tips = langTips[scenario] ?? langTips.free;
   const currentTip = tips[tipIndex % tips.length];
+
+  // ===== LOADING FEEDBACK SCREEN =====
+  if (sessionEnded && loadingFeedback) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 20, maxWidth: 480, margin: "0 auto" }} className="animate-fade-up">
+        <div style={{
+          width: 72, height: 72, borderRadius: "50%",
+          background: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.08))",
+          border: "1px solid rgba(99,102,241,0.3)",
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32,
+        }}>
+          ✨
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
+            Analysing your session…
+          </p>
+          <p style={{ fontSize: 13, color: "var(--text-3)" }}>
+            Your personalised feedback is being prepared
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 6 }}>
+          {[0, 0.2, 0.4].map((d) => (
+            <div key={d} style={{
+              width: 9, height: 9, borderRadius: "50%",
+              background: "var(--accent-2)",
+              animation: "typing-dot 1.2s ease infinite",
+              animationDelay: `${d}s`,
+            }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   // ===== FEEDBACK PANEL =====
   if (sessionEnded && feedback) {
@@ -552,15 +590,15 @@ export function TutorClient({ userLevel }: Props) {
           <div style={{ display: "flex", gap: 8 }}>
             <button
               onClick={endSession}
-              disabled={messages.length < 2}
+              disabled={messages.length < 2 || loadingFeedback}
               style={{
                 fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 9,
                 background: "rgba(16,185,129,0.12)", color: "var(--green)",
                 border: "1px solid rgba(16,185,129,0.22)", cursor: "pointer",
-                opacity: messages.length < 2 ? 0.35 : 1, transition: "opacity 0.15s",
+                opacity: messages.length < 2 || loadingFeedback ? 0.35 : 1, transition: "opacity 0.15s",
               }}
             >
-              End & Review
+              {loadingFeedback ? "Analysing…" : "End & Review"}
             </button>
             <button onClick={() => setScenario(null)} className="btn-ghost" style={{ fontSize: 12, padding: "6px 12px" }}>
               Change
@@ -596,7 +634,7 @@ export function TutorClient({ userLevel }: Props) {
                   style={{
                     maxWidth: "76%", padding: "11px 15px",
                     borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    fontSize: 14, lineHeight: 1.55,
+                    fontSize: 14, lineHeight: 1.55, whiteSpace: "pre-wrap",
                     ...(msg.role === "user"
                       ? { background: "linear-gradient(135deg, var(--accent), #4338ca)", color: "#fff" }
                       : { background: "var(--surface-2)", color: "var(--text)", border: "1px solid var(--border)" }
@@ -748,18 +786,18 @@ export function TutorClient({ userLevel }: Props) {
         {/* End session CTA */}
         <button
           onClick={endSession}
-          disabled={messages.length < 2}
+          disabled={messages.length < 2 || loadingFeedback}
           style={{
             width: "100%", padding: "12px", borderRadius: 12, cursor: "pointer",
-            background: messages.length >= 2 ? "rgba(16,185,129,0.1)" : "var(--surface-3)",
-            border: `1px solid ${messages.length >= 2 ? "rgba(16,185,129,0.3)" : "var(--border)"}`,
-            color: messages.length >= 2 ? "var(--green)" : "var(--text-3)",
+            background: messages.length >= 2 && !loadingFeedback ? "rgba(16,185,129,0.1)" : "var(--surface-3)",
+            border: `1px solid ${messages.length >= 2 && !loadingFeedback ? "rgba(16,185,129,0.3)" : "var(--border)"}`,
+            color: messages.length >= 2 && !loadingFeedback ? "var(--green)" : "var(--text-3)",
             fontSize: 13, fontWeight: 700,
-            opacity: messages.length < 2 ? 0.5 : 1,
+            opacity: messages.length < 2 || loadingFeedback ? 0.5 : 1,
             transition: "all 0.15s",
           }}
         >
-          End Session & Get Feedback
+          {loadingFeedback ? "Analysing session…" : "End Session & Get Feedback"}
         </button>
 
         {/* Quick link */}
