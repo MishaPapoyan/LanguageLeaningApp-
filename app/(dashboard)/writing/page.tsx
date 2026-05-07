@@ -137,11 +137,69 @@ const PROMPTS_ES: WritingPrompt[] = [
   },
 ];
 
+const PROMPTS_EN: WritingPrompt[] = [
+  {
+    id: "w1",
+    emoji: "👋",
+    title: "Introduce Yourself",
+    prompt: "Write 3-5 sentences introducing yourself in English. Include your name, where you're from, and one thing you enjoy.",
+    level: "beginner",
+    hints: ["My name is...", "I'm from...", "I really enjoy..."],
+    sampleWords: ["hello", "my", "name", "enjoy", "live"],
+  },
+  {
+    id: "w2",
+    emoji: "🍽️",
+    title: "At the Restaurant",
+    prompt: "You're at a British café. Write a short conversation ordering food and drinks politely.",
+    level: "beginner",
+    hints: ["Could I have..., please?", "I'd like...", "Could I get the bill, please?"],
+    sampleWords: ["could", "would", "please", "lovely", "actually"],
+  },
+  {
+    id: "w3",
+    emoji: "🏠",
+    title: "Describe Your Family",
+    prompt: "Write about your family in English. Who are they? What are they like? Use adjectives and the verb 'to be'.",
+    level: "beginner",
+    hints: ["My mother is...", "My father works as...", "I have a brother / sister"],
+    sampleWords: ["tall", "kind", "funny", "hardworking", "both"],
+  },
+  {
+    id: "w4",
+    emoji: "📅",
+    title: "My Daily Routine",
+    prompt: "Describe a typical day in English. Use the present simple tense and time expressions.",
+    level: "intermediate",
+    hints: ["In the morning, I...", "After that, I...", "In the evening, I usually..."],
+    sampleWords: ["wake", "usually", "then", "afterwards", "before"],
+  },
+  {
+    id: "w5",
+    emoji: "🌍",
+    title: "My Last Trip",
+    prompt: "Write about a trip you took (real or imaginary) in English. Use the past simple tense.",
+    level: "intermediate",
+    hints: ["I went to...", "I visited...", "It was amazing!"],
+    sampleWords: ["visited", "stayed", "tried", "enjoyed", "beautiful"],
+  },
+  {
+    id: "w6",
+    emoji: "🛒",
+    title: "Shopping List",
+    prompt: "Write a shopping list in English and describe how you'd ask for each item politely in a shop.",
+    level: "beginner",
+    hints: ["I need to get...", "Do you have any...?", "How much is...?"],
+    sampleWords: ["need", "some", "few", "fresh", "please"],
+  },
+];
+
 export default function WritingPage() {
   const { data: session } = useSession();
   const locale = getLocale((session?.user as any)?.nativeLanguage);
   const targetLanguage = session?.user?.targetLanguage ?? "fr";
-  const PROMPTS = targetLanguage === "es" ? PROMPTS_ES : PROMPTS_FR;
+  const PROMPTS = targetLanguage === "es" ? PROMPTS_ES : targetLanguage === "en" ? PROMPTS_EN : PROMPTS_FR;
+  const langName = targetLanguage === "es" ? "Spanish" : targetLanguage === "en" ? "English" : "French";
 
   const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(null);
   const [text, setText] = useState("");
@@ -161,7 +219,6 @@ export default function WritingPage() {
     if (!checkText.trim()) return;
     setCheckLoading(true);
     setCheckFeedback(null);
-    const langName = targetLanguage === "es" ? "Spanish" : "French";
     try {
       const res = await fetch("/api/writing/feedback", {
         method: "POST",
@@ -261,7 +318,7 @@ export default function WritingPage() {
           <div style={{ maxWidth: 680 }}>
             <div style={{ padding: "16px 18px", borderRadius: 16, marginBottom: 16, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)" }}>
               <p style={{ fontSize: 13, color: "var(--text-2)", margin: 0 }}>
-                {t(locale, "writing_checkDesc", { lang: targetLanguage === "es" ? "Spanish" : "French" })}
+                {t(locale, "writing_checkDesc", { lang: langName })}
               </p>
             </div>
 
@@ -270,7 +327,7 @@ export default function WritingPage() {
                 value={checkText}
                 onChange={(e) => setCheckText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleQuickCheck(); }}
-                placeholder={targetLanguage === "es" ? "Escribe tu frase aquí…" : "Écris ta phrase ici…"}
+                placeholder={targetLanguage === "es" ? "Escribe tu frase aquí…" : targetLanguage === "en" ? "Write your sentence here…" : "Écris ta phrase ici…"}
                 rows={4}
                 style={{
                   width: "100%", boxSizing: "border-box", resize: "none",
@@ -464,7 +521,7 @@ export default function WritingPage() {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={`Write in ${targetLanguage === "es" ? "Spanish" : "French"} here...`}
+          placeholder={`Write in ${langName} here...`}
           rows={8}
           style={{
             width: "100%", boxSizing: "border-box", resize: "none",

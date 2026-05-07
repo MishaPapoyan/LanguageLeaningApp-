@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   const { text, prompt, level } = await req.json();
   const targetLanguage = session.user.targetLanguage ?? "fr";
-  const langName = targetLanguage === "es" ? "Spanish" : "French";
+  const langName = targetLanguage === "es" ? "Spanish" : targetLanguage === "en" ? "English" : "French";
 
   if (!text || !prompt) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
