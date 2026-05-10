@@ -1,21 +1,28 @@
 import type { Metadata } from "next";
-import { Inter, Inter_Tight } from "next/font/google";
-import { GeistMono } from "geist/font/mono";
+import { Inter, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-sans",
+  variable: "--font-inter",
 });
 
-const interTight = Inter_Tight({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["italic", "normal"],
   display: "swap",
-  variable: "--font-inter-tight",
+  variable: "--font-serif",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-mono-jb",
 });
 
 export const metadata: Metadata = {
@@ -60,7 +67,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${interTight.variable} ${GeistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${cormorant.variable} ${jetbrains.variable} antialiased`}>
       <head>
         <script
           dangerouslySetInnerHTML={{

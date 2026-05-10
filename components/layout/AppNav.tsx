@@ -165,37 +165,40 @@ export function AppNav() {
         >
           <span
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              background: "var(--accent)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 10,
-              fontWeight: 900,
-              color: "#fff",
-              letterSpacing: "-0.5px",
+              fontSize: 18,
+              fontWeight: 700,
+              color: "#050505",
               flexShrink: 0,
-              boxShadow: "0 0 12px rgba(99,102,241,0.4)",
+              fontFamily: "var(--font-display)",
+              fontStyle: "italic",
+              boxShadow: "0 0 18px rgba(16,185,129,0.45)",
             }}
           >
-            LG
+            L
           </span>
           <span
             style={{
-              fontSize: 14,
+              fontSize: 18,
               fontWeight: 700,
               color: "var(--text)",
-              letterSpacing: "-0.3px",
+              letterSpacing: "-0.01em",
               display: "flex",
               alignItems: "center",
-              gap: 4,
+              gap: 6,
+              fontFamily: "var(--font-display)",
+              fontStyle: "italic",
             }}
-            className="hidden-xs"
+            className="hidden-xs serif"
           >
             Lingova
-            <span style={{ fontSize: 14 }}>{flag}</span>
+            <span style={{ fontSize: 14, fontStyle: "normal" }}>{flag}</span>
           </span>
         </Link>
 
