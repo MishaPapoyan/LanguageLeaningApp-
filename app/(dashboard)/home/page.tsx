@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -12,26 +12,25 @@ import {
   BookOpen,
   Gamepad2,
   MessageSquare,
-  BookMarked,
-  Brain,
-  PenLine,
+  Search,
   Flame,
-  Star,
-  Medal,
-  TrendingUp,
   Zap,
+  Trophy,
   ArrowRight,
-  Mic,
-  CheckCircle2,
+  Play,
+  GraduationCap,
+  ChevronRight,
+  TrendingUp,
+  BookMarked,
+  Volume2,
 } from "lucide-react";
 import { WordOfDayPlayer } from "@/components/home/WordOfDayPlayer";
 import { TodayPlan } from "@/components/home/TodayPlan";
-import { StreakShields } from "@/components/home/StreakShields";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Dashboard вЂ” Lingova",
+  title: "Dashboard — Lingova",
 };
 
 export default async function HomePage() {
@@ -44,7 +43,8 @@ export default async function HomePage() {
   const dayIndex = Math.floor(Date.now() / 86_400_000) % 100;
 
   let progress = null, savedWordCount = 0, completedStories = 0, recentWord = null, lastStory = null;
-  let onboardingCompleted = true; // default true so returning users see nothing
+  let onboardingCompleted = true;
+  let topLeaders: { name: string | null; xp: number }[] = [];
 
   if (userId) {
     try {
@@ -70,6 +70,17 @@ export default async function HomePage() {
           include: { story: { select: { title: true, imageEmoji: true, chapter: true } } },
         }),
       ]);
+
+      try {
+        const leaderRows = await prisma.progress.findMany({
+          orderBy: { xp: "desc" },
+          take: 4,
+          include: { user: { select: { name: true } } },
+        });
+        topLeaders = leaderRows.map((r) => ({ name: r.user?.name ?? "Anon", xp: r.xp }));
+      } catch {
+        topLeaders = [];
+      }
     } catch (err) {
       console.error("[home] DB error:", err);
     }
@@ -91,16 +102,42 @@ export default async function HomePage() {
   const earnedBadges = BADGES.filter((b) => (progress?.badges ?? []).includes(b.id));
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
 
-  const skills = [
-    { key: "vocabulary", label: t(locale, "home_vocabSkill"),    icon: <BookOpen size={16} />, color: "#60a5fa" },
-    { key: "grammar",    label: t(locale, "home_grammarSkill"),  icon: <PenLine size={16} />,  color: "var(--accent)" },
-    { key: "speaking",   label: t(locale, "home_speakingSkill"), icon: <Mic size={16} />,      color: "#2dd4bf" },
+  // Skill rings (4) — vocabulary, listening, grammar, writing
+  const rings = [
+    { skill: t(locale, "home_vocabSkill"),    val: skillTree.vocabulary ?? 0, color: "emerald" },
+    { skill: "Listening",                     val: skillTree.listening  ?? 0, color: "blue" },
+    { skill: t(locale, "home_grammarSkill"),  val: skillTree.grammar    ?? 0, color: "purple" },
+    { skill: "Writing",                       val: skillTree.writing    ?? 0, color: "rose" },
   ];
 
-  return (
-    <div className="max-w-5xl mx-auto space-y-4 animate-fade-up">
+  // Quick action buttons
+  const quickActions = [
+    { label: t(locale, "tutor_title"),    icon: MessageSquare, desc: "Practice speaking",  color: "purple",  href: "/tutor" },
+    { label: t(locale, "games_title"),    icon: Gamepad2,      desc: "Fun practice",       color: "amber",   href: "/games" },
+    { label: t(locale, "nav_dictionary"), icon: Search,        desc: "Explore words",      color: "blue",    href: "/dictionary" },
+    { label: "Stories",                   icon: BookOpen,      desc: "Immersive reading",  color: "emerald", href: "/stories" },
+  ];
 
-      {/* в”Ђв”Ђ Onboarding modal (fires once for new users) в”Ђв”Ђ */}
+  // Recommended games preview (4 cards)
+  const recommended = [
+    { title: "Word Match",       category: "Vocabulary",     mode: "Timed",   color: "blue",    href: "/games/matching" },
+    { title: "Sentence Builder", category: "Grammar",        mode: "Build",   color: "purple",  href: "/games/sentence-builder" },
+    { title: "Listen & Choose",  category: "Pronunciation",  mode: "Audio",   color: "emerald", href: "/games/listen-quiz" },
+    { title: "City Explorer",    category: "Immersive",      mode: "Story",   color: "amber",   href: "/games/city-explorer" },
+  ];
+
+  // XP progress
+  const xpProgressPct = xpInfo.pct;
+  const streakDays = progress?.streak ?? 0;
+
+  // Active unit progress (rough heuristic from skillTree avg)
+  const skillVals = Object.values(skillTree).filter((v): v is number => typeof v === "number");
+  const unitPct = skillVals.length ? Math.min(100, Math.round(skillVals.reduce((a, b) => a + b, 0) / skillVals.length)) : 0;
+
+  return (
+    <div className="space-y-12 animate-fade-up">
+
+      {/* Onboarding modal (fires once for new users) */}
       {!onboardingCompleted && (
         <OnboardingModal
           targetLang={targetLang}
@@ -109,494 +146,438 @@ export default async function HomePage() {
         />
       )}
 
-      {/* в”Ђв”Ђ Hero bento в”Ђв”Ђ */}
-      <section
-        className="bento relative overflow-hidden"
-        style={{
-          minHeight: 200,
-          background: "radial-gradient(ellipse 80% 120% at 10% 50%, rgba(16,185,129,0.28) 0%, transparent 60%), radial-gradient(ellipse 60% 100% at 90% 40%, rgba(45,212,191,0.18) 0%, transparent 55%), var(--surface)",
-          border: "1px solid var(--border-md)",
-          padding: 0,
-        }}
-      >
-        {/* decorative blobs */}
-        <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(16,185,129,0.12)", filter: "blur(40px)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -30, right: 60, width: 160, height: 160, borderRadius: "50%", background: "rgba(45,212,191,0.10)", filter: "blur(36px)", pointerEvents: "none" }} />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-stretch gap-0" style={{ minHeight: 200 }}>
-
-          {/* в”Ђв”Ђ Left: Streak hero block в”Ђв”Ђ */}
-          {progress?.streak && progress.streak > 0 ? (
-            <div
-              style={{
-                flexShrink: 0, display: "flex", flexDirection: "column",
-                alignItems: "center", justifyContent: "center",
-                padding: "24px 32px",
-                borderRight: "1px solid var(--border)",
-                minWidth: 148,
-                background: "rgba(249,115,22,0.06)",
-              }}
-            >
-              {/* Animated SVG flame */}
-              <div className="animate-flame-dance" style={{ marginBottom: 6 }}>
-                <svg width="44" height="54" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22 2C22 2 32 14 32 24C32 29.523 27.523 34 22 34C16.477 34 12 29.523 12 24C12 19 15 16 15 16C15 16 14 22 18 24C18 24 17 18 22 12C22 12 20 20 25 22C25 22 28 18 26 12C30 16 34 20 34 28C34 36.837 28.837 44 22 44C15.163 44 10 36.837 10 28C10 20 14 14 14 14C14 14 8 22 8 30C8 30 4 26 4 20C4 12 12 4 22 2Z" fill="url(#flame-grad)" filter="url(#flame-glow)"/>
-                  <defs>
-                    <linearGradient id="flame-grad" x1="22" y1="2" x2="22" y2="44" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stopColor="#FBBF24"/>
-                      <stop offset="50%" stopColor="#F97316"/>
-                      <stop offset="100%" stopColor="#EF4444"/>
-                    </linearGradient>
-                    <filter id="flame-glow">
-                      <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
-                  </defs>
-                </svg>
-              </div>
-              <p
-                style={{
-                  fontFamily: "var(--font-mono)", fontSize: 52, fontWeight: 800,
-                  color: "var(--xp)", lineHeight: 1, letterSpacing: "-0.04em",
-                  fontVariantNumeric: "tabular-nums",
-                  textShadow: "0 0 32px rgba(245,158,11,0.5)",
-                }}
-              >
-                {progress.streak}
-              </p>
-              <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginTop: 4 }}>
-                {t(locale, "home_dayStreak")}
-              </p>
-              <StreakShields shields={progress.streakShields ?? 0} />
+      {/* ─── Header ─── */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-5xl md:text-6xl mb-2 font-black italic serif" style={{ letterSpacing: "-0.02em", lineHeight: 1.05 }}>
+            {langConfig.greeting}, {firstName}.
+          </h1>
+          <p className="text-white/40 text-lg" style={{ color: "var(--text-2)" }}>
+            {streakDays > 0
+              ? t(locale, "home_streakMessage", { streak: String(streakDays) })
+              : t(locale, "home_readyMessage", { lang: langConfig.label })}
+            {" "}{langConfig.flag}
+          </p>
+        </div>
+        {earnedBadges.length > 0 && (
+          <div className="flex items-center gap-4 p-2 rounded-2xl" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+            <div className="flex -space-x-3">
+              {earnedBadges.slice(0, 3).map((b) => (
+                <div key={b.id} className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: "var(--surface-3)", border: "2px solid var(--bg)" }}>
+                  {b.emoji}
+                </div>
+              ))}
             </div>
-          ) : null}
-
-          {/* в”Ђв”Ђ Right: Greeting + XP в”Ђв”Ђ */}
-          <div style={{ flex: 1, padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <h1 className="serif" style={{ fontSize: "clamp(36px,5vw,56px)", fontWeight: 800, fontStyle: "italic", color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 8, lineHeight: 1.05 }}>
-              {langConfig.greeting}, {firstName}. {langConfig.flag}
-            </h1>
-            <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
-              {progress?.streak && progress.streak > 0
-                ? t(locale, "home_streakMessage", { streak: progress.streak.toString() })
-                : t(locale, "home_readyMessage", { lang: langConfig.label })}
+            <p className="text-xs font-bold uppercase tracking-widest pr-2" style={{ color: "var(--text-3)" }}>
+              {earnedBadges.length} {t(locale, "home_badgesEarned")}
             </p>
-
-            {/* XP bar */}
-            <div style={{ maxWidth: 340 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <span
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 5,
-                    fontSize: 11, fontWeight: 700,
-                    background: "var(--accent-dim)", color: "var(--accent-2)",
-                    border: "1px solid rgba(16,185,129,0.3)",
-                    borderRadius: 999, padding: "3px 10px",
-                  }}
-                >
-                  <Zap size={11} />
-                  {t(locale, "home_statLevel")} {xpInfo.level}
-                </span>
-                <span style={{ fontSize: 11, color: "var(--text-3)" }}>
-                  <span style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>{xpInfo.current}</span>
-                  {" / "}
-                  <span style={{ fontFamily: "var(--font-mono)", fontVariantNumeric: "tabular-nums" }}>{xpInfo.needed}</span>
-                  {" XP"}
-                </span>
-              </div>
-              <div className="xp-bar">
-                <div className="xp-bar-fill" style={{ width: `${xpInfo.pct}%` }} />
-              </div>
-            </div>
-
-            {/* Bottom row: total XP pill */}
-            <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 10 }}>
-              <div
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.22)",
-                  borderRadius: 999, padding: "5px 12px",
-                }}
-              >
-                <Zap size={13} style={{ color: "var(--accent)" }} />
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 700, color: "var(--accent-2)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-                  {(progress?.xp ?? 0).toLocaleString()}
-                </span>
-                <span style={{ fontSize: 10, color: "var(--text-3)" }}>{t(locale, "home_totalXp")}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* в”Ђв”Ђ Today's Plan в”Ђв”Ђ */}
-      <Suspense fallback={null}>
-        <TodayPlan targetLang={targetLang} />
-      </Suspense>
-
-      {/* в”Ђв”Ђ Bento row: Stats / Daily Goals / Continue Learning в”Ђв”Ђ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-        {/* Stats 2x2 */}
-        <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <p className="section-label mb-3">{t(locale, "home_yourProgress")}</p>
-          <div className="grid grid-cols-2 gap-2.5">
-            {[
-              {
-                label: t(locale, "home_wordsSaved"),
-                value: savedWordCount,
-                icon: <BookMarked size={16} />,
-                color: "#60a5fa",
-                dim: "rgba(96,165,250,0.12)",
-              },
-              {
-                label: t(locale, "home_storiesDone"),
-                value: completedStories,
-                icon: <CheckCircle2 size={16} />,
-                color: "#22c55e",
-                dim: "rgba(34,197,94,0.12)",
-              },
-              {
-                label: t(locale, "home_statLevel"),
-                value: `Lv ${xpInfo.level}`,
-                icon: <Medal size={16} />,
-                color: "var(--accent-2)",
-                dim: "var(--accent-dim)",
-              },
-              {
-                label: t(locale, "home_statDayStreak"),
-                value: progress?.streak ?? 0,
-                icon: <Flame size={16} />,
-                color: "#f59e0b",
-                dim: "rgba(245,158,11,0.12)",
-              },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="flex flex-col items-center justify-center text-center p-3 rounded-xl"
-                style={{ background: stat.dim, border: "1px solid rgba(255,255,255,0.05)" }}
-              >
-                <span
-                  className="flex items-center justify-center w-7 h-7 rounded-lg mb-1.5"
-                  style={{ background: "rgba(0,0,0,0.18)", color: stat.color }}
-                >
-                  {stat.icon}
-                </span>
-                <p className="text-lg font-extrabold leading-none" style={{ color: stat.color }}>{stat.value}</p>
-                <p className="text-[10px] mt-0.5 font-medium" style={{ color: "var(--text-3)" }}>{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Daily Goals */}
-        <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <DailyGoals />
-        </div>
-
-        {/* Continue Learning */}
-        <Link
-          href={lastStory ? `/stories/${lastStory.storyId}` : "/learn"}
-          className="bento p-5 flex flex-col justify-between group transition-all duration-200"
-          style={{ border: "1px solid var(--border)", minHeight: 160, textDecoration: "none" }}
-        >
-          <div>
-            <p className="section-label mb-2">{t(locale, "home_continueLearning")}</p>
-            {lastStory ? (
-              <>
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-3xl">{lastStory.story.imageEmoji}</span>
-                  <div>
-                    <p className="font-bold text-sm leading-snug" style={{ color: "var(--text)" }}>{lastStory.story.title}</p>
-                    <p className="text-[11px]" style={{ color: "var(--text-3)" }}>{t(locale, "home_chapterN", { n: lastStory.story.chapter.toString() })}</p>
-                  </div>
-                </div>
-                <p className="text-xs" style={{ color: "var(--text-2)" }}>
-                  {lastStory.completed ? t(locale, "home_completedReadAgain") : t(locale, "home_pickUpWhere")}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>{t(locale, "home_learningPath")}</p>
-                <p className="text-sm" style={{ color: "var(--text-2)" }}>{t(locale, "home_startFirstLesson")}</p>
-              </>
-            )}
-          </div>
-          <div
-            className="self-start mt-3 flex items-center gap-1.5 text-sm font-semibold"
-            style={{ color: "var(--accent)" }}
-          >
-            {lastStory?.completed ? t(locale, "home_readAgain") : t(locale, "home_resume")}
-            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-          </div>
-        </Link>
-      </div>
-
-      {/* в”Ђв”Ђ Quick Actions bento (asymmetric) в”Ђв”Ђ */}
-      <div>
-        <p className="section-label mb-3">{t(locale, "home_quickActions")}</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ gridAutoRows: "auto" }}>
-
-          {/* Large card: Continue Story (col-span-2) */}
-          <Link
-            href="/stories"
-            className="game-card col-span-2 group"
-            style={{
-              background: "var(--gc-teal-bg)",
-              borderColor: "var(--gc-teal-border)",
-              padding: "1.5rem",
-              minHeight: 140,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              textDecoration: "none",
-            }}
-          >
-            <div className="flex items-start justify-between">
-              <span style={{ color: "var(--gc-teal-text)", opacity: 0.9 }}>
-                <BookOpen size={32} />
-              </span>
-              <ArrowRight
-                size={18}
-                className="group-hover:translate-x-1 transition-transform"
-                style={{ color: "var(--gc-teal-muted)" }}
-              />
-            </div>
-            <div>
-              <p className="font-bold text-base" style={{ color: "var(--gc-teal-text)" }}>{t(locale, "home_continueStory")}</p>
-              <p className="text-xs mt-0.5" style={{ color: "var(--gc-teal-muted)" }}>{t(locale, "home_immersiveNarratives", { lang: langConfig.label })}</p>
-            </div>
-          </Link>
-
-          {/* Games */}
-          <Link
-            href="/games"
-            className="game-card group"
-            style={{
-              background: "var(--gc-violet-bg)",
-              borderColor: "var(--gc-violet-border)",
-              padding: "1.25rem",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: 120,
-              textDecoration: "none",
-            }}
-          >
-            <span style={{ color: "var(--gc-violet-text)", opacity: 0.9 }}>
-              <Gamepad2 size={28} />
-            </span>
-            <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-violet-text)" }}>{t(locale, "games_title")}</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-violet-muted)" }}>{t(locale, "home_playToLearn")}</p>
-            </div>
-          </Link>
-
-          {/* AI Tutor */}
-          <Link
-            href="/tutor"
-            className="game-card group"
-            style={{
-              background: "var(--gc-blue-bg)",
-              borderColor: "var(--gc-blue-border)",
-              padding: "1.25rem",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: 120,
-              textDecoration: "none",
-            }}
-          >
-            <span style={{ color: "var(--gc-blue-text)", opacity: 0.9 }}>
-              <MessageSquare size={28} />
-            </span>
-            <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>{t(locale, "tutor_title")}</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>{t(locale, "home_conversationalPractice")}</p>
-            </div>
-          </Link>
-
-          {/* Dictionary */}
-          <Link
-            href="/dictionary"
-            className="game-card group"
-            style={{
-              background: "var(--gc-blue-bg)",
-              borderColor: "var(--gc-blue-border)",
-              padding: "1.25rem",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: 120,
-              textDecoration: "none",
-            }}
-          >
-            <span style={{ color: "var(--gc-blue-text)", opacity: 0.9 }}>
-              <BookMarked size={28} />
-            </span>
-            <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-blue-text)" }}>{t(locale, "nav_dictionary")}</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-blue-muted)" }}>{t(locale, "home_browseAllWords")}</p>
-            </div>
-          </Link>
-
-          {/* Review */}
-          <Link
-            href="/review"
-            className="game-card group"
-            style={{
-              background: "var(--gc-green-bg)",
-              borderColor: "var(--gc-green-border)",
-              padding: "1.25rem",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: 120,
-              textDecoration: "none",
-            }}
-          >
-            <span style={{ color: "var(--gc-green-text)", opacity: 0.9 }}>
-              <Brain size={28} />
-            </span>
-            <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-green-text)" }}>{t(locale, "review_title")}</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-green-muted)" }}>{t(locale, "home_spacedRepetition")}</p>
-            </div>
-          </Link>
-
-          {/* My Words */}
-          <Link
-            href="/my-words"
-            className="game-card group"
-            style={{
-              background: "var(--gc-orange-bg)",
-              borderColor: "var(--gc-orange-border)",
-              padding: "1.25rem",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              minHeight: 120,
-              textDecoration: "none",
-            }}
-          >
-            <span style={{ color: "var(--gc-orange-text)", opacity: 0.9 }}>
-              <PenLine size={28} />
-            </span>
-            <div>
-              <p className="font-bold text-sm" style={{ color: "var(--gc-orange-text)" }}>{t(locale, "nav_myWords")}</p>
-              <p className="text-[11px]" style={{ color: "var(--gc-orange-muted)" }}>{t(locale, "home_savedVocabulary")}</p>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* в”Ђв”Ђ Bottom row: Word of the Day + Skill Rings в”Ђв”Ђ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-        {/* Word of the Day */}
-        {recentWord ? (
-          <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-            <p className="section-label mb-3">{t(locale, "home_wordOfDay")}</p>
-            <div className="flex items-center gap-4">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
-                style={{ background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.25)" }}
-              >
-                {recentWord.imageEmoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-xl font-bold" style={{ color: "var(--text)" }}>{recentWord.word}</p>
-                  {/* MED-5: wired up to speak() via client component */}
-                  <WordOfDayPlayer word={recentWord.word} ttsLocale={langConfig.ttsLocale ?? targetLang} />
-                </div>
-                <p className="text-sm font-semibold mt-0.5" style={{ color: "var(--accent-2)" }}>{recentWord.translation}</p>
-                <p className="text-xs mt-1 italic truncate" style={{ color: "var(--text-3)" }}>
-                  &ldquo;{recentWord.exampleFr}&rdquo;
-                </p>
-              </div>
-            </div>
-            <Link
-              href={`/dictionary/${recentWord.id}`}
-              className="btn-secondary mt-4 inline-flex items-center gap-1.5 text-xs px-4 py-2"
-            >
-              {t(locale, "home_learnThisWord")} <ArrowRight size={12} />
-            </Link>
-          </div>
-        ) : (
-          <div className="bento p-5 flex items-center justify-center" style={{ border: "1px solid var(--border)" }}>
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>{t(locale, "home_noWordToday")}</p>
           </div>
         )}
+      </header>
 
-        {/* Skill Rings */}
-        <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <p className="section-label mb-4">{t(locale, "home_skillRings")}</p>
-          <div className="flex justify-around items-center">
-            {skills.map((skill) => {
-              const pct = Math.max(skillTree[skill.key] ?? 0, 2);
-              const r = 26;
-              const circ = 2 * Math.PI * r;
-              const offset = circ - (pct / 100) * circ;
-              return (
-                <div key={skill.key} className="flex flex-col items-center gap-2">
-                  <div className="relative" style={{ width: 64, height: 64 }}>
-                    <svg width="64" height="64" style={{ transform: "rotate(-90deg)", position: "absolute", inset: 0 }}>
-                      <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
-                      <circle
-                        cx="32" cy="32" r={r}
-                        fill="none"
-                        stroke={skill.color}
-                        strokeWidth="5"
-                        strokeLinecap="round"
-                        strokeDasharray={circ}
-                        strokeDashoffset={offset}
-                        style={{ transition: "stroke-dashoffset 1s ease", filter: `drop-shadow(0 0 5px ${skill.color})` }}
-                      />
-                    </svg>
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: skill.color,
-                      }}
-                    >
-                      {skill.icon}
-                    </div>
-                  </div>
-                  <p className="text-[11px] font-bold" style={{ color: "var(--text-2)" }}>{skill.label}</p>
-                  <p className="text-xs font-extrabold" style={{ color: skill.color }}>{skillTree[skill.key] ?? 0}%</p>
-                </div>
-              );
-            })}
+      {/* ─── 4 stat cards ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Today's XP w/ progress */}
+        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl" style={{ background: "rgba(16,185,129,0.10)", color: "var(--accent)" }}>
+              <Zap size={24} />
+            </div>
+            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+              Lv {xpInfo.level}
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+              {t(locale, "home_totalXp")}
+            </p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
+                {(progress?.xp ?? 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="space-y-2 mt-2">
+              <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                <div className="h-full transition-all duration-1000" style={{ width: `${xpProgressPct}%`, background: "var(--accent)" }} />
+              </div>
+              <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
+                {xpInfo.current} / {xpInfo.needed} XP
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Streak */}
+        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.10)", color: "#f59e0b" }}>
+              <Flame size={24} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+              {t(locale, "home_statDayStreak")}
+            </p>
+            <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
+              {streakDays} <span className="text-sm font-normal" style={{ color: "var(--text-3)" }}>days</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Level */}
+        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl" style={{ background: "rgba(96,165,250,0.10)", color: "#60a5fa" }}>
+              <Trophy size={24} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+              {t(locale, "home_statLevel")}
+            </p>
+            <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
+              {xpInfo.level}
+            </p>
+          </div>
+        </div>
+
+        {/* Words saved */}
+        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl" style={{ background: "rgba(168,85,247,0.10)", color: "#a78bfa" }}>
+              <BookMarked size={24} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+              {t(locale, "home_wordsSaved")}
+            </p>
+            <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
+              {savedWordCount}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* в”Ђв”Ђ Badges scroll в”Ђв”Ђ */}
-      {earnedBadges.length > 0 && (
-        <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="section-label">{t(locale, "home_badgesEarned")}</p>
-            <Link href="/progress" className="text-xs font-semibold flex items-center gap-1" style={{ color: "var(--accent)" }}>
-              {t(locale, "home_viewAll")} <ArrowRight size={12} />
-            </Link>
-          </div>
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {earnedBadges.slice(0, 12).map((badge) => (
-              <div
-                key={badge.id}
-                className="flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-full"
-                style={{ background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.22)" }}
+      {/* ─── Two-column grid ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        {/* Left col: 8 */}
+        <div className="lg:col-span-8 space-y-12">
+
+          {/* Quick Actions */}
+          <section>
+            <h2 className="font-bold uppercase tracking-widest mb-6" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: "0.2em" }}>
+              {t(locale, "home_quickActions")}
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {quickActions.map((action) => {
+                const Icon = action.icon;
+                const colorMap: Record<string, string> = {
+                  purple: "rgba(168,85,247,0.10)",
+                  amber: "rgba(245,158,11,0.10)",
+                  blue: "rgba(96,165,250,0.10)",
+                  emerald: "rgba(16,185,129,0.10)",
+                };
+                const fgMap: Record<string, string> = {
+                  purple: "#a78bfa",
+                  amber: "#f59e0b",
+                  blue: "#60a5fa",
+                  emerald: "var(--accent)",
+                };
+                return (
+                  <Link
+                    key={action.label}
+                    href={action.href}
+                    className="card-premium p-6 group transition-all"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                      style={{ background: colorMap[action.color], color: fgMap[action.color] }}
+                    >
+                      <Icon size={20} />
+                    </div>
+                    <h4 className="font-bold text-sm" style={{ color: "var(--text)" }}>{action.label}</h4>
+                    <p className="text-[10px] font-bold uppercase tracking-tight mt-1" style={{ color: "var(--text-3)" }}>
+                      {action.desc}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Daily Curriculum */}
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl italic serif" style={{ color: "var(--text)" }}>Daily Curriculum</h2>
+              <DailyGoals />
+            </div>
+            <Suspense fallback={null}>
+              <TodayPlan targetLang={targetLang} />
+            </Suspense>
+          </section>
+
+          {/* Recommended Games */}
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl italic serif" style={{ color: "var(--text)" }}>Recommended Games</h2>
+              <Link
+                href="/games"
+                className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors"
+                style={{ color: "var(--text-3)" }}
               >
-                <span className="text-base">{badge.emoji}</span>
-                <span className="text-xs font-semibold whitespace-nowrap" style={{ color: "#fcd34d" }}>{badge.name}</span>
+                Games Hub <ChevronRight size={12} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recommended.map((game) => {
+                const dimMap: Record<string, string> = {
+                  blue: "rgba(96,165,250,0.10)",
+                  purple: "rgba(168,85,247,0.10)",
+                  emerald: "rgba(16,185,129,0.10)",
+                  amber: "rgba(245,158,11,0.10)",
+                };
+                const fgMap: Record<string, string> = {
+                  blue: "#60a5fa",
+                  purple: "#a78bfa",
+                  emerald: "var(--accent)",
+                  amber: "#f59e0b",
+                };
+                return (
+                  <Link
+                    key={game.title}
+                    href={game.href}
+                    className="card-premium p-6 group transition-all"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div className="flex justify-between items-start mb-6">
+                      <div
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
+                        style={{ background: dimMap[game.color], color: fgMap[game.color] }}
+                      >
+                        <Gamepad2 size={24} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-bold italic serif tracking-tight" style={{ color: "var(--text)" }}>
+                        {game.title}
+                      </h4>
+                      <div className="flex items-center justify-between pt-4">
+                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
+                          {game.category} · {game.mode}
+                        </span>
+                        <span
+                          className="p-2 rounded-full transition-all"
+                          style={{ border: "1px solid var(--border)" }}
+                        >
+                          <Play size={14} fill="currentColor" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+
+        {/* Right col: 4 */}
+        <div className="lg:col-span-4 space-y-8">
+
+          {/* Active Unit */}
+          <section className="card-premium p-8 group" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-black uppercase tracking-widest" style={{ fontSize: 11, color: "var(--text-3)", letterSpacing: "0.2em" }}>
+                Active Unit
+              </h3>
+              <GraduationCap size={18} style={{ color: "var(--accent)" }} />
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-end justify-between">
+                <h4 className="text-2xl font-bold italic serif" style={{ color: "var(--text)" }}>
+                  {lastStory ? lastStory.story.title : t(locale, "home_learningPath")}
+                </h4>
+                <span className="text-xs font-bold mono" style={{ color: "var(--accent)" }}>
+                  {unitPct}%
+                </span>
               </div>
-            ))}
+              <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                <div className="h-full transition-all duration-1000" style={{ width: `${unitPct}%`, background: "var(--accent)" }} />
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
+                {lastStory ? t(locale, "home_pickUpWhere") : t(locale, "home_startFirstLesson")}
+              </p>
+              <Link
+                href={lastStory ? `/stories/${lastStory.storyId}` : "/learn"}
+                className="btn-secondary w-full text-[10px]"
+                style={{ padding: "10px", display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}
+              >
+                {lastStory?.completed ? t(locale, "home_readAgain") : t(locale, "home_resume")}
+                <ArrowRight size={12} className="ml-1.5" />
+              </Link>
+            </div>
+          </section>
+
+          {/* Word of the Day */}
+          {recentWord && (
+            <section
+              className="card-premium p-8 relative overflow-hidden group"
+              style={{
+                background: "linear-gradient(135deg, rgba(16,185,129,0.18), transparent 60%)",
+                borderColor: "rgba(16,185,129,0.22)",
+              }}
+            >
+              <div
+                className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full"
+                style={{ background: "rgba(16,185,129,0.10)", filter: "blur(60px)" }}
+              />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="font-black uppercase tracking-widest" style={{ fontSize: 11, color: "var(--accent)", letterSpacing: "0.3em" }}>
+                    {t(locale, "home_wordOfDay")}
+                  </h3>
+                  <WordOfDayPlayer word={recentWord.word} ttsLocale={langConfig.ttsLocale ?? targetLang} />
+                </div>
+                <div className="space-y-4">
+                  <p
+                    className="font-black italic serif tracking-tighter"
+                    style={{ fontSize: "clamp(40px, 5vw, 56px)", color: "var(--text)", lineHeight: 1, letterSpacing: "-0.04em" }}
+                  >
+                    {recentWord.word}
+                  </p>
+                  <p className="text-base font-light" style={{ color: "var(--text-2)" }}>
+                    &ldquo;{recentWord.translation}&rdquo;
+                  </p>
+                  {recentWord.exampleFr && (
+                    <p className="text-sm italic" style={{ color: "var(--text-3)" }}>
+                      {recentWord.exampleFr}
+                    </p>
+                  )}
+                  <div className="pt-4 grid grid-cols-1 gap-2">
+                    <Link href={`/dictionary/${recentWord.id}`} className="btn-primary py-3 text-xs" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+                      {t(locale, "home_learnThisWord")}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Progress Rings */}
+          <Link
+            href="/progress"
+            className="card-premium p-8 space-y-8 cursor-pointer transition-all group block"
+            style={{ textDecoration: "none" }}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl italic serif" style={{ color: "var(--text)" }}>Progress Rings</h3>
+              <ChevronRight size={18} style={{ color: "var(--text-3)" }} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+            <div className="grid grid-cols-2 gap-8">
+              {rings.map((s) => {
+                const colorMap: Record<string, string> = {
+                  emerald: "var(--accent)",
+                  blue: "#60a5fa",
+                  purple: "#a78bfa",
+                  rose: "#fb7185",
+                };
+                const stroke = colorMap[s.color] ?? "var(--accent)";
+                const r = 34;
+                const dash = 2 * Math.PI * r;
+                const offset = dash - (dash * Math.max(s.val, 0)) / 100;
+                return (
+                  <div key={s.skill} className="flex flex-col items-center gap-3">
+                    <div className="relative w-20 h-20 flex items-center justify-center">
+                      <svg className="w-full h-full -rotate-90">
+                        <circle cx="40" cy="40" r={r} stroke="currentColor" strokeWidth="4" fill="transparent" style={{ color: "rgba(255,255,255,0.06)" }} />
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r={r}
+                          stroke={stroke}
+                          strokeWidth="4"
+                          fill="transparent"
+                          strokeDasharray={dash}
+                          strokeDashoffset={offset}
+                          strokeLinecap="round"
+                          style={{ transition: "stroke-dashoffset 1s ease" }}
+                        />
+                      </svg>
+                      <span className="absolute text-lg font-black mono italic" style={{ color: "var(--text)" }}>
+                        {s.val}%
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-center" style={{ color: "var(--text-3)" }}>
+                      {s.skill}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Link>
+
+          {/* Weekly Pulse */}
+          {topLeaders.length > 0 && (
+            <section className="card-premium p-8">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl italic serif" style={{ color: "var(--text)" }}>Weekly Pulse</h3>
+                <TrendingUp size={18} style={{ color: "var(--accent)" }} />
+              </div>
+              <div className="space-y-4">
+                {topLeaders.slice(0, 4).map((p, idx) => {
+                  const isYou = p.name === session?.user?.name;
+                  return (
+                    <div
+                      key={`${p.name}-${idx}`}
+                      className="flex items-center gap-4 p-3 rounded-2xl transition-all"
+                      style={{
+                        background: isYou ? "rgba(16,185,129,0.10)" : "transparent",
+                        border: isYou ? "1px solid rgba(16,185,129,0.22)" : "1px solid transparent",
+                      }}
+                    >
+                      <span
+                        className="w-6 text-sm font-black mono italic"
+                        style={{ color: idx === 0 ? "#fbbf24" : "var(--text-3)" }}
+                      >
+                        {idx + 1}
+                      </span>
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs"
+                        style={{ background: "var(--surface-3)", border: "1px solid var(--border)" }}
+                      >
+                        {(p.name ?? "?")[0]}
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <span className="text-sm font-bold block truncate" style={{ color: "var(--text)" }}>
+                          {isYou ? "You" : p.name}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase italic" style={{ color: "var(--text-3)" }}>
+                          {p.xp.toLocaleString()} XP
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
+
+      {/* Stats summary at bottom (stories etc, kept) */}
+      {completedStories > 0 && (
+        <div className="card-premium p-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <BookOpen size={20} style={{ color: "var(--accent)" }} />
+            <p className="text-sm font-medium" style={{ color: "var(--text-2)" }}>
+              {completedStories} {t(locale, "home_storiesDone")}
+            </p>
           </div>
+          <Link href="/stories" className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+            {t(locale, "home_viewAll")}
+          </Link>
         </div>
       )}
     </div>

@@ -7,24 +7,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/types";
 import { t, getLocale } from "@/lib/i18n";
+import {
+  User, Mail, Globe, Languages,
+  Smile, Trash2, ChevronRight,
+  Flame, Zap, BookMarked, Award, Star,
+} from "lucide-react";
 
 const AVATAR_EMOJIS = [
   "🧑", "👩", "👨", "🧔", "👱", "🧕", "🦸", "🧙", "🦊", "🐺",
   "🦁", "🐯", "🐻", "🐼", "🐸", "🦋", "🌟", "🔥", "⚡", "🎭",
   "🎨", "🎯", "🚀", "🌙", "☀️", "🌈", "💎", "👑", "🏆", "🎓",
-];
-
-const LANGUAGES = [
-  { code: "en", label: "English" },
-  { code: "hy", label: "Armenian" },
-  { code: "ru", label: "Russian" },
-  { code: "de", label: "German" },
-  { code: "es", label: "Spanish" },
-  { code: "it", label: "Italian" },
-  { code: "pt", label: "Portuguese" },
-  { code: "zh", label: "Chinese" },
-  { code: "ja", label: "Japanese" },
-  { code: "ar", label: "Arabic" },
 ];
 
 interface XpInfo { level: number; current: number; needed: number; pct: number; }
@@ -77,6 +69,8 @@ export function SettingsClient({
   const [nativeLang, setNativeLang] = useState(initialNativeLang);
   const [targetLang, setTargetLang] = useState(initialTargetLang || "fr");
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [showNativePicker, setShowNativePicker] = useState(false);
+  const [editingName, setEditingName] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -108,9 +102,7 @@ export function SettingsClient({
         body: JSON.stringify({ name, image: avatar, nativeLanguage: nativeLang, targetLanguage: targetLang }),
       });
       if (!res.ok) throw new Error("Failed to save");
-      // Refresh session so targetLanguage/nativeLanguage is reflected immediately
       await updateSession();
-      // Show saved state briefly, then reload so server components re-render with new JWT
       setSaved(true);
       setTimeout(() => { window.location.reload(); }, 800);
     } catch {
@@ -120,278 +112,287 @@ export function SettingsClient({
     }
   };
 
+  const nativeMeta = NATIVE_LANGUAGES.find(l => l.code === nativeLang) ?? NATIVE_LANGUAGES[0];
+  const initial = (name || "?").trim()[0]?.toUpperCase() ?? "?";
+  const isEmojiAvatar = !!avatar && /\p{Emoji}/u.test(avatar) && !/^[a-zA-Z0-9]$/.test(avatar);
+
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>{t(locale, "settings_title")}</h1>
-        <p className="text-sm mt-0.5" style={{ color: "var(--text-3)" }}>{t(locale, "settings_subtitle")}</p>
-      </div>
-
-      {/* Profile card */}
-      <div className="card p-6">
-        <p className="section-label mb-4">{t(locale, "settings_profile")}</p>
-
-        {/* Avatar + Name row */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="relative">
+    <div className="max-w-4xl mx-auto space-y-12 animate-fade-up">
+      {/* Profile hero */}
+      <header className="flex flex-col items-center text-center space-y-6">
+        <div className="relative group">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-400 to-blue-500 p-1 shadow-2xl">
             <button
-              onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-              className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl transition-all hover:scale-105"
-              style={{ background: "var(--surface-3)", border: `2px solid ${showAvatarPicker ? "var(--accent)" : "var(--border-md)"}` }}
+              type="button"
+              onClick={() => setShowAvatarPicker(v => !v)}
+              className="w-full h-full rounded-full bg-black flex items-center justify-center text-5xl font-bold italic serif transition-transform hover:scale-105"
+              aria-label="Change avatar"
             >
-              {avatar}
+              {isEmojiAvatar ? avatar : initial}
             </button>
-            <div
-              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs"
-              style={{ background: "var(--accent)", color: "#fff" }}
-            >
-              ✏️
-            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold mb-1" style={{ color: "var(--text)" }}>{name || t(locale, "settings_yourName")}</p>
-            <p className="text-xs" style={{ color: "var(--text-3)" }}>{email}</p>
-            <div className="flex items-center gap-2 mt-1.5">
-              <span
-                className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
-                style={{ background: "var(--accent-dim)", color: "var(--accent)" }}
-              >
-                {role === "TEACHER" ? t(locale, "settings_teacher") : t(locale, "settings_student")}
-              </span>
-              <span className="text-[11px]" style={{ color: "var(--text-3)" }}>{t(locale, "settings_joined", { date: joinDate })}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Emoji picker */}
-        {showAvatarPicker && (
-          <div
-            className="rounded-2xl p-4 mb-5"
-            style={{ background: "var(--surface-3)", border: "1px solid var(--border)" }}
-          >
-            <p className="text-xs font-semibold mb-3" style={{ color: "var(--text-3)" }}>{t(locale, "settings_chooseAvatar")}</p>
-            <div className="grid grid-cols-10 gap-1">
-              {AVATAR_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  onClick={() => { setAvatar(emoji); setShowAvatarPicker(false); }}
-                  className="w-9 h-9 rounded-xl text-xl flex items-center justify-center transition-all hover:scale-110"
-                  style={{
-                    background: avatar === emoji ? "var(--accent-dim)" : "var(--surface-2)",
-                    border: `1px solid ${avatar === emoji ? "rgba(124,106,255,0.4)" : "transparent"}`,
-                  }}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Fields */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
-              {t(locale, "settings_displayName")}
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={50}
-              placeholder={t(locale, "settings_displayNamePlaceholder")}
-              className="input w-full"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-3)" }}>
-              {t(locale, "settings_nativeLang")}
-            </label>
-            <select
-              value={nativeLang}
-              onChange={(e) => setNativeLang(e.target.value)}
-              className="input w-full"
-            >
-              {NATIVE_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Target language — flag card picker */}
-          <div>
-            <label className="block text-xs font-semibold mb-2" style={{ color: "var(--text-3)" }}>
-              {t(locale, "settings_learning")}
-            </label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-              {TARGET_LANGUAGES.map((l) => {
-                const active = targetLang === l.code;
-                return (
-                  <button
-                    key={l.code}
-                    type="button"
-                    onClick={() => setTargetLang(l.code)}
-                    style={{
-                      display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-                      padding: "12px 8px", borderRadius: 14, cursor: "pointer",
-                      background: active ? "var(--accent-dim)" : "var(--surface-2)",
-                      border: `2px solid ${active ? "var(--accent)" : "var(--border)"}`,
-                      transition: "all 0.15s",
-                      boxShadow: active ? "0 0 0 3px rgba(124,106,255,0.15)" : "none",
-                    }}
-                  >
-                    <span style={{ fontSize: 28, lineHeight: 1 }}>{l.flag}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: active ? "var(--accent)" : "var(--text)" }}>
-                      {l.label}
-                    </span>
-                    <span style={{ fontSize: 10, color: "var(--text-3)" }}>{l.nativeName}</span>
-                    {active && (
-                      <span style={{
-                        fontSize: 9, fontWeight: 800, color: "var(--accent)",
-                        background: "rgba(124,106,255,0.15)", padding: "1px 6px", borderRadius: 99,
-                      }}>✓ Selected</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {error && (
-          <p className="text-xs mt-3" style={{ color: "var(--red)" }}>{error}</p>
-        )}
-
-        <div className="flex items-center gap-3 mt-5">
           <button
-            onClick={handleSave}
-            disabled={saving || !name.trim()}
-            className="btn-primary px-6 disabled:opacity-50"
+            type="button"
+            onClick={() => setShowAvatarPicker(v => !v)}
+            className="absolute bottom-0 right-0 p-2 bg-white text-black rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all"
+            aria-label="Edit avatar"
           >
-            {saving ? t(locale, "settings_saving") : saved ? t(locale, "settings_saved") : t(locale, "settings_save")}
+            <Smile size={18} />
           </button>
-          {saved && <span className="text-xs" style={{ color: "var(--green)" }}>{t(locale, "settings_profileUpdated")}</span>}
         </div>
-      </div>
-
-      {/* Stats overview */}
-      <div className="card p-5">
-        <p className="section-label mb-4">{t(locale, "settings_yourStats")}</p>
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {[
-            { label: t(locale, "settings_level"),       value: t(locale, "settings_lvDisplay", { n: String(xpInfo.level) }),   emoji: "⭐", color: "var(--accent)" },
-            { label: t(locale, "settings_streak"),      value: t(locale, "settings_daysDisplay", { n: String(streak) }),        emoji: "🔥", color: "var(--gold)" },
-            { label: t(locale, "settings_words"),       value: savedWordCount,          emoji: "📚", color: "var(--blue)" },
-            { label: t(locale, "settings_storiesStat"), value: completedStories,        emoji: "📖", color: "var(--green)" },
-            { label: t(locale, "settings_gamesStat"),   value: gamePlays,               emoji: "🎮", color: "#f472b6" },
-            { label: t(locale, "settings_xp"),          value: xpInfo.current + xpInfo.needed > 0 ? `${xpInfo.current}/${xpInfo.needed}` : "—", emoji: "💎", color: "var(--accent)" },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-            >
-              <span className="text-lg">{s.emoji}</span>
-              <div>
-                <p className="text-sm font-bold leading-none" style={{ color: s.color }}>{s.value}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "var(--text-3)" }}>{s.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* XP progress bar */}
         <div>
-          <div className="flex justify-between text-[10px] mb-1" style={{ color: "var(--text-3)" }}>
-            <span>{t(locale, "settings_levelDisplay", { n: String(xpInfo.level) })}</span>
-            <span>{t(locale, "settings_xpProgress", { current: String(xpInfo.current), needed: String(xpInfo.needed), next: String(xpInfo.level + 1) })}</span>
+          <h1 className="text-5xl italic font-black">{name || t(locale, "settings_yourName")}</h1>
+          <p className="text-white/40 text-lg">
+            {t(locale, "settings_joined", { date: joinDate })} • {role === "TEACHER" ? t(locale, "settings_teacher") : t(locale, "settings_student")}
+          </p>
+        </div>
+      </header>
+
+      {/* Avatar picker (collapsible) */}
+      {showAvatarPicker && (
+        <div className="card-premium p-6">
+          <p className="text-sm font-bold uppercase tracking-widest text-white/30 mb-3 px-2">{t(locale, "settings_chooseAvatar")}</p>
+          <div className="grid grid-cols-10 gap-2">
+            {AVATAR_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => { setAvatar(emoji); setShowAvatarPicker(false); }}
+                className={`aspect-square rounded-2xl text-2xl flex items-center justify-center transition-all hover:scale-110 ${
+                  avatar === emoji
+                    ? "bg-emerald-500/20 border border-emerald-500/40"
+                    : "bg-white/5 border border-white/10"
+                }`}
+              >
+                {emoji}
+              </button>
+            ))}
           </div>
-          <div className="xp-bar">
-            <div className="xp-bar-fill" style={{ width: `${xpInfo.pct}%` }} />
-          </div>
+        </div>
+      )}
+
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: "Level",  value: xpInfo.level,    icon: Star,       color: "text-emerald-400" },
+          { label: "Streak", value: streak,          icon: Flame,      color: "text-amber-400"   },
+          { label: "Words",  value: savedWordCount,  icon: BookMarked, color: "text-pink-400"    },
+        ].map((s) => {
+          const Icon = s.icon;
+          return (
+            <div key={s.label} className="card-premium p-6 text-center">
+              <Icon size={20} className={`mx-auto mb-2 ${s.color}`} />
+              <p className={`mono text-3xl font-black ${s.color}`}>{s.value}</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-white/30 mt-1">{s.label}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* XP progress bar */}
+      <div className="card-premium p-6">
+        <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/30 mb-2">
+          <span>{t(locale, "settings_levelDisplay", { n: String(xpInfo.level) })}</span>
+          <span className="mono text-white/60">
+            {t(locale, "settings_xpProgress", { current: String(xpInfo.current), needed: String(xpInfo.needed), next: String(xpInfo.level + 1) })}
+          </span>
+        </div>
+        <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all" style={{ width: `${xpInfo.pct}%` }} />
         </div>
       </div>
 
-      {/* Badges */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <p className="section-label">{t(locale, "settings_earnedBadges")}</p>
-          <Link href="/progress" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-            {t(locale, "settings_allBadgesArrow")}
-          </Link>
-        </div>
-        {earnedBadges.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {earnedBadges.map((badge) => (
-              <div
-                key={badge.id}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}
+      {/* Two-column: System + Account */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* System */}
+        <section className="space-y-4">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">System</h3>
+          <div className="space-y-2">
+            {/* Display name row (editable) */}
+            <div className="card-premium p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <User size={18} className="text-white/20" />
+                  <span className="text-sm font-medium">{t(locale, "settings_displayName")}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingName(v => !v)}
+                  className="text-xs font-bold text-white/40 hover:text-white transition-colors"
+                >
+                  {editingName ? "Done" : (name || "Set name")}
+                </button>
+              </div>
+              {editingName && (
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={50}
+                  placeholder={t(locale, "settings_displayNamePlaceholder")}
+                  className="w-full mt-3 bg-white/5 border border-white/10 rounded-2xl p-3 text-sm focus:outline-none focus:border-emerald-500/50"
+                  autoFocus
+                />
+              )}
+            </div>
+
+            {/* Email (read only) */}
+            <div className="w-full card-premium p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Mail size={18} className="text-white/20" />
+                <span className="text-sm font-medium">Email</span>
+              </div>
+              <span className="text-xs font-bold text-white/40 truncate max-w-[180px]">{email}</span>
+            </div>
+
+            {/* Native language */}
+            <div className="card-premium p-4">
+              <button
+                type="button"
+                onClick={() => setShowNativePicker(v => !v)}
+                className="w-full flex items-center justify-between"
               >
-                <span className="text-lg">{badge.emoji}</span>
+                <div className="flex items-center gap-3">
+                  <Globe size={18} className="text-white/20" />
+                  <span className="text-sm font-medium">{t(locale, "settings_nativeLang")}</span>
+                </div>
+                <span className="text-xs font-bold text-white/40 flex items-center gap-2">
+                  {nativeMeta.flag} {nativeMeta.label}
+                  <ChevronRight size={14} className={`transition-transform ${showNativePicker ? "rotate-90" : ""}`} />
+                </span>
+              </button>
+              {showNativePicker && (
+                <div className="grid grid-cols-2 gap-2 mt-3">
+                  {NATIVE_LANGUAGES.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => { setNativeLang(l.code); setShowNativePicker(false); }}
+                      className={`flex items-center gap-2 p-2 rounded-xl text-sm transition-all ${
+                        nativeLang === l.code
+                          ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                          : "bg-white/5 border border-white/10 hover:bg-white/10"
+                      }`}
+                    >
+                      <span className="text-lg">{l.flag}</span>
+                      <span className="font-medium">{l.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Avatar control */}
+            <button
+              type="button"
+              onClick={() => setShowAvatarPicker(v => !v)}
+              className="w-full card-premium p-4 flex items-center justify-between hover:bg-white/5 transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <Smile size={18} className="text-white/20" />
+                <span className="text-sm font-medium">Avatar</span>
+              </div>
+              <span className="text-2xl">{isEmojiAvatar ? avatar : initial}</span>
+            </button>
+          </div>
+        </section>
+
+        {/* Targeting */}
+        <section className="space-y-4">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">Targeting</h3>
+          <p className="text-xs text-white/40 px-2">{t(locale, "settings_learning")}</p>
+          <div className="space-y-2">
+            {TARGET_LANGUAGES.map((l) => {
+              const active = targetLang === l.code;
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setTargetLang(l.code)}
+                  className={`w-full card-premium p-4 flex items-center justify-between transition-all ${
+                    active
+                      ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
+                      : "hover:bg-white/5"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-3xl">{l.flag}</span>
+                    <div className="text-left">
+                      <p className="font-medium serif italic text-lg">{l.label}</p>
+                      <p className="text-xs text-white/30">{l.nativeName}</p>
+                    </div>
+                  </div>
+                  {active && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/15 px-2 py-1 rounded-full">
+                      ✓ Active
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+
+      {/* Save bar */}
+      {error && <p className="text-xs text-rose-400 px-2">{error}</p>}
+      <div className="flex items-center gap-3 justify-end">
+        {saved && <span className="text-xs text-emerald-400">{t(locale, "settings_profileUpdated")}</span>}
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !name.trim()}
+          className="btn-primary py-3 px-8 text-sm font-bold rounded-2xl disabled:opacity-50"
+        >
+          {saving ? t(locale, "settings_saving") : saved ? t(locale, "settings_saved") : t(locale, "settings_save")}
+        </button>
+      </div>
+
+      {/* Subscriptions */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">Subscriptions</h3>
+        <div className="card-premium p-8 bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-white text-black flex items-center justify-center font-black italic text-2xl">L+</div>
+            <div>
+              <h4 className="text-2xl font-bold italic serif">Lingova Premium</h4>
+              <p className="text-white/40 text-sm">Free plan — upgrade to unlock everything</p>
+            </div>
+          </div>
+          <div className="flex gap-4 w-full md:w-auto">
+            <button type="button" className="flex-1 btn-secondary py-3 px-8 text-xs font-bold">Manage Plan</button>
+            <button type="button" className="flex-1 btn-primary py-3 px-8 text-xs font-bold">Upgrade</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Earned badges */}
+      {earnedBadges.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white/30">Earned Badges</h3>
+            <Link href="/progress" className="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300">
+              {t(locale, "settings_allBadgesArrow")}
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {earnedBadges.map((badge) => (
+              <div key={badge.id} className="card-premium p-4 flex items-center gap-3">
+                <span className="text-3xl">{badge.emoji}</span>
                 <div>
-                  <p className="text-xs font-semibold" style={{ color: "var(--gold)" }}>{badge.name}</p>
-                  <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{badge.description}</p>
+                  <p className="text-sm font-bold text-amber-400">{badge.name}</p>
+                  <p className="text-[11px] text-white/40">{badge.description}</p>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-6" style={{ color: "var(--text-3)" }}>
-            <p className="text-2xl mb-2">🏅</p>
-            <p className="text-sm">{t(locale, "settings_noBadges")}</p>
-          </div>
-        )}
-      </div>
+        </section>
+      )}
 
-      {/* Danger zone */}
-      <div className="card p-5" style={{ border: "1px solid rgba(239,68,68,0.25)" }}>
-        <p className="section-label mb-1" style={{ color: "var(--red)" }}>Danger Zone</p>
-        <p className="text-xs mb-4" style={{ color: "var(--text-3)" }}>
-          Permanently delete your account and all data. This cannot be undone.
-        </p>
-
-        {!confirmDelete ? (
-          <button
-            onClick={() => setConfirmDelete(true)}
-            className="btn text-sm px-4 py-2 rounded-xl font-semibold"
-            style={{ background: "rgba(239,68,68,0.1)", color: "var(--red)", border: "1px solid rgba(239,68,68,0.3)" }}
-          >
-            Delete my account
-          </button>
-        ) : (
-          <div className="rounded-xl p-4 space-y-3" style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.25)" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--red)" }}>
-              Are you sure? All your progress, words, and data will be gone forever.
-            </p>
-            {deleteError && <p className="text-xs" style={{ color: "var(--red)" }}>{deleteError}</p>}
-            <div className="flex gap-3">
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="btn text-sm px-4 py-2 rounded-xl font-semibold disabled:opacity-50"
-                style={{ background: "var(--red)", color: "#fff", border: "none" }}
-              >
-                {deleting ? "Deleting…" : "Yes, delete everything"}
-              </button>
-              <button
-                onClick={() => { setConfirmDelete(false); setDeleteError(""); }}
-                className="btn text-sm px-4 py-2 rounded-xl font-semibold"
-                style={{ background: "var(--surface-2)", color: "var(--text-2)", border: "1px solid var(--border)" }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Quick navigation */}
-      <div className="card p-5">
-        <p className="section-label mb-3">{t(locale, "settings_quickLinks")}</p>
-        <div className="grid grid-cols-2 gap-2">
+      {/* Quick links */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">{t(locale, "settings_quickLinks")}</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { href: "/progress",    label: t(locale, "nav_progress"),    emoji: "📊" },
             { href: "/analytics",   label: t(locale, "nav_analytics"),   emoji: "📈" },
@@ -401,17 +402,57 @@ export function SettingsClient({
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text-2)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-3)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--surface-2)")}
+              className="card-premium p-4 flex items-center gap-3 hover:bg-white/5 transition-all"
             >
-              <span>{item.emoji}</span>
-              {item.label}
+              <span className="text-xl">{item.emoji}</span>
+              <span className="text-sm font-medium">{item.label}</span>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
+
+      {/* Danger zone — bottom */}
+      <section className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-wrap gap-6">
+          {!confirmDelete ? (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="text-xs font-bold uppercase tracking-widest text-rose-500/60 hover:text-rose-400 transition-colors flex items-center gap-2"
+            >
+              <Trash2 size={16} /> Delete Account
+            </button>
+          ) : (
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs font-bold text-rose-400">Are you sure? This is permanent.</span>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full bg-rose-500 text-white disabled:opacity-50"
+              >
+                {deleting ? "Deleting…" : "Yes, delete"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setConfirmDelete(false); setDeleteError(""); }}
+                className="text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full bg-white/5 text-white/60 border border-white/10"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+          <a
+            href="mailto:support@lingova.app"
+            className="text-xs font-bold uppercase tracking-widest text-white/20 hover:text-white transition-colors flex items-center gap-2"
+          >
+            <Mail size={16} /> Contact Support
+          </a>
+        </div>
+        <p className="text-xs text-white/10 mono">Build Version: 2.14.8-premium</p>
+      </section>
+
+      {deleteError && <p className="text-xs text-rose-400 px-2">{deleteError}</p>}
     </div>
   );
 }

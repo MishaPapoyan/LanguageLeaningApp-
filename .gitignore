@@ -37,3 +37,6 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# design reference (extracted from zip, not for repo)
+/.lingova-design/
