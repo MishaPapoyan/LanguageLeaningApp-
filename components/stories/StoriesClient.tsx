@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
+import { BookOpen, Play, ChevronRight } from "lucide-react";
 
 interface StoryItem {
   id: string;
@@ -16,28 +17,16 @@ interface StoryItem {
   score: number;
 }
 
-const diffGradient: Record<string, string> = {
-  BEGINNER:     "linear-gradient(135deg, rgba(45,212,191,0.18) 0%, rgba(45,212,191,0.06) 100%)",
-  INTERMEDIATE: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(16,185,129,0.07) 100%)",
-  ADVANCED:     "linear-gradient(135deg, rgba(249,115,22,0.20) 0%, rgba(249,115,22,0.06) 100%)",
+const DIFF_LABEL: Record<string, string> = {
+  BEGINNER: "A1",
+  INTERMEDIATE: "B1",
+  ADVANCED: "B2",
 };
 
-const diffBorderColor: Record<string, string> = {
-  BEGINNER:     "rgba(45,212,191,0.22)",
-  INTERMEDIATE: "rgba(16,185,129,0.28)",
-  ADVANCED:     "rgba(249,115,22,0.24)",
-};
-
-const diffColor: Record<string, string> = {
-  BEGINNER:     "var(--teal)",
-  INTERMEDIATE: "var(--accent-2)",
-  ADVANCED:     "var(--coral)",
-};
-
-const diffClass: Record<string, string> = {
-  BEGINNER:     "diff-beginner",
-  INTERMEDIATE: "diff-intermediate",
-  ADVANCED:     "diff-advanced",
+const DIFF_BADGE_CLASS: Record<string, string> = {
+  BEGINNER: "bg-white text-black",
+  INTERMEDIATE: "bg-white text-black",
+  ADVANCED: "bg-rose-500 text-white",
 };
 
 const FILTERS = ["All", "Beginner", "Intermediate", "Advanced"] as const;
@@ -46,150 +35,86 @@ type Filter = (typeof FILTERS)[number];
 export function StoriesClient({ stories }: { stories: StoryItem[] }) {
   const [active, setActive] = useState<Filter>("All");
 
-  const visible = active === "All"
-    ? stories
-    : stories.filter((s) => s.difficulty === active.toUpperCase());
+  const visible =
+    active === "All"
+      ? stories
+      : stories.filter((s) => s.difficulty === active.toUpperCase());
 
   return (
     <>
-      {/* в”Ђв”Ђ Filter Tab Switcher в”Ђв”Ђ */}
-      <div style={{
-        display: "flex", gap: 6, marginBottom: 24,
-        background: "var(--surface)", border: "1px solid var(--border)",
-        borderRadius: 99, padding: 4, width: "fit-content",
-      }}>
+      {/* ── Filter pills ── */}
+      <div className="flex gap-2 p-1 bg-white/5 rounded-full border border-white/10 w-fit">
         {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setActive(f)}
-            style={{
-              padding: "6px 16px", borderRadius: 99, fontSize: 13, fontWeight: 600,
-              border: "none", cursor: "pointer", transition: "all 0.18s ease",
-              background: active === f ? "var(--accent)" : "transparent",
-              color: active === f ? "#fff" : "var(--text-2)",
-            }}
+            className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+              active === f
+                ? "bg-white text-black"
+                : "text-white/40 hover:text-white"
+            }`}
           >
             {f}
           </button>
         ))}
       </div>
 
-      {/* в”Ђв”Ђ Story Cards Grid в”Ђв”Ђ */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {/* ── Stories grid ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {visible.map((story) => {
-          const accentColor = diffColor[story.difficulty] || "var(--accent)";
-          const ctaLabel = story.isCompleted ? "Review" : story.isStarted ? "Continue" : "Start";
+          const diffLabel = DIFF_LABEL[story.difficulty] ?? story.difficulty.slice(0, 2);
+          const badgeClass =
+            DIFF_BADGE_CLASS[story.difficulty] ?? "bg-white text-black";
 
           return (
             <Link
               key={story.id}
               href={`/stories/${story.id}`}
-              style={{
-                display: "flex", alignItems: "center", gap: 20,
-                background: diffGradient[story.difficulty] || "var(--surface)",
-                border: `1px solid ${diffBorderColor[story.difficulty] || "var(--border)"}`,
-                borderRadius: 18, padding: "18px 20px",
-                textDecoration: "none", position: "relative", overflow: "hidden",
-                transition: "transform 0.15s ease, box-shadow 0.15s ease",
-              }}
-              className="card-hover"
+              className="card-premium p-8 text-left h-[450px] flex flex-col justify-between group no-underline"
             >
-              {/* Completed overlay badge */}
-              {story.isCompleted && (
-                <div style={{
-                  position: "absolute", top: 12, right: 14,
-                  display: "flex", alignItems: "center", gap: 5,
-                  background: "var(--green-dim)", border: "1px solid rgba(34,197,94,0.25)",
-                  borderRadius: 99, padding: "3px 10px",
-                }}>
-                  <svg width="11" height="11" fill="none" stroke="var(--green)" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--green)" }}>Completed</span>
-                  {story.score > 0 && (
-                    <span style={{ fontSize: 11, color: "var(--green)", opacity: 0.8 }}>{story.score}%</span>
-                  )}
-                </div>
-              )}
-
-              {/* Large emoji */}
-              <div style={{
-                fontSize: 48, lineHeight: 1, flexShrink: 0,
-                filter: story.isCompleted ? "none" : undefined,
-              }}>
-                {story.imageEmoji}
-              </div>
-
-              {/* Content */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                {/* Metadata row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                    Ch. {story.chapter}
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <span
+                    className={`px-3 py-1 ${badgeClass} text-[10px] font-bold uppercase rounded`}
+                  >
+                    {diffLabel}
                   </span>
-                  <span className={diffClass[story.difficulty]} style={{ fontSize: 10 }}>
-                    {story.difficulty.charAt(0) + story.difficulty.slice(1).toLowerCase()}
-                  </span>
+                  <BookOpen size={20} className="text-white/20" />
                 </div>
-
-                {/* Title */}
-                <h3 style={{
-                  fontSize: 17, fontWeight: 700, color: "var(--text)",
-                  marginBottom: 6, lineHeight: 1.3,
-                  textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap",
-                }}>
+                <h3 className="text-3xl md:text-4xl font-bold italic serif mb-4 leading-tight">
                   {story.title}
                 </h3>
-
-                {/* Stats */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 11, color: "var(--text-2)", fontWeight: 500 }}>
-                    {story.wordCount} words
-                  </span>
-                  <span style={{ width: 3, height: 3, borderRadius: "50%", background: "var(--text-3)", display: "inline-block" }} />
-                  <span style={{ fontSize: 11, color: "var(--text-2)", fontWeight: 500 }}>
-                    {story.quizCount} questions
-                  </span>
-                  <span style={{ width: 3, height: 3, borderRadius: "50%", background: "var(--text-3)", display: "inline-block" }} />
-                  {/* XP badge */}
-                  <span style={{
-                    fontSize: 11, fontWeight: 700, color: "var(--gold)",
-                    background: "var(--gold-dim)", borderRadius: 99, padding: "2px 8px",
-                  }}>
-                    +50 XP
-                  </span>
-                </div>
+                <p className="text-white/40 leading-relaxed text-sm">
+                  Escape into a world of mystery and wonder while naturally expanding your vocabulary.
+                </p>
               </div>
 
-              {/* CTA button */}
-              <div style={{
-                flexShrink: 0,
-                background: story.isCompleted ? "var(--surface-3)" : accentColor,
-                color: story.isCompleted ? "var(--text-2)" : "#fff",
-                borderRadius: 99, padding: "8px 18px",
-                fontSize: 13, fontWeight: 700,
-                border: story.isCompleted ? "1px solid var(--border)" : "none",
-                whiteSpace: "nowrap",
-              }}>
-                {ctaLabel}
+              <div className="space-y-6">
+                <span className="text-6xl md:text-7xl block transition-transform group-hover:scale-110 group-hover:rotate-6">
+                  {story.imageEmoji}
+                </span>
+                <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                  <span className="text-xs font-bold uppercase tracking-widest text-white/20">
+                    Chapter {story.chapter} · {story.wordCount} words
+                  </span>
+                  <div className="btn-secondary rounded-full p-2 group-hover:bg-white/10 transition-all">
+                    {story.isCompleted ? (
+                      <ChevronRight size={16} />
+                    ) : (
+                      <Play size={16} fill="currentColor" />
+                    )}
+                  </div>
+                </div>
               </div>
             </Link>
           );
         })}
 
         {visible.length === 0 && (
-          <div style={{
-            textAlign: "center", padding: "48px 24px",
-            background: "var(--surface)", border: "1px solid var(--border)",
-            borderRadius: 18,
-          }}>
-            <p style={{ fontSize: 32, marginBottom: 8 }}>рџ“­</p>
-            <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
-              No stories found
-            </p>
-            <p style={{ fontSize: 13, color: "var(--text-2)" }}>
-              Try a different difficulty filter.
-            </p>
+          <div className="card-premium p-12 text-center col-span-full">
+            <p className="text-5xl mb-4">📭</p>
+            <p className="text-2xl font-bold italic serif mb-2">No stories found</p>
+            <p className="text-white/40 text-sm">Try a different difficulty filter.</p>
           </div>
         )}
       </div>

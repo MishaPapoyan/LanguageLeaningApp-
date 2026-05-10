@@ -16,8 +16,6 @@ export default async function DictionaryPage() {
   const categories = [...new Set(words.map((w) => w.category))].sort();
 
   return (
-    <div className="animate-fade-up">
-      <DictionaryClient initialWords={words as any} categories={categories} />
-    </div>
+    <DictionaryClient initialWords={words as any} categories={categories} />
   );
 }

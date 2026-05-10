@@ -61,20 +61,15 @@ export default async function StoriesPage() {
   }
 
   return (
-    <div style={{ maxWidth: 760 }}>
-
+    <div className="space-y-12">
       {/* ── Header ── */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px" }}>
-            {t(locale, "stories_title")}
-          </h1>
-          <span style={{ fontSize: 24 }}>{langConfig.flag}</span>
-        </div>
-        <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          {t(locale, "stories_subtitle_tpl", { lang: langConfig.label })}
+      <header>
+        <h1 className="text-5xl mb-2">Immersive Stories</h1>
+        <p className="text-white/40 text-lg">
+          Read and listen to tales crafted for your level. {langConfig.flag}{" "}
+          <span className="text-white/30">{t(locale, "stories_subtitle_tpl", { lang: langConfig.label })}</span>
         </p>
-      </div>
+      </header>
 
       <StoriesClient stories={storiesData} />
     </div>

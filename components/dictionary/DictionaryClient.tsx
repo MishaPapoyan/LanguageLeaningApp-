@@ -3,7 +3,9 @@
 import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { speak } from "@/lib/speech";
 import Link from "next/link";
+import { Search, Volume2, Plus, Check, Library } from "lucide-react";
 
 interface Word {
   id: string;
@@ -21,182 +23,202 @@ interface Props {
   categories: string[];
 }
 
-const DIFFICULTY_LABEL: Record<string, { label: string; color: string; bg: string }> = {
-  BEGINNER:     { label: "beginner",     color: "var(--green)",  bg: "rgba(52,211,153,0.12)" },
-  INTERMEDIATE: { label: "intermediate", color: "var(--blue)",   bg: "rgba(96,165,250,0.12)" },
-  ADVANCED:     { label: "advanced",     color: "var(--red)",    bg: "rgba(248,113,113,0.12)" },
-};
-
-// Seeded shuffle so word order rotates daily but stays stable within a session
-function seededShuffle<T>(arr: T[], seed: number): T[] {
-  const a = [...arr];
-  let s = seed;
-  for (let i = a.length - 1; i > 0; i--) {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    const j = Math.abs(s) % (i + 1);
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// Computed once per module load — stable for the entire session (same calendar day)
-const DAY_SEED = Math.floor(Date.now() / 86_400_000);
-
-export function DictionaryClient({ initialWords, categories }: Props) {
+export function DictionaryClient({ initialWords }: Props) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [savingId, setSavingId] = useState<string | null>(null);
 
-  // Rotate order daily (no query = shuffled; searching = sort by relevance)
-  const shuffled = useMemo(() => seededShuffle(initialWords, DAY_SEED), [initialWords]);
-
-  const filtered = useMemo(() => {
-    const base = query ? initialWords : shuffled;
-    return base.filter((w) => {
-      const matchesQuery =
-        !query ||
-        w.word.toLowerCase().includes(query.toLowerCase()) ||
-        w.translation.toLowerCase().includes(query.toLowerCase()) ||
-        w.definition.toLowerCase().includes(query.toLowerCase());
-      const matchesCategory = !selectedCategory || w.category === selectedCategory;
-      const matchesDifficulty = !selectedDifficulty || w.difficulty === selectedDifficulty;
-      return matchesQuery && matchesCategory && matchesDifficulty;
-    });
-  }, [query, selectedCategory, selectedDifficulty, initialWords, shuffled]);
+  const matches = useMemo(() => {
+    if (!query.trim()) return [] as Word[];
+    const q = query.trim().toLowerCase();
+    return initialWords
+      .filter(
+        (w) =>
+          w.word.toLowerCase().includes(q) ||
+          w.translation.toLowerCase().includes(q) ||
+          w.definition.toLowerCase().includes(q),
+      )
+      .slice(0, 6);
+  }, [query, initialWords]);
 
   const isEmpty = initialWords.length === 0;
+  const primary = matches[0];
+  const others = matches.slice(1);
+
+  const handleSpeak = (text: string) => {
+    speak(text, { lang: `${langConfig.code}-${langConfig.code.toUpperCase()}` });
+  };
+
+  const handleSave = async (id: string) => {
+    if (savingId || savedIds.has(id)) return;
+    setSavingId(id);
+    try {
+      await fetch("/api/dictionary/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wordId: id }),
+      });
+      setSavedIds((prev) => new Set(prev).add(id));
+    } catch (err) {
+      console.error("[dictionary] save error:", err);
+    } finally {
+      setSavingId(null);
+    }
+  };
 
   return (
-    <>
-      {/* Page header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--text)" }}>Dictionary</h1>
-        <p className="text-sm" style={{ color: "var(--text-2)" }}>Browse all {langConfig.label} vocabulary. Save words to practice them later.</p>
+    <div className="space-y-12 max-w-4xl mx-auto">
+      {/* ── Header ── */}
+      <header>
+        <h1 className="text-5xl mb-2">Omnilingual Dictionary</h1>
+        <p className="text-white/40 text-lg">
+          Search {langConfig.label} vocabulary. Add words to your collection to master them.
+        </p>
+      </header>
+
+      {/* ── Search bar ── */}
+      <div className="relative">
+        <Search
+          className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20"
+          size={24}
+        />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={`Search any ${langConfig.label} word or phrase…`}
+          className="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-16 text-2xl focus:outline-none focus:border-white/20 transition-all font-light tracking-tight text-white placeholder:text-white/20"
+        />
       </div>
 
-      {/* Yellow warning if DB is empty */}
+      {/* ── Empty DB warning ── */}
       {isEmpty && (
-        <div
-          className="flex items-start gap-3 px-4 py-3 rounded-2xl mb-5"
-          style={{
-            background: "rgba(245,158,11,0.12)",
-            border: "1px solid rgba(245,158,11,0.35)",
-          }}
-        >
-          <span className="text-xl flex-shrink-0 mt-0.5">⚠️</span>
+        <div className="card-premium p-6 flex items-start gap-3">
+          <span className="text-2xl">⚠️</span>
           <div>
-            <p className="text-sm font-semibold" style={{ color: "#f59e0b" }}>No vocabulary loaded</p>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(245,158,11,0.7)" }}>
+            <p className="text-sm font-bold uppercase tracking-widest text-amber-400">
+              No vocabulary loaded
+            </p>
+            <p className="text-xs text-white/40 mt-1">
               The dictionary is empty. Run the database seed to populate vocabulary words.
             </p>
           </div>
         </div>
       )}
 
-      {/* Search + filters */}
-      <div className="flex flex-wrap gap-3 mb-5">
-        <div className="relative flex-1 min-w-[200px]">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--text-3)" }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${langConfig.label} or English...`}
-            className="input pl-10 w-full"
-          />
-        </div>
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="input w-36"
-        >
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        <select
-          value={selectedDifficulty}
-          onChange={(e) => setSelectedDifficulty(e.target.value)}
-          className="input w-36"
-        >
-          <option value="">All levels</option>
-          <option value="BEGINNER">Beginner</option>
-          <option value="INTERMEDIATE">Intermediate</option>
-          <option value="ADVANCED">Advanced</option>
-        </select>
-      </div>
-
-      <p className="text-xs font-semibold mb-4" style={{ color: "var(--text-3)" }}>
-        {filtered.length} word{filtered.length !== 1 ? "s" : ""}
-        {(selectedCategory || selectedDifficulty || query) && " found"}
-      </p>
-
-      {/* Word grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {filtered.map((word) => {
-          const diff = DIFFICULTY_LABEL[word.difficulty] ?? DIFFICULTY_LABEL.BEGINNER;
-          return (
-            <Link
-              key={word.id}
-              href={`/dictionary/${word.id}`}
-              className="flex items-center gap-3 p-4 rounded-2xl transition-all group"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-              onMouseEnter={(e) => { e.currentTarget.style.border = "1px solid var(--border-md)"; e.currentTarget.style.background = "var(--surface-3)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.border = "1px solid var(--border)"; e.currentTarget.style.background = "var(--surface-2)"; }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105"
-                style={{ background: "var(--accent-dim)" }}
-              >
-                {word.imageEmoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="font-semibold text-sm" style={{ color: "var(--text)" }}>{word.word}</span>
-                  <span
-                    className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
-                    style={{ background: diff.bg, color: diff.color }}
-                  >
-                    {diff.label}
-                  </span>
+      {/* ── Results ── */}
+      <div className="space-y-8">
+        {primary ? (
+          <>
+            <div className="card-premium p-8 space-y-6">
+              {/* Header row */}
+              <div className="flex items-start justify-between gap-6 flex-wrap">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-5xl md:text-6xl font-bold mono lowercase tracking-tighter">
+                      {primary.word}
+                    </h2>
+                    <button
+                      onClick={() => handleSpeak(primary.word)}
+                      className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 text-emerald-500 transition-colors"
+                      aria-label="Pronounce"
+                    >
+                      <Volume2 size={20} />
+                    </button>
+                  </div>
+                  <p className="text-xl italic serif text-white/40">
+                    {primary.imageEmoji} · {primary.category}
+                  </p>
                 </div>
-                <p className="text-sm font-medium" style={{ color: "var(--accent)" }}>{word.translation}</p>
-                <p className="text-[11px] truncate mt-0.5" style={{ color: "var(--text-3)" }}>{word.exampleFr}</p>
+                <button
+                  onClick={() => handleSave(primary.id)}
+                  disabled={savingId === primary.id || savedIds.has(primary.id)}
+                  className="btn-primary flex items-center gap-2 py-3 px-6"
+                  style={{ background: "var(--accent)", color: "#000" }}
+                >
+                  {savedIds.has(primary.id) ? (
+                    <>
+                      <Check size={18} /> Saved
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={18} /> Add to Collection
+                    </>
+                  )}
+                </button>
               </div>
-              <svg
-                className="w-4 h-4 flex-shrink-0 transition-transform group-hover:translate-x-1"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                style={{ color: "var(--text-3)" }}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          );
-        })}
-      </div>
 
-      {/* No results from search */}
-      {!isEmpty && filtered.length === 0 && (
-        <div
-          className="text-center py-14 rounded-2xl"
-          style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-        >
-          <p className="text-3xl mb-3">🔍</p>
-          <p className="font-semibold mb-1" style={{ color: "var(--text)" }}>No words found</p>
-          <p className="text-sm" style={{ color: "var(--text-3)" }}>Try a different search or clear the filters</p>
-          <button
-            onClick={() => { setQuery(""); setSelectedCategory(""); setSelectedDifficulty(""); }}
-            className="btn-secondary mt-4 text-sm px-4"
-          >
-            Clear filters
-          </button>
-        </div>
-      )}
-    </>
+              <div className="h-px bg-white/10" />
+
+              {/* 2-col grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                <div className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/40">
+                    Translation
+                  </p>
+                  <p className="text-3xl font-medium">{primary.translation}</p>
+                  {primary.definition && (
+                    <p className="text-sm text-white/50 leading-relaxed">
+                      {primary.definition}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/40">
+                    Usage Example
+                  </p>
+                  <p className="text-lg italic text-white/60 leading-relaxed">
+                    “{primary.exampleFr}”
+                  </p>
+                  <Link
+                    href={`/dictionary/${primary.id}`}
+                    className="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
+                  >
+                    Open full entry →
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Related results */}
+            {others.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-white/40">
+                  Related Matches
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {others.map((w) => (
+                    <Link
+                      key={w.id}
+                      href={`/dictionary/${w.id}`}
+                      className="card-premium p-4 flex items-center gap-3 group no-underline"
+                    >
+                      <span className="text-2xl">{w.imageEmoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold mono lowercase">{w.word}</p>
+                        <p className="text-sm text-white/40 truncate">
+                          {w.translation}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 text-white/10 gap-4">
+            <Library size={64} strokeWidth={1} />
+            <p className="text-lg font-medium">
+              {query.trim()
+                ? "No words match — try a different term"
+                : "Type something to search the global database"}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
