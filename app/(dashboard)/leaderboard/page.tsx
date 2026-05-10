@@ -1,14 +1,13 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getXpProgress } from "@/types";
 import { Metadata } from "next";
-import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
+import { Trophy, TrendingUp, Flame } from "lucide-react";
 import { t, getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Leaderboard вЂ” Lingova",
+  title: "Leaderboard — Lingova",
   description: "See how you rank among other learners",
 };
 
@@ -25,9 +24,7 @@ export default async function LeaderboardPage() {
       select: {
         id: true,
         name: true,
-        progress: {
-          select: { xp: true, level: true, streak: true },
-        },
+        progress: { select: { xp: true, level: true, streak: true } },
       },
       orderBy: { progress: { xp: "desc" } },
       take: 50,
@@ -47,279 +44,247 @@ export default async function LeaderboardPage() {
   }));
 
   const myRank = leaderboard.find((u) => u.isCurrentUser);
-  const isInTopTen = myRank ? myRank.rank <= 10 : false;
 
-  // Podium: [2nd, 1st, 3rd]
-  const podiumOrder = leaderboard.length >= 3 ? [leaderboard[1], leaderboard[0], leaderboard[2]] : [];
+  // Podium [2nd, 1st, 3rd] order for visual layout
+  const top3 = leaderboard.slice(0, 3);
+  const podiumPositions = top3.length === 3 ? [2, 1, 3] : [];
+  const podiumByPos: Record<number, typeof leaderboard[number]> = {};
+  if (top3.length === 3) {
+    podiumByPos[1] = top3[0];
+    podiumByPos[2] = top3[1];
+    podiumByPos[3] = top3[2];
+  }
 
-  const podiumMedals = ["рџҐ€", "рџҐ‡", "рџҐ‰"];
-  const podiumHeights = [120, 150, 100];    // px вЂ” visual height of the podium block
-  const podiumPadTop  = [28, 0, 38];        // extra top padding to align bases
-  const podiumGlow = [
-    "none",
-    "0 0 32px rgba(245,158,11,0.35), 0 0 64px rgba(245,158,11,0.15)",
-    "none",
-  ];
-  const podiumBorder = [
-    "1px solid var(--border)",
-    "1px solid rgba(245,158,11,0.4)",
-    "1px solid var(--border)",
-  ];
-  const avatarBg = [
-    "var(--surface-3)",
-    "linear-gradient(135deg,#f59e0b,#fbbf24)",
-    "var(--surface-3)",
-  ];
+  const rest = leaderboard.slice(3);
 
   return (
-    <div style={{ maxWidth: 680 }} className="animate-fade-up">
-
-      {/* в”Ђв”Ђ Header в”Ђв”Ђ */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{
-          fontSize: 28, fontWeight: 700, color: "var(--text)",
-          letterSpacing: "-0.5px", marginBottom: 4,
-          display: "flex", alignItems: "center", gap: 10,
-        }}>
-          <Trophy size={20} style={{ color: "var(--accent-2)", flexShrink: 0 }} />
-          {t(locale, "lb_title")}
-        </h1>
-        <p style={{ color: "var(--text-2)", fontSize: 14 }}>
-          {t(locale, "lb_subtitle")}
-        </p>
-      </div>
-
-      {/* в”Ђв”Ђ Podium в”Ђв”Ђ */}
-      {podiumOrder.length === 3 && (
-        <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10,
-          marginBottom: 28, alignItems: "flex-end",
-        }}>
-          {podiumOrder.map((user, i) => (
-            <div
-              key={user.id}
-              style={{
-                paddingTop: podiumPadTop[i],
-                display: "flex", flexDirection: "column",
-              }}
-            >
-              <div style={{
-                background: "var(--surface)",
-                border: `${user.isCurrentUser ? "2px solid var(--accent)" : podiumBorder[i]}`,
-                borderRadius: 18, padding: "20px 12px",
-                textAlign: "center",
-                boxShadow: user.isCurrentUser
-                  ? "0 0 24px rgba(16,185,129,0.25)"
-                  : podiumGlow[i],
-                height: podiumHeights[i],
-                display: "flex", flexDirection: "column",
-                alignItems: "center", justifyContent: "center", gap: 6,
-              }}>
-                {/* Medal: #1 gets Crown icon, #2 and #3 keep emoji medals */}
-                {i === 1 ? (
-                  <Crown size={20} style={{ color: "var(--gold)", flexShrink: 0 }} />
-                ) : (
-                  <span style={{ fontSize: 20 }}>{podiumMedals[i]}</span>
-                )}
-
-                {/* Avatar circle */}
-                <div style={{
-                  width: i === 1 ? 52 : 42, height: i === 1 ? 52 : 42,
-                  borderRadius: "50%",
-                  background: avatarBg[i],
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: i === 1 ? 20 : 16, fontWeight: 700,
-                  color: i === 1 ? "#fff" : "var(--text-2)",
-                  flexShrink: 0,
-                }}>
-                  {user.name[0]?.toUpperCase() ?? "?"}
-                </div>
-
-                {/* Name */}
-                <p style={{
-                  fontSize: 12, fontWeight: 700, color: "var(--text)",
-                  textOverflow: "ellipsis", overflow: "hidden",
-                  whiteSpace: "nowrap", width: "100%", textAlign: "center",
-                }}>
-                  {user.name}
-                </p>
-
-                {/* XP */}
-                <p style={{
-                  fontSize: i === 1 ? 14 : 12, fontWeight: 700,
-                  color: i === 1 ? "var(--xp)" : "var(--accent-2)",
-                  fontFamily: "var(--font-mono)",
-                  letterSpacing: "-0.01em",
-                  fontVariantNumeric: "tabular-nums",
-                }}>
-                  {user.xp.toLocaleString()} XP
-                </p>
-
-                <p style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600 }}>
-                  Lv.{user.level}
-                </p>
-              </div>
+    <div className="space-y-12 max-w-5xl mx-auto">
+      {/* ── Header ── */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-5xl mb-4">Elite Leagues</h1>
+          <div className="flex items-center gap-6">
+            <div className="flex -space-x-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="w-10 h-10 rounded-full border-4 border-black bg-white/10"
+                />
+              ))}
             </div>
+            <p className="text-white/40 text-lg">
+              You're currently in the{" "}
+              <span className="text-emerald-400 font-bold italic serif">
+                Gold League
+              </span>
+              . Top 3 advance to Diamond.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-2 p-1 bg-white/5 rounded-full border border-white/10">
+          {(["Global", "League", "Friends"] as const).map((f) => (
+            <button
+              key={f}
+              className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                f === "League"
+                  ? "bg-white text-black"
+                  : "text-white/40 hover:text-white"
+              }`}
+            >
+              {f}
+            </button>
           ))}
+        </div>
+      </header>
+
+      {/* ── Podium (top 3) ── */}
+      {top3.length === 3 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-12">
+          {podiumPositions.map((pos) => {
+            const user = podiumByPos[pos];
+            const isFirst = pos === 1;
+            const orderClass =
+              pos === 2
+                ? "order-0 md:order-1"
+                : pos === 1
+                ? "order-1 md:order-2 md:-translate-y-8"
+                : "order-2 md:order-3";
+            const borderClass = isFirst
+              ? "border-amber-500/50 bg-amber-500/5"
+              : "";
+            const medalBg =
+              pos === 1
+                ? "bg-amber-500"
+                : pos === 2
+                ? "bg-slate-300"
+                : "bg-orange-400";
+            const youHighlight = user.isCurrentUser
+              ? "ring-2 ring-emerald-500/60"
+              : "";
+
+            return (
+              <div
+                key={user.id}
+                className={`card-premium p-8 text-center min-h-[320px] relative transition-transform hover:scale-105 ${orderClass} ${borderClass} ${youHighlight}`}
+              >
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <div
+                    className={`w-20 h-20 rounded-full border-8 border-black flex items-center justify-center text-black font-black text-2xl ${medalBg}`}
+                  >
+                    {pos}
+                  </div>
+                </div>
+                <div className="space-y-4 pt-8">
+                  <div className="w-24 h-24 rounded-full bg-white/10 mx-auto border-4 border-white/5 flex items-center justify-center text-3xl font-bold text-white/60">
+                    {user.name[0]?.toUpperCase() ?? "?"}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold serif italic truncate">
+                      {user.name}
+                      {user.isCurrentUser && (
+                        <span className="text-emerald-400 text-sm not-italic ml-2">
+                          ({t(locale, "lb_you")})
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-xs uppercase tracking-widest font-bold text-white/30 mt-1">
+                      Level {user.level}
+                      {user.streak > 0 && ` · ${user.streak}d streak`}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <Trophy
+                      size={16}
+                      className={isFirst ? "text-amber-500" : "text-white/20"}
+                    />
+                    <span className="text-3xl font-bold mono">
+                      {user.xp.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* в”Ђв”Ђ Full Rankings Table в”Ђв”Ђ */}
+      {/* ── Full rankings table ── */}
       {leaderboard.length > 0 ? (
-        <div style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
-          borderRadius: 18, overflow: "hidden", marginBottom: 20,
-        }}>
-          {/* Table header */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "40px 1fr 80px 70px 54px",
-            padding: "10px 16px", gap: 8,
-            borderBottom: "1px solid var(--border)",
-          }}>
-            {(["#", t(locale, "lb_player"), t(locale, "lb_level"), "XP", t(locale, "lb_streak")] as string[]).map((h) => (
-              <span key={h} style={{
-                fontSize: 10, fontWeight: 700, color: "var(--text-3)",
-                textTransform: "uppercase", letterSpacing: "0.07em",
-              }}>{h}</span>
-            ))}
-          </div>
-
-          {/* Rows */}
-          <div>
-            {leaderboard.map((user) => (
-              <div
-                key={user.id}
-                style={{
-                  display: "grid", gridTemplateColumns: "40px 1fr 80px 70px 54px",
-                  alignItems: "center", padding: "11px 16px", gap: 8,
-                  background: user.isCurrentUser ? "var(--accent-dim)" : "transparent",
-                  borderBottom: "1px solid var(--border)",
-                  transition: "background 0.12s",
-                }}
-              >
-                {/* Rank */}
-                <span style={{
-                  fontSize: 13, fontWeight: 700,
-                  color: user.rank === 1 ? "var(--gold)"
-                       : user.rank === 2 ? "var(--text-2)"
-                       : user.rank === 3 ? "#cd7f32"
-                       : "var(--text-3)",
-                }}>
-                  {user.rank}
-                </span>
-
-                {/* Player */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                    background: user.isCurrentUser
-                      ? "linear-gradient(135deg, var(--accent), var(--accent-2))"
-                      : "var(--surface-3)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 700,
-                    color: user.isCurrentUser ? "#fff" : "var(--text-2)",
-                  }}>
-                    {user.name[0]?.toUpperCase() ?? "?"}
-                  </div>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{
-                      fontSize: 13, fontWeight: 600, color: "var(--text)",
-                      textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap",
-                    }}>
-                      {user.name}
-                      {user.isCurrentUser && (
-                        <span style={{ color: "var(--accent-2)", fontSize: 11, marginLeft: 5, fontWeight: 500 }}>
-                          {t(locale, "lb_you")}
+        <div className="card-premium overflow-hidden">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-white/10 text-[10px] uppercase tracking-widest font-bold text-white/40">
+                <th className="p-6">Rank</th>
+                <th className="p-6">Learner</th>
+                <th className="p-6">Level</th>
+                <th className="p-6">XP</th>
+                <th className="p-6 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(rest.length > 0 ? rest : leaderboard).map((user) => {
+                const isPromotion = user.rank <= 3;
+                const isDemotion = user.rank >= 20;
+                return (
+                  <tr
+                    key={user.id}
+                    className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+                      user.isCurrentUser ? "bg-emerald-500/5" : ""
+                    }`}
+                  >
+                    <td className="p-6 mono text-white/40">{user.rank}</td>
+                    <td className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                            user.isCurrentUser
+                              ? "bg-emerald-500 text-black"
+                              : "bg-white/5 text-white/60"
+                          }`}
+                        >
+                          {user.name[0]?.toUpperCase() ?? "?"}
+                        </div>
+                        <div>
+                          <p className="font-bold">
+                            {user.isCurrentUser
+                              ? t(locale, "lb_you")
+                              : user.name}
+                          </p>
+                          <p className="text-xs text-white/40 flex items-center gap-2">
+                            {user.streak > 0 ? (
+                              <>
+                                <Flame
+                                  size={11}
+                                  className="text-amber-400"
+                                />
+                                {user.streak}d streak
+                              </>
+                            ) : (
+                              "—"
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <span className="text-xs font-bold mono px-2 py-1 bg-white/5 rounded">
+                        Lv {user.level}
+                      </span>
+                    </td>
+                    <td className="p-6 mono font-bold">
+                      {user.xp.toLocaleString()}
+                    </td>
+                    <td className="p-6 text-right">
+                      {isPromotion ? (
+                        <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center justify-end gap-1">
+                          <TrendingUp size={12} /> Promotion
+                        </span>
+                      ) : isDemotion ? (
+                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">
+                          Demotion
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
+                          Stable
                         </span>
                       )}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Level badge */}
-                <div>
-                  <span style={{
-                    fontSize: 11, fontWeight: 700, color: "var(--accent-2)",
-                    background: "var(--accent-dim)", borderRadius: 99,
-                    padding: "3px 10px",
-                  }}>
-                    {t(locale, "lb_lvPrefix")} {user.level}
-                  </span>
-                </div>
-
-                {/* XP */}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--xp)", fontFamily: "var(--font-mono)", letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums" }}>
-                  {user.xp.toLocaleString()}
-                </span>
-
-                {/* Streak */}
-                <span style={{
-                  fontSize: 12, fontWeight: 600,
-                  color: user.streak > 0 ? "var(--xp)" : "var(--text-3)",
-                  display: "flex", alignItems: "center", gap: 3,
-                  fontFamily: "var(--font-mono)", letterSpacing: "-0.01em",
-                }}>
-                  {user.streak > 0 ? (
-                    <>
-                      <Flame size={12} style={{ color: "var(--streak)", flexShrink: 0 }} />
-                      {user.streak}d
-                    </>
-                  ) : "вЂ”"}
-                </span>
-              </div>
-            ))}
-          </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       ) : (
-        <div style={{
-          background: "var(--surface)", border: "1px solid var(--border)",
-          borderRadius: 18, textAlign: "center", padding: "56px 24px",
-          marginBottom: 20,
-        }}>
-          <p style={{ fontSize: 36, marginBottom: 10 }}>в—€</p>
-          <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
+        <div className="card-premium p-16 text-center">
+          <p className="text-5xl mb-4">◆</p>
+          <p className="text-2xl font-bold serif italic mb-2">
             {t(locale, "lb_noLearners")}
           </p>
-          <p style={{ fontSize: 13, color: "var(--text-2)" }}>
+          <p className="text-white/40 text-sm">
             {t(locale, "lb_noLearnersHint")}
           </p>
         </div>
       )}
 
-      {/* в”Ђв”Ђ Your Rank Summary Card (if not in top 10) в”Ђв”Ђ */}
-      {myRank && !isInTopTen && (
-        <div style={{
-          background: "var(--surface)", border: "1px solid var(--border-md, rgba(255,255,255,0.10))",
-          borderRadius: 18, padding: "20px 24px",
-          display: "flex", alignItems: "center", gap: 16,
-        }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: "50%", flexShrink: 0,
-            background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <Trophy size={18} style={{ color: "#fff" }} />
+      {/* ── Your rank summary if not in top 3 ── */}
+      {myRank && myRank.rank > 3 && (
+        <div className="card-premium p-6 flex items-center gap-6">
+          <div className="w-12 h-12 rounded-full bg-emerald-500 text-black flex items-center justify-center flex-shrink-0">
+            <Trophy size={20} />
           </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
-              {t(locale, "lb_yourRank", { n: String(myRank.rank) })}
+          <div className="flex-1">
+            <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-1">
+              Your Position
             </p>
-            <p style={{ fontSize: 12, color: "var(--text-2)" }}>
-              {t(locale, "lb_levelXp", { level: String(myRank.level), xp: myRank.xp.toLocaleString() })}
-              {myRank.streak > 0 && (
-                <>
-                  {" В· "}
-                  <Flame size={11} style={{ color: "var(--gold)", display: "inline", verticalAlign: "middle", marginRight: 2 }} />
-                  {t(locale, "lb_dayStreak", { n: String(myRank.streak) })}
-                </>
-              )}
+            <p className="text-2xl font-bold serif italic">
+              Rank #{myRank.rank} · {myRank.xp.toLocaleString()} XP
             </p>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <p style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
-              {t(locale, "lb_spotsFromTop10", { n: String(myRank.rank - 10) })}
-            </p>
-          </div>
+          <p className="text-xs font-bold uppercase tracking-widest text-white/40">
+            {Math.max(0, myRank.rank - 3)} spots from podium
+          </p>
         </div>
       )}
     </div>

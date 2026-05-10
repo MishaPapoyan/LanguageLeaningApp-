@@ -1,260 +1,41 @@
-﻿import { RegisterForm } from "@/components/auth/RegisterForm";
+import { RegisterForm } from "@/components/auth/RegisterForm";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Star, Zap, Globe } from "lucide-react";
 
 export default async function RegisterPage() {
   const session = await getServerSession(authOptions);
   if (session) redirect("/home");
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        background: "var(--bg)",
-        color: "var(--text)",
-      }}
-    >
-      {/* Left вЂ” decorative panel */}
-      <div
-        style={{
-          display: "none",
-          width: "50%",
-          position: "relative",
-          overflow: "hidden",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(150deg, #0d1f1a 0%, #091512 100%)",
-          borderRight: "1px solid var(--border)",
-          flexShrink: 0,
-        }}
-        className="register-panel"
-      >
-        {/* Glow orbs */}
-        <div
-          style={{
-            position: "absolute",
-            top: "20%",
-            right: "10%",
-            width: "340px",
-            height: "340px",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(20,184,166,0.2) 0%, transparent 70%)",
-            filter: "blur(50px)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "20%",
-            left: "10%",
-            width: "260px",
-            height: "260px",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(16,185,129,0.16) 0%, transparent 70%)",
-            filter: "blur(40px)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Decorative circles */}
-        <div
-          style={{
-            position: "absolute",
-            top: "60px",
-            right: "-80px",
-            width: "280px",
-            height: "280px",
-            borderRadius: "50%",
-            border: "1px solid rgba(20,184,166,0.1)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-60px",
-            left: "-60px",
-            width: "380px",
-            height: "380px",
-            borderRadius: "50%",
-            border: "1px solid rgba(20,184,166,0.07)",
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Content */}
-        <div style={{ textAlign: "center", position: "relative", zIndex: 10, padding: "0 48px" }}>
-          <p style={{ fontSize: "72px", lineHeight: 1, marginBottom: "24px" }}>{"\u{1F30D}"}</p>
-          <h2
-            style={{
-              fontFamily: "serif",
-              fontSize: "38px",
-              fontStyle: "italic",
-              color: "var(--text)",
-              marginBottom: "12px",
-            }}
-          >
-            Let's go!
-          </h2>
-          <p
-            style={{
-              fontSize: "16px",
-              color: "var(--text-2)",
-              lineHeight: 1.6,
-              marginBottom: "40px",
-            }}
-          >
-            Start speaking from day one.
-          </p>
-
-          {/* Benefit list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left" }}>
-            {[
-              { icon: Zap, label: "Up and running in 60 seconds", color: "var(--gold)" },
-              { icon: Star, label: "No credit card required", color: "var(--teal)" },
-              { icon: Globe, label: "French, Spanish & English supported", color: "var(--accent-2)" },
-            ].map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "12px 16px",
-                  borderRadius: "10px",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                <div
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "8px",
-                    background: "rgba(255,255,255,0.06)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <item.icon size={14} style={{ color: item.color }} />
-                </div>
-                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right вЂ” form */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "24px",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: "360px" }}>
-
+    <div className="min-h-screen bg-black text-white relative">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 py-16">
+        <div className="w-full max-w-lg space-y-10">
           {/* Logo */}
-          <Link
-            href="/"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "40px",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-          >
-            <div
-              style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "10px",
-                background: "var(--accent)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#050505",
-                fontWeight: 700,
-                fontSize: "18px",
-                fontFamily: "var(--font-display)",
-                fontStyle: "italic",
-                boxShadow: "0 0 18px rgba(16,185,129,0.45)",
-                flexShrink: 0,
-              }}
-            >
+          <Link href="/" className="block">
+            <div className="w-20 h-20 bg-emerald-500 rounded-3xl mx-auto flex items-center justify-center font-bold text-3xl italic text-black shadow-[0_0_50px_rgba(16,185,129,0.3)] serif">
               L
             </div>
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "18px",
-                color: "var(--text)",
-                fontWeight: 800,
-                fontStyle: "italic",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Lingova
-            </span>
           </Link>
 
-          {/* Heading */}
-          <h1
-            style={{
-              fontFamily: "serif",
-              fontSize: "30px",
-              color: "var(--text)",
-              marginBottom: "6px",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Create your account
-          </h1>
-          <p
-            style={{
-              fontSize: "14px",
-              color: "var(--text-2)",
-              marginBottom: "32px",
-              lineHeight: 1.5,
-            }}
-          >
-            Takes 60 seconds вЂ” no credit card needed
-          </p>
+          {/* Wordmark + heading */}
+          <div className="text-center space-y-3">
+            <h1 className="text-7xl md:text-8xl italic font-black tracking-tighter">Lingova</h1>
+            <p className="text-white/40 text-lg">
+              Start speaking from day one — no credit card required.
+            </p>
+          </div>
 
           {/* Form */}
           <RegisterForm />
 
           {/* Log in link */}
-          <p
-            style={{
-              textAlign: "center",
-              fontSize: "13px",
-              color: "var(--text-3)",
-              marginTop: "24px",
-            }}
-          >
+          <p className="text-center text-sm text-white/40">
             Already learning?{" "}
             <Link
               href="/login"
-              style={{
-                color: "var(--accent)",
-                fontWeight: 600,
-                textDecoration: "none",
-                cursor: "pointer",
-              }}
+              className="text-emerald-500 font-bold hover:text-emerald-400 transition-colors"
             >
               Log in
             </Link>
@@ -262,14 +43,9 @@ export default async function RegisterPage() {
         </div>
       </div>
 
-      {/* Responsive: show left panel on large screens */}
-      <style>{`
-        @media (min-width: 1024px) {
-          .register-panel {
-            display: flex !important;
-          }
-        }
-      `}</style>
+      <footer className="w-full text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/10 pb-8">
+        Lingova Global Platform · Secure Auth Enabled
+      </footer>
     </div>
   );
 }

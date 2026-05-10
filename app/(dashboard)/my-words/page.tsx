@@ -683,122 +683,107 @@ export default function MyWordsPage() {
             {words.map((word, idx) => {
               const mastery = ((idx * 17) % 80) + 20; // deterministic placeholder mastery
               const level = (idx % 5) + 1;
-              if (false) { // placeholder to satisfy original variable usage below
+              const masteryColor = mastery > 70 ? "bg-emerald-500" : "bg-amber-500";
+              const isEditing = editingId === word.id;
+
+              if (isEditing) {
+                return (
+                  <div key={word.id} className="card-premium p-4 flex items-center gap-3">
+                    <input
+                      autoFocus
+                      value={editFront}
+                      onChange={(e) => setEditFront(e.target.value)}
+                      placeholder="Your language"
+                      className="input flex-1"
+                    />
+                    <input
+                      value={editBack}
+                      onChange={(e) => setEditBack(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && saveEdit()}
+                      placeholder={langConfig.label}
+                      className="input flex-1"
+                    />
+                    <button
+                      onClick={saveEdit}
+                      className="p-2 rounded-full bg-emerald-500 text-black hover:bg-emerald-400 transition-colors"
+                      aria-label="Save"
+                    >
+                      <Check size={16} />
+                    </button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="p-2 rounded-full border border-white/10 text-white/40 hover:text-white transition-colors"
+                      aria-label="Cancel"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                );
               }
-              // Design-system themed palette
-              const palette = [
-                { color: "var(--accent-2)", dim: "var(--accent-dim)", border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)" },
-                { color: "var(--teal)",     dim: "var(--teal-dim)",   border: "rgba(45,212,191,0.3)", glow: "rgba(45,212,191,0.12)" },
-                { color: "var(--xp)",       dim: "var(--xp-dim)",     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)" },
-                { color: "#f472b6",         dim: "rgba(244,114,182,0.12)", border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.1)" },
-                { color: "var(--green)",    dim: "var(--green-dim)",  border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)" },
-                { color: "var(--blue)",     dim: "var(--blue-dim)",   border: "rgba(96,165,250,0.3)", glow: "rgba(96,165,250,0.12)" },
-              ];
-              const p = palette[idx % palette.length];
 
               return (
-                <div key={word.id} style={{
-                  borderRadius: 18,
-                  background: "var(--surface-2)",
-                  border: `1px solid ${p.border}`,
-                  overflow: "hidden",
-                  display: "flex", flexDirection: "column",
-                  transition: "transform 0.18s, box-shadow 0.18s",
-                  position: "relative",
-                  boxShadow: `0 4px 20px ${p.glow}`,
-                }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)";
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = `0 8px 32px ${p.glow}, 0 0 0 1px ${p.border}`;
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = `0 4px 20px ${p.glow}`;
-                  }}
+                <div
+                  key={word.id}
+                  className="card-premium p-4 flex items-center justify-between group"
                 >
-                  {/* Colored top accent */}
-                  <div style={{ height: 3, background: `linear-gradient(90deg, ${p.color}, ${p.color}88)` }} />
-
-                  {editingId === word.id ? (
-                    /* в”Ђв”Ђ Edit mode в”Ђв”Ђ */
-                    <div style={{ padding: "14px 14px 12px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-                      <input
-                        autoFocus value={editFront} onChange={e => setEditFront(e.target.value)}
-                        placeholder="Your language"
-                        className="input" style={{ width: "100%", fontSize: 13 }}
-                      />
-                      <input
-                        value={editBack} onChange={e => setEditBack(e.target.value)}
-                        onKeyDown={e => e.key === "Enter" && saveEdit()}
-                        placeholder={langConfig.label}
-                        className="input" style={{ width: "100%", fontSize: 13 }}
-                      />
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <button onClick={saveEdit} style={{
-                          flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-                          padding: "7px 0", borderRadius: 9, border: "none",
-                          background: "var(--accent)", color: "#fff",
-                          fontSize: 12, fontWeight: 700, cursor: "pointer",
-                        }}>
-                          <Check size={12} /> {t(locale, "mywords_save")}
-                        </button>
-                        <button onClick={() => setEditingId(null)} style={{
-                          flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-                          padding: "7px 0", borderRadius: 9,
-                          border: "1px solid var(--border)", background: "none",
-                          color: "var(--text-3)", fontSize: 12, fontWeight: 600, cursor: "pointer",
-                        }}>
-                          <X size={12} /> {t(locale, "mywords_cancel")}
-                        </button>
-                      </div>
+                  {/* Left: speaker + word/translation + category */}
+                  <div className="flex items-center gap-4 min-w-0">
+                    <button
+                      onClick={() => speakTarget(word.back, langConfig.code)}
+                      className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 text-white/40 hover:text-white transition-colors flex-shrink-0"
+                      aria-label="Listen"
+                    >
+                      <Volume2 size={16} />
+                    </button>
+                    <div className="min-w-[140px]">
+                      <p className="font-bold text-xl lowercase mono leading-tight">
+                        {word.back}
+                      </p>
+                      <p className="text-sm text-white/40 truncate">
+                        {word.front}
+                      </p>
                     </div>
-                  ) : (
-                    <>
-                      {/* Card body */}
-                      <div style={{ padding: "14px 16px", flex: 1 }}>
-                        {/* Native word */}
-                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 3px" }}>
-                          {t(locale, "mywords_yourLanguage")}
-                        </p>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text-2)", margin: "0 0 12px", wordBreak: "break-word", lineHeight: 1.3 }}>
-                          {word.front}
-                        </p>
+                    <span className="hidden sm:inline-block text-[10px] font-bold text-white/30 bg-white/5 px-2 py-1 rounded uppercase tracking-wider">
+                      {langConfig.label}
+                    </span>
+                  </div>
 
-                        {/* Separator with flag */}
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                          <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${p.border}, transparent)` }} />
-                          <span style={{ fontSize: 14 }}>{langConfig.flag}</span>
-                          <div style={{ flex: 1, height: 1, background: `linear-gradient(270deg, ${p.border}, transparent)` }} />
-                        </div>
-
-                        {/* Target language word */}
-                        <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: p.color, margin: "0 0 3px", opacity: 0.8 }}>
-                          {langConfig.label}
-                        </p>
-                        <p style={{ fontSize: 19, fontWeight: 800, color: p.color, margin: 0, wordBreak: "break-word", lineHeight: 1.2, letterSpacing: "-0.01em" }}>
-                          {word.back}
-                        </p>
+                  {/* Right: mastery + level + actions */}
+                  <div className="flex items-center gap-6 md:gap-12">
+                    <div className="hidden md:flex w-32 items-center gap-3">
+                      <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-1000 ${masteryColor}`}
+                          style={{ width: `${mastery}%` }}
+                        />
                       </div>
-
-                      {/* Action row */}
-                      <div style={{ display: "flex", alignItems: "center", borderTop: `1px solid ${p.border}40`, padding: "0 4px" }}>
-                        <button onClick={() => speakTarget(word.back, langConfig.code)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "color 0.12s" }}
-                          onMouseEnter={e => e.currentTarget.style.color = p.color}
-                          onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                        ><Volume2 size={12} /> {t(locale, "mywords_listen")}</button>
-                        <div style={{ width: 1, height: 16, background: "var(--border)" }} />
-                        <button onClick={() => startEdit(word)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "color 0.12s" }}
-                          onMouseEnter={e => e.currentTarget.style.color = "var(--accent)"}
-                          onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                        ><Pencil size={12} /> {t(locale, "mywords_edit")}</button>
-                        <div style={{ width: 1, height: 16, background: "var(--border)" }} />
-                        <button onClick={() => deleteWord(word.id)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 4, padding: "9px 0", background: "none", border: "none", color: "var(--text-3)", cursor: "pointer", fontSize: 11, fontWeight: 600, transition: "color 0.12s" }}
-                          onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
-                          onMouseLeave={e => e.currentTarget.style.color = "var(--text-3)"}
-                        ><Trash2 size={12} /> {t(locale, "mywords_delete")}</button>
-                      </div>
-                    </>
-                  )}
+                      <span className="text-xs font-bold mono w-8 text-right">
+                        {mastery}%
+                      </span>
+                    </div>
+                    <span className="hidden sm:inline-block w-6 text-xs font-bold mono text-emerald-500/60 text-center">
+                      {level}
+                    </span>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      <button
+                        onClick={() => startEdit(word)}
+                        className="p-2 text-white/40 hover:text-emerald-500 transition-colors"
+                        aria-label="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => deleteWord(word.id)}
+                        className="p-2 text-rose-500/40 hover:text-rose-500 transition-colors"
+                        aria-label="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                      <button className="p-2 text-white/40 hover:text-white transition-colors">
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -806,28 +791,14 @@ export default function MyWordsPage() {
 
           {/* Bottom quiz CTA */}
           {words.length >= 2 && (
-            <button onClick={() => setMode("setup")} style={{
-              width: "100%", marginTop: 20, padding: "18px",
-              borderRadius: 16, cursor: "pointer",
-              background: "linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))",
-              border: "2px dashed rgba(16,185,129,0.3)",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              color: "var(--accent)", fontSize: 15, fontWeight: 800,
-              transition: "all 0.18s",
-            }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(16,185,129,0.14)";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(16,185,129,0.3)";
-              }}
+            <button
+              onClick={() => setMode("setup")}
+              className="w-full mt-6 p-5 rounded-2xl border-2 border-dashed border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 flex items-center justify-center gap-3 text-emerald-400 font-bold uppercase tracking-widest text-sm transition-all"
             >
-              <Play size={17} /> {t(locale, "mywords_quizMe", { n: words.length.toString() })}
+              <Play size={16} fill="currentColor" /> {t(locale, "mywords_quizMe", { n: words.length.toString() })}
             </button>
           )}
-        </>
+        </div>
       )}
     </div>
   );
