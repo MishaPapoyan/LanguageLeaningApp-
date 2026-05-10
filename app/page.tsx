@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export default async function LandingPage() {
     {
       icon: Gamepad2,
       title: "Games",
-      desc: "Flashcards, matching, memory palace — vocabulary that actually sticks.",
+      desc: "Flashcards, matching, memory palace вЂ” vocabulary that actually sticks.",
       tag: "Vocab",
       color: "var(--teal)",
       colorDim: "rgba(20,184,166,0.12)",
@@ -120,12 +120,12 @@ export default async function LandingPage() {
         }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
             <div style={{
-              width: "32px", height: "32px", borderRadius: "8px",
-              background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
+              width: "32px", height: "32px", borderRadius: "10px",
+              background: "var(--accent)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "white", fontWeight: 700, fontSize: "11px", letterSpacing: "0.05em", flexShrink: 0,
-            }}>LG</div>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", color: "var(--text)", fontWeight: 800, letterSpacing: "-0.02em" }}>Lingova</span>
+              color: "#050505", fontWeight: 700, fontSize: "18px", fontFamily: "var(--font-display)", fontStyle: "italic", boxShadow: "0 0 18px rgba(16,185,129,0.45)", flexShrink: 0,
+            }}>L</div>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", color: "var(--text)", fontWeight: 800, fontStyle: "italic", letterSpacing: "-0.02em" }}>Lingova</span>
             <span style={{ fontSize: "15px", lineHeight: 1 }}>{"\u{1F30D}"}</span>
           </Link>
 
@@ -150,7 +150,7 @@ export default async function LandingPage() {
               padding: "5px 14px", borderRadius: "999px",
               background: "var(--accent-dim)", color: "var(--accent-2)",
               fontSize: "12px", fontWeight: 600, marginBottom: "28px",
-              border: "1px solid rgba(99,102,241,0.25)",
+              border: "1px solid rgba(16,185,129,0.25)",
             }}>
               <Zap size={11} /> AI-powered language learning
             </div>
@@ -166,7 +166,7 @@ export default async function LandingPage() {
             </h1>
 
             <p style={{ fontSize: "18px", lineHeight: 1.75, color: "var(--text-2)", maxWidth: "440px", margin: "0 0 40px" }}>
-              Stories, AI conversations, and games — no textbook, no memorisation grids. Just start talking.
+              Stories, AI conversations, and games вЂ” no textbook, no memorisation grids. Just start talking.
             </p>
 
             {/* CTAs */}
@@ -201,13 +201,13 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          {/* Right — floating word cards */}
+          {/* Right вЂ” floating word cards */}
           <div style={{ position: "relative", height: "420px", display: "none" }} className="hero-cards">
             {/* Glow orb */}
             <div style={{
               position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
               width: "300px", height: "300px", borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%)",
               filter: "blur(28px)", pointerEvents: "none",
             }} />
 
@@ -219,16 +219,16 @@ export default async function LandingPage() {
               boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
               minWidth: "200px",
             }}>
-              <div style={{ fontSize: "36px", marginBottom: "8px" }}>🇫🇷</div>
+              <div style={{ fontSize: "36px", marginBottom: "8px" }}>рџ‡«рџ‡·</div>
               <p style={{ fontFamily: "serif", fontSize: "28px", color: "var(--text)", margin: "0 0 4px" }}>Bonjour</p>
-              <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>Hello · French</p>
+              <p style={{ fontSize: "13px", color: "var(--text-3)", margin: 0 }}>Hello В· French</p>
             </div>
 
             {[
-              { top: "6%", right: "4%", word: "Merci", flag: "🇫🇷", en: "Thank you", rotate: "-2deg" },
-              { top: "18%", left: "2%", word: "Hola", flag: "🇪🇸", en: "Hello", rotate: "1.5deg" },
-              { bottom: "14%", right: "8%", word: "Amigo", flag: "🇪🇸", en: "Friend", rotate: "2deg" },
-              { bottom: "6%", left: "10%", word: "Bonsoir", flag: "🇫🇷", en: "Good evening", rotate: "-1.5deg" },
+              { top: "6%", right: "4%", word: "Merci", flag: "рџ‡«рџ‡·", en: "Thank you", rotate: "-2deg" },
+              { top: "18%", left: "2%", word: "Hola", flag: "рџ‡Єрџ‡ё", en: "Hello", rotate: "1.5deg" },
+              { bottom: "14%", right: "8%", word: "Amigo", flag: "рџ‡Єрџ‡ё", en: "Friend", rotate: "2deg" },
+              { bottom: "6%", left: "10%", word: "Bonsoir", flag: "рџ‡«рџ‡·", en: "Good evening", rotate: "-1.5deg" },
             ].map((w) => (
               <div key={w.word} style={{
                 position: "absolute",
@@ -259,7 +259,7 @@ export default async function LandingPage() {
           color: "var(--text)", marginBottom: "12px", letterSpacing: "-0.01em",
         }}>Three steps to fluency</h2>
         <p style={{ fontSize: "15px", color: "var(--text-2)", marginBottom: "40px", maxWidth: "480px" }}>
-          A complete learning loop — read, speak, and practice — all in one place.
+          A complete learning loop вЂ” read, speak, and practice вЂ” all in one place.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
@@ -347,8 +347,8 @@ export default async function LandingPage() {
       <section style={{ maxWidth: "1100px", margin: "0 auto", padding: "48px 24px 96px" }}>
         <div style={{
           borderRadius: "24px",
-          background: "linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(91,79,207,0.10) 60%, rgba(20,184,166,0.07) 100%)",
-          border: "1px solid rgba(99,102,241,0.28)",
+          background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(91,79,207,0.10) 60%, rgba(20,184,166,0.07) 100%)",
+          border: "1px solid rgba(16,185,129,0.28)",
           padding: "clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)",
           textAlign: "center", position: "relative", overflow: "hidden",
         }}>
@@ -356,7 +356,7 @@ export default async function LandingPage() {
           <div style={{
             position: "absolute", top: "-80px", left: "50%", transform: "translateX(-50%)",
             width: "500px", height: "280px", borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(99,102,241,0.22) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(16,185,129,0.22) 0%, transparent 70%)",
             filter: "blur(40px)", pointerEvents: "none",
           }} />
           <div style={{
@@ -364,7 +364,7 @@ export default async function LandingPage() {
             padding: "5px 14px", borderRadius: "999px",
             background: "var(--accent-dim)", color: "var(--accent-2)",
             fontSize: "12px", fontWeight: 600, marginBottom: "24px",
-            border: "1px solid rgba(99,102,241,0.3)", position: "relative",
+            border: "1px solid rgba(16,185,129,0.3)", position: "relative",
           }}>
             <Zap size={11} /> No credit card, no catch
           </div>
@@ -398,12 +398,12 @@ export default async function LandingPage() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <div style={{
-              width: "22px", height: "22px", borderRadius: "5px",
-              background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
+              width: "22px", height: "22px", borderRadius: "7px",
+              background: "var(--accent)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "white", fontWeight: 700, fontSize: "8px",
-            }}>LG</div>
-            <span>© 2026 Lingova. All rights reserved.</span>
+              color: "#050505", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)", fontStyle: "italic",
+            }}>L</div>
+            <span>В© 2026 Lingova. All rights reserved.</span>
           </div>
           <div style={{ display: "flex", gap: "20px" }}>
             <Link href="/login" style={{ color: "var(--text-3)", textDecoration: "none" }}>Log in</Link>

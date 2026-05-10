@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import {
   Globe, Calendar, Award, TrendingUp, User, Star,
 } from "lucide-react";
 
-/* ─── Types ──────────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Types в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 interface ProfileData {
   id: string;
   name: string | null;
@@ -27,11 +27,11 @@ interface ProfileData {
 }
 interface Props { profile: ProfileData; viewerUserId: string; }
 
-/* ─── Constants ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Constants в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 const LANG: Record<string, { label: string; flag: string; grad: string; accent: string }> = {
-  fr: { label: "French",  flag: "🇫🇷", grad: "linear-gradient(135deg,#0f1b6b 0%,#2d1d8a 40%,#5b21b6 100%)", accent: "#818cf8" },
-  es: { label: "Spanish", flag: "🇪🇸", grad: "linear-gradient(135deg,#7c2d12 0%,#b45309 50%,#d97706 100%)", accent: "#fbbf24" },
-  en: { label: "English", flag: "🇬🇧", grad: "linear-gradient(135deg,#0c1e3a 0%,#155e75 50%,#0e7490 100%)", accent: "#22d3ee" },
+  fr: { label: "French",  flag: "рџ‡«рџ‡·", grad: "linear-gradient(135deg,#0f1b6b 0%,#2d1d8a 40%,#5b21b6 100%)", accent: "var(--accent-2)" },
+  es: { label: "Spanish", flag: "рџ‡Єрџ‡ё", grad: "linear-gradient(135deg,#7c2d12 0%,#b45309 50%,#d97706 100%)", accent: "#fbbf24" },
+  en: { label: "English", flag: "рџ‡¬рџ‡§", grad: "linear-gradient(135deg,#0c1e3a 0%,#155e75 50%,#0e7490 100%)", accent: "#22d3ee" },
 };
 const GAME_LABEL: Record<string, string> = {
   MATCHING:"Matching", WORD_SCRAMBLE:"Scramble", FILL_BLANK:"Fill Blank",
@@ -39,12 +39,12 @@ const GAME_LABEL: Record<string, string> = {
   DIALOG_ADVENTURE:"Dialog", CITY_EXPLORER:"City Explorer", WORD_BLAST:"Word Blast",
 };
 const GAME_ICON: Record<string, string> = {
-  MATCHING:"🃏", WORD_SCRAMBLE:"🔀", FILL_BLANK:"✏️", TRUE_FALSE:"⚖️",
-  SENTENCE_BUILDER:"🔤", DIALOG_ADVENTURE:"💬", CITY_EXPLORER:"🏙️", WORD_BLAST:"💥",
+  MATCHING:"рџѓЏ", WORD_SCRAMBLE:"рџ”Ђ", FILL_BLANK:"вњЏпёЏ", TRUE_FALSE:"вљ–пёЏ",
+  SENTENCE_BUILDER:"рџ”¤", DIALOG_ADVENTURE:"рџ’¬", CITY_EXPLORER:"рџЏ™пёЏ", WORD_BLAST:"рџ’Ґ",
 };
 const XP_PER_LVL = 500;
 
-/* ─── Helpers ────────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function isEmoji(s: string | null) {
   return !!s && /\p{Emoji}/u.test(s) && !/^[a-zA-Z0-9]$/.test(s);
 }
@@ -65,7 +65,7 @@ function useCountUp(target: number, ms = 1200, go: boolean) {
   return v;
 }
 
-/* ─── XP Ring ────────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ XP Ring в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function XpRing({ xp, level, go }: { xp: number; level: number; go: boolean }) {
   const R = 52, C = 2 * Math.PI * R;
   const pct = Math.min(((xp % XP_PER_LVL) / XP_PER_LVL) * 100, 100);
@@ -106,7 +106,7 @@ function XpRing({ xp, level, go }: { xp: number; level: number; go: boolean }) {
   );
 }
 
-/* ─── Skill bar ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Skill bar в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function SkillBar({ label, icon, value, go, delay=0, color }: { label:string; icon:string; value:number; go:boolean; delay?:number; color:string }) {
   const [w, setW] = useState(0);
   useEffect(() => {
@@ -127,7 +127,7 @@ function SkillBar({ label, icon, value, go, delay=0, color }: { label:string; ic
   );
 }
 
-/* ─── Stat tile ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Stat tile в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function StatTile({ icon, label, value, color, go, delay=0 }: { icon:React.ReactNode; label:string; value:number; color:string; go:boolean; delay?:number }) {
   const [hov, setHov] = useState(false);
   const n = useCountUp(value, 1100, go);
@@ -148,7 +148,7 @@ function StatTile({ icon, label, value, color, go, delay=0 }: { icon:React.React
   );
 }
 
-/* ─── Weekly chart ───────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Weekly chart в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function WeekChart({ data, go }: { data: Record<string,number>; go: boolean }) {
   const DAYS = ["M","T","W","T","F","S","S"];
   const today = new Date();
@@ -171,7 +171,7 @@ function WeekChart({ data, go }: { data: Record<string,number>; go: boolean }) {
         {bars.map((b,i)=>(
           <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
             <div style={{ width:"100%", height:68, display:"flex", alignItems:"flex-end" }}>
-              <div style={{ width:"100%", height:`${hs[i]}%`, minHeight: b.xp>0?4:0, borderRadius:"4px 4px 0 0", background: b.xp>0?"linear-gradient(180deg,var(--accent-2),var(--accent))":"var(--surface-3)", transition:`height 0.8s cubic-bezier(.4,0,.2,1) ${i*55}ms`, boxShadow: b.xp>0?"0 0 8px rgba(99,102,241,0.3)":"none" }}/>
+              <div style={{ width:"100%", height:`${hs[i]}%`, minHeight: b.xp>0?4:0, borderRadius:"4px 4px 0 0", background: b.xp>0?"linear-gradient(180deg,var(--accent-2),var(--accent))":"var(--surface-3)", transition:`height 0.8s cubic-bezier(.4,0,.2,1) ${i*55}ms`, boxShadow: b.xp>0?"0 0 8px rgba(16,185,129,0.3)":"none" }}/>
             </div>
             <span style={{ fontSize:9, color:"var(--text-3)", fontWeight:600 }}>{b.d}</span>
           </div>
@@ -184,7 +184,7 @@ function WeekChart({ data, go }: { data: Record<string,number>; go: boolean }) {
   );
 }
 
-/* ─── Compare bar ────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Compare bar в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function CmpBar({ label, a, b, nameA, nameB }: { label:string; a:number; b:number; nameA:string; nameB:string }) {
   const t = a+b||1;
   const pA = Math.round((a/t)*100);
@@ -204,7 +204,7 @@ function CmpBar({ label, a, b, nameA, nameB }: { label:string; a:number; b:numbe
   );
 }
 
-/* ─── Collapsible card ───────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Collapsible card в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function Card({ title, icon, children }: { title:string; icon:React.ReactNode; children:React.ReactNode }) {
   return (
     <div className="card" style={{ padding:"20px 22px", marginBottom:12 }}>
@@ -217,9 +217,9 @@ function Card({ title, icon, children }: { title:string; icon:React.ReactNode; c
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
    MAIN COMPONENT
-═══════════════════════════════════════════════════════════════════════════ */
+в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 export function PublicProfile({ profile, viewerUserId }: Props) {
   const { data: session } = useSession();
   const locale = getLocale((session?.user as any)?.nativeLanguage);
@@ -250,7 +250,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
   return (
     <div style={{ width:"100%" }}>
 
-      {/* ══ COVER ═══════════════════════════════════════════════════════════ */}
+      {/* в•ђв•ђ COVER в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */}
       <div style={{ height:220, borderRadius:0, background:lm.grad, position:"relative", overflow:"hidden" }}>
         {/* decorative blobs */}
         {[{w:300,h:300,t:-80,r:-60,o:0.06},{w:180,h:180,b:-60,l:80,o:0.07},{w:100,h:100,t:30,l:220,o:0.05},{w:60,h:60,t:80,r:120,o:0.08}].map((s,i)=>(
@@ -259,7 +259,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         {/* streak */}
         {streak>0 && (
           <div style={{ position:"absolute", top:18, left:20, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(10px)", borderRadius:20, padding:"6px 14px", fontSize:13, fontWeight:700, color:"#fbbf24", border:"1px solid rgba(251,191,36,0.3)", display:"flex", alignItems:"center", gap:6 }}>
-            🔥 {t(locale, "profile_dayStreak", { n: streak.toString() })}
+            рџ”Ґ {t(locale, "profile_dayStreak", { n: streak.toString() })}
           </div>
         )}
         {/* lang pill */}
@@ -268,7 +268,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         </div>
       </div>
 
-      {/* ══ IDENTITY ROW ════════════════════════════════════════════════════ */}
+      {/* в•ђв•ђ IDENTITY ROW в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */}
       <div style={{ background:"var(--surface)", borderBottom:"1px solid var(--border)", padding:"0 20px 24px", position:"relative", zIndex:2 }}>
         <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", flexWrap:"wrap", gap:14, marginBottom:18 }}>
           {/* avatar */}
@@ -288,12 +288,12 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           {/* action buttons */}
           <div style={{ display:"flex", gap:8, paddingTop:10 }}>
             {isOwn ? (
-              <Link href="/settings" style={{ display:"inline-flex", alignItems:"center", gap:7, fontSize:13, fontWeight:700, padding:"9px 18px", borderRadius:11, textDecoration:"none", background:"var(--accent)", color:"#fff", boxShadow:"0 4px 14px rgba(99,102,241,0.4)", transition:"all 0.15s" }}>
-                ✏️ {t(locale, "profile_editProfile")}
+              <Link href="/settings" style={{ display:"inline-flex", alignItems:"center", gap:7, fontSize:13, fontWeight:700, padding:"9px 18px", borderRadius:11, textDecoration:"none", background:"var(--accent)", color:"#fff", boxShadow:"0 4px 14px rgba(16,185,129,0.4)", transition:"all 0.15s" }}>
+                вњЏпёЏ {t(locale, "profile_editProfile")}
               </Link>
             ) : (
               <Link href="/community" style={{ display:"inline-flex", alignItems:"center", gap:7, fontSize:13, fontWeight:700, padding:"9px 18px", borderRadius:11, textDecoration:"none", background:"var(--surface-2)", color:"var(--text-2)", border:"1px solid var(--border)", transition:"all 0.15s" }}>
-                ← Back
+                в†ђ Back
               </Link>
             )}
           </div>
@@ -302,8 +302,8 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         {/* name */}
         <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", marginBottom:8 }}>
           <h1 style={{ fontSize:28, fontWeight:900, color:"var(--text)", margin:0 }}>{profile.name ?? t(locale, "profile_learner")}</h1>
-          {isOwn && <span style={{ fontSize:11, fontWeight:800, color:"var(--accent)", background:"var(--accent-dim)", padding:"3px 10px", borderRadius:20, border:"1px solid rgba(99,102,241,0.25)" }}>{t(locale, "profile_you")}</span>}
-          {badges.length>0 && <span style={{ fontSize:11, fontWeight:800, color:lm.accent, background:"rgba(0,0,0,0.15)", padding:"3px 10px", borderRadius:20 }}>⭐ {badges.length} badges</span>}
+          {isOwn && <span style={{ fontSize:11, fontWeight:800, color:"var(--accent)", background:"var(--accent-dim)", padding:"3px 10px", borderRadius:20, border:"1px solid rgba(16,185,129,0.25)" }}>{t(locale, "profile_you")}</span>}
+          {badges.length>0 && <span style={{ fontSize:11, fontWeight:800, color:lm.accent, background:"rgba(0,0,0,0.15)", padding:"3px 10px", borderRadius:20 }}>в­ђ {badges.length} badges</span>}
         </div>
 
         {/* meta row */}
@@ -313,7 +313,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           {bestGame && <span style={{ fontSize:13, color:"var(--text-3)", display:"flex", alignItems:"center", gap:5 }}><Trophy size={13} style={{ color:"var(--gold)" }} /> {t(locale, "profile_best")} {GAME_LABEL[bestGame[0]]}</span>}
         </div>
 
-        {/* ── 6 stat tiles ── */}
+        {/* в”Ђв”Ђ 6 stat tiles в”Ђв”Ђ */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:10 }}>
           <StatTile icon={<Zap size={22}/>}       label={t(locale, "profile_totalXp")}  value={xp}                        color="var(--accent)"   go={go} delay={0}   />
           <StatTile icon={<Star size={22}/>}       label={t(locale, "profile_level")}    value={level}                     color="var(--accent-2)" go={go} delay={70}  />
@@ -324,10 +324,10 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         </div>
       </div>
 
-      {/* ══ 2-COLUMN BODY ═══════════════════════════════════════════════════ */}
+      {/* в•ђв•ђ 2-COLUMN BODY в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, margin:"12px 0 0", padding:"0 20px 32px" }}>
 
-        {/* ── LEFT COLUMN ── */}
+        {/* в”Ђв”Ђ LEFT COLUMN в”Ђв”Ђ */}
         <div>
           {/* XP ring + weekly */}
           <div className="card" style={{ padding:"22px", marginBottom:12 }}>
@@ -345,12 +345,12 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
 
           {/* Skill tree */}
           <Card title={t(locale, "profile_skillTree")} icon={<Zap size={15}/>}>
-            <SkillBar label={t(locale, "profile_vocabulary")} icon="📚" value={skill.vocabulary} go={go} delay={0}   color="#818cf8"/>
-            <SkillBar label={t(locale, "profile_grammar")}    icon="✍️"  value={skill.grammar}    go={go} delay={120} color="#34d399"/>
-            <SkillBar label={t(locale, "profile_speaking")}   icon="🎙️"  value={skill.speaking}   go={go} delay={240} color="#f472b6"/>
+            <SkillBar label={t(locale, "profile_vocabulary")} icon="рџ“љ" value={skill.vocabulary} go={go} delay={0}   color="var(--accent-2)"/>
+            <SkillBar label={t(locale, "profile_grammar")}    icon="вњЌпёЏ"  value={skill.grammar}    go={go} delay={120} color="#34d399"/>
+            <SkillBar label={t(locale, "profile_speaking")}   icon="рџЋ™пёЏ"  value={skill.speaking}   go={go} delay={240} color="#f472b6"/>
           </Card>
 
-          {/* Compare — only when viewing someone else */}
+          {/* Compare вЂ” only when viewing someone else */}
           {!isOwn && (
             <Card title={t(locale, "profile_compareWith")} icon={<User size={15}/>}>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:14 }}>
@@ -366,7 +366,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           )}
         </div>
 
-        {/* ── RIGHT COLUMN ── */}
+        {/* в”Ђв”Ђ RIGHT COLUMN в”Ђв”Ђ */}
         <div>
           {/* Best game scores */}
           {Object.keys(profile.bestScores).length > 0 && (
@@ -395,7 +395,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
           {/* Empty state if no scores / badges yet */}
           {Object.keys(profile.bestScores).length === 0 && badges.length === 0 && (
             <div className="card" style={{ padding:"40px 20px", textAlign:"center" }}>
-              <div style={{ fontSize:40, marginBottom:10 }}>🎮</div>
+              <div style={{ fontSize:40, marginBottom:10 }}>рџЋ®</div>
               <p style={{ fontSize:14, fontWeight:700, color:"var(--text)", marginBottom:4 }}>{t(locale, "profile_noGames")}</p>
               <p style={{ fontSize:12, color:"var(--text-3)" }}>{t(locale, "profile_noGamesHint")}</p>
             </div>
@@ -413,25 +413,25 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
   );
 }
 
-/* ─── Game score card ─────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Game score card в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function GameCard({ game, score }: { game:string; score:number }) {
   const [hov, setHov] = useState(false);
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{
       padding:"14px", borderRadius:14, cursor:"default",
       background: hov ? "var(--accent-dim)" : "var(--surface-2)",
-      border:`1.5px solid ${hov?"rgba(99,102,241,0.35)":"var(--border)"}`,
+      border:`1.5px solid ${hov?"rgba(16,185,129,0.35)":"var(--border)"}`,
       transform: hov ? "translateY(-2px) scale(1.03)" : "none",
       transition:"all 0.2s cubic-bezier(.34,1.56,.64,1)",
     }}>
-      <div style={{ fontSize:22, marginBottom:6 }}>{GAME_ICON[game]??"🎮"}</div>
+      <div style={{ fontSize:22, marginBottom:6 }}>{GAME_ICON[game]??"рџЋ®"}</div>
       <div style={{ fontSize:10, fontWeight:700, color:"var(--text-3)", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:3 }}>{GAME_LABEL[game]??game}</div>
       <div style={{ fontSize:20, fontWeight:900, color: hov?"var(--accent)":"var(--text)", fontVariantNumeric:"tabular-nums" }}>{score.toLocaleString()}</div>
     </div>
   );
 }
 
-/* ─── Badge chip ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђв”Ђ Badge chip в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function BadgeChip({ badge, delay }: { badge:string; delay:number }) {
   const [vis, setVis] = useState(false);
   const [hov, setHov] = useState(false);
@@ -440,7 +440,7 @@ function BadgeChip({ badge, delay }: { badge:string; delay:number }) {
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{
       padding:"8px 14px", borderRadius:20, cursor:"default",
       background: hov ? "var(--accent-dim)" : "var(--surface-2)",
-      border:`1px solid ${hov?"rgba(99,102,241,0.4)":"rgba(99,102,241,0.15)"}`,
+      border:`1px solid ${hov?"rgba(16,185,129,0.4)":"rgba(16,185,129,0.15)"}`,
       display:"flex", alignItems:"center", gap:6,
       transform: vis ? (hov?"scale(1.06)":"scale(1)") : "scale(0.3)",
       opacity: vis ? 1 : 0,

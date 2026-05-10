@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { SpeakButton } from "@/components/ui/SpeakButton";
 
-// ── Map constants ─────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Map constants в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const TILE    = 40;
 const COLS    = 20;
 const ROWS    = 14;
@@ -16,17 +16,17 @@ const NPC_R   = 14;
 const TALK_D  = TILE * 1.5;
 
 // Tile IDs
-const W  = 1; // Wall        – not walkable
-const R  = 2; // Road        – walkable
-const C  = 3; // Café floor  – walkable
-const M  = 4; // Market floor– walkable
-const S  = 5; // Station     – walkable
-const G  = 6; // Grass/park  – walkable
-const FN = 7; // Fountain    – not walkable
+const W  = 1; // Wall        вЂ“ not walkable
+const R  = 2; // Road        вЂ“ walkable
+const C  = 3; // CafГ© floor  вЂ“ walkable
+const M  = 4; // Market floorвЂ“ walkable
+const S  = 5; // Station     вЂ“ walkable
+const G  = 6; // Grass/park  вЂ“ walkable
+const FN = 7; // Fountain    вЂ“ not walkable
 
 const WALKABLE = new Set([R, C, M, S, G]);
 
-// 20×14 city map
+// 20Г—14 city map
 const MAP: number[][] = [
   [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],
   [W,C,C,C,C,W,R,R,R,R,R,R,R,R,W,M,M,M,M,W],
@@ -55,7 +55,7 @@ const TC: Record<number, [string, string]> = {
   [FN]: ["#93c5fd", "#60a5fa"],
 };
 
-// ── NPC data ──────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ NPC data в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 interface Chal { word: string; right: string; wrong: [string, string] }
 interface NPC {
   id: string; name: string; emoji: string
@@ -65,16 +65,16 @@ interface NPC {
 
 const NPCS: NPC[] = [
   {
-    id: "waiter", name: "Marcel", emoji: "👨‍🍳", tx: 2, ty: 2,
+    id: "waiter", name: "Marcel", emoji: "рџ‘ЁвЂЌрџЌі", tx: 2, ty: 2,
     color: "#f59e0b",
-    greeting: "Bienvenue! Let me test your café vocabulary!",
+    greeting: "Bienvenue! Let me test your cafГ© vocabulary!",
     fr: [
-      { word: "café",    right: "coffee", wrong: ["tea",    "juice"]  },
+      { word: "cafГ©",    right: "coffee", wrong: ["tea",    "juice"]  },
       { word: "pain",    right: "bread",  wrong: ["cake",   "rice"]   },
       { word: "eau",     right: "water",  wrong: ["milk",   "wine"]   },
     ],
     es: [
-      { word: "café",    right: "coffee", wrong: ["tea",    "juice"]  },
+      { word: "cafГ©",    right: "coffee", wrong: ["tea",    "juice"]  },
       { word: "pan",     right: "bread",  wrong: ["cake",   "rice"]   },
       { word: "agua",    right: "water",  wrong: ["milk",   "wine"]   },
     ],
@@ -85,7 +85,7 @@ const NPCS: NPC[] = [
     ],
   },
   {
-    id: "vendor", name: "Sofia", emoji: "🧑‍🌾", tx: 17, ty: 2,
+    id: "vendor", name: "Sofia", emoji: "рџ§‘вЂЌрџЊѕ", tx: 17, ty: 2,
     color: "#ef4444",
     greeting: "Welcome to my market! Let's practice shopping words!",
     fr: [
@@ -105,7 +105,7 @@ const NPCS: NPC[] = [
     ],
   },
   {
-    id: "agent", name: "Pierre", emoji: "🧑‍✈️", tx: 2, ty: 10,
+    id: "agent", name: "Pierre", emoji: "рџ§‘вЂЌвњ€пёЏ", tx: 2, ty: 10,
     color: "#3b82f6",
     greeting: "Bon voyage! Test your travel vocabulary!",
     fr: [
@@ -125,7 +125,7 @@ const NPCS: NPC[] = [
     ],
   },
   {
-    id: "ranger", name: "Luna", emoji: "🌿", tx: 17, ty: 10,
+    id: "ranger", name: "Luna", emoji: "рџЊї", tx: 17, ty: 10,
     color: "#22c55e",
     greeting: "Welcome to the park! Let's learn nature words!",
     fr: [
@@ -134,7 +134,7 @@ const NPCS: NPC[] = [
       { word: "courir",  right: "to run",  wrong: ["to walk", "to fly"] },
     ],
     es: [
-      { word: "árbol",   right: "tree",    wrong: ["flower",  "bush"]   },
+      { word: "ГЎrbol",   right: "tree",    wrong: ["flower",  "bush"]   },
       { word: "flor",    right: "flower",  wrong: ["grass",   "leaf"]   },
       { word: "correr",  right: "to run",  wrong: ["to walk", "to fly"] },
     ],
@@ -145,9 +145,9 @@ const NPCS: NPC[] = [
     ],
   },
   {
-    id: "musician", name: "Diego", emoji: "🎵", tx: 8, ty: 3,
+    id: "musician", name: "Diego", emoji: "рџЋµ", tx: 8, ty: 3,
     color: "#a855f7",
-    greeting: "¡Hola! Let's learn some emotion words!",
+    greeting: "ВЎHola! Let's learn some emotion words!",
     fr: [
       { word: "heureux", right: "happy",    wrong: ["sad",     "angry"]   },
       { word: "musique", right: "music",    wrong: ["dance",   "art"]     },
@@ -155,7 +155,7 @@ const NPCS: NPC[] = [
     ],
     es: [
       { word: "feliz",   right: "happy",    wrong: ["sad",     "angry"]   },
-      { word: "música",  right: "music",    wrong: ["dance",   "art"]     },
+      { word: "mГєsica",  right: "music",    wrong: ["dance",   "art"]     },
       { word: "amar",    right: "to love",  wrong: ["to hate", "to fear"] },
     ],
     en: [
@@ -166,7 +166,7 @@ const NPCS: NPC[] = [
   },
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function tileAt(col: number, row: number): number {
   if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return W;
   return MAP[row][col];
@@ -186,7 +186,7 @@ function mkChoices(c: Chal): string[] {
   return [c.right, ...c.wrong].sort(() => Math.random() - 0.5);
 }
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Types в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 interface NPCState { npc: NPC; cleared: boolean; px: number; py: number }
 interface Quiz {
   npcId: string; npcName: string; greeting: string
@@ -194,7 +194,7 @@ interface Quiz {
   choices: string[]; chosen: number | null
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// в”Ђв”Ђ Component в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 export function CityExplorer({ targetLang }: { targetLang: string }) {
   const lang = (["fr","es","en"].includes(targetLang) ? targetLang : "fr") as "fr" | "es" | "en";
 
@@ -221,7 +221,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
   useEffect(() => { quizRef.current  = quiz;       }, [quiz]);
   useEffect(() => { scoreRef.current = score;      }, [score]);
 
-  // ── Draw ───────────────────────────────────────────────────────────────────
+  // в”Ђв”Ђ Draw в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -232,7 +232,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
 
     ctx.clearRect(0, 0, CW, CH);
 
-    // ── Tiles ──
+    // в”Ђв”Ђ Tiles в”Ђв”Ђ
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const t = MAP[row][col];
@@ -266,7 +266,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
     ctx.setLineDash([]);
     ctx.restore();
 
-    // ── Fountain animation ──
+    // в”Ђв”Ђ Fountain animation в”Ђв”Ђ
     [[9,3],[10,3],[9,4],[10,4]].forEach(([col, row]) => {
       if (MAP[row]?.[col] === FN) {
         const wave = 0.55 + Math.sin(f * 0.07 + col) * 0.25;
@@ -279,23 +279,23 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
       }
     });
 
-    // ── Zone labels ──
+    // в”Ђв”Ђ Zone labels в”Ђв”Ђ
     ctx.font = "bold 10px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     const labels: [string, number, number][] = [
-      ["☕ CAFÉ",     2.5 * TILE,  0.4 * TILE],
-      ["🛒 MARKET",  17.5 * TILE, 0.4 * TILE],
-      ["🚉 STATION",  2.5 * TILE,  8.5 * TILE],
-      ["🌿 PARK",    17.5 * TILE,  8.5 * TILE],
-      ["⛲ PLAZA",   10.5 * TILE,  1.8 * TILE],
+      ["в• CAFГ‰",     2.5 * TILE,  0.4 * TILE],
+      ["рџ›’ MARKET",  17.5 * TILE, 0.4 * TILE],
+      ["рџљ‰ STATION",  2.5 * TILE,  8.5 * TILE],
+      ["рџЊї PARK",    17.5 * TILE,  8.5 * TILE],
+      ["в›І PLAZA",   10.5 * TILE,  1.8 * TILE],
     ];
     labels.forEach(([txt, x, y]) => {
       ctx.fillStyle = "rgba(0,0,0,0.45)";
       ctx.fillText(txt, x, y);
     });
 
-    // ── NPCs ──
+    // в”Ђв”Ђ NPCs в”Ђв”Ђ
     states.forEach(ns => {
       const pulse = ns.cleared ? 0 : Math.sin(f * 0.06) * 2.5;
       const r = NPC_R + pulse;
@@ -319,7 +319,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
       ctx.font = "15px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(ns.cleared ? "✅" : ns.npc.emoji, ns.px, ns.py);
+      ctx.fillText(ns.cleared ? "вњ…" : ns.npc.emoji, ns.px, ns.py);
 
       // Name tag
       ctx.font = "bold 9px sans-serif";
@@ -342,7 +342,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
       }
     });
 
-    // ── Player ──
+    // в”Ђв”Ђ Player в”Ђв”Ђ
     const moving = keysRef.current.size > 0 && !quizRef.current;
     const bounce = moving ? Math.sin(f * 0.28) * 2 : 0;
 
@@ -353,7 +353,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
     ctx.fill();
 
     // Body
-    ctx.fillStyle = "#6366f1";
+    ctx.fillStyle = "var(--accent)";
     ctx.beginPath();
     ctx.roundRect(p.x - PSIZE * 0.42, p.y - PSIZE * 0.18 + bounce, PSIZE * 0.84, PSIZE * 0.65, 5);
     ctx.fill();
@@ -382,7 +382,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
       !ns.cleared && Math.hypot(p.x - ns.px, p.y - ns.py) < TALK_D
     );
     if (nearNPC && !quizRef.current) {
-      const hint = `Talk to ${nearNPC.npc.name} — Press E`;
+      const hint = `Talk to ${nearNPC.npc.name} вЂ” Press E`;
       ctx.font = "bold 11px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
@@ -395,7 +395,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
       ctx.fillText(hint, p.x, p.y - PSIZE * 1.6);
     }
 
-    // ── HUD ──
+    // в”Ђв”Ђ HUD в”Ђв”Ђ
     const cleared = states.filter(s => s.cleared).length;
     ctx.fillStyle = "rgba(15,23,42,0.72)";
     ctx.beginPath();
@@ -405,14 +405,14 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillStyle = "#fbbf24";
-    ctx.fillText(`⭐ ${scoreRef.current} pts`, 16, 13);
+    ctx.fillText(`в­ђ ${scoreRef.current} pts`, 16, 13);
     ctx.fillStyle = "#4ade80";
-    ctx.fillText(`✓ ${cleared} / ${NPCS.length} NPCs found`, 16, 29);
+    ctx.fillText(`вњ“ ${cleared} / ${NPCS.length} NPCs found`, 16, 29);
 
     frameRef.current++;
   }, []);
 
-  // ── Game loop ──────────────────────────────────────────────────────────────
+  // в”Ђв”Ђ Game loop в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   const loop = useCallback(() => {
     if (!quizRef.current) {
       const keys = keysRef.current;
@@ -513,7 +513,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
     }, 700);
   }, []);
 
-  // ── Keyboard listeners ────────────────────────────────────────────────────
+  // в”Ђв”Ђ Keyboard listeners в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       keysRef.current.add(e.key);
@@ -528,24 +528,24 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
     };
   }, []);
 
-  // ── Start / stop game loop ────────────────────────────────────────────────
+  // в”Ђв”Ђ Start / stop game loop в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   useEffect(() => {
     if (!started) return;
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
   }, [started, loop]);
 
-  // ── Mobile D-pad helpers ──────────────────────────────────────────────────
+  // в”Ђв”Ђ Mobile D-pad helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   const dpadPress   = (key: string) => keysRef.current.add(key);
   const dpadRelease = (key: string) => keysRef.current.delete(key);
   const tapE = () => { keysRef.current.add("e"); setTimeout(() => keysRef.current.delete("e"), 150); };
 
-  // ── Start screen ──────────────────────────────────────────────────────────
+  // в”Ђв”Ђ Start screen в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   if (!started) {
     return (
       <div style={{ maxWidth: 480, textAlign: "center" }}>
         <div className="card" style={{ padding: "44px 28px" }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>🏙️</div>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>рџЏ™пёЏ</div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", margin: "0 0 10px" }}>
             City Explorer
           </h2>
@@ -555,10 +555,10 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28, textAlign: "left" }}>
             {[
-              ["🕹️", "WASD or Arrow keys to move"],
-              ["💬", "Press E to talk to an NPC"],
-              ["✅", "Answer all 3 questions to clear them"],
-              ["🏆", "Clear all 5 to win"],
+              ["рџ•№пёЏ", "WASD or Arrow keys to move"],
+              ["рџ’¬", "Press E to talk to an NPC"],
+              ["вњ…", "Answer all 3 questions to clear them"],
+              ["рџЏ†", "Clear all 5 to win"],
             ].map(([icon, txt]) => (
               <div key={txt as string} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", borderRadius: 10, background: "var(--surface-2)", border: "1px solid var(--border)" }}>
                 <span style={{ fontSize: 16 }}>{icon}</span>
@@ -567,24 +567,24 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
             ))}
           </div>
           <button onClick={() => setStarted(true)} className="btn-primary" style={{ width: "100%", fontSize: 16, padding: "14px" }}>
-            Start Exploring 🗺️
+            Start Exploring рџ—єпёЏ
           </button>
         </div>
       </div>
     );
   }
 
-  // ── End screen ────────────────────────────────────────────────────────────
+  // в”Ђв”Ђ End screen в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   if (finished) {
     const total = NPCS.length * 3;
     const pct   = Math.round((score / total) * 100);
     return (
       <div style={{ maxWidth: 480, textAlign: "center" }}>
         <div className="card" style={{ padding: "44px 28px" }}>
-          <div style={{ fontSize: 56, marginBottom: 12 }}>{pct >= 80 ? "🏆" : pct >= 60 ? "🎉" : "💪"}</div>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>{pct >= 80 ? "рџЏ†" : pct >= 60 ? "рџЋ‰" : "рџ’Є"}</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>City Explored!</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
-            <strong style={{ color: "var(--accent)" }}>{score}/{total}</strong> correct answers · {pct}%
+            <strong style={{ color: "var(--accent)" }}>{score}/{total}</strong> correct answers В· {pct}%
           </p>
           {xpEarned > 0 && (
             <div style={{ padding: "10px 16px", borderRadius: 12, background: "var(--accent-dim)", marginBottom: 20, fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
@@ -604,10 +604,10 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
     );
   }
 
-  // ── Game view ─────────────────────────────────────────────────────────────
+  // в”Ђв”Ђ Game view в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-      {/* Canvas wrapper — horizontally scrollable on small screens */}
+      {/* Canvas wrapper вЂ” horizontally scrollable on small screens */}
       <div style={{ position: "relative", overflowX: "auto", maxWidth: "100%", borderRadius: 12 }}>
         <canvas
           ref={canvasRef}
@@ -633,7 +633,7 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
               maxWidth: 360,
               width: "100%",
             }}>
-              {/* Greeting — first question only */}
+              {/* Greeting вЂ” first question only */}
               {quiz.idx === 0 && (
                 <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 14, fontStyle: "italic", lineHeight: 1.4 }}>
                   {quiz.npcName}: "{quiz.greeting}"
@@ -702,13 +702,13 @@ export function CityExplorer({ targetLang }: { targetLang: string }) {
       {/* Mobile D-pad */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 48px)", gridTemplateRows: "repeat(3, 48px)", gap: 5 }}>
         <div />
-        <DBtn label="▲" onPress={() => dpadPress("ArrowUp")}    onRelease={() => dpadRelease("ArrowUp")} />
+        <DBtn label="в–І" onPress={() => dpadPress("ArrowUp")}    onRelease={() => dpadRelease("ArrowUp")} />
         <div />
-        <DBtn label="◀" onPress={() => dpadPress("ArrowLeft")}  onRelease={() => dpadRelease("ArrowLeft")} />
+        <DBtn label="в—Ђ" onPress={() => dpadPress("ArrowLeft")}  onRelease={() => dpadRelease("ArrowLeft")} />
         <DBtn label="E"  onPress={tapE}                          onRelease={() => {}} center />
-        <DBtn label="▶" onPress={() => dpadPress("ArrowRight")} onRelease={() => dpadRelease("ArrowRight")} />
+        <DBtn label="в–¶" onPress={() => dpadPress("ArrowRight")} onRelease={() => dpadRelease("ArrowRight")} />
         <div />
-        <DBtn label="▼" onPress={() => dpadPress("ArrowDown")}  onRelease={() => dpadRelease("ArrowDown")} />
+        <DBtn label="в–ј" onPress={() => dpadPress("ArrowDown")}  onRelease={() => dpadRelease("ArrowDown")} />
         <div />
       </div>
     </div>

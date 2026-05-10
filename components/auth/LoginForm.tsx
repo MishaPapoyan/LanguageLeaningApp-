@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
@@ -32,7 +32,7 @@ export function LoginForm() {
     ev.preventDefault();
     setLoading(true);
     setError("");
-    // For phone login, pass phone as email field — auth layer will resolve it
+    // For phone login, pass phone as email field вЂ” auth layer will resolve it
     await doSignIn(loginMethod === "email" ? email : phone, password);
   };
 
@@ -52,8 +52,8 @@ export function LoginForm() {
         style={{
           width: "100%", marginBottom: 20,
           padding: "13px 16px", borderRadius: 14,
-          background: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(20,184,166,0.12))",
-          border: "1.5px solid rgba(99,102,241,0.35)",
+          background: "linear-gradient(135deg, rgba(16,185,129,0.15), rgba(20,184,166,0.12))",
+          border: "1.5px solid rgba(16,185,129,0.35)",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
           cursor: demoLoading ? "wait" : "pointer",
           transition: "all 0.15s",
@@ -61,7 +61,7 @@ export function LoginForm() {
       >
         <Zap size={15} style={{ color: "var(--accent)" }} />
         <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
-          {demoLoading ? "Loading demo…" : "Try demo account — one click"}
+          {demoLoading ? "Loading demoвЂ¦" : "Try demo account вЂ” one click"}
         </span>
       </button>
 

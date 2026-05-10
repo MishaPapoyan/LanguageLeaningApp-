@@ -1,14 +1,14 @@
-import { getServerSession } from "next-auth";
+﻿import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const ADMIN_NAV = [
-  { href: "/admin",            label: "Overview",   emoji: "🏠" },
-  { href: "/admin/users",      label: "Users",      emoji: "👥" },
-  { href: "/admin/analytics",  label: "Analytics",  emoji: "📊" },
-  { href: "/admin/groups",     label: "Classrooms", emoji: "🏫" },
-  { href: "/admin/locations",  label: "Locations",  emoji: "📍" },
+  { href: "/admin",            label: "Overview",   emoji: "рџЏ " },
+  { href: "/admin/users",      label: "Users",      emoji: "рџ‘Ґ" },
+  { href: "/admin/analytics",  label: "Analytics",  emoji: "рџ“Љ" },
+  { href: "/admin/groups",     label: "Classrooms", emoji: "рџЏ«" },
+  { href: "/admin/locations",  label: "Locations",  emoji: "рџ“Ќ" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -46,7 +46,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {/* Desktop sidebar */}
         <aside className="admin-sidebar">
           <div style={{ padding: "20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #7c6aff, #5b4fcf)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 900 }}>LG</div>
+            <div style={{ width: 28, height: 28, borderRadius: 9, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#050505", fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", fontStyle: "italic", boxShadow: "0 0 16px rgba(16,185,129,0.4)" }}>L</div>
             <div>
               <p style={{ fontSize: 12, fontWeight: 800, color: "var(--text)", margin: 0 }}>Lingova</p>
               <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent)", margin: 0 }}>Admin</p>
@@ -61,7 +61,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </nav>
           <div style={{ padding: "12px 10px", borderTop: "1px solid var(--border)" }}>
             <Link href="/home" style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 10, fontSize: 12, color: "var(--text-3)", textDecoration: "none", fontWeight: 600 }}>
-              ← Back to app
+              в†ђ Back to app
             </Link>
           </div>
         </aside>
@@ -69,14 +69,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {/* Mobile top bar */}
         <div className="admin-mobile-bar">
           <Link href="/home" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 99, background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12, fontWeight: 700, color: "var(--text-3)", textDecoration: "none", whiteSpace: "nowrap" }}>
-            ← App
+            в†ђ App
           </Link>
           {ADMIN_NAV.map(item => (
             <Link key={item.href} href={item.href} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 99, background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12, fontWeight: 700, color: "var(--text-2)", textDecoration: "none", whiteSpace: "nowrap" }}>
               {item.emoji} {item.label}
             </Link>
           ))}
-          <div style={{ marginLeft: "auto", flexShrink: 0, width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #7c6aff, #4338ca)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800 }}>
+          <div style={{ marginLeft: "auto", flexShrink: 0, width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg, #10b981, var(--accent-press))", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800 }}>
             {initial}
           </div>
         </div>

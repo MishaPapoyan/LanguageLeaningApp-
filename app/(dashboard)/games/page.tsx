@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+﻿export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -14,19 +14,19 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Games — Lingova",
+  title: "Games вЂ” Lingova",
   description: "Practice vocabulary with fun games",
 };
 
 const GAMES = [
-  // ── Vocabulary ──────────────────────────────────────────────────
+  // в”Ђв”Ђ Vocabulary в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   {
     href: "/games/flashcards",
     gameType: "FLASHCARDS",
     icon: Layers,
     title: "Flashcards",
     desc: "Flip cards, test recall, build memory through spaced repetition",
-    theme: "#6366F1",
+    theme: "var(--accent)",
     difficulty: "A1",
     category: "vocabulary",
     xp: 20,
@@ -58,7 +58,7 @@ const GAMES = [
     gameType: "WORD_SCRAMBLE",
     icon: Shuffle,
     title: "Word Scramble",
-    desc: "Unscramble jumbled vocabulary words — race against your brain",
+    desc: "Unscramble jumbled vocabulary words вЂ” race against your brain",
     theme: "#F43F5E",
     difficulty: "A2",
     category: "vocabulary",
@@ -69,7 +69,7 @@ const GAMES = [
     gameType: "SPEED_TYPING",
     icon: Keyboard,
     title: "Speed Typing",
-    desc: "See the meaning, type the word — train muscle memory fast",
+    desc: "See the meaning, type the word вЂ” train muscle memory fast",
     theme: "#EC4899",
     difficulty: "B1",
     category: "vocabulary",
@@ -80,19 +80,19 @@ const GAMES = [
     gameType: "MEMORY_PALACE",
     icon: Puzzle,
     title: "Memory Palace",
-    desc: "Place words in virtual rooms — spatial memory that never fades",
+    desc: "Place words in virtual rooms вЂ” spatial memory that never fades",
     theme: "#8B5CF6",
     difficulty: "B2",
     category: "vocabulary",
     xp: 50,
   },
-  // ── Grammar ─────────────────────────────────────────────────────
+  // в”Ђв”Ђ Grammar в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   {
     href: "/games/fill-blank",
     gameType: "FILL_BLANK",
     icon: PenLine,
     title: "Fill the Blank",
-    desc: "Complete sentences — context makes vocabulary stick",
+    desc: "Complete sentences вЂ” context makes vocabulary stick",
     theme: "#14B8A6",
     difficulty: "A2",
     category: "grammar",
@@ -103,13 +103,13 @@ const GAMES = [
     gameType: "SENTENCE_BUILDER",
     icon: AlignJustify,
     title: "Sentence Builder",
-    desc: "Tap word tiles to assemble correct sentences — master grammar fast",
+    desc: "Tap word tiles to assemble correct sentences вЂ” master grammar fast",
     theme: "#0EA5E9",
     difficulty: "B1",
     category: "grammar",
     xp: 30,
   },
-  // ── Listening ───────────────────────────────────────────────────
+  // в”Ђв”Ђ Listening в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   {
     href: "/games/immersion",
     gameType: "IMMERSION",
@@ -126,19 +126,19 @@ const GAMES = [
     gameType: "LISTEN_QUIZ",
     icon: Headphones,
     title: "Listen & Choose",
-    desc: "Hear the word spoken — pick the right translation from 4",
+    desc: "Hear the word spoken вЂ” pick the right translation from 4",
     theme: "#06B6D4",
     difficulty: "B1",
     category: "listening",
     xp: 35,
   },
-  // ── Immersive ───────────────────────────────────────────────────
+  // в”Ђв”Ђ Immersive в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   {
     href: "/games/dialog-adventure",
     gameType: "DIALOG_ADVENTURE",
     icon: MessagesSquare,
     title: "Dialog Adventure",
-    desc: "Real scenarios, real conversations — café, train station, getting lost",
+    desc: "Real scenarios, real conversations вЂ” cafГ©, train station, getting lost",
     theme: "#F97316",
     difficulty: "B1",
     category: "grammar",
@@ -149,7 +149,7 @@ const GAMES = [
     gameType: "INTERVIEW",
     icon: Briefcase,
     title: "Job Interview",
-    desc: "Sit across a 3D interviewer — answer in your target language to get hired",
+    desc: "Sit across a 3D interviewer вЂ” answer in your target language to get hired",
     theme: "#3B82F6",
     difficulty: "B2",
     category: "immersive",
@@ -160,7 +160,7 @@ const GAMES = [
     gameType: "CITY_EXPLORER",
     icon: Map,
     title: "City Explorer",
-    desc: "Walk a 2D city, find NPCs, answer their challenges — the full RPG experience",
+    desc: "Walk a 2D city, find NPCs, answer their challenges вЂ” the full RPG experience",
     theme: "#84CC16",
     difficulty: "B2",
     category: "immersive",
@@ -171,8 +171,8 @@ const GAMES = [
     gameType: "CITY_EXPLORER",
     icon: Box,
     title: "Word Blaster 3D",
-    desc: "Shoot the correct translation in a neon 3D arena — grow, shrink, speed up each round",
-    theme: "#6366F1",
+    desc: "Shoot the correct translation in a neon 3D arena вЂ” grow, shrink, speed up each round",
+    theme: "var(--accent)",
     difficulty: "C1",
     category: "immersive",
     xp: 60,
@@ -182,7 +182,7 @@ const GAMES = [
     gameType: "AIRPORT",
     icon: Plane,
     title: "Airport",
-    desc: "Check in, pass security and board your flight — real conversations at every step",
+    desc: "Check in, pass security and board your flight вЂ” real conversations at every step",
     theme: "#0EA5E9",
     difficulty: "B1",
     category: "immersive",
@@ -221,7 +221,7 @@ const GAMES = [
     category: "immersive",
     xp: 40,
   },
-  // ── New Games v2 ──────────────────────────────────────────────
+  // в”Ђв”Ђ New Games v2 в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   {
     href: "/games/word-association",
     gameType: "WORD_ASSOCIATION",
@@ -238,7 +238,7 @@ const GAMES = [
     gameType: "ERROR_DETECTIVE",
     icon: Search,
     title: "Error Detective",
-    desc: "Find the grammar mistake in each sentence and correct it — trains the editing eye",
+    desc: "Find the grammar mistake in each sentence and correct it вЂ” trains the editing eye",
     theme: "#F43F5E",
     difficulty: "B1",
     category: "grammar",
@@ -249,7 +249,7 @@ const GAMES = [
     gameType: "TENSE_CHALLENGE",
     icon: Clock,
     title: "Tense Challenge",
-    desc: "Rewrite sentences in different tenses — the hardest and most important grammar skill",
+    desc: "Rewrite sentences in different tenses вЂ” the hardest and most important grammar skill",
     theme: "#0EA5E9",
     difficulty: "B1",
     category: "grammar",
@@ -260,7 +260,7 @@ const GAMES = [
     gameType: "DICTATION",
     icon: Mic,
     title: "Dictation",
-    desc: "Listen and type exactly what you hear — spelling and accents count",
+    desc: "Listen and type exactly what you hear вЂ” spelling and accents count",
     theme: "#8B5CF6",
     difficulty: "A2",
     category: "listening",
@@ -271,7 +271,7 @@ const GAMES = [
     gameType: "STORY_AUDIO",
     icon: BookOpen,
     title: "Story Audio",
-    desc: "Listen to a short story then answer comprehension questions — pure audio understanding",
+    desc: "Listen to a short story then answer comprehension questions вЂ” pure audio understanding",
     theme: "#10B981",
     difficulty: "B1",
     category: "listening",
@@ -282,7 +282,7 @@ const GAMES = [
     gameType: "SPEED_LISTENING",
     icon: Radio,
     title: "Speed Listening",
-    desc: "Audio at 1.5× speed — close the gap between classroom language and real conversation",
+    desc: "Audio at 1.5Г— speed вЂ” close the gap between classroom language and real conversation",
     theme: "#F97316",
     difficulty: "B2",
     category: "listening",
@@ -293,7 +293,7 @@ const GAMES = [
     gameType: "ACCENT_CHALLENGE",
     icon: Mic2,
     title: "Accent Challenge",
-    desc: "Same word, three accents — identify it across regional pronunciation variations",
+    desc: "Same word, three accents вЂ” identify it across regional pronunciation variations",
     theme: "#EC4899",
     difficulty: "B1",
     category: "listening",
@@ -302,14 +302,14 @@ const GAMES = [
 ];
 
 const CATEGORIES = [
-  { key: "vocabulary", label: "Vocabulary", emoji: "📚", color: "#6366F1" },
-  { key: "grammar",    label: "Grammar",    emoji: "✏️", color: "#14B8A6" },
-  { key: "listening",  label: "Listening",  emoji: "🎧", color: "#06B6D4" },
-  { key: "immersive",  label: "Immersive",  emoji: "🌍", color: "#F97316" },
+  { key: "vocabulary", label: "Vocabulary", emoji: "рџ“љ", color: "var(--accent)" },
+  { key: "grammar",    label: "Grammar",    emoji: "вњЏпёЏ", color: "#14B8A6" },
+  { key: "listening",  label: "Listening",  emoji: "рџЋ§", color: "#06B6D4" },
+  { key: "immersive",  label: "Immersive",  emoji: "рџЊЌ", color: "#F97316" },
 ];
 
 const CAT_DESC: Record<string, string> = {
-  vocabulary: "Build your word bank — translations, spellings and recall under pressure",
+  vocabulary: "Build your word bank вЂ” translations, spellings and recall under pressure",
   grammar:    "Conjugations, tenses, sentence structure and conversation patterns",
   listening:  "Train your ear for real speech speed, accents and comprehension",
   immersive:  "Full role-play in airports, markets, clinics and 3D arenas",
@@ -371,12 +371,12 @@ export default async function GamesPage() {
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 4px" }}>
 
-      {/* ── Page header ── */}
+      {/* в”Ђв”Ђ Page header в”Ђв”Ђ */}
       <div style={{ marginBottom: 22, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 10px", borderRadius: 999, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.22)", marginBottom: 10 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 10px", borderRadius: 999, background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.22)", marginBottom: 10 }}>
             <Gamepad2 size={11} style={{ color: "var(--accent)" }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.07em", textTransform: "uppercase" }}>24 Games · 4 Categories</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.07em", textTransform: "uppercase" }}>24 Games В· 4 Categories</span>
           </div>
           <h1 style={{ fontSize: 34, fontWeight: 900, fontFamily: "var(--font-display)", letterSpacing: "-0.025em", color: "var(--text)", lineHeight: 1.08, marginBottom: 6 }}>
             {t(locale, "games_title")}
@@ -386,7 +386,7 @@ export default async function GamesPage() {
           </p>
         </div>
 
-        {/* Stats pills — only when user has played */}
+        {/* Stats pills вЂ” only when user has played */}
         {totalGamesPlayed > 0 && (
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", paddingTop: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 13px", borderRadius: 12, background: "var(--xp-dim)", border: "1px solid rgba(245,158,11,0.22)" }}>
@@ -396,7 +396,7 @@ export default async function GamesPage() {
               </span>
               <span style={{ fontSize: 11, color: "var(--text-3)" }}>XP earned</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 13px", borderRadius: 12, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.22)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 13px", borderRadius: 12, background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.22)" }}>
               <Trophy size={13} style={{ color: "var(--accent)" }} />
               <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)", fontFamily: "var(--font-mono)", letterSpacing: "-0.01em" }}>
                 {totalGamesPlayed}
@@ -407,7 +407,7 @@ export default async function GamesPage() {
         )}
       </div>
 
-      {/* ── Category nav pills ── */}
+      {/* в”Ђв”Ђ Category nav pills в”Ђв”Ђ */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 28 }}>
         {CATEGORIES.map((cat) => {
           const n = GAMES.filter((g) => g.category === cat.key).length;
@@ -424,10 +424,10 @@ export default async function GamesPage() {
         })}
       </div>
 
-      {/* ── Daily Challenge banner ── */}
+      {/* в”Ђв”Ђ Daily Challenge banner в”Ђв”Ђ */}
       <div className="daily-banner" style={{ marginBottom: 36, display: "flex", alignItems: "center", gap: 18 }}>
         <div style={{ width: 54, height: 54, borderRadius: 14, background: "linear-gradient(135deg, #F59E0B, #F97316)", display: "grid", placeItems: "center", flexShrink: 0 }}>
-          <Flame size={24} className="animate-flame-dance" style={{ color: "#0B0F1A" }} />
+          <Flame size={24} className="animate-flame-dance" style={{ color: "var(--bg)" }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3, flexWrap: "wrap" }}>
@@ -439,7 +439,7 @@ export default async function GamesPage() {
             </span>
           </div>
           <p style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 1, letterSpacing: "-0.012em" }}>
-            Word Blaster 3D — Hard mode
+            Word Blaster 3D вЂ” Hard mode
           </p>
           <p style={{ fontSize: 12, color: "var(--text-2)" }}>
             Clear 30 targets, lose no more than 2 lives.
@@ -449,12 +449,12 @@ export default async function GamesPage() {
           <div style={{ fontSize: 22, fontWeight: 700, color: "var(--xp)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>+500</div>
           <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)" }}>XP reward</div>
         </div>
-        <Link href="/games/city-3d" style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: 11, background: "linear-gradient(135deg, #F59E0B, #F97316)", color: "#0B0F1A", fontWeight: 700, fontSize: 13, textDecoration: "none", flexShrink: 0, fontFamily: "var(--font-display)", letterSpacing: "-0.01em", boxShadow: "0 0 20px rgba(245,158,11,0.35)", whiteSpace: "nowrap" }}>
-          Play →
+        <Link href="/games/city-3d" style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: 11, background: "linear-gradient(135deg, #F59E0B, #F97316)", color: "var(--bg)", fontWeight: 700, fontSize: 13, textDecoration: "none", flexShrink: 0, fontFamily: "var(--font-display)", letterSpacing: "-0.01em", boxShadow: "0 0 20px rgba(245,158,11,0.35)", whiteSpace: "nowrap" }}>
+          Play в†’
         </Link>
       </div>
 
-      {/* ── Category sections ── */}
+      {/* в”Ђв”Ђ Category sections в”Ђв”Ђ */}
       <div style={{ display: "flex", flexDirection: "column", gap: 44, marginBottom: 40 }}>
         {CATEGORIES.map((cat) => {
           const catGames = GAMES.filter((g) => g.category === cat.key);
@@ -514,7 +514,7 @@ export default async function GamesPage() {
                     >
                       <div className="gc-aura" />
                       <div className="gc-sheen" />
-                      <div className="gc-arrow">↗</div>
+                      <div className="gc-arrow">в†—</div>
 
                       {/* Icon + difficulty badge */}
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14, position: "relative", zIndex: 1 }}>
@@ -554,13 +554,13 @@ export default async function GamesPage() {
         })}
       </div>
 
-      {/* ── Coming soon: Hotel ── */}
+      {/* в”Ђв”Ђ Coming soon: Hotel в”Ђв”Ђ */}
       <div style={{ borderRadius: 16, padding: "16px 20px", border: "1px dashed var(--border-md)", background: "var(--surface-2)", display: "flex", alignItems: "center", gap: 14, marginBottom: 8 }}>
         <div style={{ width: 42, height: 42, borderRadius: 11, background: "var(--surface-3)", display: "grid", placeItems: "center", flexShrink: 0 }}>
-          <span style={{ fontSize: 22 }}>🏨</span>
+          <span style={{ fontSize: 22 }}>рџЏЁ</span>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 1 }}>Hotel — Coming in Phase 4</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 1 }}>Hotel вЂ” Coming in Phase 4</p>
           <p style={{ fontSize: 12, color: "var(--text-3)" }}>Navigate check-in, room service and concierge in your target language</p>
         </div>
         <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "var(--surface-3)", color: "var(--text-3)", letterSpacing: "0.07em", textTransform: "uppercase", flexShrink: 0 }}>
@@ -568,7 +568,7 @@ export default async function GamesPage() {
         </span>
       </div>
 
-      {/* ── CSS ── */}
+      {/* в”Ђв”Ђ CSS в”Ђв”Ђ */}
       <style>{`
         .games-grid {
           display: grid;

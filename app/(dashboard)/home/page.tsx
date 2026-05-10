@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+﻿export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -31,7 +31,7 @@ import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Dashboard — Lingova",
+  title: "Dashboard вЂ” Lingova",
 };
 
 export default async function HomePage() {
@@ -100,7 +100,7 @@ export default async function HomePage() {
   return (
     <div className="max-w-5xl mx-auto space-y-4 animate-fade-up">
 
-      {/* ── Onboarding modal (fires once for new users) ── */}
+      {/* в”Ђв”Ђ Onboarding modal (fires once for new users) в”Ђв”Ђ */}
       {!onboardingCompleted && (
         <OnboardingModal
           targetLang={targetLang}
@@ -109,23 +109,23 @@ export default async function HomePage() {
         />
       )}
 
-      {/* ── Hero bento ── */}
+      {/* в”Ђв”Ђ Hero bento в”Ђв”Ђ */}
       <section
         className="bento relative overflow-hidden"
         style={{
           minHeight: 200,
-          background: "radial-gradient(ellipse 80% 120% at 10% 50%, rgba(99,102,241,0.28) 0%, transparent 60%), radial-gradient(ellipse 60% 100% at 90% 40%, rgba(45,212,191,0.18) 0%, transparent 55%), var(--surface)",
+          background: "radial-gradient(ellipse 80% 120% at 10% 50%, rgba(16,185,129,0.28) 0%, transparent 60%), radial-gradient(ellipse 60% 100% at 90% 40%, rgba(45,212,191,0.18) 0%, transparent 55%), var(--surface)",
           border: "1px solid var(--border-md)",
           padding: 0,
         }}
       >
         {/* decorative blobs */}
-        <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(99,102,241,0.12)", filter: "blur(40px)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(16,185,129,0.12)", filter: "blur(40px)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: -30, right: 60, width: 160, height: 160, borderRadius: "50%", background: "rgba(45,212,191,0.10)", filter: "blur(36px)", pointerEvents: "none" }} />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-stretch gap-0" style={{ minHeight: 200 }}>
 
-          {/* ── Left: Streak hero block ── */}
+          {/* в”Ђв”Ђ Left: Streak hero block в”Ђв”Ђ */}
           {progress?.streak && progress.streak > 0 ? (
             <div
               style={{
@@ -171,10 +171,10 @@ export default async function HomePage() {
             </div>
           ) : null}
 
-          {/* ── Right: Greeting + XP ── */}
+          {/* в”Ђв”Ђ Right: Greeting + XP в”Ђв”Ђ */}
           <div style={{ flex: 1, padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <h1 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 6 }}>
-              {langConfig.greeting}, {firstName}! {langConfig.flag}
+            <h1 className="serif" style={{ fontSize: "clamp(36px,5vw,56px)", fontWeight: 800, fontStyle: "italic", color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 8, lineHeight: 1.05 }}>
+              {langConfig.greeting}, {firstName}. {langConfig.flag}
             </h1>
             <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
               {progress?.streak && progress.streak > 0
@@ -190,7 +190,7 @@ export default async function HomePage() {
                     display: "inline-flex", alignItems: "center", gap: 5,
                     fontSize: 11, fontWeight: 700,
                     background: "var(--accent-dim)", color: "var(--accent-2)",
-                    border: "1px solid rgba(99,102,241,0.3)",
+                    border: "1px solid rgba(16,185,129,0.3)",
                     borderRadius: 999, padding: "3px 10px",
                   }}
                 >
@@ -214,7 +214,7 @@ export default async function HomePage() {
               <div
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
-                  background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.22)",
+                  background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.22)",
                   borderRadius: 999, padding: "5px 12px",
                 }}
               >
@@ -229,12 +229,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Today's Plan ── */}
+      {/* в”Ђв”Ђ Today's Plan в”Ђв”Ђ */}
       <Suspense fallback={null}>
         <TodayPlan targetLang={targetLang} />
       </Suspense>
 
-      {/* ── Bento row: Stats / Daily Goals / Continue Learning ── */}
+      {/* в”Ђв”Ђ Bento row: Stats / Daily Goals / Continue Learning в”Ђв”Ђ */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
         {/* Stats 2x2 */}
@@ -332,7 +332,7 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* ── Quick Actions bento (asymmetric) ── */}
+      {/* в”Ђв”Ђ Quick Actions bento (asymmetric) в”Ђв”Ђ */}
       <div>
         <p className="section-label mb-3">{t(locale, "home_quickActions")}</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ gridAutoRows: "auto" }}>
@@ -490,7 +490,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── Bottom row: Word of the Day + Skill Rings ── */}
+      {/* в”Ђв”Ђ Bottom row: Word of the Day + Skill Rings в”Ђв”Ђ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         {/* Word of the Day */}
@@ -500,7 +500,7 @@ export default async function HomePage() {
             <div className="flex items-center gap-4">
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
-                style={{ background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)" }}
+                style={{ background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.25)" }}
               >
                 {recentWord.imageEmoji}
               </div>
@@ -576,7 +576,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── Badges scroll ── */}
+      {/* в”Ђв”Ђ Badges scroll в”Ђв”Ђ */}
       {earnedBadges.length > 0 && (
         <div className="bento p-5" style={{ border: "1px solid var(--border)" }}>
           <div className="flex items-center justify-between mb-4">

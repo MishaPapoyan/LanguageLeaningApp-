@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
@@ -77,29 +77,29 @@ export interface AnalyticsData {
 type TabId = "overview" | "vocabulary" | "games" | "tutor" | "activity";
 
 const TAB_IDS: { id: TabId; key: "analytics_overview" | "analytics_activity" | "analytics_vocabulary" | "analytics_games" | "analytics_aiTutor"; emoji: string }[] = [
-  { id: "overview",   key: "analytics_overview",    emoji: "📊" },
-  { id: "activity",   key: "analytics_activity",    emoji: "📅" },
-  { id: "vocabulary", key: "analytics_vocabulary",  emoji: "📚" },
-  { id: "games",      key: "analytics_games",       emoji: "🎮" },
-  { id: "tutor",      key: "analytics_aiTutor",     emoji: "🤖" },
+  { id: "overview",   key: "analytics_overview",    emoji: "рџ“Љ" },
+  { id: "activity",   key: "analytics_activity",    emoji: "рџ“…" },
+  { id: "vocabulary", key: "analytics_vocabulary",  emoji: "рџ“љ" },
+  { id: "games",      key: "analytics_games",       emoji: "рџЋ®" },
+  { id: "tutor",      key: "analytics_aiTutor",     emoji: "рџ¤–" },
 ];
 
-const COLORS = ["#7c3aed", "#3b82f6", "#f43f5e", "#f59e0b", "#0ea5e9", "#06b6d4", "#ec4899", "#6366f1"];
+const COLORS = ["#7c3aed", "#3b82f6", "#f43f5e", "#f59e0b", "#0ea5e9", "#06b6d4", "#ec4899", "var(--accent)"];
 
 const GAME_LABELS: Record<string, string> = {
   FLASHCARDS: "Flashcards", MATCHING: "Matching", MEMORY_PALACE: "Memory Palace",
 };
 
 const GAME_EMOJI: Record<string, string> = {
-  FLASHCARDS: "🃏", MATCHING: "🎯", MEMORY_PALACE: "🏠",
+  FLASHCARDS: "рџѓЏ", MATCHING: "рџЋЇ", MEMORY_PALACE: "рџЏ ",
 };
 
 const SCENARIO_LABELS: Record<string, string> = {
-  waiter: "Café Waiter", traveler: "City Explorer", teacher: "Language Teacher", free: "Free Chat",
+  waiter: "CafГ© Waiter", traveler: "City Explorer", teacher: "Language Teacher", free: "Free Chat",
 };
 
 const SCENARIO_EMOJI: Record<string, string> = {
-  waiter: "🍽️", traveler: "🗼", teacher: "👩‍🏫", free: "💬",
+  waiter: "рџЌЅпёЏ", traveler: "рџ—ј", teacher: "рџ‘©вЂЌрџЏ«", free: "рџ’¬",
 };
 
 function StatCard({ label, value, subtext, emoji, gradient }: {
@@ -109,7 +109,7 @@ function StatCard({ label, value, subtext, emoji, gradient }: {
     <div className="card p-4">
       <div className="flex items-center justify-between mb-2">
         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-lg`}
-          style={{ color: "#0B0F1A" }}>
+          style={{ color: "var(--bg)" }}>
           {emoji}
         </div>
         <span style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-mono)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{value}</span>
@@ -133,8 +133,8 @@ function HeatmapGrid({ data }: { data: { date: string; total: number; xp: number
             <div key={day.date} title={`${dayLabel}: ${day.total} activities, ${day.xp} XP`}
               className="w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium cursor-default transition-all hover:scale-110"
               style={{
-                backgroundColor: day.total === 0 ? "rgba(255,255,255,0.05)" : `rgba(99,102,241,${0.15 + intensity * 0.75})`,
-                color: intensity > 0.5 ? "#fff" : day.total > 0 ? "#818CF8" : "var(--text-3)",
+                backgroundColor: day.total === 0 ? "rgba(255,255,255,0.05)" : `rgba(16,185,129,${0.15 + intensity * 0.75})`,
+                color: intensity > 0.5 ? "#fff" : day.total > 0 ? "var(--accent-2)" : "var(--text-3)",
               }}
             >
               {date.getDate()}
@@ -146,7 +146,7 @@ function HeatmapGrid({ data }: { data: { date: string; total: number; xp: number
         <span>Less</span>
         {[0, 0.25, 0.5, 0.75, 1].map((intensity, i) => (
           <div key={i} className="w-4 h-4 rounded-sm"
-            style={{ backgroundColor: intensity === 0 ? "rgba(255,255,255,0.05)" : `rgba(99,102,241,${0.15 + intensity * 0.75})` }}
+            style={{ backgroundColor: intensity === 0 ? "rgba(255,255,255,0.05)" : `rgba(16,185,129,${0.15 + intensity * 0.75})` }}
           />
         ))}
         <span>More</span>
@@ -264,14 +264,14 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
         ))}
       </div>
 
-      {/* ═══ OVERVIEW ═══ */}
+      {/* в•ђв•ђв•ђ OVERVIEW в•ђв•ђв•ђ */}
       {activeTab === "overview" && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
-            <StatCard emoji="⚡" label="Total XP" value={overview.totalXp.toLocaleString()} gradient="from-blue-500 to-indigo-600" subtext={`Level ${overview.level}`} />
-            <StatCard emoji="🔥" label="Current Streak" value={`${overview.streak}d`} gradient="from-orange-500 to-rose-500" subtext={overview.streak > 0 ? "Keep it up!" : "Start today!"} />
-            <StatCard emoji="📅" label="Days Active" value={overview.daysActive} gradient="from-emerald-500 to-teal-500" subtext={`${overview.consistencyPct}% consistency`} />
-            <StatCard emoji="📈" label="Avg Weekly XP" value={overview.avgWeeklyXp} gradient="from-violet-500 to-purple-500" subtext="Last 4 weeks" />
+            <StatCard emoji="вљЎ" label="Total XP" value={overview.totalXp.toLocaleString()} gradient="from-blue-500 to-indigo-600" subtext={`Level ${overview.level}`} />
+            <StatCard emoji="рџ”Ґ" label="Current Streak" value={`${overview.streak}d`} gradient="from-orange-500 to-rose-500" subtext={overview.streak > 0 ? "Keep it up!" : "Start today!"} />
+            <StatCard emoji="рџ“…" label="Days Active" value={overview.daysActive} gradient="from-emerald-500 to-teal-500" subtext={`${overview.consistencyPct}% consistency`} />
+            <StatCard emoji="рџ“€" label="Avg Weekly XP" value={overview.avgWeeklyXp} gradient="from-violet-500 to-purple-500" subtext="Last 4 weeks" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -280,7 +280,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
               {weeklyXpData.some((w) => w.value > 0) ? (
                 <SimpleAreaChart data={weeklyXpData} height={200} color="#3b82f6" formatValue={(v) => `${v} XP`} />
               ) : (
-                <EmptyState emoji="📈" message="Start learning to see your XP trend!" action={{ label: "Start Learning", href: "/learn" }} />
+                <EmptyState emoji="рџ“€" message="Start learning to see your XP trend!" action={{ label: "Start Learning", href: "/learn" }} />
               )}
             </div>
 
@@ -300,7 +300,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   </div>
                 </div>
               ) : (
-                <EmptyState emoji="🎯" message="No XP earned yet!" action={{ label: "Start Earning", href: "/learn" }} />
+                <EmptyState emoji="рџЋЇ" message="No XP earned yet!" action={{ label: "Start Earning", href: "/learn" }} />
               )}
             </div>
           </div>
@@ -315,11 +315,11 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
               <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Learning Summary</h3>
               <div className="space-y-3">
                 {[
-                  { label: "Words Saved", value: vocabulary.total, total: vocabulary.totalAvailable, emoji: "📚", color: "#8b5cf6" },
-                  { label: "Stories Completed", value: stories.completed, total: stories.total, emoji: "📖", color: "#3b82f6" },
-                  { label: "Games Played", value: games.totalPlayed, total: null, emoji: "🎮", color: "#ec4899" },
-                  { label: "Tutor Sessions", value: tutor.totalSessions, total: null, emoji: "🤖", color: "#10b981" },
-                  { label: "Badges Earned", value: overview.badges.length, total: 10, emoji: "🏅", color: "#f59e0b" },
+                  { label: "Words Saved", value: vocabulary.total, total: vocabulary.totalAvailable, emoji: "рџ“љ", color: "#8b5cf6" },
+                  { label: "Stories Completed", value: stories.completed, total: stories.total, emoji: "рџ“–", color: "#3b82f6" },
+                  { label: "Games Played", value: games.totalPlayed, total: null, emoji: "рџЋ®", color: "#ec4899" },
+                  { label: "Tutor Sessions", value: tutor.totalSessions, total: null, emoji: "рџ¤–", color: "#10b981" },
+                  { label: "Badges Earned", value: overview.badges.length, total: 10, emoji: "рџЏ…", color: "#f59e0b" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-3">
                     <span className="text-xl">{item.emoji}</span>
@@ -345,7 +345,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
         </div>
       )}
 
-      {/* ═══ ACTIVITY ═══ */}
+      {/* в•ђв•ђв•ђ ACTIVITY в•ђв•ђв•ђ */}
       {activeTab === "activity" && (
         <div className="space-y-6">
           <div className="card">
@@ -367,7 +367,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 formatValue={(v) => `${v} XP`}
               />
             ) : (
-              <EmptyState emoji="📅" message="No activity in the last 30 days" action={{ label: "Start Learning", href: "/learn" }} />
+              <EmptyState emoji="рџ“…" message="No activity in the last 30 days" action={{ label: "Start Learning", href: "/learn" }} />
             )}
           </div>
 
@@ -393,27 +393,27 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 ]}
               />
             ) : (
-              <EmptyState emoji="📊" message="Activity data will appear as you learn" />
+              <EmptyState emoji="рџ“Љ" message="Activity data will appear as you learn" />
             )}
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
-            <StatCard emoji="📅" label="Total Days Active" value={overview.daysActive} gradient="from-blue-500 to-indigo-600" />
-            <StatCard emoji="🎯" label="Consistency" value={`${overview.consistencyPct}%`} gradient="from-emerald-500 to-teal-500" subtext={`of ${overview.daysSinceJoin} days`} />
-            <StatCard emoji="🔥" label="Current Streak" value={`${overview.streak}d`} gradient="from-orange-500 to-rose-500" />
-            <StatCard emoji="📈" label="Avg XP/Week" value={overview.avgWeeklyXp} gradient="from-violet-500 to-purple-500" />
+            <StatCard emoji="рџ“…" label="Total Days Active" value={overview.daysActive} gradient="from-blue-500 to-indigo-600" />
+            <StatCard emoji="рџЋЇ" label="Consistency" value={`${overview.consistencyPct}%`} gradient="from-emerald-500 to-teal-500" subtext={`of ${overview.daysSinceJoin} days`} />
+            <StatCard emoji="рџ”Ґ" label="Current Streak" value={`${overview.streak}d`} gradient="from-orange-500 to-rose-500" />
+            <StatCard emoji="рџ“€" label="Avg XP/Week" value={overview.avgWeeklyXp} gradient="from-violet-500 to-purple-500" />
           </div>
         </div>
       )}
 
-      {/* ═══ VOCABULARY ═══ */}
+      {/* в•ђв•ђв•ђ VOCABULARY в•ђв•ђв•ђ */}
       {activeTab === "vocabulary" && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
-            <StatCard emoji="📚" label="Words Saved" value={vocabulary.total} gradient="from-violet-500 to-purple-500" subtext={`of ${vocabulary.totalAvailable} available`} />
-            <StatCard emoji="🎯" label="Mastered" value={vocabulary.byMastery[5] ?? 0} gradient="from-emerald-500 to-teal-500" subtext="Level 5 words" />
-            <StatCard emoji="📖" label="Categories" value={Object.keys(vocabulary.byCategory).length} gradient="from-blue-500 to-indigo-600" />
-            <StatCard emoji="📈" label="Collection" value={`${vocabulary.totalAvailable > 0 ? Math.round((vocabulary.total / vocabulary.totalAvailable) * 100) : 0}%`} gradient="from-rose-500 to-pink-500" subtext="of all words" />
+            <StatCard emoji="рџ“љ" label="Words Saved" value={vocabulary.total} gradient="from-violet-500 to-purple-500" subtext={`of ${vocabulary.totalAvailable} available`} />
+            <StatCard emoji="рџЋЇ" label="Mastered" value={vocabulary.byMastery[5] ?? 0} gradient="from-emerald-500 to-teal-500" subtext="Level 5 words" />
+            <StatCard emoji="рџ“–" label="Categories" value={Object.keys(vocabulary.byCategory).length} gradient="from-blue-500 to-indigo-600" />
+            <StatCard emoji="рџ“€" label="Collection" value={`${vocabulary.totalAvailable > 0 ? Math.round((vocabulary.total / vocabulary.totalAvailable) * 100) : 0}%`} gradient="from-rose-500 to-pink-500" subtext="of all words" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -429,7 +429,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   formatValue={(v) => `${v} words`}
                 />
               ) : (
-                <EmptyState emoji="📝" message="Save words to see mastery stats" action={{ label: "Browse Dictionary", href: "/dictionary" }} />
+                <EmptyState emoji="рџ“ќ" message="Save words to see mastery stats" action={{ label: "Browse Dictionary", href: "/dictionary" }} />
               )}
             </div>
 
@@ -454,7 +454,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   })}
                 </div>
               ) : (
-                <EmptyState emoji="📂" message="No categories yet" />
+                <EmptyState emoji="рџ“‚" message="No categories yet" />
               )}
             </div>
           </div>
@@ -469,7 +469,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 formatValue={(v) => `${v} words`}
               />
             ) : (
-              <EmptyState emoji="📈" message="Save words to track your progress over time" />
+              <EmptyState emoji="рџ“€" message="Save words to track your progress over time" />
             )}
           </div>
 
@@ -479,9 +479,9 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
               {Object.keys(vocabulary.byDifficulty).length > 0 ? (
                 <div className="space-y-3">
                   {[
-                    { key: "BEGINNER", label: "Beginner", color: "#22c55e", emoji: "🟢" },
-                    { key: "INTERMEDIATE", label: "Intermediate", color: "#f59e0b", emoji: "🟡" },
-                    { key: "ADVANCED", label: "Advanced", color: "#ef4444", emoji: "🔴" },
+                    { key: "BEGINNER", label: "Beginner", color: "#22c55e", emoji: "рџџў" },
+                    { key: "INTERMEDIATE", label: "Intermediate", color: "#f59e0b", emoji: "рџџЎ" },
+                    { key: "ADVANCED", label: "Advanced", color: "#ef4444", emoji: "рџ”ґ" },
                   ].map((diff) => {
                     const count = vocabulary.byDifficulty[diff.key] ?? 0;
                     return (
@@ -504,7 +504,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   })}
                 </div>
               ) : (
-                <EmptyState emoji="📊" message="No words saved yet" />
+                <EmptyState emoji="рџ“Љ" message="No words saved yet" />
               )}
             </div>
 
@@ -527,21 +527,21 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                   ))}
                 </div>
               ) : (
-                <EmptyState emoji="📝" message="No words saved yet" />
+                <EmptyState emoji="рџ“ќ" message="No words saved yet" />
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* ═══ GAMES ═══ */}
+      {/* в•ђв•ђв•ђ GAMES в•ђв•ђв•ђ */}
       {activeTab === "games" && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
-            <StatCard emoji="🎮" label="Total Games" value={games.totalPlayed} gradient="from-rose-500 to-pink-500" />
-            <StatCard emoji="🏆" label="Best Score" value={`${games.bestScore}%`} gradient="from-amber-500 to-orange-500" />
-            <StatCard emoji="📊" label="Avg Score" value={`${games.avgScore}%`} gradient="from-blue-500 to-indigo-600" />
-            <StatCard emoji="⚡" label="XP from Games" value={games.totalXpEarned} gradient="from-violet-500 to-purple-500" />
+            <StatCard emoji="рџЋ®" label="Total Games" value={games.totalPlayed} gradient="from-rose-500 to-pink-500" />
+            <StatCard emoji="рџЏ†" label="Best Score" value={`${games.bestScore}%`} gradient="from-amber-500 to-orange-500" />
+            <StatCard emoji="рџ“Љ" label="Avg Score" value={`${games.avgScore}%`} gradient="from-blue-500 to-indigo-600" />
+            <StatCard emoji="вљЎ" label="XP from Games" value={games.totalXpEarned} gradient="from-violet-500 to-purple-500" />
           </div>
 
           <div className="grid md:grid-cols-3 gap-3 stagger-children">
@@ -588,20 +588,20 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 domain={[0, 100]}
               />
             ) : (
-              <EmptyState emoji="🎮" message="Play games to track your score trend" action={{ label: "Play a Game", href: "/games" }} />
+              <EmptyState emoji="рџЋ®" message="Play games to track your score trend" action={{ label: "Play a Game", href: "/games" }} />
             )}
           </div>
         </div>
       )}
 
-      {/* ═══ AI TUTOR ═══ */}
+      {/* в•ђв•ђв•ђ AI TUTOR в•ђв•ђв•ђ */}
       {activeTab === "tutor" && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
-            <StatCard emoji="🤖" label="Total Sessions" value={tutor.totalSessions} gradient="from-violet-500 to-purple-500" />
-            <StatCard emoji="✏️" label="Avg Grammar" value={tutor.avgGrammarScore !== null ? `${tutor.avgGrammarScore}%` : "N/A"} gradient="from-blue-500 to-indigo-600" />
-            <StatCard emoji="🎯" label="Avg Accuracy" value={tutor.avgAccuracy !== null ? `${tutor.avgAccuracy}%` : "N/A"} gradient="from-emerald-500 to-teal-500" />
-            <StatCard emoji="⚡" label="XP Earned" value={tutor.totalXpEarned} gradient="from-amber-500 to-orange-500" />
+            <StatCard emoji="рџ¤–" label="Total Sessions" value={tutor.totalSessions} gradient="from-violet-500 to-purple-500" />
+            <StatCard emoji="вњЏпёЏ" label="Avg Grammar" value={tutor.avgGrammarScore !== null ? `${tutor.avgGrammarScore}%` : "N/A"} gradient="from-blue-500 to-indigo-600" />
+            <StatCard emoji="рџЋЇ" label="Avg Accuracy" value={tutor.avgAccuracy !== null ? `${tutor.avgAccuracy}%` : "N/A"} gradient="from-emerald-500 to-teal-500" />
+            <StatCard emoji="вљЎ" label="XP Earned" value={tutor.totalXpEarned} gradient="from-amber-500 to-orange-500" />
           </div>
 
           <div className="card">
@@ -610,7 +610,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
                 {Object.entries(tutor.byScenario).map(([scenario, stats]) => (
                   <div key={scenario} style={{ background: "var(--surface-3)", borderRadius: 14, padding: "16px 12px", textAlign: "center" }}>
-                    <span className="text-3xl">{SCENARIO_EMOJI[scenario] ?? "💬"}</span>
+                    <span className="text-3xl">{SCENARIO_EMOJI[scenario] ?? "рџ’¬"}</span>
                     <p className="text-sm font-medium text-fg mt-2">{SCENARIO_LABELS[scenario] ?? scenario}</p>
                     <p className="text-2xl font-bold text-fg mt-1">{stats.count}</p>
                     <p className="text-xs text-fg-2">{stats.totalXp} XP earned</p>
@@ -618,22 +618,22 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                 ))}
               </div>
             ) : (
-              <EmptyState emoji="🤖" message="Start a conversation with the AI tutor!" action={{ label: "Chat with Tutor", href: "/tutor" }} />
+              <EmptyState emoji="рџ¤–" message="Start a conversation with the AI tutor!" action={{ label: "Chat with Tutor", href: "/tutor" }} />
             )}
           </div>
 
           {tutor.totalSessions > 0 && (
-            <div className="card" style={{ background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)" }}>
+            <div className="card" style={{ background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.2)" }}>
               <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--accent-2)", marginBottom: 8, fontFamily: "var(--font-display)" }}>Tutor Insights</h3>
               <div className="space-y-2 text-sm text-fg-2">
                 {tutor.avgGrammarScore !== null && tutor.avgGrammarScore < 60 && (
-                  <p>Your grammar score is below 60% — try the <strong>Language Teacher</strong> scenario for structured practice.</p>
+                  <p>Your grammar score is below 60% вЂ” try the <strong>Language Teacher</strong> scenario for structured practice.</p>
                 )}
                 {tutor.avgAccuracy !== null && tutor.avgAccuracy >= 80 && (
                   <p>Great accuracy at {tutor.avgAccuracy}%! Try more advanced scenarios to keep improving.</p>
                 )}
                 {Object.keys(tutor.byScenario).length < 3 && (
-                  <p>You&apos;ve only tried {Object.keys(tutor.byScenario).length} scenario(s) — explore others for broader practice!</p>
+                  <p>You&apos;ve only tried {Object.keys(tutor.byScenario).length} scenario(s) вЂ” explore others for broader practice!</p>
                 )}
                 {tutor.totalSessions >= 5 && (
                   <p>With {tutor.totalSessions} sessions, you&apos;re building great conversational habits!</p>

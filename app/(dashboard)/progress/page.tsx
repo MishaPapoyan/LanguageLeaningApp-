@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+﻿export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -19,7 +19,7 @@ const WeeklyChart = nextDynamic(
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Progress — Lingova",
+  title: "My Progress вЂ” Lingova",
   description: "Track your learning progress and achievements",
 };
 
@@ -136,14 +136,14 @@ export default async function ProgressPage() {
   return (
     <div className="animate-fade-up" style={{ maxWidth: 780 }}>
 
-      {/* ── Hero Stats Bento Grid ── */}
+      {/* в”Ђв”Ђ Hero Stats Bento Grid в”Ђв”Ђ */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
         gap: 12, marginBottom: 20,
       }}>
 
-        {/* Level ring — spans 1 col */}
+        {/* Level ring вЂ” spans 1 col */}
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border)",
           borderRadius: 18, padding: "20px 16px",
@@ -151,7 +151,7 @@ export default async function ProgressPage() {
           position: "relative", overflow: "hidden",
         }}>
           {/* soft accent glow behind ring */}
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 110, height: 110, borderRadius: "50%", background: "rgba(99,102,241,0.12)", filter: "blur(20px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 110, height: 110, borderRadius: "50%", background: "rgba(16,185,129,0.12)", filter: "blur(20px)", pointerEvents: "none" }} />
           <div style={{ position: "relative", width: 100, height: 100 }}>
             <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: "rotate(-90deg)" }}>
               <circle cx="50" cy="50" r="44" fill="none" stroke="var(--surface-3)" strokeWidth="7" />
@@ -160,7 +160,7 @@ export default async function ProgressPage() {
                 stroke="var(--accent)" strokeWidth="7" strokeLinecap="round"
                 strokeDasharray={levelCircumference}
                 strokeDashoffset={levelCircumference - (xpInfo.pct / 100) * levelCircumference}
-                style={{ transition: "stroke-dashoffset 1s ease", filter: "drop-shadow(0 0 6px rgba(99,102,241,0.6))" }}
+                style={{ transition: "stroke-dashoffset 1s ease", filter: "drop-shadow(0 0 6px rgba(16,185,129,0.6))" }}
               />
             </svg>
             <div style={{
@@ -186,10 +186,10 @@ export default async function ProgressPage() {
 
         {/* Total XP */}
         <div style={{
-          background: "var(--surface)", border: "1px solid rgba(99,102,241,0.2)",
+          background: "var(--surface)", border: "1px solid rgba(16,185,129,0.2)",
           borderRadius: 18, padding: "20px 18px",
           display: "flex", flexDirection: "column", justifyContent: "space-between",
-          boxShadow: "0 0 0 1px rgba(99,102,241,0.06), 0 4px 20px rgba(99,102,241,0.08)",
+          boxShadow: "0 0 0 1px rgba(16,185,129,0.06), 0 4px 20px rgba(16,185,129,0.08)",
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
@@ -254,7 +254,7 @@ export default async function ProgressPage() {
         </div>
       </div>
 
-      {/* ── XP Timeline Chart ── */}
+      {/* в”Ђв”Ђ XP Timeline Chart в”Ђв”Ђ */}
       <div style={{
         background: "var(--surface)", border: "1px solid var(--border)",
         borderRadius: 18, padding: "22px 24px", marginBottom: 20,
@@ -267,7 +267,7 @@ export default async function ProgressPage() {
         <WeeklyChart weeklyXp={weeklyXp} />
       </div>
 
-      {/* ── Skills Section ── */}
+      {/* в”Ђв”Ђ Skills Section в”Ђв”Ђ */}
       <div style={{
         background: "var(--surface)", border: "1px solid var(--border)",
         borderRadius: 18, padding: "22px 24px", marginBottom: 20,
@@ -332,7 +332,7 @@ export default async function ProgressPage() {
         </div>
       </div>
 
-      {/* ── Badges Grid ── */}
+      {/* в”Ђв”Ђ Badges Grid в”Ђв”Ђ */}
       <div style={{
         background: "var(--surface)", border: "1px solid var(--border)",
         borderRadius: 18, padding: "22px 24px", marginBottom: 20,
@@ -357,7 +357,7 @@ export default async function ProgressPage() {
                 // cycle through accent gradients for each badge
                 const gradients = [
                   { bg: "linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.08) 100%)", border: "rgba(245,158,11,0.35)", glow: "rgba(245,158,11,0.18)", name: "var(--gold)" },
-                  { bg: "linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(129,140,248,0.08) 100%)", border: "rgba(99,102,241,0.35)", glow: "rgba(99,102,241,0.18)", name: "var(--accent-2)" },
+                  { bg: "linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(129,140,248,0.08) 100%)", border: "rgba(16,185,129,0.35)", glow: "rgba(16,185,129,0.18)", name: "var(--accent-2)" },
                   { bg: "linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(52,211,153,0.08) 100%)", border: "rgba(16,185,129,0.35)", glow: "rgba(16,185,129,0.18)", name: "var(--green)" },
                   { bg: "linear-gradient(135deg, rgba(45,212,191,0.15) 0%, rgba(94,234,212,0.08) 100%)", border: "rgba(45,212,191,0.35)", glow: "rgba(45,212,191,0.18)", name: "var(--teal)" },
                 ];
@@ -438,7 +438,7 @@ export default async function ProgressPage() {
         )}
       </div>
 
-      {/* ── Next Milestone Card ── */}
+      {/* в”Ђв”Ђ Next Milestone Card в”Ђв”Ђ */}
       {nextMilestone && nextMilestoneBadge && (
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border-md, rgba(255,255,255,0.10))",
@@ -449,7 +449,7 @@ export default async function ProgressPage() {
           <div style={{
             position: "absolute", top: -40, right: -40,
             width: 120, height: 120, borderRadius: "50%",
-            background: "rgba(99,102,241,0.12)", filter: "blur(40px)", pointerEvents: "none",
+            background: "rgba(16,185,129,0.12)", filter: "blur(40px)", pointerEvents: "none",
           }} />
 
           <p style={{
@@ -468,7 +468,7 @@ export default async function ProgressPage() {
             {/* Badge preview */}
             <div style={{
               width: 60, height: 60, borderRadius: 16, flexShrink: 0,
-              background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)",
+              background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.25)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 30,
             }}>
@@ -506,7 +506,7 @@ export default async function ProgressPage() {
         </div>
       )}
 
-      {/* ── All-Time Stats ── */}
+      {/* в”Ђв”Ђ All-Time Stats в”Ђв”Ђ */}
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20,
       }}>
@@ -532,7 +532,7 @@ export default async function ProgressPage() {
         ))}
       </div>
 
-      {/* ── Recent Games ── */}
+      {/* в”Ђв”Ђ Recent Games в”Ђв”Ђ */}
       {recentGames.length > 0 && (
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border)",

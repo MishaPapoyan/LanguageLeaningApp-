@@ -1,4 +1,4 @@
-import { RegisterForm } from "@/components/auth/RegisterForm";
+﻿import { RegisterForm } from "@/components/auth/RegisterForm";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -18,7 +18,7 @@ export default async function RegisterPage() {
         color: "var(--text)",
       }}
     >
-      {/* Left — decorative panel */}
+      {/* Left вЂ” decorative panel */}
       <div
         style={{
           display: "none",
@@ -55,7 +55,7 @@ export default async function RegisterPage() {
             width: "260px",
             height: "260px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(99,102,241,0.16) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(16,185,129,0.16) 0%, transparent 70%)",
             filter: "blur(40px)",
             pointerEvents: "none",
           }}
@@ -153,7 +153,7 @@ export default async function RegisterPage() {
         </div>
       </div>
 
-      {/* Right — form */}
+      {/* Right вЂ” form */}
       <div
         style={{
           flex: 1,
@@ -181,19 +181,21 @@ export default async function RegisterPage() {
               style={{
                 width: "32px",
                 height: "32px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
+                borderRadius: "10px",
+                background: "var(--accent)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "white",
+                color: "#050505",
                 fontWeight: 700,
-                fontSize: "11px",
-                letterSpacing: "0.05em",
+                fontSize: "18px",
+                fontFamily: "var(--font-display)",
+                fontStyle: "italic",
+                boxShadow: "0 0 18px rgba(16,185,129,0.45)",
                 flexShrink: 0,
               }}
             >
-              LG
+              L
             </div>
             <span
               style={{
@@ -201,6 +203,7 @@ export default async function RegisterPage() {
                 fontSize: "18px",
                 color: "var(--text)",
                 fontWeight: 800,
+                fontStyle: "italic",
                 letterSpacing: "-0.02em",
               }}
             >
@@ -228,7 +231,7 @@ export default async function RegisterPage() {
               lineHeight: 1.5,
             }}
           >
-            Takes 60 seconds — no credit card needed
+            Takes 60 seconds вЂ” no credit card needed
           </p>
 
           {/* Form */}

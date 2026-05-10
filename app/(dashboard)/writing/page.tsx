@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -26,64 +26,64 @@ interface WritingPrompt {
 const PROMPTS_FR: WritingPrompt[] = [
   {
     id: "w1",
-    emoji: "👋",
+    emoji: "рџ‘‹",
     title: "Introduce Yourself",
     prompt: "Write 3-5 sentences introducing yourself in French. Include your name, where you live, and one thing you like.",
     level: "beginner",
-    hints: ["Je m'appelle...", "J'habite à...", "J'aime..."],
+    hints: ["Je m'appelle...", "J'habite Г ...", "J'aime..."],
     sampleWords: ["bonjour", "je", "suis", "aimer", "habiter"],
   },
   {
     id: "w2",
-    emoji: "🍽️",
+    emoji: "рџЌЅпёЏ",
     title: "At the Restaurant",
     prompt: "You're at a French restaurant. Write a short conversation ordering food and drinks.",
     level: "beginner",
-    hints: ["Bonjour, je voudrais...", "L'addition, s'il vous plaît", "C'est délicieux !"],
-    sampleWords: ["voudrais", "s'il vous plaît", "merci", "eau", "café"],
+    hints: ["Bonjour, je voudrais...", "L'addition, s'il vous plaГ®t", "C'est dГ©licieux !"],
+    sampleWords: ["voudrais", "s'il vous plaГ®t", "merci", "eau", "cafГ©"],
   },
   {
     id: "w3",
-    emoji: "🏠",
+    emoji: "рџЏ ",
     title: "Describe Your Family",
     prompt: "Write about your family. Who are they? What do they look like? Use adjectives!",
     level: "beginner",
-    hints: ["Ma mère est...", "Mon père est...", "J'ai un frère / une soeur"],
+    hints: ["Ma mГЁre est...", "Mon pГЁre est...", "J'ai un frГЁre / une soeur"],
     sampleWords: ["famille", "grand", "petit", "gentil", "avoir"],
   },
   {
     id: "w4",
-    emoji: "📅",
+    emoji: "рџ“…",
     title: "My Daily Routine",
     prompt: "Describe a typical day in French. What do you do in the morning, afternoon, and evening?",
     level: "intermediate",
-    hints: ["Le matin, je...", "L'après-midi, je...", "Le soir, je..."],
+    hints: ["Le matin, je...", "L'aprГЁs-midi, je...", "Le soir, je..."],
     sampleWords: ["manger", "travailler", "regarder", "dormir", "puis"],
   },
   {
     id: "w5",
-    emoji: "🌍",
+    emoji: "рџЊЌ",
     title: "My Last Trip",
-    prompt: "Write in French about a trip you took (real or imaginary). Use the past tense (passé composé)!",
+    prompt: "Write in French about a trip you took (real or imaginary). Use the past tense (passГ© composГ©)!",
     level: "intermediate",
-    hints: ["Je suis allé(e) à...", "J'ai visité...", "C'était magnifique !"],
+    hints: ["Je suis allГ©(e) Г ...", "J'ai visitГ©...", "C'Г©tait magnifique !"],
     sampleWords: ["voyager", "visiter", "manger", "voir", "aimer"],
   },
   {
     id: "w6",
-    emoji: "🛒",
+    emoji: "рџ›’",
     title: "Shopping List",
     prompt: "In French, write a list of what you need to buy and how you'll ask for each item at the market.",
     level: "beginner",
     hints: ["J'ai besoin de...", "Je voudrais du / de la / des...", "C'est combien ?"],
-    sampleWords: ["pain", "fromage", "fruits", "légumes", "combien"],
+    sampleWords: ["pain", "fromage", "fruits", "lГ©gumes", "combien"],
   },
 ];
 
 const PROMPTS_ES: WritingPrompt[] = [
   {
     id: "w1",
-    emoji: "👋",
+    emoji: "рџ‘‹",
     title: "Introduce Yourself",
     prompt: "Write 3-5 sentences introducing yourself in Spanish. Include your name, where you live, and one thing you like.",
     level: "beginner",
@@ -92,55 +92,55 @@ const PROMPTS_ES: WritingPrompt[] = [
   },
   {
     id: "w2",
-    emoji: "🍽️",
+    emoji: "рџЌЅпёЏ",
     title: "At the Restaurant",
     prompt: "You're at a Spanish tapas bar. Write a short conversation ordering food and drinks.",
     level: "beginner",
-    hints: ["Hola, quiero...", "La cuenta, por favor", "¡Está delicioso!"],
-    sampleWords: ["quiero", "por favor", "gracias", "agua", "café"],
+    hints: ["Hola, quiero...", "La cuenta, por favor", "ВЎEstГЎ delicioso!"],
+    sampleWords: ["quiero", "por favor", "gracias", "agua", "cafГ©"],
   },
   {
     id: "w3",
-    emoji: "🏠",
+    emoji: "рџЏ ",
     title: "Describe Your Family",
     prompt: "Write about your family in Spanish. Who are they? What do they look like? Use adjectives!",
     level: "beginner",
     hints: ["Mi madre es...", "Mi padre es...", "Tengo un hermano / una hermana"],
-    sampleWords: ["familia", "grande", "pequeño", "simpático", "tener"],
+    sampleWords: ["familia", "grande", "pequeГ±o", "simpГЎtico", "tener"],
   },
   {
     id: "w4",
-    emoji: "📅",
+    emoji: "рџ“…",
     title: "My Daily Routine",
     prompt: "Describe a typical day in Spanish. What do you do in the morning, afternoon, and evening?",
     level: "intermediate",
-    hints: ["Por la mañana, yo...", "Por la tarde, yo...", "Por la noche, yo..."],
-    sampleWords: ["comer", "trabajar", "ver", "dormir", "después"],
+    hints: ["Por la maГ±ana, yo...", "Por la tarde, yo...", "Por la noche, yo..."],
+    sampleWords: ["comer", "trabajar", "ver", "dormir", "despuГ©s"],
   },
   {
     id: "w5",
-    emoji: "🌍",
+    emoji: "рџЊЌ",
     title: "My Last Trip",
     prompt: "Write in Spanish about a trip you took (real or imaginary). Use the preterite tense!",
     level: "intermediate",
-    hints: ["Fui a...", "Visité...", "¡Fue increíble!"],
+    hints: ["Fui a...", "VisitГ©...", "ВЎFue increГ­ble!"],
     sampleWords: ["viajar", "visitar", "comer", "ver", "gustar"],
   },
   {
     id: "w6",
-    emoji: "🛒",
+    emoji: "рџ›’",
     title: "Shopping List",
     prompt: "In Spanish, write a list of what you need to buy and how you'll ask for each item at the market.",
     level: "beginner",
-    hints: ["Necesito...", "Quisiera...", "¿Cuánto cuesta?"],
-    sampleWords: ["pan", "queso", "frutas", "verduras", "cuánto"],
+    hints: ["Necesito...", "Quisiera...", "ВїCuГЎnto cuesta?"],
+    sampleWords: ["pan", "queso", "frutas", "verduras", "cuГЎnto"],
   },
 ];
 
 const PROMPTS_EN: WritingPrompt[] = [
   {
     id: "w1",
-    emoji: "👋",
+    emoji: "рџ‘‹",
     title: "Introduce Yourself",
     prompt: "Write 3-5 sentences introducing yourself in English. Include your name, where you're from, and one thing you enjoy.",
     level: "beginner",
@@ -149,16 +149,16 @@ const PROMPTS_EN: WritingPrompt[] = [
   },
   {
     id: "w2",
-    emoji: "🍽️",
+    emoji: "рџЌЅпёЏ",
     title: "At the Restaurant",
-    prompt: "You're at a British café. Write a short conversation ordering food and drinks politely.",
+    prompt: "You're at a British cafГ©. Write a short conversation ordering food and drinks politely.",
     level: "beginner",
     hints: ["Could I have..., please?", "I'd like...", "Could I get the bill, please?"],
     sampleWords: ["could", "would", "please", "lovely", "actually"],
   },
   {
     id: "w3",
-    emoji: "🏠",
+    emoji: "рџЏ ",
     title: "Describe Your Family",
     prompt: "Write about your family in English. Who are they? What are they like? Use adjectives and the verb 'to be'.",
     level: "beginner",
@@ -167,7 +167,7 @@ const PROMPTS_EN: WritingPrompt[] = [
   },
   {
     id: "w4",
-    emoji: "📅",
+    emoji: "рџ“…",
     title: "My Daily Routine",
     prompt: "Describe a typical day in English. Use the present simple tense and time expressions.",
     level: "intermediate",
@@ -176,7 +176,7 @@ const PROMPTS_EN: WritingPrompt[] = [
   },
   {
     id: "w5",
-    emoji: "🌍",
+    emoji: "рџЊЌ",
     title: "My Last Trip",
     prompt: "Write about a trip you took (real or imaginary) in English. Use the past simple tense.",
     level: "intermediate",
@@ -185,7 +185,7 @@ const PROMPTS_EN: WritingPrompt[] = [
   },
   {
     id: "w6",
-    emoji: "🛒",
+    emoji: "рџ›’",
     title: "Shopping List",
     prompt: "Write a shopping list in English and describe how you'd ask for each item politely in a shop.",
     level: "beginner",
@@ -225,7 +225,7 @@ export default function WritingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: checkText.trim(),
-          prompt: `The user wrote a sentence in ${langName}. Check grammar, spelling, and naturalness. Be concise and direct — just point out what's wrong and give the corrected version. If it's perfect, say so.`,
+          prompt: `The user wrote a sentence in ${langName}. Check grammar, spelling, and naturalness. Be concise and direct вЂ” just point out what's wrong and give the corrected version. If it's perfect, say so.`,
           level: "beginner",
         }),
       });
@@ -316,7 +316,7 @@ export default function WritingPage() {
         {/* Quick Sentence Check */}
         {view === "check" && (
           <div style={{ maxWidth: 680 }}>
-            <div style={{ padding: "16px 18px", borderRadius: 16, marginBottom: 16, background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)" }}>
+            <div style={{ padding: "16px 18px", borderRadius: 16, marginBottom: 16, background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.2)" }}>
               <p style={{ fontSize: 13, color: "var(--text-2)", margin: 0 }}>
                 {t(locale, "writing_checkDesc", { lang: langName })}
               </p>
@@ -327,7 +327,7 @@ export default function WritingPage() {
                 value={checkText}
                 onChange={(e) => setCheckText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleQuickCheck(); }}
-                placeholder={targetLanguage === "es" ? "Escribe tu frase aquí…" : targetLanguage === "en" ? "Write your sentence here…" : "Écris ta phrase ici…"}
+                placeholder={targetLanguage === "es" ? "Escribe tu frase aquГ­вЂ¦" : targetLanguage === "en" ? "Write your sentence hereвЂ¦" : "Г‰cris ta phrase iciвЂ¦"}
                 rows={4}
                 style={{
                   width: "100%", boxSizing: "border-box", resize: "none",
@@ -375,12 +375,12 @@ export default function WritingPage() {
                   background: "var(--surface-2)", borderRadius: 16, padding: "18px 20px",
                   border: "1px solid var(--border-md)", cursor: "pointer", transition: "all 0.15s",
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.4)"; (e.currentTarget as HTMLElement).style.background = "var(--surface-3)"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.4)"; (e.currentTarget as HTMLElement).style.background = "var(--surface-3)"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border-md)"; (e.currentTarget as HTMLElement).style.background = "var(--surface-2)"; }}
               >
                 <div style={{
                   width: 48, height: 48, borderRadius: 14, flexShrink: 0,
-                  background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)",
+                  background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.2)",
                   display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22,
                 }}>
                   {p.emoji}
@@ -407,7 +407,7 @@ export default function WritingPage() {
             )}
             {!historyLoading && history.length === 0 && (
               <div style={{ textAlign: "center", padding: "48px 0" }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📝</div>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>рџ“ќ</div>
                 <p style={{ fontSize: 13, color: "var(--text-3)" }}>{t(locale, "writing_noHistory")}</p>
                 <button onClick={() => setView("prompts")} style={{ marginTop: 12, fontSize: 13, fontWeight: 600, color: "var(--accent-2)", background: "none", border: "none", cursor: "pointer" }}>
                   {t(locale, "writing_startWriting")}
@@ -480,7 +480,7 @@ export default function WritingPage() {
       </div>
 
       {/* Prompt card */}
-      <div style={{ borderRadius: 14, padding: "14px 16px", background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)", marginBottom: 16 }}>
+      <div style={{ borderRadius: 14, padding: "14px 16px", background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.25)", marginBottom: 16 }}>
         <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>{selectedPrompt.prompt}</p>
       </div>
 
@@ -563,7 +563,7 @@ export default function WritingPage() {
                     <span style={{ fontSize: 12, color: "var(--text-3)", fontWeight: 600 }}>/10</span>
                   </div>
                 )}
-                {/* Rewrite button — clears feedback so the user can revise */}
+                {/* Rewrite button вЂ” clears feedback so the user can revise */}
                 <button
                   onClick={() => { setFeedback(null); setText(""); setShowHints(false); }}
                   style={{
@@ -574,7 +574,7 @@ export default function WritingPage() {
                   onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent-2)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-md)"; e.currentTarget.style.color = "var(--text-2)"; }}
                 >
-                  ↺ Rewrite
+                  в†є Rewrite
                 </button>
               </div>
             </div>

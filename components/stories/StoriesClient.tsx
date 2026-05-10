@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -18,13 +18,13 @@ interface StoryItem {
 
 const diffGradient: Record<string, string> = {
   BEGINNER:     "linear-gradient(135deg, rgba(45,212,191,0.18) 0%, rgba(45,212,191,0.06) 100%)",
-  INTERMEDIATE: "linear-gradient(135deg, rgba(99,102,241,0.22) 0%, rgba(99,102,241,0.07) 100%)",
+  INTERMEDIATE: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(16,185,129,0.07) 100%)",
   ADVANCED:     "linear-gradient(135deg, rgba(249,115,22,0.20) 0%, rgba(249,115,22,0.06) 100%)",
 };
 
 const diffBorderColor: Record<string, string> = {
   BEGINNER:     "rgba(45,212,191,0.22)",
-  INTERMEDIATE: "rgba(99,102,241,0.28)",
+  INTERMEDIATE: "rgba(16,185,129,0.28)",
   ADVANCED:     "rgba(249,115,22,0.24)",
 };
 
@@ -52,7 +52,7 @@ export function StoriesClient({ stories }: { stories: StoryItem[] }) {
 
   return (
     <>
-      {/* ── Filter Tab Switcher ── */}
+      {/* в”Ђв”Ђ Filter Tab Switcher в”Ђв”Ђ */}
       <div style={{
         display: "flex", gap: 6, marginBottom: 24,
         background: "var(--surface)", border: "1px solid var(--border)",
@@ -74,7 +74,7 @@ export function StoriesClient({ stories }: { stories: StoryItem[] }) {
         ))}
       </div>
 
-      {/* ── Story Cards Grid ── */}
+      {/* в”Ђв”Ђ Story Cards Grid в”Ђв”Ђ */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {visible.map((story) => {
           const accentColor = diffColor[story.difficulty] || "var(--accent)";
@@ -183,7 +183,7 @@ export function StoriesClient({ stories }: { stories: StoryItem[] }) {
             background: "var(--surface)", border: "1px solid var(--border)",
             borderRadius: 18,
           }}>
-            <p style={{ fontSize: 32, marginBottom: 8 }}>📭</p>
+            <p style={{ fontSize: 32, marginBottom: 8 }}>рџ“­</p>
             <p style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
               No stories found
             </p>

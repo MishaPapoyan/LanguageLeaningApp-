@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+﻿export const dynamic = 'force-dynamic';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -8,7 +8,7 @@ import { Flame, Zap, Trophy, Crown, Medal, ArrowUp } from "lucide-react";
 import { t, getLocale } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Leaderboard — Lingova",
+  title: "Leaderboard вЂ” Lingova",
   description: "See how you rank among other learners",
 };
 
@@ -52,8 +52,8 @@ export default async function LeaderboardPage() {
   // Podium: [2nd, 1st, 3rd]
   const podiumOrder = leaderboard.length >= 3 ? [leaderboard[1], leaderboard[0], leaderboard[2]] : [];
 
-  const podiumMedals = ["🥈", "🥇", "🥉"];
-  const podiumHeights = [120, 150, 100];    // px — visual height of the podium block
+  const podiumMedals = ["рџҐ€", "рџҐ‡", "рџҐ‰"];
+  const podiumHeights = [120, 150, 100];    // px вЂ” visual height of the podium block
   const podiumPadTop  = [28, 0, 38];        // extra top padding to align bases
   const podiumGlow = [
     "none",
@@ -74,7 +74,7 @@ export default async function LeaderboardPage() {
   return (
     <div style={{ maxWidth: 680 }} className="animate-fade-up">
 
-      {/* ── Header ── */}
+      {/* в”Ђв”Ђ Header в”Ђв”Ђ */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{
           fontSize: 28, fontWeight: 700, color: "var(--text)",
@@ -89,7 +89,7 @@ export default async function LeaderboardPage() {
         </p>
       </div>
 
-      {/* ── Podium ── */}
+      {/* в”Ђв”Ђ Podium в”Ђв”Ђ */}
       {podiumOrder.length === 3 && (
         <div style={{
           display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10,
@@ -109,7 +109,7 @@ export default async function LeaderboardPage() {
                 borderRadius: 18, padding: "20px 12px",
                 textAlign: "center",
                 boxShadow: user.isCurrentUser
-                  ? "0 0 24px rgba(99,102,241,0.25)"
+                  ? "0 0 24px rgba(16,185,129,0.25)"
                   : podiumGlow[i],
                 height: podiumHeights[i],
                 display: "flex", flexDirection: "column",
@@ -164,7 +164,7 @@ export default async function LeaderboardPage() {
         </div>
       )}
 
-      {/* ── Full Rankings Table ── */}
+      {/* в”Ђв”Ђ Full Rankings Table в”Ђв”Ђ */}
       {leaderboard.length > 0 ? (
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border)",
@@ -264,7 +264,7 @@ export default async function LeaderboardPage() {
                       <Flame size={12} style={{ color: "var(--streak)", flexShrink: 0 }} />
                       {user.streak}d
                     </>
-                  ) : "—"}
+                  ) : "вЂ”"}
                 </span>
               </div>
             ))}
@@ -276,7 +276,7 @@ export default async function LeaderboardPage() {
           borderRadius: 18, textAlign: "center", padding: "56px 24px",
           marginBottom: 20,
         }}>
-          <p style={{ fontSize: 36, marginBottom: 10 }}>◈</p>
+          <p style={{ fontSize: 36, marginBottom: 10 }}>в—€</p>
           <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
             {t(locale, "lb_noLearners")}
           </p>
@@ -286,7 +286,7 @@ export default async function LeaderboardPage() {
         </div>
       )}
 
-      {/* ── Your Rank Summary Card (if not in top 10) ── */}
+      {/* в”Ђв”Ђ Your Rank Summary Card (if not in top 10) в”Ђв”Ђ */}
       {myRank && !isInTopTen && (
         <div style={{
           background: "var(--surface)", border: "1px solid var(--border-md, rgba(255,255,255,0.10))",
@@ -308,7 +308,7 @@ export default async function LeaderboardPage() {
               {t(locale, "lb_levelXp", { level: String(myRank.level), xp: myRank.xp.toLocaleString() })}
               {myRank.streak > 0 && (
                 <>
-                  {" · "}
+                  {" В· "}
                   <Flame size={11} style={{ color: "var(--gold)", display: "inline", verticalAlign: "middle", marginRight: 2 }} />
                   {t(locale, "lb_dayStreak", { n: String(myRank.streak) })}
                 </>

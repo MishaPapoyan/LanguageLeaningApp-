@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { speak } from "@/lib/speech";
@@ -20,7 +20,7 @@ interface Props {
   ttsLocale?: string;
 }
 
-// ─── Waveform bar animation (CSS-only, no canvas needed) ─────────────────────
+// в”Ђв”Ђв”Ђ Waveform bar animation (CSS-only, no canvas needed) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function WaveformBars({ active }: { active: boolean }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 2, height: 20 }}>
@@ -51,7 +51,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
   const [ttsStatus, setTtsStatus] = useState<"idle" | "loading" | "playing">("idle");
   const playing = ttsStatus !== "idle";
 
-  // ── Recording state ─────────────────────────────────────────────────────────
+  // в”Ђв”Ђ Recording state в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   const [recording, setRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -96,7 +96,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
     speakText(word.exampleFr);
   };
 
-  // ── Recording logic ─────────────────────────────────────────────────────────
+  // в”Ђв”Ђ Recording logic в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   const startRecording = async () => {
     setMicError(null);
     setRecordedUrl(null);
@@ -167,9 +167,9 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
       <div style={{
         display: "flex", alignItems: "flex-start", gap: 12,
         background: "var(--accent-dim)", borderRadius: 14, padding: "14px 16px",
-        marginBottom: 24, border: "1px solid rgba(99,102,241,0.2)",
+        marginBottom: 24, border: "1px solid rgba(16,185,129,0.2)",
       }}>
-        <span style={{ fontSize: 18 }}>♪</span>
+        <span style={{ fontSize: 18 }}>в™Є</span>
         <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>
           <span style={{ fontWeight: 700, color: "var(--text)" }}>How to practice:</span> Click a word to hear it, then hit{" "}
           <span style={{ fontWeight: 700 }}>Record</span> to compare your pronunciation.
@@ -200,9 +200,9 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
             </label>
             <div style={{ display: "flex", gap: 6 }}>
               {([
-                { label: "0.75×", value: 0.75 },
-                { label: "1×",    value: 1.0  },
-                { label: "1.25×", value: 1.25 },
+                { label: "0.75Г—", value: 0.75 },
+                { label: "1Г—",    value: 1.0  },
+                { label: "1.25Г—", value: 1.25 },
               ] as const).map((s) => (
                 <button
                   key={s.value}
@@ -232,12 +232,12 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
       {currentWord && (
         <div style={{
           background: "var(--surface-2)", borderRadius: 16, padding: "18px 20px", marginBottom: 24,
-          border: "1px solid rgba(99,102,241,0.35)", boxShadow: "0 0 24px rgba(99,102,241,0.1)",
+          border: "1px solid rgba(16,185,129,0.35)", boxShadow: "0 0 24px rgba(16,185,129,0.1)",
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
             <div style={{
               width: 56, height: 56, borderRadius: 16, flexShrink: 0,
-              background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.2)",
+              background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.2)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28,
             }}>
               {currentWord.imageEmoji}
@@ -249,12 +249,12 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                 </p>
                 {ttsStatus === "loading" && (
                   <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
-                    Loading…
+                    LoadingвЂ¦
                   </span>
                 )}
                 {ttsStatus === "playing" && (
                   <span style={{ fontSize: 11, color: "var(--accent-2)", fontWeight: 600, animation: "pulse 1s infinite" }}>
-                    Playing…
+                    PlayingвЂ¦
                   </span>
                 )}
               </div>
@@ -277,7 +277,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
           {/* Recording row */}
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
             <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-              🎙 Your pronunciation
+              рџЋ™ Your pronunciation
             </p>
 
             {micError && (
@@ -313,7 +313,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               {recording && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <WaveformBars active={true} />
-                  <span style={{ fontSize: 12, color: "var(--red)", fontWeight: 600 }}>Recording…</span>
+                  <span style={{ fontSize: 12, color: "var(--red)", fontWeight: 600 }}>RecordingвЂ¦</span>
                 </div>
               )}
 
@@ -323,7 +323,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                   style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "8px 16px", borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: "pointer",
-                    background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)", color: "var(--accent-2)",
+                    background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.3)", color: "var(--accent-2)",
                   }}
                 >
                   <Play size={13} /> Play back
@@ -358,7 +358,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               key={word.id}
               style={{
                 background: isActive ? "var(--surface-3)" : "var(--surface-2)",
-                borderRadius: 16, border: `1px solid ${isActive ? "rgba(99,102,241,0.35)" : "var(--border)"}`,
+                borderRadius: 16, border: `1px solid ${isActive ? "rgba(16,185,129,0.35)" : "var(--border)"}`,
                 padding: "12px 16px", display: "flex", alignItems: "center", gap: 12,
                 cursor: "pointer", transition: "all 0.12s",
               }}
@@ -385,7 +385,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                     width: 32, height: 32, borderRadius: 9,
                     background: "var(--accent-dim)", color: "var(--accent-2)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "1px solid rgba(99,102,241,0.2)", cursor: "pointer",
+                    border: "1px solid rgba(16,185,129,0.2)", cursor: "pointer",
                   }}
                   title="Listen to word"
                 >
@@ -401,7 +401,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                   }}
                   title="Listen to example"
                 >
-                  ◈
+                  в—€
                 </button>
               </div>
             </div>
@@ -411,7 +411,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
 
       {filtered.length === 0 && (
         <div style={{ textAlign: "center", padding: "64px 0", color: "var(--text-3)" }}>
-          <p style={{ fontSize: 24, marginBottom: 8 }}>♪</p>
+          <p style={{ fontSize: 24, marginBottom: 8 }}>в™Є</p>
           <p style={{ fontSize: 14 }}>No words found in this category</p>
         </div>
       )}

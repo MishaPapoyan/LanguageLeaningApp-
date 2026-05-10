@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/* ── SVG icons ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ SVG icons в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function IconHome({ active }: { active: boolean }) {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -97,7 +97,7 @@ function IconBookmark({ active }: { active: boolean }) {
   );
 }
 
-/* ── nav items ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ nav items в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 const ITEMS = [
   {
     href:  "/home",
@@ -126,7 +126,7 @@ const ITEMS = [
   },
 ];
 
-/* ── component ──────────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ component в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 export function MobileNav() {
   const pathname = usePathname();
 
@@ -162,7 +162,7 @@ export function MobileNav() {
             WebkitBackdropFilter: "blur(24px)",
             border: "1px solid rgba(255,255,255,0.08)",
             boxShadow:
-              "0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04), 0 0 24px rgba(99,102,241,0.08)",
+              "0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04), 0 0 24px rgba(16,185,129,0.08)",
           }}
         >
           {ITEMS.map((item) => {
@@ -192,7 +192,7 @@ export function MobileNav() {
                   background: active ? "var(--accent-dim)" : "transparent",
                   color: active ? "var(--accent)" : "var(--text-3)",
                   /* border only on active */
-                  border: active ? "1px solid rgba(99,102,241,0.22)" : "1px solid transparent",
+                  border: active ? "1px solid rgba(16,185,129,0.22)" : "1px solid transparent",
                 }}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.color = "var(--text-2)";

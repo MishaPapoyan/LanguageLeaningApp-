@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -9,14 +9,14 @@ import { speakTarget } from "@/lib/speech";
 interface Word { id: string; word: string; translation: string; imageEmoji: string; definition: string; }
 
 const PALACE_OBJECTS = [
-  { id: "table", label: "table", emoji: "🪑", x: 20, y: 60 },
-  { id: "coffee", label: "coffee", emoji: "☕", x: 50, y: 30 },
-  { id: "bread", label: "bread", emoji: "🥖", x: 75, y: 55 },
-  { id: "window", label: "window", emoji: "🪟", x: 35, y: 15 },
-  { id: "menu", label: "menu", emoji: "📋", x: 65, y: 20 },
-  { id: "cheese", label: "cheese", emoji: "🧀", x: 15, y: 35 },
-  { id: "wine", label: "wine", emoji: "🍷", x: 82, y: 75 },
-  { id: "flower", label: "flower", emoji: "🌸", x: 50, y: 75 },
+  { id: "table", label: "table", emoji: "рџЄ‘", x: 20, y: 60 },
+  { id: "coffee", label: "coffee", emoji: "в•", x: 50, y: 30 },
+  { id: "bread", label: "bread", emoji: "рџҐ–", x: 75, y: 55 },
+  { id: "window", label: "window", emoji: "рџЄџ", x: 35, y: 15 },
+  { id: "menu", label: "menu", emoji: "рџ“‹", x: 65, y: 20 },
+  { id: "cheese", label: "cheese", emoji: "рџ§Ђ", x: 15, y: 35 },
+  { id: "wine", label: "wine", emoji: "рџЌ·", x: 82, y: 75 },
+  { id: "flower", label: "flower", emoji: "рџЊё", x: 50, y: 75 },
 ];
 
 export function MemoryPalace({ words }: { words: Word[] }) {
@@ -115,14 +115,14 @@ export function MemoryPalace({ words }: { words: Word[] }) {
               paddingBottom: 16, pointerEvents: "none",
             }}>
               <p style={{ fontSize: 80, fontWeight: 800, color: "var(--text)", opacity: 0.04, fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}>
-                Café
+                CafГ©
               </p>
             </div>
 
             {/* Grid overlay */}
             <div style={{
               position: "absolute", inset: 0, pointerEvents: "none",
-              backgroundImage: "linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px)",
+              backgroundImage: "linear-gradient(rgba(16,185,129,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.05) 1px, transparent 1px)",
               backgroundSize: "40px 40px",
             }} />
 
@@ -147,7 +147,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                   <span style={{ fontSize: 28 }}>{obj.emoji}</span>
                   {isRevealed && word ? (
                     <span style={{
-                      background: "var(--surface-2)", border: "1px solid rgba(99,102,241,0.35)",
+                      background: "var(--surface-2)", border: "1px solid rgba(16,185,129,0.35)",
                       color: "var(--accent-2)", fontSize: 11, fontWeight: 700,
                       padding: "2px 8px", borderRadius: 8, marginTop: 4,
                       whiteSpace: "nowrap", boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
@@ -171,8 +171,8 @@ export function MemoryPalace({ words }: { words: Word[] }) {
               className="animate-fade-up"
               style={{
                 borderRadius: 16, padding: "16px 18px", marginBottom: 16,
-                background: "var(--surface-2)", border: "1px solid rgba(99,102,241,0.35)",
-                boxShadow: "0 0 24px rgba(99,102,241,0.12)",
+                background: "var(--surface-2)", border: "1px solid rgba(16,185,129,0.35)",
+                boxShadow: "0 0 24px rgba(16,185,129,0.12)",
               }}
             >
               <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
@@ -189,10 +189,10 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                     width: 28, height: 28, borderRadius: 8,
                     background: "var(--accent-dim)", color: "var(--accent-2)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "1px solid rgba(99,102,241,0.25)", cursor: "pointer", fontSize: 14,
+                    border: "1px solid rgba(16,185,129,0.25)", cursor: "pointer", fontSize: 14,
                   }}
                 >
-                  ♪
+                  в™Є
                 </button>
               </div>
               <p style={{ fontSize: 14, color: "var(--accent-2)", fontWeight: 600, marginTop: 4 }}>
@@ -220,7 +220,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
       ) : !quizSubmitted ? (
         <div className="space-y-4 animate-fade-up">
           <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 16 }}>
-            What {langConfig.label} word goes with each object in the café?
+            What {langConfig.label} word goes with each object in the cafГ©?
           </p>
           {PALACE_OBJECTS.filter((obj) => assignments[obj.id]).map((obj) => {
             const word = assignments[obj.id];
@@ -238,7 +238,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                     value={quizAnswers[obj.id] ?? ""}
                     onChange={(e) => setQuizAnswers((prev) => ({ ...prev, [obj.id]: e.target.value }))}
                     className="input"
-                    placeholder={`Type the ${langConfig.label} word…`}
+                    placeholder={`Type the ${langConfig.label} wordвЂ¦`}
                   />
                 </div>
               </div>
@@ -271,7 +271,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 12, color: "var(--text-3)" }}>{word.translation}</p>
                   <p style={{ fontSize: 15, fontWeight: 700, color: correct ? "var(--green)" : "var(--red)" }}>
-                    {answer || "(blank)"} {correct ? "✓" : "✗"}
+                    {answer || "(blank)"} {correct ? "вњ“" : "вњ—"}
                   </p>
                   {!correct && (
                     <p style={{ fontSize: 12, color: "var(--text-2)", marginTop: 2 }}>
@@ -284,7 +284,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                     onClick={() => handleSaveFromResults(word.id)}
                     style={{
                       padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap",
-                      background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+                      background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.3)",
                       color: "var(--accent-2)", cursor: "pointer",
                     }}
                   >
@@ -292,7 +292,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                   </button>
                 )}
                 {savedFromResults.has(word.id) && (
-                  <span style={{ fontSize: 11, color: "var(--green)", fontWeight: 700, whiteSpace: "nowrap" }}>Saved ✓</span>
+                  <span style={{ fontSize: 11, color: "var(--green)", fontWeight: 700, whiteSpace: "nowrap" }}>Saved вњ“</span>
                 )}
               </div>
             );
@@ -300,11 +300,11 @@ export function MemoryPalace({ words }: { words: Word[] }) {
           {xpEarned > 0 && (
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 6,
-              background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+              background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.3)",
               borderRadius: 999, padding: "6px 16px",
               fontSize: 14, fontWeight: 800, color: "var(--accent-2)",
             }}>
-              ⚡ +{xpEarned} XP earned!
+              вљЎ +{xpEarned} XP earned!
             </div>
           )}
           <div style={{ display: "flex", gap: 10 }}>

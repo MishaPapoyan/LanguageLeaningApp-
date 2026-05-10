@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
@@ -22,7 +22,7 @@ const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
   STUDENT: { bg: "rgba(255,255,255,0.06)", color: "var(--text-3)" },
 };
 
-const LANG_FLAG: Record<string, string> = { fr: "🇫🇷", es: "🇪🇸" };
+const LANG_FLAG: Record<string, string> = { fr: "рџ‡«рџ‡·", es: "рџ‡Єрџ‡ё" };
 
 const NATIVE_LABEL: Record<string, string> = {
   en: "EN", hy: "HY", ru: "RU", de: "DE", es: "ES", fr: "FR", ar: "AR", zh: "ZH",
@@ -89,7 +89,7 @@ export default function AdminUsersPage() {
       <div className="flex gap-3 mb-6 flex-wrap">
         <input
           type="text"
-          placeholder="Search name or email…"
+          placeholder="Search name or emailвЂ¦"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="input text-sm"
@@ -152,15 +152,15 @@ export default function AdminUsersPage() {
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold"
-                      style={{ background: "linear-gradient(135deg, #7c6aff, #4338ca)" }}
+                      style={{ background: "linear-gradient(135deg, #10b981, var(--accent-press))" }}
                     >
                       {u.name?.[0]?.toUpperCase() ?? u.email[0].toUpperCase()}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{u.name ?? "—"}</p>
+                        <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{u.name ?? "вЂ”"}</p>
                         {u.onboardingCompleted && (
-                          <span className="text-[10px] flex-shrink-0" title="Onboarding complete">✅</span>
+                          <span className="text-[10px] flex-shrink-0" title="Onboarding complete">вњ…</span>
                         )}
                       </div>
                       <p className="text-xs truncate" style={{ color: "var(--text-3)" }}>{u.email}</p>
@@ -170,7 +170,7 @@ export default function AdminUsersPage() {
                   {/* Level / XP */}
                   <div>
                     <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                      {LANG_FLAG[u.targetLanguage] ?? "🌍"} Lv {u.progress?.level ?? 1}
+                      {LANG_FLAG[u.targetLanguage] ?? "рџЊЌ"} Lv {u.progress?.level ?? 1}
                     </p>
                     <p className="text-xs" style={{ color: "var(--text-3)" }}>{(u.progress?.xp ?? 0).toLocaleString()} XP</p>
                   </div>
@@ -178,10 +178,10 @@ export default function AdminUsersPage() {
                   {/* Activity */}
                   <div>
                     <p className="text-xs" style={{ color: "var(--text-2)" }}>
-                      🔥 {u.progress?.streak ?? 0}d · {u.progress?.lastActive ? timeAgo(u.progress.lastActive) : "never"}
+                      рџ”Ґ {u.progress?.streak ?? 0}d В· {u.progress?.lastActive ? timeAgo(u.progress.lastActive) : "never"}
                     </p>
                     <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                      {u._count.savedWords}w · {u._count.aiInteractions}ai · {u._count.gameScores}g
+                      {u._count.savedWords}w В· {u._count.aiInteractions}ai В· {u._count.gameScores}g
                     </p>
                   </div>
 
@@ -229,7 +229,7 @@ export default function AdminUsersPage() {
                           className="text-[11px] font-semibold px-2 py-1 rounded-lg disabled:opacity-50"
                           style={{ background: "var(--red)", color: "#fff" }}
                         >
-                          {deleting === u.id ? "…" : "Confirm"}
+                          {deleting === u.id ? "вЂ¦" : "Confirm"}
                         </button>
                         <button
                           onClick={() => setConfirmDeleteId(null)}
@@ -263,7 +263,7 @@ export default function AdminUsersPage() {
                         Native: <strong>{NATIVE_LABEL[u.nativeLanguage] ?? u.nativeLanguage}</strong>
                       </p>
                       <p className="text-xs" style={{ color: "var(--text-2)" }}>
-                        Learning: <strong>{LANG_FLAG[u.targetLanguage] ?? "🌍"} {u.targetLanguage.toUpperCase()}</strong>
+                        Learning: <strong>{LANG_FLAG[u.targetLanguage] ?? "рџЊЌ"} {u.targetLanguage.toUpperCase()}</strong>
                       </p>
                     </div>
                     <div>
@@ -275,7 +275,7 @@ export default function AdminUsersPage() {
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>Engagement</p>
                       <p className="text-xs" style={{ color: "var(--text-2)" }}>{u._count.aiInteractions} AI sessions</p>
                       <p className="text-xs" style={{ color: "var(--text-2)" }}>{u._count.gameScores} game plays</p>
-                      <p className="text-xs" style={{ color: "var(--text-2)" }}>{u._count.writingSessions} writing · {u._count.voiceSessions} voice</p>
+                      <p className="text-xs" style={{ color: "var(--text-2)" }}>{u._count.writingSessions} writing В· {u._count.voiceSessions} voice</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>Account</p>
@@ -283,7 +283,7 @@ export default function AdminUsersPage() {
                         Joined {new Date(u.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                       <p className="text-xs" style={{ color: "var(--text-2)" }}>
-                        Onboarding: {u.onboardingCompleted ? "✅ done" : "⏳ pending"}
+                        Onboarding: {u.onboardingCompleted ? "вњ… done" : "вЏі pending"}
                       </p>
                     </div>
                   </div>

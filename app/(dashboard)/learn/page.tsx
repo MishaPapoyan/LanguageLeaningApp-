@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { LEARNING_PATH_META } from "@/data/learning-path-meta";
 import { LEARNING_PATH_META_ES } from "@/data/learning-path-es-meta";
@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { t, getLocale } from "@/lib/i18n";
 
-/* ── colour / difficulty maps ─────────────────────────────────── */
+/* в”Ђв”Ђ colour / difficulty maps в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 const typeColors: Record<string, string> = {
   alphabet:     "var(--gold)",
   pronunciation:"var(--coral)",
@@ -35,29 +35,29 @@ const LABEL_KEY_MAP: Record<string, string> = {
   conversation: "learn_conversation", culture: "learn_culture",
 };
 
-/* ── phases ────────────────────────────────────────────────────── */
+/* в”Ђв”Ђ phases в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 const FR_PHASES = [
-  { label: "Phase 1 — The Basics",       emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
-  { label: "Phase 2 — Core Grammar",     emoji: "⚙️", ids: ["articles-gender","subject-pronouns","avoir-verb","present-tense","adjectives","negation","questions"] },
-  { label: "Phase 3 — Real World French",emoji: "🌍", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
+  { label: "Phase 1 вЂ” The Basics",       emoji: "рџЊ±", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
+  { label: "Phase 2 вЂ” Core Grammar",     emoji: "вљ™пёЏ", ids: ["articles-gender","subject-pronouns","avoir-verb","present-tense","adjectives","negation","questions"] },
+  { label: "Phase 3 вЂ” Real World French",emoji: "рџЊЌ", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
 ];
 const ES_PHASES = [
-  { label: "Phase 1 — The Basics",       emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
-  { label: "Phase 2 — Core Grammar",     emoji: "⚙️", ids: ["articles-gender","subject-pronouns","tener-verb","present-tense","adjectives","negation","questions"] },
-  { label: "Phase 3 — Real World Spanish",emoji:"🌍", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
+  { label: "Phase 1 вЂ” The Basics",       emoji: "рџЊ±", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
+  { label: "Phase 2 вЂ” Core Grammar",     emoji: "вљ™пёЏ", ids: ["articles-gender","subject-pronouns","tener-verb","present-tense","adjectives","negation","questions"] },
+  { label: "Phase 3 вЂ” Real World Spanish",emoji:"рџЊЌ", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
 ];
 const EN_PHASES = [
-  { label: "Phase 1 — The Basics",       emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
-  { label: "Phase 2 — Core Grammar",     emoji: "⚙️", ids: ["articles","pronouns-be","have-do","present-simple","adjectives","negation","questions"] },
-  { label: "Phase 3 — Real World English",emoji:"🌍", ids: ["food-drinks","directions","time-days","past-simple","future"] },
+  { label: "Phase 1 вЂ” The Basics",       emoji: "рџЊ±", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
+  { label: "Phase 2 вЂ” Core Grammar",     emoji: "вљ™пёЏ", ids: ["articles","pronouns-be","have-do","present-simple","adjectives","negation","questions"] },
+  { label: "Phase 3 вЂ” Real World English",emoji:"рџЊЌ", ids: ["food-drinks","directions","time-days","past-simple","future"] },
 ];
 
-/* ── prize definitions ────────────────────────────────────────── */
+/* в”Ђв”Ђ prize definitions в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 const CHAPTER_PRIZES = [10, 15, 20, 25];   // XP per chapter (cycles)
 const PHASE_PRIZES   = [150, 250, 400];     // XP per phase
 const COURSE_PRIZE   = 1000;               // XP for full completion
 
-/* ── celebration modal ────────────────────────────────────────── */
+/* в”Ђв”Ђ celebration modal в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 type ModalKind = "chapter" | "phase" | "course";
 interface CelebModal {
   kind: ModalKind;
@@ -96,12 +96,12 @@ function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () =
 
         {modal.kind === "course" && (
           <div style={{ fontSize: 11, fontWeight: 800, color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
-            🎓 Course Complete
+            рџЋ“ Course Complete
           </div>
         )}
         {modal.kind === "phase" && (
           <div style={{ fontSize: 11, fontWeight: 800, color: "#a78bfa", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
-            ✨ {modal.phaseLabel} Complete
+            вњЁ {modal.phaseLabel} Complete
           </div>
         )}
 
@@ -114,14 +114,14 @@ function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () =
           background: "var(--gold-dim)", border: "1px solid var(--gold)",
           borderRadius: 99, padding: "10px 24px", marginBottom: 28,
         }}>
-          <span style={{ fontSize: 22 }}>⚡</span>
+          <span style={{ fontSize: 22 }}>вљЎ</span>
           <span style={{ fontSize: 24, fontWeight: 900, color: "var(--gold)" }}>+{modal.xp} XP</span>
           <span style={{ fontSize: 12, color: "var(--text-3)" }}>reward</span>
         </div>
 
         {/* progress stars */}
         <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 28 }}>
-          {["⭐","⭐","⭐"].map((s,i) => (
+          {["в­ђ","в­ђ","в­ђ"].map((s,i) => (
             <span key={i} style={{
               fontSize: 22,
               animation: `starPop 0.4s ${i * 0.12}s cubic-bezier(.34,1.56,.64,1) both`,
@@ -137,7 +137,7 @@ function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () =
             border: "none", color: "#000", fontWeight: 800, fontSize: 15, cursor: "pointer",
           }}
         >
-          {modal.kind === "course" ? "🎓 View My Certificate" : "Continue →"}
+          {modal.kind === "course" ? "рџЋ“ View My Certificate" : "Continue в†’"}
         </button>
       </div>
 
@@ -150,9 +150,9 @@ function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () =
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
    PAGE
-══════════════════════════════════════════════════════════════════ */
+в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 export default function LearnPage() {
   const { data: session } = useSession();
   const targetLang = session?.user?.targetLanguage ?? "fr";
@@ -237,9 +237,9 @@ export default function LearnPage() {
         setShownCelebrations(prev => new Set(prev).add("course"));
         setModal({
           kind: "course",
-          emoji: "🎓",
+          emoji: "рџЋ“",
           title: "Course Complete!",
-          subtitle: "You've completed the entire learning path! You're truly dedicated — collect your reward and keep growing.",
+          subtitle: "You've completed the entire learning path! You're truly dedicated вЂ” collect your reward and keep growing.",
           xp: COURSE_PRIZE,
         });
       }
@@ -287,10 +287,10 @@ export default function LearnPage() {
   return (
     <div style={{ maxWidth: 720 }}>
 
-      {/* ── Celebration Modal ── */}
+      {/* в”Ђв”Ђ Celebration Modal в”Ђв”Ђ */}
       {modal && <CelebrationModal modal={modal} onClose={() => setModal(null)} />}
 
-      {/* ── Header ── */}
+      {/* в”Ђв”Ђ Header в”Ђв”Ђ */}
       <div style={{ marginBottom: 28, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
         <div>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.5px", marginBottom: 4 }}>
@@ -320,7 +320,7 @@ export default function LearnPage() {
         )}
       </div>
 
-      {/* ── Progress Overview ── */}
+      {/* в”Ђв”Ђ Progress Overview в”Ђв”Ђ */}
       <div style={{
         display: "flex", alignItems: "center", gap: 16,
         background: "var(--surface)", border: "1px solid var(--border)",
@@ -342,7 +342,7 @@ export default function LearnPage() {
             justifyContent: "center", fontSize: courseComplete ? 18 : 11,
             fontWeight: 700, color: courseComplete ? "var(--gold)" : "var(--accent-2)",
           }}>
-            {courseComplete ? "🎓" : `${overallPct}%`}
+            {courseComplete ? "рџЋ“" : `${overallPct}%`}
           </span>
         </div>
         <div style={{ flex: 1 }}>
@@ -360,19 +360,19 @@ export default function LearnPage() {
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
           <span className={courseComplete ? "badge-green" : "badge-accent"} style={{ fontSize: 11 }}>
-            {courseComplete ? "🎓 Complete!" : `${LEARNING_PATH.length} ${lbl("chapters")}`}
+            {courseComplete ? "рџЋ“ Complete!" : `${LEARNING_PATH.length} ${lbl("chapters")}`}
           </span>
         </div>
       </div>
 
-      {/* ── Course Complete Hero ── */}
+      {/* в”Ђв”Ђ Course Complete Hero в”Ђв”Ђ */}
       {courseComplete && (
         <div style={{
           borderRadius: 20, padding: "28px 24px", marginBottom: 28, textAlign: "center",
           background: "linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.05))",
           border: "1px solid rgba(251,191,36,0.4)",
         }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>🎓</div>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>рџЋ“</div>
           <h2 style={{ fontSize: 22, fontWeight: 900, color: "var(--gold)", margin: "0 0 8px" }}>
             You've completed the full course!
           </h2>
@@ -383,17 +383,17 @@ export default function LearnPage() {
             <Link href="/games" style={{
               padding: "10px 20px", borderRadius: 12, fontWeight: 700, fontSize: 13,
               background: "var(--gold)", color: "#000", textDecoration: "none",
-            }}>Play Games →</Link>
+            }}>Play Games в†’</Link>
             <Link href="/tutor" style={{
               padding: "10px 20px", borderRadius: 12, fontWeight: 700, fontSize: 13,
               background: "var(--accent-dim)", color: "var(--accent)", textDecoration: "none",
               border: "1px solid rgba(124,106,255,0.3)",
-            }}>AI Tutor →</Link>
+            }}>AI Tutor в†’</Link>
           </div>
         </div>
       )}
 
-      {/* ── Phases ── */}
+      {/* в”Ђв”Ђ Phases в”Ђв”Ђ */}
       <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
         {PHASES.map((phase, phaseIdx) => {
           const phaseTopics = LEARNING_PATH.filter(t => phase.ids.includes(t.id));
@@ -421,10 +421,10 @@ export default function LearnPage() {
                       <span style={{ fontSize: 15, fontWeight: 800, color: phaseComplete ? "var(--green)" : "var(--text)" }}>
                         {phase.label}
                       </span>
-                      {phaseComplete && <span className="badge-green" style={{ fontSize: 10 }}>Complete ✓</span>}
+                      {phaseComplete && <span className="badge-green" style={{ fontSize: 10 }}>Complete вњ“</span>}
                     </div>
                     <p style={{ fontSize: 12, color: "var(--text-3)", margin: "2px 0 0" }}>
-                      {phaseDone} / {phaseLessons.length} lessons · {PHASE_PRIZES[phaseIdx]} XP reward
+                      {phaseDone} / {phaseLessons.length} lessons В· {PHASE_PRIZES[phaseIdx]} XP reward
                     </p>
                   </div>
                   <span style={{ fontSize: 14, fontWeight: 700, color: phaseComplete ? "var(--green)" : "var(--accent)" }}>
@@ -464,7 +464,7 @@ export default function LearnPage() {
                           <span style={{ fontSize: 13, fontWeight: 600, color: isComplete ? "var(--green)" : unlocked ? "var(--text)" : "var(--text-3)" }}>
                             {topic.title}
                           </span>
-                          {isComplete && <span className="badge-green" style={{ fontSize: 10 }}>{lbl("done")} ✓</span>}
+                          {isComplete && <span className="badge-green" style={{ fontSize: 10 }}>{lbl("done")} вњ“</span>}
                           {!unlocked && (
                             <span style={{
                               fontSize: 10, fontWeight: 700, color: "var(--text-3)",
@@ -502,7 +502,7 @@ export default function LearnPage() {
                               style={{
                                 display: "flex", alignItems: "center", gap: 14,
                                 background: isStarted ? "var(--accent-dim)" : "var(--surface)",
-                                border: `1px solid ${isStarted ? "rgba(99,102,241,0.25)" : "var(--border)"}`,
+                                border: `1px solid ${isStarted ? "rgba(16,185,129,0.25)" : "var(--border)"}`,
                                 borderRadius: 14, padding: "12px 16px",
                                 textDecoration: "none",
                                 opacity: isLocked ? 0.4 : 1,
@@ -535,7 +535,7 @@ export default function LearnPage() {
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                   <span className={`diff-${diffKey}`} style={{ fontSize: 10 }}>{lbl(diffKey)}</span>
-                                  <span style={{ fontSize: 11, color: "var(--text-3)" }}>·</span>
+                                  <span style={{ fontSize: 11, color: "var(--text-3)" }}>В·</span>
                                   <span style={{ fontSize: 11, color: "var(--text-3)" }}>{lbl(lesson.type)}</span>
                                 </div>
                               </div>

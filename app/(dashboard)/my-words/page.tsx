@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
@@ -7,7 +7,7 @@ import { getLanguageConfig } from "@/data/language-config";
 import { speakTarget } from "@/lib/speech";
 import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X, Pencil } from "lucide-react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Types в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 interface CustomWord {
   id: string;
@@ -24,7 +24,7 @@ interface QuizQuestion {
   correctIndex: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 const OPTION_LABELS = ["A", "B", "C", "D"];
 
@@ -38,7 +38,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 function buildQuestion(word: CustomWord, pool: CustomWord[]): QuizQuestion {
   const dist = shuffle(pool.filter(w => w.id !== word.id)).slice(0, 3).map(w => w.front);
-  const fill = ["None of these", "I don't know", "Skip", "—"];
+  const fill = ["None of these", "I don't know", "Skip", "вЂ”"];
   while (dist.length < 3) dist.push(fill[dist.length]);
   const options = shuffle([word.front, ...dist]);
   return { word, options, correctIndex: options.indexOf(word.front) };
@@ -47,7 +47,7 @@ function buildQuiz(words: CustomWord[]): QuizQuestion[] {
   return shuffle(words).map(w => buildQuestion(w, words));
 }
 
-// ─── API helpers ──────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ API helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 async function apiGet(): Promise<CustomWord[]> {
   const r = await fetch("/api/my-words", { cache: "no-store" });
@@ -77,7 +77,7 @@ async function apiPatch(id: string, front: string, back: string): Promise<Custom
   return r.json();
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// в”Ђв”Ђв”Ђ Component в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 
 export default function MyWordsPage() {
   const { data: session } = useSession();
@@ -180,14 +180,14 @@ export default function MyWordsPage() {
   const currentQ = questions[qIndex];
   const pct = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   //  RESULT SCREEN
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   if (mode === "result") {
-    const grade = pct === 100 ? { label: t(locale, "mywords_resultPerfect"), color: "var(--green)", emoji: "🏆" }
-                : pct >= 70   ? { label: t(locale, "mywords_resultGreat"), color: "var(--accent)", emoji: "🎉" }
-                : pct >= 40   ? { label: t(locale, "mywords_resultKeep"), color: "var(--gold)", emoji: "💪" }
-                :               { label: t(locale, "mywords_resultPractice"), color: "var(--red)", emoji: "📚" };
+    const grade = pct === 100 ? { label: t(locale, "mywords_resultPerfect"), color: "var(--green)", emoji: "рџЏ†" }
+                : pct >= 70   ? { label: t(locale, "mywords_resultGreat"), color: "var(--accent)", emoji: "рџЋ‰" }
+                : pct >= 40   ? { label: t(locale, "mywords_resultKeep"), color: "var(--gold)", emoji: "рџ’Є" }
+                :               { label: t(locale, "mywords_resultPractice"), color: "var(--red)", emoji: "рџ“љ" };
 
     return (
       <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 16px" }}>
@@ -226,7 +226,7 @@ export default function MyWordsPage() {
               borderRadius: 99, padding: "8px 18px",
               fontSize: 15, fontWeight: 800, color: "var(--gold)",
             }}>
-              ⚡ {t(locale, "mywords_xpEarned", { xp: xpEarned.toString() })}
+              вљЎ {t(locale, "mywords_xpEarned", { xp: xpEarned.toString() })}
             </div>
           )}
 
@@ -248,9 +248,9 @@ export default function MyWordsPage() {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   //  SETUP SCREEN
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   if (mode === "setup") {
     const PRESETS = [10, 20, 40, 50, 100];
     const resolvedCount = quizCount === "custom"
@@ -333,7 +333,7 @@ export default function MyWordsPage() {
         {canStart && (
           <div style={{
             padding: "14px 18px", borderRadius: 14, marginBottom: 24,
-            background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)",
+            background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
             fontSize: 13, color: "var(--text-2)",
           }}>
             {t(locale, "mywords_quizOn", { n: resolvedCount.toString() })}
@@ -349,9 +349,9 @@ export default function MyWordsPage() {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   //  QUIZ SCREEN
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   if (mode === "quiz" && currentQ) {
     const progress = ((qIndex + 1) / questions.length) * 100;
 
@@ -413,7 +413,7 @@ export default function MyWordsPage() {
 
           <button onClick={() => speakTarget(currentQ.word.back, langConfig.code)} style={{
             display: "inline-flex", alignItems: "center", gap: 8,
-            background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.3)",
+            background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.3)",
             borderRadius: 99, padding: "9px 20px",
             color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer",
             transition: "all 0.15s",
@@ -493,20 +493,20 @@ export default function MyWordsPage() {
               fontSize: 13, fontWeight: 700,
               opacity: hintUsed || selected !== null ? 0.5 : 1,
             }}>
-            💡 {hintErr ? t(locale, "mywords_notEnoughXp") : hintUsed ? t(locale, "mywords_hintUsed") : t(locale, "mywords_hint")}
+            рџ’Ў {hintErr ? t(locale, "mywords_notEnoughXp") : hintUsed ? t(locale, "mywords_hintUsed") : t(locale, "mywords_hint")}
           </button>
         </div>
       </div>
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   //  LIST / ADD SCREEN
-  // ══════════════════════════════════════════════════════════════════════════
+  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
   return (
     <div style={{ maxWidth: 780 }}>
 
-      {/* ── Page header ── */}
+      {/* в”Ђв”Ђ Page header в”Ђв”Ђ */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 12, flexWrap: "wrap" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
@@ -516,7 +516,7 @@ export default function MyWordsPage() {
             {words.length > 0 && (
               <span style={{
                 fontSize: 13, fontWeight: 800, color: "var(--accent)",
-                background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)",
+                background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.25)",
                 borderRadius: 99, padding: "3px 12px",
               }}>
                 {words.length}
@@ -532,14 +532,14 @@ export default function MyWordsPage() {
           <button onClick={() => setMode("setup")} className="btn-primary" style={{
             display: "flex", alignItems: "center", gap: 9,
             padding: "11px 22px", fontSize: 14, fontWeight: 800,
-            boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
+            boxShadow: "0 4px 20px rgba(16,185,129,0.35)",
           }}>
             <Play size={15} /> {t(locale, "mywords_startQuiz")}
           </button>
         )}
       </div>
 
-      {/* ── Add word panel ── */}
+      {/* в”Ђв”Ђ Add word panel в”Ђв”Ђ */}
       <div style={{
         borderRadius: 20, padding: "24px 24px 20px",
         background: "var(--surface-2)",
@@ -588,7 +588,7 @@ export default function MyWordsPage() {
             width: 36, height: 38,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 20, color: "var(--text-3)",
-          }}>→</div>
+          }}>в†’</div>
 
           {/* Target language input */}
           <div style={{ flex: 1 }}>
@@ -618,7 +618,7 @@ export default function MyWordsPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: front.trim() && back.trim() && !saving ? "pointer" : "not-allowed",
               transition: "all 0.2s",
-              boxShadow: front.trim() && back.trim() && !saving ? "0 4px 12px rgba(99,102,241,0.35)" : "none",
+              boxShadow: front.trim() && back.trim() && !saving ? "0 4px 12px rgba(16,185,129,0.35)" : "none",
             }}
             title="Add word pair"
           >
@@ -628,12 +628,12 @@ export default function MyWordsPage() {
 
         {words.length === 1 && (
           <p style={{ fontSize: 12, color: "var(--gold)", margin: "12px 0 0", display: "flex", alignItems: "center", gap: 5 }}>
-            ⚡ {t(locale, "mywords_unlockHint")}
+            вљЎ {t(locale, "mywords_unlockHint")}
           </p>
         )}
       </div>
 
-      {/* ── Word tile grid ── */}
+      {/* в”Ђв”Ђ Word tile grid в”Ђв”Ђ */}
       {loading ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
           {Array.from({ length: 6 }).map((_, i) => (
@@ -646,7 +646,7 @@ export default function MyWordsPage() {
           border: "2px dashed var(--border-md)",
           textAlign: "center",
         }}>
-          <div style={{ fontSize: 48, marginBottom: 14 }}>🗂️</div>
+          <div style={{ fontSize: 48, marginBottom: 14 }}>рџ—‚пёЏ</div>
           <p style={{ fontSize: 18, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>
             {t(locale, "mywords_emptyTitle")}
           </p>
@@ -672,7 +672,7 @@ export default function MyWordsPage() {
             {words.map((word, idx) => {
               // Design-system themed palette
               const palette = [
-                { color: "var(--accent-2)", dim: "var(--accent-dim)", border: "rgba(99,102,241,0.3)", glow: "rgba(99,102,241,0.12)" },
+                { color: "var(--accent-2)", dim: "var(--accent-dim)", border: "rgba(16,185,129,0.3)", glow: "rgba(16,185,129,0.12)" },
                 { color: "var(--teal)",     dim: "var(--teal-dim)",   border: "rgba(45,212,191,0.3)", glow: "rgba(45,212,191,0.12)" },
                 { color: "var(--xp)",       dim: "var(--xp-dim)",     border: "rgba(245,158,11,0.3)", glow: "rgba(245,158,11,0.12)" },
                 { color: "#f472b6",         dim: "rgba(244,114,182,0.12)", border: "rgba(244,114,182,0.3)", glow: "rgba(244,114,182,0.1)" },
@@ -705,7 +705,7 @@ export default function MyWordsPage() {
                   <div style={{ height: 3, background: `linear-gradient(90deg, ${p.color}, ${p.color}88)` }} />
 
                   {editingId === word.id ? (
-                    /* ── Edit mode ── */
+                    /* в”Ђв”Ђ Edit mode в”Ђв”Ђ */
                     <div style={{ padding: "14px 14px 12px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
                       <input
                         autoFocus value={editFront} onChange={e => setEditFront(e.target.value)}
@@ -794,19 +794,19 @@ export default function MyWordsPage() {
             <button onClick={() => setMode("setup")} style={{
               width: "100%", marginTop: 20, padding: "18px",
               borderRadius: 16, cursor: "pointer",
-              background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05))",
-              border: "2px dashed rgba(99,102,241,0.3)",
+              background: "linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))",
+              border: "2px dashed rgba(16,185,129,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
               color: "var(--accent)", fontSize: 15, fontWeight: 800,
               transition: "all 0.18s",
             }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,0.14)";
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(16,185,129,0.14)";
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05))";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,0.3)";
+                (e.currentTarget as HTMLButtonElement).style.background = "linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(16,185,129,0.3)";
               }}
             >
               <Play size={17} /> {t(locale, "mywords_quizMe", { n: words.length.toString() })}

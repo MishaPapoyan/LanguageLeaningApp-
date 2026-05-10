@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -91,7 +91,7 @@ export function WordDetail({ word }: { word: WordData }) {
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{
               width: 68, height: 68, borderRadius: 18, flexShrink: 0,
-              background: "var(--accent-dim)", border: "1px solid rgba(99,102,241,0.25)",
+              background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.25)",
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36,
             }}>
               {word.imageEmoji}
@@ -107,11 +107,11 @@ export function WordDetail({ word }: { word: WordData }) {
                     width: 30, height: 30, borderRadius: 8, flexShrink: 0,
                     background: "var(--accent-dim)", color: "var(--accent-2)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "1px solid rgba(99,102,241,0.25)", cursor: "pointer", fontSize: 14,
+                    border: "1px solid rgba(16,185,129,0.25)", cursor: "pointer", fontSize: 14,
                   }}
                   title={`Listen (${langConfig.label})`}
                 >
-                  ♪
+                  в™Є
                 </button>
               </div>
               <p style={{ fontSize: 20, color: "var(--accent-2)", fontWeight: 700, marginBottom: 4 }}>
@@ -121,7 +121,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 onClick={() => handleSpeak(word.translation, "en-US")}
                 style={{ fontSize: 11, color: "var(--text-3)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
               >
-                ♪ English pronunciation
+                в™Є English pronunciation
               </button>
             </div>
           </div>
@@ -137,7 +137,7 @@ export function WordDetail({ word }: { word: WordData }) {
               border: `1px solid ${isSaved ? "rgba(16,185,129,0.3)" : "var(--border-md)"}`,
             }}
           >
-            {saving ? "..." : isSaved ? "✓ Saved" : "+ Save"}
+            {saving ? "..." : isSaved ? "вњ“ Saved" : "+ Save"}
           </button>
         </div>
 
@@ -152,7 +152,7 @@ export function WordDetail({ word }: { word: WordData }) {
           <p style={{ fontSize: 14, color: "var(--text-1)", lineHeight: 1.6 }}>{word.definition}</p>
         </div>
 
-        {/* Quiz stats — only for saved words with attempts */}
+        {/* Quiz stats вЂ” only for saved words with attempts */}
         {word.isSaved && word.quizAttempts > 0 && (
           <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 16, fontSize: 13 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -170,7 +170,7 @@ export function WordDetail({ word }: { word: WordData }) {
                   style={{
                     width: 16, height: 16, borderRadius: 4,
                     background: n <= word.masteryLevel ? "var(--accent)" : "var(--surface-3)",
-                    border: `1px solid ${n <= word.masteryLevel ? "rgba(99,102,241,0.4)" : "var(--border)"}`,
+                    border: `1px solid ${n <= word.masteryLevel ? "rgba(16,185,129,0.4)" : "var(--border)"}`,
                     transition: "background 0.2s",
                   }}
                 />
@@ -181,7 +181,7 @@ export function WordDetail({ word }: { word: WordData }) {
 
         {word.isSaved && word.quizAttempts === 0 && (
           <p style={{ marginTop: 10, fontSize: 12, color: "var(--text-3)" }}>
-            Not reviewed yet —{" "}
+            Not reviewed yet вЂ”{" "}
             <a href="/review" style={{ color: "var(--accent-2)", textDecoration: "none" }}>
               Visit Review
             </a>{" "}
@@ -197,7 +197,7 @@ export function WordDetail({ word }: { word: WordData }) {
         </h2>
         <div style={{
           background: "var(--accent-dim)", borderRadius: 14, padding: "16px 18px",
-          border: "1px solid rgba(99,102,241,0.25)",
+          border: "1px solid rgba(16,185,129,0.25)",
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
             <p style={{ fontSize: 14, color: "var(--text-1)", fontStyle: "italic", lineHeight: 1.55 }}>
@@ -212,7 +212,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 border: "none", cursor: "pointer", fontSize: 14,
               }}
             >
-              ♪
+              в™Є
             </button>
           </div>
           <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 6 }}>
@@ -241,7 +241,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 border: "1px solid rgba(245,158,11,0.25)", cursor: "pointer", fontSize: 14,
               }}
             >
-              ♪
+              в™Є
             </button>
             <p style={{ fontSize: 14, color: "var(--text-1)", lineHeight: 1.65 }}>{word.miniStory}</p>
           </div>

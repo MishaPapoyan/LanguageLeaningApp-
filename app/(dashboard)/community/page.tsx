@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ interface Learner {
   _count: { gameScores: number; savedWords: number };
 }
 
-const LANG_FLAGS:  Record<string, string> = { fr: "🇫🇷", es: "🇪🇸", en: "🇬🇧" };
+const LANG_FLAGS:  Record<string, string> = { fr: "рџ‡«рџ‡·", es: "рџ‡Єрџ‡ё", en: "рџ‡¬рџ‡§" };
 const LANG_LABELS: Record<string, string> = { fr: "French", es: "Spanish", en: "English" };
 const LANG_GRADIENT: Record<string, string> = {
   fr: "linear-gradient(135deg,#1e3a8a,#3730a3)",
@@ -31,7 +31,7 @@ function isEmoji(s: string | null) {
 function Avatar({ image, name, size = 44, lang }: { image: string | null; name: string | null; size?: number; lang?: string }) {
   const emoji = isEmoji(image);
   const initial = (name ?? "?")[0]?.toUpperCase();
-  const bg = !emoji ? (LANG_GRADIENT[lang ?? "fr"] ?? "linear-gradient(135deg,#6366f1,#4f46e5)") : "var(--surface-3)";
+  const bg = !emoji ? (LANG_GRADIENT[lang ?? "fr"] ?? "linear-gradient(135deg, #10b981, #059669)") : "var(--surface-3)";
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
@@ -45,7 +45,7 @@ function Avatar({ image, name, size = 44, lang }: { image: string | null; name: 
   );
 }
 
-/* ── Podium card for top 3 ────────────────────────────── */
+/* в”Ђв”Ђ Podium card for top 3 в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 | 3; locale: import("@/lib/i18n").Locale }) {
   const [hov, setHov] = useState(false);
   const xp = learner.progress?.xp ?? 0;
@@ -53,7 +53,7 @@ function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 |
   const streak = learner.progress?.streak ?? 0;
   const lang = learner.targetLanguage ?? "fr";
 
-  const medals = ["🥇", "🥈", "🥉"];
+  const medals = ["рџҐ‡", "рџҐ€", "рџҐ‰"];
   const heights = [96, 72, 56];
   const colors = ["#fbbf24", "#94a3b8", "#d97706"];
   const glows = ["rgba(251,191,36,0.3)", "rgba(148,163,184,0.2)", "rgba(217,119,6,0.2)"];
@@ -84,7 +84,7 @@ function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 |
             background: "#fbbf24", borderRadius: "50%", width: 18, height: 18,
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9,
             border: "2px solid var(--surface)",
-          }}>🔥</div>
+          }}>рџ”Ґ</div>
         )}
       </div>
 
@@ -93,7 +93,7 @@ function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 |
         padding: rank === 1 ? "14px 16px" : "11px 14px",
         borderRadius: 14, width: "100%",
         background: `linear-gradient(135deg, var(--surface-2), var(--accent-dim))`,
-        border: `1px solid ${hov ? colors[rank - 1] + "66" : "rgba(99,102,241,0.15)"}`,
+        border: `1px solid ${hov ? colors[rank - 1] + "66" : "rgba(16,185,129,0.15)"}`,
         boxShadow: hov ? `0 8px 24px ${glows[rank - 1]}` : "none",
         transition: "all 0.2s",
         textAlign: "center",
@@ -109,11 +109,11 @@ function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 |
             <Zap size={9} /> Lv {level}
           </span>
           <span style={{ fontSize: 11, fontWeight: 700, color: colors[rank - 1], display: "flex", alignItems: "center", gap: 3, fontVariantNumeric: "tabular-nums" }}>
-            ⚡ {xp.toLocaleString()}
+            вљЎ {xp.toLocaleString()}
           </span>
           {streak > 0 && (
             <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", display: "flex", alignItems: "center", gap: 2 }}>
-              🔥{streak}
+              рџ”Ґ{streak}
             </span>
           )}
         </div>
@@ -122,7 +122,7 @@ function PodiumCard({ learner, rank, locale }: { learner: Learner; rank: 1 | 2 |
   );
 }
 
-/* ── List row for rank 4+ ─────────────────────────────── */
+/* в”Ђв”Ђ List row for rank 4+ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
 function LeaderRow({ learner, rank, isYou, locale }: { learner: Learner; rank: number; isYou: boolean; locale: import("@/lib/i18n").Locale }) {
   const [hov, setHov] = useState(false);
   const xp = learner.progress?.xp ?? 0;
@@ -141,10 +141,10 @@ function LeaderRow({ learner, rank, isYou, locale }: { learner: Learner; rank: n
         display: "flex", alignItems: "center", gap: 12, padding: "12px 16px",
         borderRadius: 14, textDecoration: "none",
         background: isYou ? "var(--accent-dim)" : hov ? "var(--surface-3)" : "var(--surface-2)",
-        border: `1px solid ${isYou ? "rgba(99,102,241,0.35)" : hov ? "rgba(99,102,241,0.2)" : "var(--border)"}`,
+        border: `1px solid ${isYou ? "rgba(16,185,129,0.35)" : hov ? "rgba(16,185,129,0.2)" : "var(--border)"}`,
         transform: hov ? "translateX(4px)" : "none",
         transition: "all 0.18s ease",
-        boxShadow: isYou ? "0 2px 16px rgba(99,102,241,0.1)" : "none",
+        boxShadow: isYou ? "0 2px 16px rgba(16,185,129,0.1)" : "none",
       }}
     >
       {/* rank */}
@@ -159,7 +159,7 @@ function LeaderRow({ learner, rank, isYou, locale }: { learner: Learner; rank: n
             {learner.name ?? t(locale, "comm_learner")}
           </span>
           <span style={{ fontSize: 12 }}>{LANG_FLAGS[lang]}</span>
-          {isYou && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "rgba(99,102,241,0.12)", padding: "1px 6px", borderRadius: 5 }}>{t(locale, "comm_you")}</span>}
+          {isYou && <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent)", background: "rgba(16,185,129,0.12)", padding: "1px 6px", borderRadius: 5 }}>{t(locale, "comm_you")}</span>}
         </div>
         {/* mini XP bar */}
         <div style={{ height: 4, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden", width: "100%", maxWidth: 160 }}>
@@ -176,9 +176,9 @@ function LeaderRow({ learner, rank, isYou, locale }: { learner: Learner; rank: n
           {xp.toLocaleString()} XP
         </span>
         {streak > 0 && (
-          <span style={{ fontSize: 11, color: "#fbbf24", fontWeight: 700 }}>🔥{streak}</span>
+          <span style={{ fontSize: 11, color: "#fbbf24", fontWeight: 700 }}>рџ”Ґ{streak}</span>
         )}
-        <span style={{ fontSize: 11, color: "var(--text-3)" }}>🎮{learner._count.gameScores}</span>
+        <span style={{ fontSize: 11, color: "var(--text-3)" }}>рџЋ®{learner._count.gameScores}</span>
       </div>
     </Link>
   );
@@ -199,20 +199,20 @@ const MONTH_NAMES = ["January","February","March","April","May","June","July","A
 
 function MonthlyTopCard({ entry, myId }: { entry: MonthlyEntry; myId: string }) {
   const isMe = entry.userId === myId;
-  const medals: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  const medals: Record<number, string> = { 1: "рџҐ‡", 2: "рџҐ€", 3: "рџҐ‰" };
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
       borderRadius: 14,
       background: isMe ? "var(--accent-dim)" : entry.rank <= 3 ? "var(--surface-3)" : "var(--surface-2)",
-      border: `1px solid ${isMe ? "rgba(99,102,241,0.3)" : entry.rank === 1 ? "rgba(251,191,36,0.3)" : "var(--border)"}`,
+      border: `1px solid ${isMe ? "rgba(16,185,129,0.3)" : entry.rank === 1 ? "rgba(251,191,36,0.3)" : "var(--border)"}`,
     }}>
       <span style={{ minWidth: 24, textAlign: "center", fontSize: 14 }}>
         {medals[entry.rank] ?? `#${entry.rank}`}
       </span>
       <div style={{
         width: 32, height: 32, borderRadius: "50%",
-        background: "linear-gradient(135deg,#7c6aff,#4338ca)",
+        background: "linear-gradient(135deg,#10b981,var(--accent-press))",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 13, fontWeight: 900, color: "#fff", flexShrink: 0,
       }}>
@@ -224,12 +224,12 @@ function MonthlyTopCard({ entry, myId }: { entry: MonthlyEntry; myId: string }) 
         </p>
         <p style={{ fontSize: 11, color: "var(--text-3)" }}>
           {LANG_FLAGS[entry.targetLanguage]} Lv {entry.level}
-          {entry.streak > 0 && ` · 🔥${entry.streak}`}
+          {entry.streak > 0 && ` В· рџ”Ґ${entry.streak}`}
         </p>
       </div>
       <div style={{ textAlign: "right", flexShrink: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 800, color: entry.rank === 1 ? "#fbbf24" : "var(--text)" }}>
-          ⚡ {entry.monthlyXp.toLocaleString()}
+          вљЎ {entry.monthlyXp.toLocaleString()}
         </p>
         <p style={{ fontSize: 10, color: "var(--text-3)" }}>XP this month</p>
       </div>
@@ -237,9 +237,9 @@ function MonthlyTopCard({ entry, myId }: { entry: MonthlyEntry; myId: string }) 
   );
 }
 
-/* ══════════════════════════════════════════════════════════
+/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
    PAGE
-══════════════════════════════════════════════════════════ */
+в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
 export default function CommunityPage() {
   const { data: session } = useSession();
   const locale = getLocale((session?.user as any)?.nativeLanguage);
@@ -295,14 +295,14 @@ export default function CommunityPage() {
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 0 60px" }}>
 
-      {/* ── Header ── */}
+      {/* в”Ђв”Ђ Header в”Ђв”Ђ */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{
             width: 42, height: 42, borderRadius: 12,
-            background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+            background: "linear-gradient(135deg, #10b981, #059669)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 0 16px rgba(99,102,241,0.35)",
+            boxShadow: "0 0 16px rgba(16,185,129,0.35)",
           }}>
             <Users size={20} color="#fff" />
           </div>
@@ -317,15 +317,15 @@ export default function CommunityPage() {
             display: "inline-flex", alignItems: "center", gap: 6,
             fontSize: 12, fontWeight: 700, padding: "8px 14px", borderRadius: 10,
             background: "var(--accent-dim)", color: "var(--accent)",
-            border: "1px solid rgba(99,102,241,0.3)", textDecoration: "none",
+            border: "1px solid rgba(16,185,129,0.3)", textDecoration: "none",
             transition: "all 0.15s",
           }}>
-            👤 {t(locale, "comm_myProfile")} {myRank > 0 && <span style={{ opacity: 0.7 }}>#{myRank}</span>}
+            рџ‘¤ {t(locale, "comm_myProfile")} {myRank > 0 && <span style={{ opacity: 0.7 }}>#{myRank}</span>}
           </Link>
         )}
       </div>
 
-      {/* ── Monthly Clever Student ── */}
+      {/* в”Ђв”Ђ Monthly Clever Student в”Ђв”Ђ */}
       {monthly.length > 0 && (
         <div style={{
           borderRadius: 20, padding: "20px 20px 16px",
@@ -334,23 +334,23 @@ export default function CommunityPage() {
           border: "1px solid rgba(251,191,36,0.3)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-            <span style={{ fontSize: 22 }}>🏅</span>
+            <span style={{ fontSize: 22 }}>рџЏ…</span>
             <div>
               <p style={{ fontSize: 13, fontWeight: 900, color: "#fbbf24", margin: 0 }}>
                 Clever Student of the Month
               </p>
               <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0 }}>
-                {monthLabel} · ranked by XP earned this month
+                {monthLabel} В· ranked by XP earned this month
               </p>
             </div>
             {monthly[0] && (
               <div style={{ marginLeft: "auto", textAlign: "center" }}>
-                <div style={{ fontSize: 28 }}>🥇</div>
+                <div style={{ fontSize: 28 }}>рџҐ‡</div>
                 <p style={{ fontSize: 11, fontWeight: 800, color: "#fbbf24", margin: 0 }}>
                   {monthly[0].name}
                 </p>
                 <p style={{ fontSize: 10, color: "var(--text-3)", margin: 0 }}>
-                  ⚡ {monthly[0].monthlyXp.toLocaleString()} XP
+                  вљЎ {monthly[0].monthlyXp.toLocaleString()} XP
                 </p>
               </div>
             )}
@@ -363,7 +363,7 @@ export default function CommunityPage() {
         </div>
       )}
 
-      {/* ── Search + filter ── */}
+      {/* в”Ђв”Ђ Search + filter в”Ђв”Ђ */}
       <div style={{ display: "flex", gap: 8, margin: "20px 0", flexWrap: "wrap" }}>
         <div style={{ position: "relative", flex: 1, minWidth: 180 }}>
           <Search size={13} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }} />
@@ -386,7 +386,7 @@ export default function CommunityPage() {
             color: langFilter === l ? "var(--accent)" : "var(--text-2)",
             transition: "all 0.15s",
           }}>
-            {l === "" ? `🌍 ${t(locale, "comm_all")}` : `${LANG_FLAGS[l]} ${LANG_LABELS[l]}`}
+            {l === "" ? `рџЊЌ ${t(locale, "comm_all")}` : `${LANG_FLAGS[l]} ${LANG_LABELS[l]}`}
           </button>
         ))}
       </div>
@@ -405,7 +405,7 @@ export default function CommunityPage() {
         </div>
       ) : (
         <>
-          {/* ── Podium (top 3) ── */}
+          {/* в”Ђв”Ђ Podium (top 3) в”Ђв”Ђ */}
           {top3.length === 3 && (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
@@ -420,7 +420,7 @@ export default function CommunityPage() {
             </>
           )}
 
-          {/* ── Rest of leaderboard ── */}
+          {/* в”Ђв”Ђ Rest of leaderboard в”Ђв”Ђ */}
           {rest.length > 0 && (
             <>
               {!isSearching && top3.length === 3 && (

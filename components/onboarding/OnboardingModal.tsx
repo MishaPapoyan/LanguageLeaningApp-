@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Gamepad2, BookOpen, Brain, ArrowRight, CheckCircle2, X } from "lucide-react";
 
 const LEVELS = [
-  { id: "A1", label: "A1 — Beginner",      desc: "I know almost nothing" },
-  { id: "A2", label: "A2 — Elementary",    desc: "I know a few basics" },
-  { id: "B1", label: "B1 — Intermediate",  desc: "I can hold simple conversations" },
-  { id: "B2", label: "B2 — Upper-Inter",   desc: "I'm fairly comfortable" },
-  { id: "C1", label: "C1 — Advanced",      desc: "I'm nearly fluent" },
-  { id: "C2", label: "C2 — Mastery",       desc: "I'm fully fluent" },
+  { id: "A1", label: "A1 вЂ” Beginner",      desc: "I know almost nothing" },
+  { id: "A2", label: "A2 вЂ” Elementary",    desc: "I know a few basics" },
+  { id: "B1", label: "B1 вЂ” Intermediate",  desc: "I can hold simple conversations" },
+  { id: "B2", label: "B2 вЂ” Upper-Inter",   desc: "I'm fairly comfortable" },
+  { id: "C1", label: "C1 вЂ” Advanced",      desc: "I'm nearly fluent" },
+  { id: "C2", label: "C2 вЂ” Mastery",       desc: "I'm fully fluent" },
 ];
 
 const DAILY_GOALS = [
@@ -25,7 +25,7 @@ const FEATURES = [
     icon: <Gamepad2 size={22} style={{ color: "#a78bfa" }} />,
     bg: "rgba(139,92,246,0.12)",
     title: "12+ Games",
-    desc: "Flashcards, dictation, city explorer, job interview — learn by doing.",
+    desc: "Flashcards, dictation, city explorer, job interview вЂ” learn by doing.",
   },
   {
     icon: <BookOpen size={22} style={{ color: "#2dd4bf" }} />,
@@ -72,7 +72,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
         }),
       });
     } catch (_) {
-      // non-blocking — don't block the user on a network hiccup
+      // non-blocking вЂ” don't block the user on a network hiccup
     }
     setClosed(true);
     router.refresh();
@@ -126,7 +126,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
           ))}
         </div>
 
-        {/* ── Step 0: Welcome ── */}
+        {/* в”Ђв”Ђ Step 0: Welcome в”Ђв”Ђ */}
         {step === 0 && (
           <div>
             <div style={{ fontSize: 48, marginBottom: 12 }}>{langFlag}</div>
@@ -135,7 +135,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
             </h2>
             <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.7, marginBottom: 24 }}>
               You're learning <strong style={{ color: "var(--text)" }}>{langLabel}</strong>.
-              Let's take 30 seconds to personalise your experience — then you're good to go.
+              Let's take 30 seconds to personalise your experience вЂ” then you're good to go.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
@@ -177,7 +177,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
           </div>
         )}
 
-        {/* ── Step 1: Level + Daily Goal ── */}
+        {/* в”Ђв”Ђ Step 1: Level + Daily Goal в”Ђв”Ђ */}
         {step === 1 && (
           <div>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", marginBottom: 4, letterSpacing: "-0.02em" }}>
@@ -198,7 +198,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
                   style={{
                     padding: "10px 12px", borderRadius: 10, textAlign: "left",
                     background: level === l.id ? "var(--accent-dim)" : "var(--surface-2)",
-                    border: `1px solid ${level === l.id ? "rgba(99,102,241,0.5)" : "var(--border)"}`,
+                    border: `1px solid ${level === l.id ? "rgba(16,185,129,0.5)" : "var(--border)"}`,
                     cursor: "pointer", transition: "all 0.15s",
                   }}
                 >
@@ -219,7 +219,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
                   style={{
                     padding: "10px 8px", borderRadius: 10, textAlign: "center",
                     background: goal === g.minutes ? "var(--accent-dim)" : "var(--surface-2)",
-                    border: `1px solid ${goal === g.minutes ? "rgba(99,102,241,0.5)" : "var(--border)"}`,
+                    border: `1px solid ${goal === g.minutes ? "rgba(16,185,129,0.5)" : "var(--border)"}`,
                     cursor: "pointer", transition: "all 0.15s",
                   }}
                 >
@@ -255,10 +255,10 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
           </div>
         )}
 
-        {/* ── Step 2: Tips ── */}
+        {/* в”Ђв”Ђ Step 2: Tips в”Ђв”Ђ */}
         {step === 2 && (
           <div>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🚀</div>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>рџљЂ</div>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", marginBottom: 8, letterSpacing: "-0.02em" }}>
               You're all set!
             </h2>
@@ -268,9 +268,9 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {[
-                { emoji: "🛡️", tip: "Earn streak shields by playing 7 days in a row — they protect your streak if you miss a day." },
-                { emoji: "💾", tip: "Tap any word during a game to save it. It'll appear in your daily review with spaced repetition." },
-                { emoji: "🎯", tip: "Check Today's Plan on your home screen — it always shows the next best thing to study." },
+                { emoji: "рџ›ЎпёЏ", tip: "Earn streak shields by playing 7 days in a row вЂ” they protect your streak if you miss a day." },
+                { emoji: "рџ’ѕ", tip: "Tap any word during a game to save it. It'll appear in your daily review with spaced repetition." },
+                { emoji: "рџЋЇ", tip: "Check Today's Plan on your home screen вЂ” it always shows the next best thing to study." },
               ].map((t) => (
                 <div
                   key={t.emoji}
@@ -309,7 +309,7 @@ export function OnboardingModal({ targetLang, langLabel, langFlag }: Props) {
                 }}
               >
                 <CheckCircle2 size={16} />
-                {saving ? "Saving…" : "Let's go!"}
+                {saving ? "SavingвЂ¦" : "Let's go!"}
               </button>
             </div>
           </div>
