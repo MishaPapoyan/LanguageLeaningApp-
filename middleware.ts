@@ -9,16 +9,10 @@ export default withAuth(
     if (req.nextUrl.pathname.startsWith("/admin") && token?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/home", req.url));
     }
-
-    // PERF: enable browser back/forward cache restoration on dynamic pages.
-    // Next.js auto-adds `Cache-Control: private, no-cache, no-store, max-age=0,
-    // must-revalidate` to every SSR'd dynamic page, which disables BF-cache and
-    // forces a full reload on browser-back. We strip `no-store` so BF-cache works
-    // while keeping `no-cache + must-revalidate` so fresh data still loads on
-    // direct navigation. Personal-data API routes continue to set their own headers.
-    const res = NextResponse.next();
-    res.headers.set("Cache-Control", "private, no-cache, must-revalidate, max-age=0");
-    return res;
+    // BF-cache header override moved to next.config.mjs `headers()` — applies at
+    // the edge AFTER Next.js sets its dynamic-page defaults (middleware headers
+    // get overwritten for SSR pages, config.headers() do not).
+    return NextResponse.next();
   },
   {
     callbacks: {
