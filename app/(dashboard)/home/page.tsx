@@ -298,7 +298,7 @@ export default async function HomePage() {
                     >
                       <Icon size={20} />
                     </div>
-                    <h4 className="font-bold text-sm" style={{ color: "var(--text)" }}>{action.label}</h4>
+                    <h3 className="font-bold text-sm" style={{ color: "var(--text)" }}>{action.label}</h3>
                     <p className="text-[10px] font-bold uppercase tracking-tight mt-1" style={{ color: "var(--text-3)" }}>
                       {action.desc}
                     </p>
@@ -361,9 +361,9 @@ export default async function HomePage() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-xl font-bold italic serif tracking-tight" style={{ color: "var(--text)" }}>
+                      <h3 className="text-xl font-bold italic serif tracking-tight" style={{ color: "var(--text)" }}>
                         {game.title}
-                      </h4>
+                      </h3>
                       <div className="flex items-center justify-between pt-4">
                         <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
                           {game.category} · {game.mode}

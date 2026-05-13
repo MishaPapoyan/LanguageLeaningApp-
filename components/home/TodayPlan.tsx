@@ -115,7 +115,8 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
                 flexShrink: 0, minWidth: 24, height: 24,
                 background: "var(--accent)", borderRadius: 999,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 800, color: "#fff",
+                fontSize: 11, fontWeight: 800, color: "#050505",
+                padding: "0 8px",
               }}>
                 {dueCount > 99 ? "99+" : dueCount}
               </span>
