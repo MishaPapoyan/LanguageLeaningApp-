@@ -33,7 +33,7 @@ export default function LessonPage() {
   if (!lesson) {
     return (
       <div className="max-w-3xl text-center py-20">
-        <p style={{ fontSize: 24, marginBottom: 12, color: "var(--text-3)" }}>в—€</p>
+        <p style={{ fontSize: 24, marginBottom: 12, color: "var(--text-3)" }}>◈</p>
         <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>Lesson not found</h1>
         <Link href="/learn" className="btn-primary mt-4 inline-flex">Back to Learning Path</Link>
       </div>
@@ -44,7 +44,7 @@ export default function LessonPage() {
   const exercise = exercises[currentExercise];
 
   function normalize(s: string) {
-    return s.toLowerCase().trim().replace(/^[ВїВЎ]+/, "").replace(/[.!?,;ВїВЎ]+$/, "").trim();
+    return s.toLowerCase().trim().replace(/^[¿¡]+/, "").replace(/[.!?,;¿¡]+$/, "").trim();
   }
 
   const handleAnswer = (answer: string) => {
@@ -88,7 +88,7 @@ export default function LessonPage() {
     return idx < all.length - 1 ? all[idx + 1] : null;
   };
 
-  // в”Ђв”Ђ LEARN PHASE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── LEARN PHASE ──────────────────────────────────────────────────────────────
   if (phase === "learn") {
     return (
       <div className="max-w-3xl">
@@ -157,7 +157,7 @@ export default function LessonPage() {
                       padding: "9px 14px", border: "1px solid rgba(16,185,129,0.2)",
                     }}>
                       <span style={{ fontWeight: 700, color: "var(--accent-2)", fontSize: 13 }}>{ex.fr}</span>
-                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>вЂ” {ex.en}</span>
+                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>— {ex.en}</span>
                     </div>
                   ))}
                 </div>
@@ -188,7 +188,7 @@ export default function LessonPage() {
     );
   }
 
-  // в”Ђв”Ђ PRACTICE PHASE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── PRACTICE PHASE ───────────────────────────────────────────────────────────
   if (phase === "practice" && exercise) {
     const answered = showResult[currentExercise];
     const userAnswer = answers[currentExercise];
@@ -253,8 +253,8 @@ export default function LessonPage() {
                     }}
                   >
                     {opt}
-                    {answered && correct && " вњ“"}
-                    {answered && selected && !correct && " вњ—"}
+                    {answered && correct && " ✓"}
+                    {answered && selected && !correct && " ✗"}
                   </button>
                 );
               })}
@@ -297,7 +297,7 @@ export default function LessonPage() {
                   color: isCorrect ? "var(--green)" : "var(--red)",
                 }}>
                   {isCorrect ? (
-                    <span>Correct! вњ“</span>
+                    <span>Correct! ✓</span>
                   ) : (
                     <span>The answer is: <strong>{exercise.answer}</strong></span>
                   )}
@@ -316,7 +316,7 @@ export default function LessonPage() {
     );
   }
 
-  // в”Ђв”Ђ DONE PHASE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── DONE PHASE ───────────────────────────────────────────────────────────────
   const pct = Math.round((score / exercises.length) * 100);
   const nextLesson = getNextLesson();
   const pctColor = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--xp)" : "var(--red)";
@@ -330,7 +330,7 @@ export default function LessonPage() {
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 26, color: "#fff",
         }}>
-          {pct >= 80 ? "в—€" : pct >= 50 ? "в–¤" : "в–і"}
+          {pct >= 80 ? "◈" : pct >= 50 ? "▤" : "△"}
         </div>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>
           Lesson Complete!

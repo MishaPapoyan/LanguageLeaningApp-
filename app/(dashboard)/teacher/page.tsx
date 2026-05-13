@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Teacher Dashboard вЂ” Lingova",
+  title: "Teacher Dashboard — Lingova",
 };
 
 export default function TeacherPage() {
@@ -22,7 +22,7 @@ export default function TeacherPage() {
           margin: "0 auto 24px",
         }}
       >
-        рџЏ«
+        🏫
       </div>
       <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", marginBottom: 12 }}>
         Teacher Dashboard
@@ -72,7 +72,7 @@ export default function TeacherPage() {
               fontSize: 14,
             }}
           >
-            <span style={{ color: "var(--accent)", fontSize: 16 }}>в—‹</span>
+            <span style={{ color: "var(--accent)", fontSize: 16 }}>○</span>
             {item}
           </div>
         ))}

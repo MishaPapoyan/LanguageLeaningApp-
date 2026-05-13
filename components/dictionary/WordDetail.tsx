@@ -111,7 +111,7 @@ export function WordDetail({ word }: { word: WordData }) {
                   }}
                   title={`Listen (${langConfig.label})`}
                 >
-                  в™Є
+                  ♪
                 </button>
               </div>
               <p style={{ fontSize: 20, color: "var(--accent-2)", fontWeight: 700, marginBottom: 4 }}>
@@ -121,7 +121,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 onClick={() => handleSpeak(word.translation, "en-US")}
                 style={{ fontSize: 11, color: "var(--text-3)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
               >
-                в™Є English pronunciation
+                ♪ English pronunciation
               </button>
             </div>
           </div>
@@ -137,7 +137,7 @@ export function WordDetail({ word }: { word: WordData }) {
               border: `1px solid ${isSaved ? "rgba(16,185,129,0.3)" : "var(--border-md)"}`,
             }}
           >
-            {saving ? "..." : isSaved ? "вњ“ Saved" : "+ Save"}
+            {saving ? "..." : isSaved ? "✓ Saved" : "+ Save"}
           </button>
         </div>
 
@@ -152,7 +152,7 @@ export function WordDetail({ word }: { word: WordData }) {
           <p style={{ fontSize: 14, color: "var(--text-1)", lineHeight: 1.6 }}>{word.definition}</p>
         </div>
 
-        {/* Quiz stats вЂ” only for saved words with attempts */}
+        {/* Quiz stats — only for saved words with attempts */}
         {word.isSaved && word.quizAttempts > 0 && (
           <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 16, fontSize: 13 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -181,7 +181,7 @@ export function WordDetail({ word }: { word: WordData }) {
 
         {word.isSaved && word.quizAttempts === 0 && (
           <p style={{ marginTop: 10, fontSize: 12, color: "var(--text-3)" }}>
-            Not reviewed yet вЂ”{" "}
+            Not reviewed yet —{" "}
             <a href="/review" style={{ color: "var(--accent-2)", textDecoration: "none" }}>
               Visit Review
             </a>{" "}
@@ -212,7 +212,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 border: "none", cursor: "pointer", fontSize: 14,
               }}
             >
-              в™Є
+              ♪
             </button>
           </div>
           <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 6 }}>
@@ -241,7 +241,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 border: "1px solid rgba(245,158,11,0.25)", cursor: "pointer", fontSize: 14,
               }}
             >
-              в™Є
+              ♪
             </button>
             <p style={{ fontSize: 14, color: "var(--text-1)", lineHeight: 1.65 }}>{word.miniStory}</p>
           </div>

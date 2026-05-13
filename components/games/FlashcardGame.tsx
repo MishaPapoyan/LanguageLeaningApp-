@@ -89,7 +89,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
     setChosen(null); setFlipped(false);
   };
 
-  // в”Ђв”Ђ Results в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── Results ──────────────────────────────────────────────────────────────────
   if (finished) {
     const pct = Math.round((score / queue.length) * 100);
     return (
@@ -101,11 +101,11 @@ export function FlashcardGame({ words }: { words: Word[] }) {
             background: pct >= 70 ? "rgba(16,185,129,0.12)" : "var(--accent-dim)",
             border: `2px solid ${pct >= 70 ? "rgba(16,185,129,0.3)" : "rgba(16,185,129,0.3)"}`,
           }}>
-            {pct >= 80 ? "рџЏ†" : pct >= 60 ? "рџЋ‰" : "рџ’Є"}
+            {pct >= 80 ? "🏆" : pct >= 60 ? "🎉" : "💪"}
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 6 }}>Round Complete!</h2>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
-            <strong style={{ color: "var(--accent)" }}>{score}/{queue.length}</strong> correct В· {pct}%
+            <strong style={{ color: "var(--accent)" }}>{score}/{queue.length}</strong> correct · {pct}%
           </p>
           {xpEarned > 0 && (
             <div style={{
@@ -113,7 +113,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
               background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.3)",
               borderRadius: 999, padding: "6px 16px", fontSize: 14, fontWeight: 800, color: "var(--accent-2)",
             }}>
-              вљЎ +{xpEarned} XP earned!
+              ⚡ +{xpEarned} XP earned!
             </div>
           )}
           <div style={{ display: "flex", gap: 10 }}>
@@ -128,7 +128,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
   if (!card) return null;
   const pctDone = (current / queue.length) * 100;
 
-  // в”Ђв”Ђ Game в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── Game ─────────────────────────────────────────────────────────────────────
   return (
     <div style={{ maxWidth: 480, margin: "0 auto" }}>
       {/* Progress */}
@@ -153,7 +153,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
           transition: "transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1)",
           transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
         }}>
-          {/* Front вЂ” word */}
+          {/* Front — word */}
           <div style={{
             position: "absolute", inset: 0, backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden", borderRadius: 20,
@@ -174,10 +174,10 @@ export function FlashcardGame({ words }: { words: Word[] }) {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 border: "1px solid rgba(16,185,129,0.25)", cursor: "pointer", fontSize: 16,
               }}
-            >в™Є</button>
+            >♪</button>
           </div>
 
-          {/* Back вЂ” translation + example */}
+          {/* Back — translation + example */}
           <div style={{
             position: "absolute", inset: 0, backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden", transform: "rotateY(180deg)",
@@ -192,7 +192,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
             padding: "24px", gap: 8,
           }}>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: chosen === null ? "var(--text-3)" : chosen === card.translation ? "var(--green)" : "var(--red)" }}>
-              {chosen === null ? "" : chosen === card.translation ? "вњ“ Correct!" : "вњ— Not quite"}
+              {chosen === null ? "" : chosen === card.translation ? "✓ Correct!" : "✗ Not quite"}
             </p>
             <p style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", textAlign: "center" }}>
               {card.translation}
@@ -209,7 +209,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
       {/* Instruction */}
       {!chosen && (
         <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-3)", marginBottom: 14 }}>
-          Pick the correct translation в†“
+          Pick the correct translation ↓
         </p>
       )}
 
@@ -238,7 +238,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
                 opacity: chosen && !isChosen && !isCorrect ? 0.4 : 1,
               }}
             >
-              {isChosen && !isCorrect ? "вњ— " : isCorrect && chosen ? "вњ“ " : ""}{opt}
+              {isChosen && !isCorrect ? "✗ " : isCorrect && chosen ? "✓ " : ""}{opt}
             </button>
           );
         })}
@@ -246,7 +246,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
 
       {/* Score */}
       <div style={{ textAlign: "center", marginTop: 16, fontSize: 12, color: "var(--text-3)" }}>
-        вњ“ {score} correct so far
+        ✓ {score} correct so far
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ export default function AdminLocationsPage() {
       <div className="flex items-center gap-3 mb-6">
         <input
           type="text"
-          placeholder="Search user, city, countryвЂ¦"
+          placeholder="Search user, city, country…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="input text-sm"
@@ -76,7 +76,7 @@ export default function AdminLocationsPage() {
 
           {filtered.length === 0 ? (
             <div className="px-5 py-12 text-center" style={{ background: "var(--surface)" }}>
-              <p className="text-3xl mb-3">рџ“Ќ</p>
+              <p className="text-3xl mb-3">📍</p>
               <p className="text-sm font-medium" style={{ color: "var(--text-2)" }}>No locations yet</p>
               <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
                 Users will appear here once they allow location access.
@@ -101,7 +101,7 @@ export default function AdminLocationsPage() {
                     {l.user.name?.[0]?.toUpperCase() ?? l.user.email[0].toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{l.user.name ?? "вЂ”"}</p>
+                    <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{l.user.name ?? "—"}</p>
                     <p className="text-xs truncate" style={{ color: "var(--text-3)" }}>{l.user.email}</p>
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export default function AdminLocationsPage() {
                   <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
                     {l.city ?? "Unknown"}
                   </p>
-                  <p className="text-xs" style={{ color: "var(--text-3)" }}>{l.country ?? "вЂ”"}</p>
+                  <p className="text-xs" style={{ color: "var(--text-3)" }}>{l.country ?? "—"}</p>
                 </div>
 
                 {/* Coordinates + Maps link */}
@@ -125,13 +125,13 @@ export default function AdminLocationsPage() {
                   >
                     {l.latitude.toFixed(5)}, {l.longitude.toFixed(5)}
                   </a>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>Open in Maps в†—</p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>Open in Maps ↗</p>
                 </div>
 
                 {/* Accuracy */}
                 <div>
                   <p className="text-xs" style={{ color: "var(--text-2)" }}>
-                    {l.accuracy != null ? `В±${Math.round(l.accuracy)}m` : "вЂ”"}
+                    {l.accuracy != null ? `±${Math.round(l.accuracy)}m` : "—"}
                   </p>
                 </div>
 

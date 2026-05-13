@@ -4,7 +4,7 @@ import { AdminAutoRefresh } from "@/components/AdminAutoRefresh";
 
 export const dynamic = "force-dynamic";
 
-const LANG_FLAG: Record<string, string> = { fr: "рџ‡«рџ‡·", es: "рџ‡Єрџ‡ё", en: "рџ‡¬рџ‡§" };
+const LANG_FLAG: Record<string, string> = { fr: "🇫🇷", es: "🇪🇸", en: "🇬🇧" };
 
 export default async function AdminOverview() {
   let d = {
@@ -61,14 +61,14 @@ export default async function AdminOverview() {
   }
 
   const stats = [
-    { label: "Total users",       value: d.userCount,                    emoji: "рџ‘Ґ", href: "/admin/users" },
-    { label: "Active today",      value: d.activeToday,                  emoji: "рџџў", href: "/admin/users" },
-    { label: "Active this week",  value: d.activeWeek,                   emoji: "рџ“…", href: "/admin/users" },
-    { label: "Classrooms",        value: d.groupCount,                   emoji: "рџЏ«", href: "/admin/groups" },
-    { label: "Total XP earned",   value: d.totalXp.toLocaleString(),     emoji: "вљЎ", href: "/admin/analytics" },
-    { label: "AI sessions",       value: d.aiCount.toLocaleString(),     emoji: "рџ¤–", href: "/admin/analytics" },
-    { label: "Game plays",        value: d.gameCount.toLocaleString(),   emoji: "рџЋ®", href: "/admin/analytics" },
-    { label: "Writing sessions",  value: d.writeCount.toLocaleString(),  emoji: "вњЌпёЏ", href: "/admin/analytics" },
+    { label: "Total users",       value: d.userCount,                    emoji: "👥", href: "/admin/users" },
+    { label: "Active today",      value: d.activeToday,                  emoji: "🟢", href: "/admin/users" },
+    { label: "Active this week",  value: d.activeWeek,                   emoji: "📅", href: "/admin/users" },
+    { label: "Classrooms",        value: d.groupCount,                   emoji: "🏫", href: "/admin/groups" },
+    { label: "Total XP earned",   value: d.totalXp.toLocaleString(),     emoji: "⚡", href: "/admin/analytics" },
+    { label: "AI sessions",       value: d.aiCount.toLocaleString(),     emoji: "🤖", href: "/admin/analytics" },
+    { label: "Game plays",        value: d.gameCount.toLocaleString(),   emoji: "🎮", href: "/admin/analytics" },
+    { label: "Writing sessions",  value: d.writeCount.toLocaleString(),  emoji: "✍️", href: "/admin/analytics" },
   ];
 
   return (
@@ -124,9 +124,9 @@ export default async function AdminOverview() {
         <div className="rounded-2xl p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
           <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--text)" }}>Target languages</h3>
           {[
-            { lang: "French",  count: d.frCount, flag: "рџ‡«рџ‡·", color: "#3b82f6" },
-            { lang: "Spanish", count: d.esCount, flag: "рџ‡Єрџ‡ё", color: "#f59e0b" },
-            { lang: "English", count: d.enCount, flag: "рџ‡¬рџ‡§", color: "#22d3ee" },
+            { lang: "French",  count: d.frCount, flag: "🇫🇷", color: "#3b82f6" },
+            { lang: "Spanish", count: d.esCount, flag: "🇪🇸", color: "#f59e0b" },
+            { lang: "English", count: d.enCount, flag: "🇬🇧", color: "#22d3ee" },
           ].map((l) => (
             <div key={l.lang} className="mb-3 last:mb-0">
               <div className="flex justify-between text-xs mb-1">
@@ -143,8 +143,8 @@ export default async function AdminOverview() {
           ))}
           <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
             <p className="text-xs" style={{ color: "var(--text-3)" }}>
-              рџ“Ќ {d.locationCount} user{d.locationCount !== 1 ? "s" : ""} sharing location В·{" "}
-              <Link href="/admin/locations" style={{ color: "var(--accent)" }}>View map в†’</Link>
+              📍 {d.locationCount} user{d.locationCount !== 1 ? "s" : ""} sharing location ·{" "}
+              <Link href="/admin/locations" style={{ color: "var(--accent)" }}>View map →</Link>
             </p>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default async function AdminOverview() {
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
           <div className="px-5 py-3.5 flex items-center justify-between" style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
             <h2 className="font-semibold text-sm" style={{ color: "var(--text)" }}>Recent sign-ups</h2>
-            <Link href="/admin/users" className="text-xs" style={{ color: "var(--accent)" }}>View all в†’</Link>
+            <Link href="/admin/users" className="text-xs" style={{ color: "var(--accent)" }}>View all →</Link>
           </div>
           <div style={{ background: "var(--surface)" }}>
             {d.recentUsers.map((u: any, i: number) => (
@@ -172,12 +172,12 @@ export default async function AdminOverview() {
                   {u.name?.[0]?.toUpperCase() ?? u.email[0].toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{u.name ?? "вЂ”"}</p>
+                  <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{u.name ?? "—"}</p>
                   <p className="text-xs truncate" style={{ color: "var(--text-3)" }}>{u.email}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-xs font-medium" style={{ color: "var(--text-2)" }}>
-                    {LANG_FLAG[u.targetLanguage] ?? "рџЊЌ"} Lv {u.progress?.level ?? 1}
+                    {LANG_FLAG[u.targetLanguage] ?? "🌍"} Lv {u.progress?.level ?? 1}
                   </p>
                   <p className="text-xs" style={{ color: "var(--text-3)" }}>
                     {new Date(u.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
@@ -192,7 +192,7 @@ export default async function AdminOverview() {
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
           <div className="px-5 py-3.5 flex items-center justify-between" style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
             <h2 className="font-semibold text-sm" style={{ color: "var(--text)" }}>Recent game plays</h2>
-            <Link href="/admin/analytics" className="text-xs" style={{ color: "var(--accent)" }}>Analytics в†’</Link>
+            <Link href="/admin/analytics" className="text-xs" style={{ color: "var(--accent)" }}>Analytics →</Link>
           </div>
           <div style={{ background: "var(--surface)" }}>
             {d.recentGames.length === 0 ? (
@@ -203,7 +203,7 @@ export default async function AdminOverview() {
                 className="px-5 py-3 flex items-center gap-3"
                 style={{ borderTop: i > 0 ? "1px solid var(--border)" : undefined }}
               >
-                <div className="text-xl flex-shrink-0">рџЋ®</div>
+                <div className="text-xl flex-shrink-0">🎮</div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>
                     {g.gameType.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase())}

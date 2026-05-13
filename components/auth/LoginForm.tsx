@@ -32,7 +32,7 @@ export function LoginForm() {
     ev.preventDefault();
     setLoading(true);
     setError("");
-    // For phone login, pass phone as email field вЂ” auth layer will resolve it
+    // For phone login, pass phone as email field — auth layer will resolve it
     await doSignIn(loginMethod === "email" ? email : phone, password);
   };
 
@@ -61,7 +61,7 @@ export function LoginForm() {
       >
         <Zap size={15} style={{ color: "var(--accent)" }} />
         <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
-          {demoLoading ? "Loading demoвЂ¦" : "Try demo account вЂ” one click"}
+          {demoLoading ? "Loading demo…" : "Try demo account — one click"}
         </span>
       </button>
 

@@ -20,7 +20,7 @@ interface Props {
   ttsLocale?: string;
 }
 
-// в”Ђв”Ђв”Ђ Waveform bar animation (CSS-only, no canvas needed) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ─── Waveform bar animation (CSS-only, no canvas needed) ─────────────────────
 function WaveformBars({ active }: { active: boolean }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 2, height: 20 }}>
@@ -51,7 +51,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
   const [ttsStatus, setTtsStatus] = useState<"idle" | "loading" | "playing">("idle");
   const playing = ttsStatus !== "idle";
 
-  // в”Ђв”Ђ Recording state в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── Recording state ─────────────────────────────────────────────────────────
   const [recording, setRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -96,7 +96,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
     speakText(word.exampleFr);
   };
 
-  // в”Ђв”Ђ Recording logic в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── Recording logic ─────────────────────────────────────────────────────────
   const startRecording = async () => {
     setMicError(null);
     setRecordedUrl(null);
@@ -169,7 +169,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
         background: "var(--accent-dim)", borderRadius: 14, padding: "14px 16px",
         marginBottom: 24, border: "1px solid rgba(16,185,129,0.2)",
       }}>
-        <span style={{ fontSize: 18 }}>в™Є</span>
+        <span style={{ fontSize: 18 }}>♪</span>
         <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>
           <span style={{ fontWeight: 700, color: "var(--text)" }}>How to practice:</span> Click a word to hear it, then hit{" "}
           <span style={{ fontWeight: 700 }}>Record</span> to compare your pronunciation.
@@ -200,9 +200,9 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
             </label>
             <div style={{ display: "flex", gap: 6 }}>
               {([
-                { label: "0.75Г—", value: 0.75 },
-                { label: "1Г—",    value: 1.0  },
-                { label: "1.25Г—", value: 1.25 },
+                { label: "0.75×", value: 0.75 },
+                { label: "1×",    value: 1.0  },
+                { label: "1.25×", value: 1.25 },
               ] as const).map((s) => (
                 <button
                   key={s.value}
@@ -249,12 +249,12 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                 </p>
                 {ttsStatus === "loading" && (
                   <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
-                    LoadingвЂ¦
+                    Loading…
                   </span>
                 )}
                 {ttsStatus === "playing" && (
                   <span style={{ fontSize: 11, color: "var(--accent-2)", fontWeight: 600, animation: "pulse 1s infinite" }}>
-                    PlayingвЂ¦
+                    Playing…
                   </span>
                 )}
               </div>
@@ -277,7 +277,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
           {/* Recording row */}
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
             <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-              рџЋ™ Your pronunciation
+              🎙 Your pronunciation
             </p>
 
             {micError && (
@@ -313,7 +313,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
               {recording && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <WaveformBars active={true} />
-                  <span style={{ fontSize: 12, color: "var(--red)", fontWeight: 600 }}>RecordingвЂ¦</span>
+                  <span style={{ fontSize: 12, color: "var(--red)", fontWeight: 600 }}>Recording…</span>
                 </div>
               )}
 
@@ -401,7 +401,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
                   }}
                   title="Listen to example"
                 >
-                  в—€
+                  ◈
                 </button>
               </div>
             </div>
@@ -411,7 +411,7 @@ export function PronunciationClient({ words, categories, ttsLocale = "fr-FR" }: 
 
       {filtered.length === 0 && (
         <div style={{ textAlign: "center", padding: "64px 0", color: "var(--text-3)" }}>
-          <p style={{ fontSize: 24, marginBottom: 8 }}>в™Є</p>
+          <p style={{ fontSize: 24, marginBottom: 8 }}>♪</p>
           <p style={{ fontSize: 14 }}>No words found in this category</p>
         </div>
       )}

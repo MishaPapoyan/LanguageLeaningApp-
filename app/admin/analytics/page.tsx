@@ -4,10 +4,10 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 const GAME_EMOJI: Record<string, string> = {
-  FLASHCARDS: "рџѓЏ", MATCHING: "рџ”—", MEMORY_PALACE: "рџЏ›пёЏ", WORD_SCRAMBLE: "рџ”Ђ",
-  FILL_BLANK: "вњЏпёЏ", TRUE_FALSE: "вљ–пёЏ", SPEED_TYPING: "вЊЁпёЏ", LISTEN_QUIZ: "рџ‘‚",
-  SENTENCE_BUILDER: "рџ“ќ", DIALOG_ADVENTURE: "рџ’¬", CITY_EXPLORER: "рџЏ™пёЏ",
-  IMMERSION: "рџЊЉ", INTERVIEW: "рџЋ¤",
+  FLASHCARDS: "🃏", MATCHING: "🔗", MEMORY_PALACE: "🏛️", WORD_SCRAMBLE: "🔀",
+  FILL_BLANK: "✏️", TRUE_FALSE: "⚖️", SPEED_TYPING: "⌨️", LISTEN_QUIZ: "👂",
+  SENTENCE_BUILDER: "📝", DIALOG_ADVENTURE: "💬", CITY_EXPLORER: "🏙️",
+  IMMERSION: "🌊", INTERVIEW: "🎤",
 };
 
 const LANG_NAME: Record<string, string> = {
@@ -77,11 +77,11 @@ export default async function AdminAnalyticsPage() {
       {/* Feature engagement totals */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
         {[
-          { label: "Saved words",      value: totals.words,   emoji: "рџ“љ" },
-          { label: "AI sessions",      value: totals.ai,      emoji: "рџ¤–" },
-          { label: "Game plays",       value: totals.games,   emoji: "рџЋ®" },
-          { label: "Writing sessions", value: totals.writing, emoji: "вњЌпёЏ" },
-          { label: "Voice sessions",   value: totals.voice,   emoji: "рџЋ¤" },
+          { label: "Saved words",      value: totals.words,   emoji: "📚" },
+          { label: "AI sessions",      value: totals.ai,      emoji: "🤖" },
+          { label: "Game plays",       value: totals.games,   emoji: "🎮" },
+          { label: "Writing sessions", value: totals.writing, emoji: "✍️" },
+          { label: "Voice sessions",   value: totals.voice,   emoji: "🎤" },
         ].map((s) => (
           <div key={s.label} className="rounded-2xl p-4" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p className="text-xl mb-1.5">{s.emoji}</p>
@@ -96,7 +96,7 @@ export default async function AdminAnalyticsPage() {
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
           <div className="px-5 py-3.5 flex items-center justify-between" style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
             <h2 className="font-semibold text-sm" style={{ color: "var(--text)" }}>Top learners by XP</h2>
-            <Link href="/admin/users" className="text-xs" style={{ color: "var(--accent)" }}>All users в†’</Link>
+            <Link href="/admin/users" className="text-xs" style={{ color: "var(--accent)" }}>All users →</Link>
           </div>
           <div style={{ background: "var(--surface)" }}>
             {topUsers.length === 0 ? (
@@ -120,9 +120,9 @@ export default async function AdminAnalyticsPage() {
                   {u.user.name?.[0]?.toUpperCase() ?? u.user.email[0].toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{u.user.name ?? "вЂ”"}</p>
+                  <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{u.user.name ?? "—"}</p>
                   <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                    рџ”Ґ {u.streak} streak В· Lv {u.level}
+                    🔥 {u.streak} streak · Lv {u.level}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
@@ -130,7 +130,7 @@ export default async function AdminAnalyticsPage() {
                     {u.xp.toLocaleString()} XP
                   </p>
                   <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                    {u.user.targetLanguage === "fr" ? "рџ‡«рџ‡·" : u.user.targetLanguage === "en" ? "рџ‡¬рџ‡§" : "рџ‡Єрџ‡ё"}
+                    {u.user.targetLanguage === "fr" ? "🇫🇷" : u.user.targetLanguage === "en" ? "🇬🇧" : "🇪🇸"}
                   </p>
                 </div>
               </div>
@@ -150,7 +150,7 @@ export default async function AdminAnalyticsPage() {
               <div key={g.gameType} className="mb-3 last:mb-0">
                 <div className="flex justify-between text-xs mb-1">
                   <span style={{ color: "var(--text-2)" }}>
-                    {GAME_EMOJI[g.gameType] ?? "рџЋ®"}{" "}
+                    {GAME_EMOJI[g.gameType] ?? "🎮"}{" "}
                     {g.gameType.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase())}
                   </span>
                   <span style={{ color: "var(--text-3)" }}>{g._count.gameType} plays</span>

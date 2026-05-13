@@ -21,8 +21,8 @@ export function WeeklyChart({ weeklyXp }: Props) {
   if (weeks.every((w) => w.xp === 0)) {
     return (
       <div className="text-center py-8" style={{ color: "var(--text-3)" }}>
-        <p className="text-2xl mb-2">в—€</p>
-        <p className="text-sm">No XP data yet вЂ” start learning to see your weekly progress!</p>
+        <p className="text-2xl mb-2">◈</p>
+        <p className="text-sm">No XP data yet — start learning to see your weekly progress!</p>
       </div>
     );
   }

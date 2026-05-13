@@ -15,7 +15,7 @@ function scramble(str: string): string[] {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  // Ensure scrambled в‰  original
+  // Ensure scrambled ≠ original
   if (arr.join("") === str.toUpperCase() && arr.length > 1) {
     [arr[0], arr[1]] = [arr[1], arr[0]];
   }
@@ -188,7 +188,7 @@ export function WordScramble({ words }: { words: Word[] }) {
         body: JSON.stringify({ wordId }),
       }).catch(() => {});
     }
-    // Advance вЂ” use scoreRef.current (post-increment value)
+    // Advance — use scoreRef.current (post-increment value)
     const next = round + 1;
     if (next >= ROUNDS) {
       setFinished(true);
@@ -212,10 +212,10 @@ export function WordScramble({ words }: { words: Word[] }) {
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
-          <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "рџЏ†" : pct >= 60 ? "рџЋ‰" : "рџ’Є"}</div>
+          <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "🏆" : pct >= 60 ? "🎉" : "💪"}</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
-            <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> words В· {fmt(elapsed)} В· {pct}%
+            <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> words · {fmt(elapsed)} · {pct}%
           </p>
           {xpEarned > 0 && (
             <div style={{ padding: "10px 16px", borderRadius: 12, background: "var(--accent-dim)", marginBottom: 20, fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
@@ -247,7 +247,7 @@ export function WordScramble({ words }: { words: Word[] }) {
           <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>Word Scramble</p>
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{round + 1} of {ROUNDS}</p>
         </div>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>вЏ± {fmt(elapsed)}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>⏱ {fmt(elapsed)}</span>
       </div>
 
       {/* Progress */}
@@ -326,7 +326,7 @@ export function WordScramble({ words }: { words: Word[] }) {
         </button>
         <button onClick={() => { setScore(s => s); advance(); }}
           style={{ marginLeft: "auto", padding: "9px 16px", borderRadius: 11, border: "1px solid var(--border)", background: "transparent", color: "var(--text-3)", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
-          Skip в†’
+          Skip →
         </button>
       </div>
 
@@ -344,7 +344,7 @@ export function WordScramble({ words }: { words: Word[] }) {
             textAlign: "center",
             boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(16,185,129,0.12)",
           }}>
-            <div style={{ fontSize: 44, marginBottom: 6 }}>{savePrompt.imageEmoji || "в­ђ"}</div>
+            <div style={{ fontSize: 44, marginBottom: 6 }}>{savePrompt.imageEmoji || "⭐"}</div>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent-2)", marginBottom: 10 }}>
               First time!
             </p>
@@ -359,7 +359,7 @@ export function WordScramble({ words }: { words: Word[] }) {
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => handleSaveWord(savePrompt.id, true)} className="btn-primary" style={{ flex: 1 }}>
-                вњ“ Save
+                ✓ Save
               </button>
               <button
                 onClick={() => handleSaveWord(savePrompt.id, false)}

@@ -24,12 +24,12 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>вЊЁпёЏ</div>
+          <div style={{ fontSize: 44, marginBottom: 12 }}>⌨️</div>
           <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>Not enough words yet</p>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
-            Play other games first вЂ” words get saved to your dictionary automatically and will appear here.
+            Play other games first — words get saved to your dictionary automatically and will appear here.
           </p>
-          <a href="/games" style={{ display: "inline-block", textDecoration: "none" }} className="btn-primary">в†ђ Back to Games</a>
+          <a href="/games" style={{ display: "inline-block", textDecoration: "none" }} className="btn-primary">← Back to Games</a>
         </div>
       </div>
     );
@@ -109,7 +109,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
         }
       } catch { setTimeout(() => advance(true), 400); }
     } else if (stripDiacritics(typed) === stripDiacritics(target) && typed.length === target.length) {
-      // Correct word but missing accent вЂ” accept and hint
+      // Correct word but missing accent — accept and hint
       setAccentHint(true);
       setStatus("correct");
       try {
@@ -171,10 +171,10 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
-          <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "вљЎ" : pct >= 60 ? "рџЋ‰" : "рџ’Є"}</div>
+          <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "⚡" : pct >= 60 ? "🎉" : "💪"}</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
-            <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct В· {fmt(elapsed)} В· {pct}%
+            <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct · {fmt(elapsed)} · {pct}%
           </p>
           {xpEarned > 0 && (
             <div style={{ padding: "10px 16px", borderRadius: 12, background: "var(--accent-dim)", marginBottom: 20, fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
@@ -203,8 +203,8 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{current + 1} of {ROUNDS}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--green)" }}>вњ“ {score}</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>вЏ± {fmt(elapsed)}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--green)" }}>✓ {score}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>⏱ {fmt(elapsed)}</span>
         </div>
       </div>
 
@@ -225,7 +225,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           onClick={() => speakTarget(word.word, targetLang)}
           style={{ fontSize: 12, color: "var(--text-3)", background: "none", border: "none", cursor: "pointer", padding: "4px 8px" }}
         >
-          рџ”Љ Hear it
+          🔊 Hear it
         </button>
       </div>
 
@@ -236,7 +236,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           value={input}
           onChange={(e) => handleInput(e.target.value)}
           disabled={status === "correct"}
-          placeholder={`Type in ${targetLang === "es" ? "Spanish" : targetLang === "en" ? "English" : "French"}вЂ¦`}
+          placeholder={`Type in ${targetLang === "es" ? "Spanish" : targetLang === "en" ? "English" : "French"}…`}
           autoCapitalize="none"
           autoComplete="off"
           spellCheck={false}
@@ -252,7 +252,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           }}
         />
         {status === "correct" && (
-          <div style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 20, color: "var(--green)" }}>вњ“</div>
+          <div style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: 20, color: "var(--green)" }}>✓</div>
         )}
       </div>
 
@@ -266,13 +266,13 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
             color: "var(--text-3)", cursor: "pointer",
           }}
         >
-          Skip в†’ show answer
+          Skip → show answer
         </button>
       </div>
 
       {accentHint && (
         <div style={{ marginTop: 12, padding: "10px 16px", borderRadius: 12, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", textAlign: "center" }}>
-          <span style={{ fontSize: 13, color: "#d97706" }}>вњ“ Correct! Remember the accent: <strong>{word.word}</strong></span>
+          <span style={{ fontSize: 13, color: "#d97706" }}>✓ Correct! Remember the accent: <strong>{word.word}</strong></span>
         </div>
       )}
 
@@ -296,7 +296,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
             textAlign: "center",
             boxShadow: "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(16,185,129,0.12)",
           }}>
-            <div style={{ fontSize: 44, marginBottom: 6 }}>в­ђ</div>
+            <div style={{ fontSize: 44, marginBottom: 6 }}>⭐</div>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--accent-2)", marginBottom: 10 }}>
               First time!
             </p>
@@ -311,7 +311,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => handleSaveWord(savePrompt.id, true)} className="btn-primary" style={{ flex: 1 }}>
-                вњ“ Save
+                ✓ Save
               </button>
               <button
                 onClick={() => handleSaveWord(savePrompt.id, false)}

@@ -84,30 +84,30 @@ export default function ReviewPage() {
         repetitions: updated.repetitions,
         nextReview: updated.nextReview,
       }),
-    }).catch(() => {/* silent вЂ” don't block the UI */});
+    }).catch(() => {/* silent — don't block the UI */});
 
     setFlipped(false);
     if (current < dueWords.length - 1) setCurrent(current + 1);
     else setSessionDone(true);
   };
 
-  // в”Ђв”Ђ Loading в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div style={{ maxWidth: 520, margin: "0 auto", paddingTop: 80, textAlign: "center" }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>вЏі</div>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>⏳</div>
         <p style={{ color: "var(--text-3)", fontSize: 14 }}>{t(locale, "review_loading")}</p>
       </div>
     );
   }
 
-  // в”Ђв”Ђ Done / empty state в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  // ── Done / empty state ──────────────────────────────────────────────────────
   if (sessionDone) {
     const acc = reviewed > 0 ? Math.round((correct / reviewed) * 100) : 0;
     return (
       <div style={{ maxWidth: 520, margin: "0 auto", paddingTop: 48, textAlign: "center" }}>
         <div className="card" style={{ padding: "52px 32px" }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>{reviewed > 0 ? "рџЋЇ" : "вњЁ"}</div>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>{reviewed > 0 ? "🎯" : "✨"}</div>
           <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", margin: "0 0 10px" }}>
             {reviewed > 0 ? t(locale, "review_sessionComplete") : t(locale, "review_allCaughtUp")}
           </h2>
@@ -259,7 +259,7 @@ export default function ReviewPage() {
         )}
       </div>
 
-      {/* Rating buttons вЂ” only when flipped */}
+      {/* Rating buttons — only when flipped */}
       {flipped && (
         <>
           <p style={{ fontSize: 12, textAlign: "center", color: "var(--text-3)", marginBottom: 10 }}>
@@ -279,7 +279,7 @@ export default function ReviewPage() {
                 }}
               >
                 <span style={{ fontSize: 22 }}>
-                  {r.q === 0 ? "рџµ" : r.q === 3 ? "рџ¬" : r.q === 4 ? "рџЉ" : "рџ¤©"}
+                  {r.q === 0 ? "😵" : r.q === 3 ? "😬" : r.q === 4 ? "😉" : "🤩"}
                 </span>
                 <span style={{ fontSize: 11 }}>{t(locale, r.key)}</span>
               </button>
@@ -296,8 +296,8 @@ export default function ReviewPage() {
           display: "flex", alignItems: "center", gap: 16, fontSize: 13,
         }}>
           <span style={{ color: "var(--text-3)" }}>{t(locale, "review_session")}</span>
-          <span style={{ color: "var(--green)", fontWeight: 700 }}>вњ“ {t(locale, "review_correctCount", { n: correct.toString() })}</span>
-          <span style={{ color: "var(--red)", fontWeight: 700 }}>вњ— {t(locale, "review_missedCount", { n: (reviewed - correct).toString() })}</span>
+          <span style={{ color: "var(--green)", fontWeight: 700 }}>✓ {t(locale, "review_correctCount", { n: correct.toString() })}</span>
+          <span style={{ color: "var(--red)", fontWeight: 700 }}>✗ {t(locale, "review_missedCount", { n: (reviewed - correct).toString() })}</span>
           <span style={{ marginLeft: "auto", color: "var(--text-3)", fontWeight: 600 }}>
             {t(locale, "review_accuracyPct", { pct: Math.round((correct / reviewed) * 100).toString() })}
           </span>

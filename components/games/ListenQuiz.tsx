@@ -98,10 +98,10 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
-          <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "рџЋ§" : pct >= 60 ? "рџЋ‰" : "рџ’Є"}</div>
+          <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "🎧" : pct >= 60 ? "🎉" : "💪"}</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
-            <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct В· {fmt(elapsed)} В· {pct}%
+            <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct · {fmt(elapsed)} · {pct}%
           </p>
           {xpEarned > 0 && (
             <div style={{ padding: "10px 16px", borderRadius: 12, background: "var(--accent-dim)", marginBottom: 20, fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
@@ -117,17 +117,17 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
     );
   }
 
-  // Not enough valid words вЂ” show friendly empty state
+  // Not enough valid words — show friendly empty state
   if (!round) {
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>рџЋ§</div>
+          <div style={{ fontSize: 44, marginBottom: 12 }}>🎧</div>
           <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>Not enough words yet</p>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
-            Play other games first вЂ” words get saved to your dictionary automatically and will appear here.
+            Play other games first — words get saved to your dictionary automatically and will appear here.
           </p>
-          <Link href="/games" className="btn-primary" style={{ display: "inline-block", textDecoration: "none" }}>в†ђ Back to Games</Link>
+          <Link href="/games" className="btn-primary" style={{ display: "inline-block", textDecoration: "none" }}>← Back to Games</Link>
         </div>
       </div>
     );
@@ -144,8 +144,8 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{current + 1} of {ROUNDS}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--green)" }}>вњ“ {score}</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>вЏ± {fmt(elapsed)}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--green)" }}>✓ {score}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>⏱ {fmt(elapsed)}</span>
         </div>
       </div>
 
@@ -174,10 +174,10 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
             animation: playing ? "pulse 0.8s ease infinite alternate" : "none",
           }}
         >
-          {playing ? "рџ”Љ" : "в–¶"}
+          {playing ? "🔊" : "▶"}
         </button>
         <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 12 }}>
-          {playing ? "PlayingвЂ¦" : "Tap to hear again"}
+          {playing ? "Playing…" : "Tap to hear again"}
         </p>
       </div>
 
@@ -208,8 +208,8 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
               }}
             >
               {opt.translation}
-              {selected !== null && isCorrect && <div style={{ fontSize: 18, marginTop: 4 }}>вњ“</div>}
-              {selected !== null && isSelected && !isCorrect && <div style={{ fontSize: 18, marginTop: 4 }}>вњ—</div>}
+              {selected !== null && isCorrect && <div style={{ fontSize: 18, marginTop: 4 }}>✓</div>}
+              {selected !== null && isSelected && !isCorrect && <div style={{ fontSize: 18, marginTop: 4 }}>✗</div>}
             </button>
           );
         })}

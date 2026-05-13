@@ -6,16 +6,16 @@ import { Brain, BookOpen, Gamepad2, ArrowRight, CheckCircle2 } from "lucide-reac
 
 // One suggested game per category that rotates daily
 const GAME_SUGGESTIONS = [
-  { label: "Flashcards",      href: "/games/flashcards",       emoji: "рџЋґ", category: "Vocabulary" },
-  { label: "Word Scramble",   href: "/games/word-scramble",    emoji: "рџ”Ђ", category: "Vocabulary" },
-  { label: "Speed Typing",    href: "/games/speed-typing",     emoji: "вЊЁпёЏ", category: "Vocabulary" },
-  { label: "Tense Challenge", href: "/games/tense-challenge",  emoji: "вЏ±пёЏ", category: "Grammar"    },
-  { label: "Error Detective", href: "/games/error-detective",  emoji: "рџ”Ќ", category: "Grammar"    },
-  { label: "Dictation",       href: "/games/dictation",        emoji: "рџ–ЉпёЏ", category: "Listening"  },
-  { label: "Story Audio",     href: "/games/story-audio",      emoji: "рџЋ§", category: "Listening"  },
-  { label: "City Explorer",   href: "/games/city-explorer",    emoji: "рџЏ™пёЏ", category: "Conversation"},
-  { label: "Job Interview",   href: "/games/interview",        emoji: "рџ’ј", category: "Conversation"},
-  { label: "Hotel",           href: "/games/hotel",            emoji: "рџЏЁ", category: "Immersive"   },
+  { label: "Flashcards",      href: "/games/flashcards",       emoji: "🎴", category: "Vocabulary" },
+  { label: "Word Scramble",   href: "/games/word-scramble",    emoji: "🔀", category: "Vocabulary" },
+  { label: "Speed Typing",    href: "/games/speed-typing",     emoji: "⌨️", category: "Vocabulary" },
+  { label: "Tense Challenge", href: "/games/tense-challenge",  emoji: "⏱️", category: "Grammar"    },
+  { label: "Error Detective", href: "/games/error-detective",  emoji: "🔍", category: "Grammar"    },
+  { label: "Dictation",       href: "/games/dictation",        emoji: "🖊️", category: "Listening"  },
+  { label: "Story Audio",     href: "/games/story-audio",      emoji: "🎧", category: "Listening"  },
+  { label: "City Explorer",   href: "/games/city-explorer",    emoji: "🏙️", category: "Conversation"},
+  { label: "Job Interview",   href: "/games/interview",        emoji: "💼", category: "Conversation"},
+  { label: "Hotel",           href: "/games/hotel",            emoji: "🏨", category: "Immersive"   },
 ];
 
 export async function TodayPlan({ targetLang }: { targetLang: string }) {
@@ -44,7 +44,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
 
   const playedToday = new Set(todayScores.map((s) => s.gameType));
 
-  // Pick today's suggested game вЂ” rotate daily, skip already-played ones
+  // Pick today's suggested game — rotate daily, skip already-played ones
   const dayIndex = Math.floor(Date.now() / 86_400_000);
   let suggestion = GAME_SUGGESTIONS[dayIndex % GAME_SUGGESTIONS.length];
   // If already played today, find next unplayed
@@ -107,7 +107,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
                   ? "Save words in games first"
                   : dueCount > 0
                   ? `${dueCount} word${dueCount === 1 ? "" : "s"} due now`
-                  : "All caught up вњ“"}
+                  : "All caught up ✓"}
               </p>
             </div>
             {dueCount > 0 && (
@@ -175,7 +175,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
                 {suggestion.label}
               </p>
               <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0, marginTop: 2 }}>
-                {suggestion.category} В· today's pick
+                {suggestion.category} · today's pick
               </p>
             </div>
             <ArrowRight size={14} style={{ color: "var(--text-3)", flexShrink: 0 }} />

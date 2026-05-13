@@ -7,7 +7,7 @@ import { getLanguageConfig } from "@/data/language-config";
 import { speakTarget } from "@/lib/speech";
 import { Volume2, Trash2, Play, Plus, ArrowLeft, Check, X, Pencil, Zap, History, ChevronRight } from "lucide-react";
 
-// в”Ђв”Ђв”Ђ Types в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CustomWord {
   id: string;
@@ -24,7 +24,7 @@ interface QuizQuestion {
   correctIndex: number;
 }
 
-// в”Ђв”Ђв”Ђ Helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const OPTION_LABELS = ["A", "B", "C", "D"];
 
@@ -38,7 +38,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 function buildQuestion(word: CustomWord, pool: CustomWord[]): QuizQuestion {
   const dist = shuffle(pool.filter(w => w.id !== word.id)).slice(0, 3).map(w => w.front);
-  const fill = ["None of these", "I don't know", "Skip", "вЂ”"];
+  const fill = ["None of these", "I don't know", "Skip", "—"];
   while (dist.length < 3) dist.push(fill[dist.length]);
   const options = shuffle([word.front, ...dist]);
   return { word, options, correctIndex: options.indexOf(word.front) };
@@ -47,7 +47,7 @@ function buildQuiz(words: CustomWord[]): QuizQuestion[] {
   return shuffle(words).map(w => buildQuestion(w, words));
 }
 
-// в”Ђв”Ђв”Ђ API helpers в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ─── API helpers ──────────────────────────────────────────────────────────────
 
 async function apiGet(): Promise<CustomWord[]> {
   const r = await fetch("/api/my-words", { cache: "no-store" });
@@ -77,7 +77,7 @@ async function apiPatch(id: string, front: string, back: string): Promise<Custom
   return r.json();
 }
 
-// в”Ђв”Ђв”Ђ Component в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MyWordsPage() {
   const { data: session } = useSession();
@@ -180,14 +180,14 @@ export default function MyWordsPage() {
   const currentQ = questions[qIndex];
   const pct = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
 
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   //  RESULT SCREEN
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   if (mode === "result") {
-    const grade = pct === 100 ? { label: t(locale, "mywords_resultPerfect"), color: "var(--green)", emoji: "рџЏ†" }
-                : pct >= 70   ? { label: t(locale, "mywords_resultGreat"), color: "var(--accent)", emoji: "рџЋ‰" }
-                : pct >= 40   ? { label: t(locale, "mywords_resultKeep"), color: "var(--gold)", emoji: "рџ’Є" }
-                :               { label: t(locale, "mywords_resultPractice"), color: "var(--red)", emoji: "рџ“љ" };
+    const grade = pct === 100 ? { label: t(locale, "mywords_resultPerfect"), color: "var(--green)", emoji: "🏆" }
+                : pct >= 70   ? { label: t(locale, "mywords_resultGreat"), color: "var(--accent)", emoji: "🎉" }
+                : pct >= 40   ? { label: t(locale, "mywords_resultKeep"), color: "var(--gold)", emoji: "💪" }
+                :               { label: t(locale, "mywords_resultPractice"), color: "var(--red)", emoji: "📚" };
 
     return (
       <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 16px" }}>
@@ -226,7 +226,7 @@ export default function MyWordsPage() {
               borderRadius: 99, padding: "8px 18px",
               fontSize: 15, fontWeight: 800, color: "var(--gold)",
             }}>
-              вљЎ {t(locale, "mywords_xpEarned", { xp: xpEarned.toString() })}
+              ⚡ {t(locale, "mywords_xpEarned", { xp: xpEarned.toString() })}
             </div>
           )}
 
@@ -248,9 +248,9 @@ export default function MyWordsPage() {
     );
   }
 
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   //  SETUP SCREEN
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   if (mode === "setup") {
     const PRESETS = [10, 20, 40, 50, 100];
     const resolvedCount = quizCount === "custom"
@@ -349,9 +349,9 @@ export default function MyWordsPage() {
     );
   }
 
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   //  QUIZ SCREEN
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   if (mode === "quiz" && currentQ) {
     const progress = ((qIndex + 1) / questions.length) * 100;
 
@@ -493,16 +493,16 @@ export default function MyWordsPage() {
               fontSize: 13, fontWeight: 700,
               opacity: hintUsed || selected !== null ? 0.5 : 1,
             }}>
-            рџ’Ў {hintErr ? t(locale, "mywords_notEnoughXp") : hintUsed ? t(locale, "mywords_hintUsed") : t(locale, "mywords_hint")}
+            💡 {hintErr ? t(locale, "mywords_notEnoughXp") : hintUsed ? t(locale, "mywords_hintUsed") : t(locale, "mywords_hint")}
           </button>
         </div>
       </div>
     );
   }
 
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   //  LIST / ADD SCREEN
-  // в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
+  // ══════════════════════════════════════════════════════════════════════════
   // Stats — compute from current words
   const totalWords = words.length;
   const overallMastery = totalWords > 0 ? 72 : 0; // placeholder mastery — preserves existing logic
@@ -603,7 +603,7 @@ export default function MyWordsPage() {
             width: 36, height: 38,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 20, color: "var(--text-3)",
-          }}>в†’</div>
+          }}>→</div>
 
           {/* Target language input */}
           <div style={{ flex: 1 }}>
@@ -643,7 +643,7 @@ export default function MyWordsPage() {
 
         {words.length === 1 && (
           <p style={{ fontSize: 12, color: "var(--gold)", margin: "12px 0 0", display: "flex", alignItems: "center", gap: 5 }}>
-            вљЎ {t(locale, "mywords_unlockHint")}
+            ⚡ {t(locale, "mywords_unlockHint")}
           </p>
         )}
       </div>
