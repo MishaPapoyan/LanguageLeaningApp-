@@ -22,7 +22,7 @@ const nextConfig = {
 
   // Tree-shake large barrel packages
   experimental: {
-    optimizePackageImports: ["date-fns", "lodash"],
+    optimizePackageImports: ["lucide-react", "@react-three/drei", "date-fns", "lodash"],
     serverActions: { allowedOrigins: getAllowedOrigins() },
   },
 

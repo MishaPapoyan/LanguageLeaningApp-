@@ -30,7 +30,7 @@
   --text:        #FFFFFF;
   --text-1:      rgba(255,255,255,0.85);
   --text-2:      rgba(255,255,255,0.55);
-  --text-3:      rgba(255,255,255,0.32);
+  --text-3:      rgba(255,255,255,0.55);
   --fg:          var(--text);
   --fg-1:        var(--text-1);
   --fg-2:        var(--text-2);
@@ -221,7 +221,7 @@ html:not(.dark) {
   --text:        #050505;
   --text-1:      rgba(5,5,5,0.86);
   --text-2:      rgba(5,5,5,0.55);
-  --text-3:      rgba(5,5,5,0.36);
+  --text-3:      rgba(5,5,5,0.55);
 
   --fg:          var(--text);
   --fg-1:        var(--text-1);
