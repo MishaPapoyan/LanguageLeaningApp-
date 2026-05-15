@@ -9,6 +9,7 @@ import { SCENARIO_INFO } from "@/lib/scenarios";
 import Link from "next/link";
 import {
   Send, User, Mic, Sparkles, ShieldCheck, BrainCircuit, Play,
+  X, Award, TrendingUp, BookMarked, RotateCcw, ArrowRight, CheckCircle2, AlertCircle, Lightbulb,
 } from "lucide-react";
 
 const SCENARIOS = Object.entries(SCENARIO_INFO).map(([key, val]) => ({
@@ -70,6 +71,10 @@ export function TutorClient({ userLevel }: Props) {
   const [sessionEnded, setSessionEnded] = useState(false);
   const [tipIndex, setTipIndex] = useState(0);
   const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackTab, setFeedbackTab] = useState<"corrections" | "strengths" | "next">("corrections");
+  const [savingCorrections, setSavingCorrections] = useState(false);
+  const [correctionsSaved, setCorrectionsSaved] = useState(false);
   const [pickedScenario, setPickedScenario] = useState<TutorScenario>("waiter");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -202,7 +207,9 @@ export function TutorClient({ userLevel }: Props) {
   const endSession = async () => {
     if (!scenario || messages.length < 2 || loadingFeedback) return;
     setSessionEnded(true);
+    setFeedbackOpen(true);
     setLoadingFeedback(true);
+    setCorrectionsSaved(false);
     try {
       const res = await fetch("/api/tutor/feedback", {
         method: "POST",
@@ -223,115 +230,48 @@ export function TutorClient({ userLevel }: Props) {
     }
   };
 
-  // ===== LOADING FEEDBACK SCREEN =====
-  if (sessionEnded && loadingFeedback) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[320px] gap-5 max-w-md mx-auto">
-        <div className="w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-3xl animate-pulse">
-          ✨
-        </div>
-        <div className="text-center">
-          <p className="text-xl italic mb-1">Analysing your session…</p>
-          <p className="text-xs text-white/40 uppercase tracking-widest font-bold">
-            Preparing personalised feedback
-          </p>
-        </div>
-        <div className="flex gap-1.5">
-          {[0, 0.2, 0.4].map((d) => (
-            <div
-              key={d}
-              className="w-2 h-2 rounded-full bg-emerald-500"
-              style={{ animation: "typing-dot 1.2s ease infinite", animationDelay: `${d}s` }}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const startNewSession = () => {
+    setScenario(null);
+    setMessages([]);
+    setFeedback(null);
+    setSessionEnded(false);
+    setFeedbackOpen(false);
+    setXpEarned(0);
+    setCorrectionsSaved(false);
+  };
 
-  // ===== FEEDBACK PANEL =====
-  if (sessionEnded && feedback) {
-    return (
-      <div className="space-y-4 max-w-2xl mx-auto">
-        {xpEarned > 0 && (
-          <div className="text-center p-8 rounded-3xl bg-emerald-500/10 border border-emerald-500/30">
-            <p className="text-6xl font-bold text-emerald-500 mono tracking-tight">
-              +{xpEarned} XP
-            </p>
-            <p className="text-sm text-white/60 mt-2 uppercase tracking-widest font-bold">
-              {t(locale, "tutor_sessionComplete")}
-            </p>
-          </div>
-        )}
+  const saveCorrectionsAsCards = async () => {
+    if (!feedback?.corrections.length || savingCorrections) return;
+    setSavingCorrections(true);
+    try {
+      // Each correction becomes a custom card: front = corrected phrase, back = rule + original
+      await Promise.all(
+        feedback.corrections.map((c) =>
+          fetch("/api/my-words", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              front: c.corrected,
+              back: `${c.rule}${c.original ? ` (was: "${c.original}")` : ""}`,
+            }),
+          })
+        )
+      );
+      setCorrectionsSaved(true);
+    } catch {
+      // ignore — UI just won't show success state
+    } finally {
+      setSavingCorrections(false);
+    }
+  };
 
-        <div className="card-premium p-6">
-          <h2 className="text-2xl serif italic font-bold mb-6">Session Feedback</h2>
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            {[
-              { label: "Grammar",  value: feedback.grammarScore, color: "text-emerald-500" },
-              { label: "Accuracy", value: feedback.accuracyPct,  color: "text-emerald-500" },
-            ].map((score) => (
-              <div key={score.label} className="text-center p-5 rounded-2xl bg-white/5 border border-white/10">
-                <p className={`text-5xl font-bold mono ${score.color} tracking-tight`}>
-                  {score.value}%
-                </p>
-                <p className="text-[10px] text-white/40 mt-1 uppercase tracking-widest font-bold">
-                  {score.label}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {feedback.strengths.length > 0 && (
-            <div className="mb-4">
-              <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
-                Strengths
-              </p>
-              <div className="space-y-1.5">
-                {feedback.strengths.map((s, i) => (
-                  <div key={i} className="text-sm py-2 px-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    ✓ {s}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {feedback.corrections.length > 0 && (
-            <div className="mb-4">
-              <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
-                Corrections
-              </p>
-              <div className="space-y-1.5">
-                {feedback.corrections.map((c, i) => (
-                  <div key={i} className="text-sm py-2.5 px-3.5 rounded-xl bg-rose-500/5 border border-rose-500/20">
-                    <p>
-                      <span className="text-rose-400 line-through">{c.original}</span>
-                      <span className="text-white/40"> → </span>
-                      <span className="text-emerald-400 font-semibold">{c.corrected}</span>
-                    </p>
-                    <p className="text-xs text-white/40 mt-1">{c.rule}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="p-3 rounded-xl text-sm bg-purple-500/10 text-white/70 border border-purple-500/20">
-            <span className="font-bold text-purple-400">Recommendation: </span>
-            {feedback.recommendation}
-          </div>
-        </div>
-
-        <button
-          onClick={() => { setScenario(null); setMessages([]); setFeedback(null); setSessionEnded(false); }}
-          className="btn-primary w-full py-4"
-        >
-          Start new session
-        </button>
-      </div>
-    );
-  }
+  // ESC closes the modal
+  useEffect(() => {
+    if (!feedbackOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setFeedbackOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [feedbackOpen]);
 
   // ===== SCENARIO PICKER =====
   if (!scenario) {
@@ -427,27 +367,38 @@ export function TutorClient({ userLevel }: Props) {
           <div>
             <h2 className="text-xl font-bold flex items-center gap-2">
               {currentAvatarName}
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className={`w-2 h-2 rounded-full ${sessionEnded ? "bg-white/20" : "bg-emerald-500 animate-pulse"}`} />
             </h2>
             <p className="text-xs text-white/40 uppercase font-bold tracking-widest">
-              {scenarioInfo.label}
+              {scenarioInfo.label}{sessionEnded ? " · ended" : ""}
             </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <button
-            className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
-            title="Safe practice"
-          >
-            <ShieldCheck size={20} />
-          </button>
-          <button
-            onClick={endSession}
-            disabled={messages.length < 2 || loadingFeedback}
-            className="px-4 py-3 bg-white/5 rounded-full hover:bg-rose-500/10 transition-colors text-rose-400 text-xs font-bold uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            End
-          </button>
+          {sessionEnded && feedback ? (
+            <button
+              onClick={() => setFeedbackOpen(true)}
+              className="px-4 py-3 bg-emerald-500/10 rounded-full hover:bg-emerald-500/20 transition-colors text-emerald-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2"
+            >
+              <Award size={14} /> View feedback
+            </button>
+          ) : (
+            <>
+              <button
+                className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+                title="Safe practice"
+              >
+                <ShieldCheck size={20} />
+              </button>
+              <button
+                onClick={endSession}
+                disabled={messages.length < 2 || loadingFeedback}
+                className="px-4 py-3 bg-white/5 rounded-full hover:bg-rose-500/10 transition-colors text-rose-400 text-xs font-bold uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                End
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -480,46 +431,297 @@ export function TutorClient({ userLevel }: Props) {
       </div>
 
       <footer className="pt-6 border-t border-white/10">
-        <div className="flex items-center gap-4">
-          <button className="p-4 bg-white/5 rounded-2xl text-white/40 hover:text-white transition-colors">
-            <Mic size={24} />
-          </button>
-          <div className="flex-1 relative">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder={`Respond to ${currentAvatarName}…`}
-              disabled={streaming}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-emerald-500/50 text-lg disabled:opacity-50"
-            />
+        {sessionEnded ? (
+          <div className="flex items-center justify-between gap-4 px-2 py-3">
+            <p className="text-sm text-white/40 italic">
+              Session ended. Read the conversation or start a new session.
+            </p>
             <button
-              onClick={handleSend}
-              disabled={streaming || !input.trim()}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all ${
-                input.trim() && !streaming
-                  ? "bg-emerald-500 text-black"
-                  : "text-white/20 cursor-not-allowed"
-              }`}
+              onClick={startNewSession}
+              className="btn-primary px-6 py-3 flex items-center gap-2"
             >
-              <Send size={20} />
+              <RotateCcw size={16} /> New session
             </button>
           </div>
-        </div>
-        <div className="mt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-white/20 px-2">
-          <span>{langConfig.flag} Respond in {langConfig.label}</span>
-          <div className="flex items-center gap-1">
-            <Sparkles size={12} /> AI tutor offers grammar corrections in character
+        ) : (
+          <>
+            <div className="flex items-center gap-4">
+              <button className="p-4 bg-white/5 rounded-2xl text-white/40 hover:text-white transition-colors">
+                <Mic size={24} />
+              </button>
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  placeholder={`Respond to ${currentAvatarName}…`}
+                  disabled={streaming}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-emerald-500/50 text-lg disabled:opacity-50"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={streaming || !input.trim()}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all ${
+                    input.trim() && !streaming
+                      ? "bg-emerald-500 text-black"
+                      : "text-white/20 cursor-not-allowed"
+                  }`}
+                >
+                  <Send size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-[10px] uppercase tracking-widest font-bold text-white/20 px-2">
+              <span>{langConfig.flag} Respond in {langConfig.label}</span>
+              <div className="flex items-center gap-1">
+                <Sparkles size={12} /> AI tutor offers grammar corrections in character
+              </div>
+            </div>
+          </>
+        )}
+      </footer>
+
+      {/* ===== Feedback modal (loading + result) ===== */}
+      {feedbackOpen && (
+        <div
+          onClick={() => !loadingFeedback && setFeedbackOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)" }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="card-premium w-full max-w-2xl max-h-[90vh] flex flex-col"
+            style={{ animation: "bounce-in 0.32s var(--ease-spring) both" }}
+          >
+            {loadingFeedback || !feedback ? (
+              <div className="flex flex-col items-center justify-center gap-5 px-8 py-16">
+                <div className="w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-3xl animate-pulse">
+                  <BrainCircuit size={36} className="text-purple-400" />
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl italic serif mb-1">Analysing your session…</p>
+                  <p className="text-xs text-white/40 uppercase tracking-widest font-bold">
+                    Preparing personalised feedback
+                  </p>
+                </div>
+                <div className="flex gap-1.5">
+                  {[0, 0.2, 0.4].map((d) => (
+                    <div
+                      key={d}
+                      className="w-2 h-2 rounded-full bg-emerald-500"
+                      style={{ animation: "typing-dot 1.2s ease infinite", animationDelay: `${d}s` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* HERO — XP + scores */}
+                <div className="relative p-6 md:p-8 border-b border-white/5">
+                  <button
+                    onClick={() => setFeedbackOpen(false)}
+                    aria-label="Close"
+                    className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles size={14} className="text-emerald-400" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+                      Session feedback
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl serif italic font-bold mb-5">
+                    {feedback.grammarScore >= 85
+                      ? "Outstanding work."
+                      : feedback.grammarScore >= 70
+                      ? "Solid progress."
+                      : feedback.grammarScore >= 50
+                      ? "Good effort — keep going."
+                      : "Every attempt builds you up."}
+                  </h2>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    {/* XP earned */}
+                    <div className="rounded-2xl p-4 bg-gradient-to-br from-amber-500/15 to-transparent border border-amber-500/30">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <Award size={14} className="text-amber-400" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">XP</span>
+                      </div>
+                      <p className="text-3xl font-bold mono text-amber-400 tracking-tight">+{xpEarned}</p>
+                    </div>
+                    {/* Grammar */}
+                    <div className="rounded-2xl p-4 bg-gradient-to-br from-emerald-500/15 to-transparent border border-emerald-500/30">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <CheckCircle2 size={14} className="text-emerald-400" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Grammar</span>
+                      </div>
+                      <p className="text-3xl font-bold mono text-emerald-400 tracking-tight">{feedback.grammarScore}%</p>
+                    </div>
+                    {/* Accuracy */}
+                    <div className="rounded-2xl p-4 bg-gradient-to-br from-blue-500/15 to-transparent border border-blue-500/30">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <TrendingUp size={14} className="text-blue-400" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400">Accuracy</span>
+                      </div>
+                      <p className="text-3xl font-bold mono text-blue-400 tracking-tight">{feedback.accuracyPct}%</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* TABS */}
+                <div className="flex items-center gap-1 px-4 md:px-6 pt-4 border-b border-white/5">
+                  {([
+                    { id: "corrections", label: "Corrections", count: feedback.corrections.length, Icon: AlertCircle },
+                    { id: "strengths",   label: "Wins",        count: feedback.strengths.length,   Icon: CheckCircle2 },
+                    { id: "next",        label: "Next steps",  count: 0,                            Icon: Lightbulb },
+                  ] as const).map((tab) => {
+                    const active = feedbackTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setFeedbackTab(tab.id)}
+                        className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                          active
+                            ? "border-emerald-500 text-white"
+                            : "border-transparent text-white/40 hover:text-white/70"
+                        }`}
+                      >
+                        <tab.Icon size={14} />
+                        <span>{tab.label}</span>
+                        {tab.count > 0 && (
+                          <span className={`text-[10px] font-bold mono px-1.5 py-0.5 rounded-full ${
+                            active ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-white/40"
+                          }`}>
+                            {tab.count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* TAB CONTENT (scrollable) */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                  {feedbackTab === "corrections" && (
+                    feedback.corrections.length === 0 ? (
+                      <div className="text-center py-12 text-white/40">
+                        <CheckCircle2 size={32} className="mx-auto mb-3 text-emerald-500/40" />
+                        <p className="italic serif text-lg">No corrections — clean work.</p>
+                      </div>
+                    ) : (
+                      <ul className="space-y-3">
+                        {feedback.corrections.map((c, i) => (
+                          <li
+                            key={i}
+                            className="rounded-2xl p-4 bg-white/5 border border-white/10 hover:border-white/20 transition-colors"
+                          >
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex items-start gap-2">
+                                <span className="text-[10px] font-bold mono uppercase tracking-widest text-rose-400 mt-1 shrink-0">
+                                  Was
+                                </span>
+                                <p className="text-rose-300/80 line-through decoration-rose-500/40">
+                                  {c.original}
+                                </p>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-[10px] font-bold mono uppercase tracking-widest text-emerald-400 mt-1 shrink-0">
+                                  Should be
+                                </span>
+                                <p className="text-emerald-300 font-medium">
+                                  {c.corrected}
+                                </p>
+                              </div>
+                              <p className="text-xs text-white/50 italic pl-1 pt-1.5 border-t border-white/5">
+                                {c.rule}
+                              </p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  )}
+
+                  {feedbackTab === "strengths" && (
+                    feedback.strengths.length === 0 ? (
+                      <div className="text-center py-12 text-white/40">
+                        <Lightbulb size={32} className="mx-auto mb-3 text-amber-500/40" />
+                        <p className="italic serif text-lg">More wins next session.</p>
+                      </div>
+                    ) : (
+                      <ul className="space-y-2">
+                        {feedback.strengths.map((s, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 rounded-xl p-3.5 bg-emerald-500/5 border border-emerald-500/20"
+                          >
+                            <CheckCircle2 size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+                            <p className="text-sm text-emerald-100/90 leading-relaxed">{s}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  )}
+
+                  {feedbackTab === "next" && (
+                    <div className="rounded-2xl p-5 bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Lightbulb size={16} className="text-purple-400" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400">
+                          Recommended next step
+                        </span>
+                      </div>
+                      <p className="text-base leading-relaxed text-white/85">
+                        {feedback.recommendation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* FOOTER actions */}
+                <div className="flex flex-col sm:flex-row gap-2 p-4 md:p-6 border-t border-white/5 bg-black/20">
+                  {feedback.corrections.length > 0 && (
+                    <button
+                      onClick={saveCorrectionsAsCards}
+                      disabled={savingCorrections || correctionsSaved}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-medium border border-white/10 hover:border-white/20 hover:bg-white/5 transition-colors disabled:opacity-60"
+                    >
+                      <BookMarked size={15} />
+                      {correctionsSaved
+                        ? "Saved to My Words ✓"
+                        : savingCorrections
+                        ? "Saving…"
+                        : `Save ${feedback.corrections.length} correction${feedback.corrections.length === 1 ? "" : "s"} to My Words`}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setFeedbackOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Continue reading
+                  </button>
+                  <button
+                    onClick={startNewSession}
+                    className="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3"
+                  >
+                    New session <ArrowRight size={15} />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      </footer>
+      )}
     </div>
   );
 }

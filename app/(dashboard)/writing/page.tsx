@@ -60,7 +60,9 @@ export default function WritingPage() {
   const PROMPTS = targetLanguage === "es" ? PROMPTS_ES : targetLanguage === "en" ? PROMPTS_EN : PROMPTS_FR;
   const langName = targetLanguage === "es" ? "Spanish" : targetLanguage === "en" ? "English" : "French";
 
-  const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(PROMPTS[0]);
+  // selectedPrompt = null  → Free Write mode (no constraint, user writes anything)
+  // selectedPrompt = prompt → Prompted mode (writing exercise around a topic)
+  const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(null);
   const [text, setText] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,12 @@ export default function WritingPage() {
   const [history, setHistory] = useState<WritingHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Free-write prompt sent to the AI. Reads as a real writing task so the API
+  // validation passes and the model knows there's no topic constraint.
+  const freeWritePrompt =
+    `Free writing — the student is practising ${langName} writing without a fixed topic. ` +
+    `Critique grammar, vocabulary, and naturalness regardless of subject.`;
 
   const loadHistory = async () => {
     setHistoryLoading(true);
@@ -84,7 +92,7 @@ export default function WritingPage() {
   }, [view]);
 
   const handleSubmit = async () => {
-    if (!selectedPrompt || !text.trim() || text.length < 20) return;
+    if (!text.trim() || text.length < 20) return;
     setLoading(true);
     setFeedback(null);
 
@@ -94,8 +102,8 @@ export default function WritingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: text.trim(),
-          prompt: selectedPrompt.prompt,
-          level: selectedPrompt.level,
+          prompt: selectedPrompt?.prompt ?? freeWritePrompt,
+          level: selectedPrompt?.level ?? "intermediate",
         }),
       });
 
@@ -250,29 +258,60 @@ export default function WritingPage() {
         </div>
       )}
 
-      {view === "write" && selectedPrompt && (
+      {view === "write" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT: Prompt + Editor */}
+          {/* LEFT: Mode card + Editor */}
           <div className="lg:col-span-2 space-y-6">
-            <section className="card-premium p-6 bg-emerald-500/5 border-emerald-500/20">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-500">
-                  Current Prompt
-                </h3>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">
-                  {selectedPrompt.level}
-                </span>
-              </div>
-              <p className="text-xl serif italic font-medium leading-relaxed">
-                "{selectedPrompt.prompt}"
-              </p>
-            </section>
+            {selectedPrompt ? (
+              <section className="card-premium p-6 bg-emerald-500/5 border-emerald-500/20">
+                <div className="flex items-center justify-between mb-2 gap-3">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                    <span className="text-base">{selectedPrompt.emoji}</span>
+                    {selectedPrompt.title}
+                  </h3>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">
+                      {selectedPrompt.level}
+                    </span>
+                    <button
+                      onClick={() => { setSelectedPrompt(null); setText(""); setFeedback(null); }}
+                      className="text-[10px] font-bold uppercase tracking-widest text-white/50 hover:text-white transition-colors"
+                    >
+                      Switch to free write
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xl serif italic font-medium leading-relaxed">
+                  "{selectedPrompt.prompt}"
+                </p>
+              </section>
+            ) : (
+              <section className="card-premium p-6 bg-white/5 border-white/10">
+                <div className="flex items-center justify-between mb-2 gap-3">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-white/50 flex items-center gap-2">
+                    <Sparkles size={12} /> Free Write
+                  </h3>
+                  <button
+                    onClick={() => setView("prompts")}
+                    className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    Browse prompts
+                  </button>
+                </div>
+                <p className="text-xl serif italic font-medium leading-relaxed text-white/70">
+                  Write about anything in {langName} — a story, your day, a memory, a thought.
+                  No topic. No limits. Just write and let the AI critique your grammar and word choice.
+                </p>
+              </section>
+            )}
 
             <div className="relative">
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder={`Start writing in ${langName}…`}
+                placeholder={selectedPrompt
+                  ? `Start writing in ${langName}…`
+                  : `Start writing freely in ${langName} — anything you want…`}
                 className="w-full h-96 bg-white/5 border border-white/10 rounded-3xl p-8 text-xl focus:outline-none focus:border-white/20 transition-all resize-none font-light leading-relaxed"
               />
               <div className="absolute bottom-6 right-6 flex items-center gap-4">
@@ -299,8 +338,8 @@ export default function WritingPage() {
               </div>
             </div>
 
-            {/* Hints */}
-            {selectedPrompt.hints.length > 0 && (
+            {/* Hints — only for prompted mode */}
+            {selectedPrompt && selectedPrompt.hints.length > 0 && (
               <div className="card-premium p-6 space-y-4">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-white/40">
                   Helpful Phrases
