@@ -11,11 +11,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!session) redirect("/login");
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh", display: "flex" }}>
+    <div style={{ background: "var(--paper)", minHeight: "100vh", display: "flex" }}>
       <NavigationProgress />
       <Sidebar />
       <main style={{ flex: 1, minWidth: 0, overflowX: "hidden" }}>
-        <div className="px-4 md:px-8 lg:px-10 pt-6 lg:pt-8 pb-20" style={{ maxWidth: 1280, marginInline: "auto", width: "100%" }}>
+        <div
+          className="lv-page-enter px-5 md:px-10 lg:px-14 pt-8 lg:pt-10 pb-20"
+          style={{ maxWidth: 1280, marginInline: "auto", width: "100%" }}
+        >
           {children}
         </div>
       </main>

@@ -16,16 +16,23 @@ import {
 
 interface ProgressData { xp: number; level: number; streak: number; }
 
-const NAV_ITEMS: { id: string; href: string; icon: typeof Home; label: string }[] = [
-  { id: "dashboard",  href: "/home",       icon: Home,           label: "Dashboard" },
+type NavEntry =
+  | { group: string }
+  | { id: string; href: string; icon: typeof Home; label: string };
+
+const NAV_ITEMS: NavEntry[] = [
+  { group: "Learn" },
+  { id: "dashboard",  href: "/home",       icon: Home,           label: "Today" },
   { id: "path",       href: "/learn",      icon: GraduationCap,  label: "Learning Path" },
-  { id: "games",      href: "/games",      icon: Gamepad2,       label: "Games Hub" },
+  { id: "games",      href: "/games",      icon: Gamepad2,       label: "Games" },
   { id: "tutor",      href: "/tutor",      icon: MessageSquare,  label: "AI Tutor" },
   { id: "stories",    href: "/stories",    icon: BookOpen,       label: "Stories" },
-  { id: "writing",    href: "/writing",    icon: Award,          label: "Writing" },
+  { id: "writing",    href: "/writing",    icon: Award,          label: "Writing Lab" },
+  { group: "Library" },
   { id: "dictionary", href: "/dictionary", icon: Search,         label: "Dictionary" },
   { id: "mywords",    href: "/my-words",   icon: BookMarked,     label: "My Words" },
   { id: "review",     href: "/review",     icon: RotateCcw,      label: "Review" },
+  { group: "Community" },
   { id: "progress",   href: "/progress",   icon: TrendingUp,     label: "Progress" },
   { id: "leaderboard",href: "/leaderboard",icon: Trophy,         label: "Leaderboard" },
   { id: "community",  href: "/community",  icon: Users,          label: "Community" },
@@ -83,13 +90,14 @@ export function Sidebar() {
   const avatarIsEmoji = isEmoji(userImage);
   const avatarInitial = userName[0]?.toUpperCase() ?? "U";
 
+  const pct = xpInfo ? Math.round((xpInfo.current / xpInfo.needed) * 100) : 0;
+
   return (
     <>
       {/* Mobile burger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 w-10 h-10 rounded-xl flex items-center justify-center"
-        style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text)" }}
+        className="lg:hidden fixed top-4 left-4 z-40 lv-btn lv-btn--ghost lv-btn--icon"
         aria-label="Open menu"
       >
         <Menu size={18} />
@@ -100,50 +108,37 @@ export function Sidebar() {
         <div
           onClick={() => setMobileOpen(false)}
           className="lg:hidden fixed inset-0 z-40"
-          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+          style={{ background: "oklch(0.17 0.018 60 / 0.45)", backdropFilter: "blur(3px)" }}
         />
       )}
 
       <aside
-        className={`${mobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:sticky top-0 left-0 z-50 lg:z-10 w-64 h-screen flex flex-col transition-transform duration-300`}
+        className={`${mobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:sticky top-0 left-0 z-50 lg:z-10 h-screen flex flex-col transition-transform duration-300`}
         style={{
-          background: "var(--nav-bg)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          borderRight: "1px solid var(--border)",
+          width: 248,
+          background: "var(--paper)",
+          borderRight: "1px solid var(--line)",
+          padding: "24px 18px",
+          overflowY: "auto",
         }}
       >
-        {/* Logo + close (mobile) */}
-        <div className="px-6 py-5 flex items-center justify-between">
-          <Link href="/home" className="flex items-center gap-3" style={{ textDecoration: "none" }}>
-            <span
-              style={{
-                width: 40, height: 40, borderRadius: 12,
-                background: "var(--accent)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 22, fontWeight: 700, color: "#050505",
-                fontFamily: "var(--font-display)", fontStyle: "italic",
-                boxShadow: "0 0 24px rgba(16,185,129,0.45)",
-                flexShrink: 0,
-              }}
-            >L</span>
-            <span
-              className="serif"
-              style={{
-                fontSize: 22, fontWeight: 700, color: "var(--text)",
-                fontFamily: "var(--font-display)", fontStyle: "italic",
-                letterSpacing: "-0.01em",
-                display: "flex", alignItems: "center", gap: 6,
-              }}
-            >
-              Lingova
-              <span style={{ fontSize: 16, fontStyle: "normal" }}>{flag}</span>
+        {/* Logo */}
+        <div className="flex items-center justify-between" style={{ padding: "4px 10px 18px" }}>
+          <Link href="/home" className="flex items-center" style={{ gap: 10, textDecoration: "none" }}>
+            <svg viewBox="0 0 40 40" width={26} height={26} aria-hidden>
+              <circle cx="20" cy="20" r="18" fill="none" stroke="var(--ink)" strokeWidth="1.5" />
+              <path d="M12 27 V13 H15 V24 H22" fill="none" stroke="var(--ink)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="27" cy="13" r="2.5" fill="var(--terracotta)" />
+            </svg>
+            <span style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: "-0.02em", color: "var(--ink)", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <span>Ling<em style={{ fontStyle: "italic", color: "var(--terracotta)" }}>o</em>va</span>
+              <span style={{ fontSize: 14 }}>{flag}</span>
             </span>
           </Link>
           <button
             onClick={() => setMobileOpen(false)}
             className="lg:hidden"
-            style={{ color: "var(--text-2)" }}
+            style={{ color: "var(--ink-3)", background: "none", border: "none", cursor: "pointer" }}
             aria-label="Close menu"
           >
             <X size={20} />
@@ -151,105 +146,111 @@ export function Sidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-2 overflow-y-auto" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {NAV_ITEMS.map((item) => {
+        <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {NAV_ITEMS.map((item, i) => {
+            if ("group" in item) {
+              return (
+                <div
+                  key={"g" + i}
+                  style={{
+                    fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.14em",
+                    textTransform: "uppercase", color: "var(--ink-4)", padding: "14px 12px 6px",
+                  }}
+                >
+                  {item.group}
+                </div>
+              );
+            }
             const Icon = item.icon;
             const active = pathname === item.href || (item.href !== "/home" && pathname?.startsWith(item.href));
             return (
               <Link
                 key={item.id}
                 href={item.href}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                className="lv-nav-item"
                 style={{
-                  background: active ? "rgba(255,255,255,0.08)" : "transparent",
-                  color: active ? "var(--text)" : "var(--text-2)",
-                  textDecoration: "none",
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "9px 12px", borderRadius: "var(--r-md)",
+                  fontSize: 14, fontWeight: 450, textDecoration: "none",
+                  background: active ? "var(--ink)" : "transparent",
+                  color: active ? "var(--paper)" : "var(--ink-2)",
+                  transition: "background 160ms, color 160ms",
                 }}
                 onMouseEnter={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                    e.currentTarget.style.color = "var(--text)";
-                  }
+                  if (!active) { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }
                 }}
                 onMouseLeave={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = "var(--text-2)";
-                  }
+                  if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-2)"; }
                 }}
               >
-                <Icon size={18} style={{ flexShrink: 0 }} />
+                <Icon size={17} style={{ flexShrink: 0, opacity: 0.85 }} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Profile widget */}
-        <div className="p-4" style={{ borderTop: "1px solid var(--border)" }}>
+        {/* Profile card + stamps */}
+        <div style={{ marginTop: "auto", paddingTop: 20 }}>
           <Link
             href={session?.user?.id ? `/community/${(session.user as { id?: string }).id}` : "/community"}
-            className="w-full flex items-center gap-3 p-3 rounded-xl transition-all"
-            style={{ textDecoration: "none" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+            style={{
+              display: "block", textDecoration: "none",
+              background: "var(--paper-2)", borderRadius: "var(--r-lg)", padding: 16,
+            }}
           >
-            <div
-              style={{
-                width: 40, height: 40, borderRadius: "50%",
-                background: "linear-gradient(135deg, var(--accent), #60a5fa)",
-                padding: 1, flexShrink: 0,
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <div
                 style={{
-                  width: "100%", height: "100%", borderRadius: "50%",
-                  background: "var(--bg)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: avatarIsEmoji ? 18 : 12,
-                  fontWeight: 700, color: "var(--text)",
-                  fontFamily: "var(--font-display)", fontStyle: avatarIsEmoji ? "normal" : "italic",
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "var(--terracotta)", color: "#fff",
+                  display: "grid", placeItems: "center",
+                  fontFamily: "var(--display)", fontSize: avatarIsEmoji ? 18 : 16,
+                  flexShrink: 0,
                 }}
               >
                 {avatarIsEmoji ? userImage : avatarInitial}
               </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 500, fontSize: 13.5, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>
+                <div style={{ fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-3)" }}>Lv · {level}</div>
+              </div>
             </div>
-            <div style={{ flex: 1, overflow: "hidden" }}>
-              <p style={{ fontSize: 14, fontWeight: 500, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</p>
-              <p style={{ fontSize: 11, color: "var(--text-3)" }}>Level {level}</p>
+            <div className="lv-progress lv-progress--terra">
+              <span style={{ width: `${pct}%` }} />
             </div>
-            <ChevronRight size={14} style={{ color: "var(--text-3)" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+              <span>{(progress?.xp ?? 0).toLocaleString()} xp</span>
+              <span>{xpInfo ? xpInfo.needed.toLocaleString() : "—"}</span>
+            </div>
           </Link>
 
-          <div style={{ display: "flex", gap: 4, marginTop: 12, paddingLeft: 4 }}>
+          {/* Actions + stamp row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "14px 6px 0" }}>
             <Link
               href="/settings"
-              style={{
-                padding: 8, color: "var(--text-3)", borderRadius: 8,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "color var(--dur-fast) var(--ease)",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = "var(--text)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "var(--text-3)"; }}
+              style={{ padding: 7, color: "var(--ink-3)", borderRadius: 8, display: "flex", transition: "color 160ms" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "var(--ink)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-3)"; }}
               aria-label="Settings"
             >
-              <Settings size={18} />
+              <Settings size={17} />
             </Link>
             <ThemeToggle />
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              style={{
-                padding: 8, color: "rgba(244,63,94,0.6)", borderRadius: 8,
-                background: "transparent", border: "none", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "color var(--dur-fast) var(--ease)",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = "rgb(244,63,94)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "rgba(244,63,94,0.6)"; }}
+              style={{ padding: 7, color: "var(--ink-3)", borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", transition: "color 160ms" }}
+              onMouseEnter={e => { e.currentTarget.style.color = "var(--terracotta)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-3)"; }}
               aria-label="Sign out"
             >
-              <LogOut size={18} />
+              <LogOut size={17} />
             </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 10px 0", fontFamily: "var(--mono)", fontSize: 9, letterSpacing: "0.14em", color: "var(--ink-4)", textTransform: "uppercase" }}>
+            <span>EST · 2025</span>
+            <span className="lv-dot" />
+            <span>LV-001</span>
           </div>
         </div>
       </aside>

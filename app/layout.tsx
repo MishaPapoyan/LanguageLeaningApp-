@@ -1,28 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const inter = Inter({
+// Field Guide type system: Instrument Serif (display, italic) · Geist (body) · Geist Mono (stamps)
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400"],
   style: ["italic", "normal"],
   display: "swap",
   variable: "--font-serif",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-mono-jb",
 });
 
 export const metadata: Metadata = {
@@ -67,13 +56,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${cormorant.variable} ${jetbrains.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable} antialiased`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.getItem('theme') !== 'light') {
+                if (localStorage.getItem('theme') === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
               } catch(e) {}
