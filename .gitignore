@@ -38,5 +38,7 @@ next-env.d.ts
 
 /app/generated/prisma
 
-# design reference (extracted from zip, not for repo)
+# design reference (extracted from handoff bundles, not for repo)
 /.lingova-design/
+/.design-drop/
+/.claude/worktrees/

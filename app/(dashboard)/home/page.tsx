@@ -134,8 +134,11 @@ export default async function HomePage() {
   const skillVals = Object.values(skillTree).filter((v): v is number => typeof v === "number");
   const unitPct = skillVals.length ? Math.min(100, Math.round(skillVals.reduce((a, b) => a + b, 0) / skillVals.length)) : 0;
 
+  const greetHour = new Date().getHours();
+  const greetWord = greetHour < 12 ? "Good morning" : greetHour < 19 ? "Good afternoon" : "Good evening";
+
   return (
-    <div className="space-y-12 animate-fade-up">
+    <div className="lv-fade-up">
 
       {/* Onboarding modal (fires once for new users) */}
       {!onboardingCompleted && (
@@ -146,436 +149,371 @@ export default async function HomePage() {
         />
       )}
 
-      {/* ─── Header ─── */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h1 className="text-5xl md:text-6xl mb-2 font-black italic serif" style={{ letterSpacing: "-0.02em", lineHeight: 1.05 }}>
-            {langConfig.greeting}, {firstName}.
-          </h1>
-          <p className="text-white/40 text-lg" style={{ color: "var(--text-2)" }}>
-            {streakDays > 0
-              ? t(locale, "home_streakMessage", { streak: String(streakDays) })
-              : t(locale, "home_readyMessage", { lang: langConfig.label })}
-            {" "}{langConfig.flag}
-          </p>
+      {/* ─── PageHead ─── */}
+      <header style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: 40 }}>
+        <div className="mono-sm" style={{ color: "var(--ink-3)" }}>
+          § Day {streakDays} · {greetWord} {langConfig.flag}
         </div>
-        {earnedBadges.length > 0 && (
-          <div className="flex items-center gap-4 p-2 rounded-2xl" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-            <div className="flex -space-x-3">
-              {earnedBadges.slice(0, 3).map((b) => (
-                <div key={b.id} className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: "var(--surface-3)", border: "2px solid var(--bg)" }}>
-                  {b.emoji}
-                </div>
-              ))}
-            </div>
-            <p className="text-xs font-bold uppercase tracking-widest pr-2" style={{ color: "var(--text-3)" }}>
-              {earnedBadges.length} {t(locale, "home_badgesEarned")}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div style={{ maxWidth: 720 }}>
+            <h1 style={{ fontFamily: "var(--display)", fontSize: 56, lineHeight: 1, margin: 0 }}>
+              {langConfig.greeting},{" "}
+              <em style={{ fontStyle: "italic", color: "var(--terracotta)" }}>{firstName}.</em>
+            </h1>
+            <p style={{ marginTop: 14, fontSize: 16, color: "var(--ink-3)", lineHeight: 1.5 }}>
+              {streakDays > 0
+                ? t(locale, "home_streakMessage", { streak: String(streakDays) })
+                : t(locale, "home_readyMessage", { lang: langConfig.label })}
             </p>
           </div>
-        )}
+          <div style={{ display: "flex", gap: 10 }}>
+            <Link href="/dictionary" className="lv-btn lv-btn--ghost" style={{ textDecoration: "none" }}>
+              <Search size={16} /> Search
+            </Link>
+            <Link
+              href={lastStory ? `/stories/${lastStory.storyId}` : "/learn"}
+              className="lv-btn lv-btn--primary"
+              style={{ textDecoration: "none" }}
+            >
+              {t(locale, "home_resume")} <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
       </header>
 
-      {/* ─── 4 stat cards ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Today's XP w/ progress */}
-        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl" style={{ background: "rgba(16,185,129,0.10)", color: "var(--accent)" }}>
-              <Zap size={24} />
-            </div>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
-              Lv {xpInfo.level}
-            </div>
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-              {t(locale, "home_totalXp")}
-            </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
-                {(progress?.xp ?? 0).toLocaleString()}
-              </p>
-            </div>
-            <div className="space-y-2 mt-2">
-              <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                <div className="h-full transition-all duration-1000" style={{ width: `${xpProgressPct}%`, background: "var(--accent)" }} />
+      {/* ─── Today's path ─── */}
+      <section className="lv-fade-up" style={{ marginBottom: 40 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 16 }}>
+          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Today&apos;s path</span>
+          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Level {xpInfo.level} · {(progress?.xp ?? 0).toLocaleString()} xp earned</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: 16 }}>
+          {[
+            { num: "01", title: t(locale, "home_quickActions"), sub: t(locale, "home_learningPath"), meta: `${xpInfo.current} / ${xpInfo.needed} XP`, status: "done", href: "/learn" },
+            { num: "02", title: lastStory ? lastStory.story.title : "Stories", sub: lastStory ? t(locale, "home_pickUpWhere") : t(locale, "home_startFirstLesson"), meta: `${unitPct}%`, status: "now", href: lastStory ? `/stories/${lastStory.storyId}` : "/stories" },
+            { num: "03", title: t(locale, "tutor_title"), sub: "AI tutor · speaking practice", meta: `+${xpInfo.needed - xpInfo.current} xp`, status: "next", href: "/tutor" },
+          ].map((task) => {
+            const done = task.status === "done";
+            const now = task.status === "now";
+            return (
+              <Link
+                key={task.num}
+                href={task.href}
+                className={`lv-card lv-card--hover${now ? " lv-card--ink" : ""}`}
+                style={{ textDecoration: "none", position: "relative", overflow: "hidden" }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
+                  <span className="mono-sm" style={{ color: now ? "var(--paper-3)" : "var(--ink-3)" }}>{task.num}</span>
+                  {done && (
+                    <span style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--lime)", color: "var(--ink)", display: "grid", placeItems: "center" }}>
+                      <Zap size={14} />
+                    </span>
+                  )}
+                  {now && <span className="lv-sticker" style={{ color: "var(--lime)", transform: "rotate(3deg)" }}>In progress</span>}
+                  {!done && !now && <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Up next</span>}
+                </div>
+                <div style={{ fontFamily: "var(--display)", fontSize: 26, lineHeight: 1.1, marginBottom: 6 }}>{task.title}</div>
+                <div style={{ fontSize: 13.5, opacity: 0.7, marginBottom: 16 }}>{task.sub}</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span className="mono-sm" style={{ color: now ? "var(--paper-3)" : "var(--ink-3)" }}>· {task.meta}</span>
+                  <ArrowRight size={16} />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ─── Stats row ─── */}
+      <section className="grid grid-cols-1 md:grid-cols-3" style={{ gap: 16, marginBottom: 40 }}>
+        {/* Level */}
+        <div className="lv-card" style={{ padding: 28 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+            <div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_statLevel")}</span>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginTop: 6 }}>
+                <span style={{ fontFamily: "var(--display)", fontSize: 72, lineHeight: 1 }}>{xpInfo.level}</span>
               </div>
-              <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
-                {xpInfo.current} / {xpInfo.needed} XP
-              </p>
             </div>
+            <span className="lv-sticker" style={{ color: "var(--terracotta)", transform: "rotate(-3deg)" }}>
+              {savedWordCount} {t(locale, "home_wordsSaved")}
+            </span>
+          </div>
+          <div className="lv-progress lv-progress--terra">
+            <span style={{ width: `${xpProgressPct}%` }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
+            <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{(progress?.xp ?? 0).toLocaleString()} xp</span>
+            <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{xpInfo.needed - xpInfo.current} to level {xpInfo.level + 1}</span>
           </div>
         </div>
 
         {/* Streak */}
-        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.10)", color: "#f59e0b" }}>
-              <Flame size={24} />
-            </div>
+        <div className="lv-card" style={{ background: "var(--terracotta)", color: "var(--paper)", borderColor: "var(--terracotta)", padding: 28 }}>
+          <span className="mono-sm" style={{ color: "var(--paper)", opacity: 0.8 }}>{t(locale, "home_statDayStreak")}</span>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6, marginBottom: 12 }}>
+            <Flame size={36} />
+            <span style={{ fontFamily: "var(--display)", fontSize: 72, lineHeight: 1 }}>{streakDays}</span>
           </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-              {t(locale, "home_statDayStreak")}
-            </p>
-            <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
-              {streakDays} <span className="text-sm font-normal" style={{ color: "var(--text-3)" }}>days</span>
-            </p>
+          <span className="mono-sm" style={{ color: "var(--paper)", opacity: 0.8 }}>days streak</span>
+          <div style={{ display: "flex", gap: 4, marginTop: 18 }}>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i < (streakDays % 7 || (streakDays > 0 ? 7 : 0)) ? "var(--paper)" : "rgba(255,255,255,0.3)" }} />
+            ))}
           </div>
         </div>
 
-        {/* Level */}
-        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl" style={{ background: "rgba(96,165,250,0.10)", color: "#60a5fa" }}>
-              <Trophy size={24} />
+        {/* Word of the day */}
+        {recentWord ? (
+          <div className="lv-card" style={{ padding: 28, position: "relative", overflow: "hidden" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_wordOfDay")}</span>
+              <WordOfDayPlayer word={recentWord.word} ttsLocale={langConfig.ttsLocale ?? targetLang} />
             </div>
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-              {t(locale, "home_statLevel")}
-            </p>
-            <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
-              {xpInfo.level}
-            </p>
-          </div>
-        </div>
-
-        {/* Words saved */}
-        <div className="card-premium p-6 flex flex-col gap-4 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl" style={{ background: "rgba(168,85,247,0.10)", color: "#a78bfa" }}>
-              <BookMarked size={24} />
+            <div style={{ fontFamily: "var(--display)", fontSize: 40, lineHeight: 1, marginTop: 10, marginBottom: 8 }}>
+              {recentWord.word}
             </div>
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-              {t(locale, "home_wordsSaved")}
-            </p>
-            <p className="text-3xl font-bold mono tracking-tight" style={{ color: "var(--text)" }}>
-              {savedWordCount}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── Two-column grid ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-        {/* Left col: 8 */}
-        <div className="lg:col-span-8 space-y-12">
-
-          {/* Quick Actions */}
-          <section>
-            <h2 className="font-bold uppercase tracking-widest mb-6" style={{ fontSize: 10, color: "var(--text-3)", letterSpacing: "0.2em" }}>
-              {t(locale, "home_quickActions")}
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                const colorMap: Record<string, string> = {
-                  purple: "rgba(168,85,247,0.10)",
-                  amber: "rgba(245,158,11,0.10)",
-                  blue: "rgba(96,165,250,0.10)",
-                  emerald: "rgba(16,185,129,0.10)",
-                };
-                const fgMap: Record<string, string> = {
-                  purple: "#a78bfa",
-                  amber: "#f59e0b",
-                  blue: "#60a5fa",
-                  emerald: "var(--accent)",
-                };
-                return (
-                  <Link
-                    key={action.label}
-                    href={action.href}
-                    className="card-premium p-6 group transition-all"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                      style={{ background: colorMap[action.color], color: fgMap[action.color] }}
-                    >
-                      <Icon size={20} />
-                    </div>
-                    <h3 className="font-bold text-sm" style={{ color: "var(--text)" }}>{action.label}</h3>
-                    <p className="text-[10px] font-bold uppercase tracking-tight mt-1" style={{ color: "var(--text-3)" }}>
-                      {action.desc}
-                    </p>
-                  </Link>
-                );
-              })}
+            <div style={{ fontSize: 14, color: "var(--ink-2)", marginBottom: 6 }}>
+              &ldquo;{recentWord.translation}&rdquo;
             </div>
-          </section>
-
-          {/* Daily Curriculum */}
-          <section>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl italic serif" style={{ color: "var(--text)" }}>Daily Curriculum</h2>
-              <DailyGoals />
-            </div>
-            <Suspense fallback={null}>
-              <TodayPlan targetLang={targetLang} />
-            </Suspense>
-          </section>
-
-          {/* Recommended Games */}
-          <section className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl italic serif" style={{ color: "var(--text)" }}>Recommended Games</h2>
-              <Link
-                href="/games"
-                className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors"
-                style={{ color: "var(--text-3)" }}
-              >
-                Games Hub <ChevronRight size={12} />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recommended.map((game) => {
-                const dimMap: Record<string, string> = {
-                  blue: "rgba(96,165,250,0.10)",
-                  purple: "rgba(168,85,247,0.10)",
-                  emerald: "rgba(16,185,129,0.10)",
-                  amber: "rgba(245,158,11,0.10)",
-                };
-                const fgMap: Record<string, string> = {
-                  blue: "#60a5fa",
-                  purple: "#a78bfa",
-                  emerald: "var(--accent)",
-                  amber: "#f59e0b",
-                };
-                return (
-                  <Link
-                    key={game.title}
-                    href={game.href}
-                    className="card-premium p-6 group transition-all"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <div className="flex justify-between items-start mb-6">
-                      <div
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
-                        style={{ background: dimMap[game.color], color: fgMap[game.color] }}
-                      >
-                        <Gamepad2 size={24} />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-bold italic serif tracking-tight" style={{ color: "var(--text)" }}>
-                        {game.title}
-                      </h3>
-                      <div className="flex items-center justify-between pt-4">
-                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
-                          {game.category} · {game.mode}
-                        </span>
-                        <span
-                          className="p-2 rounded-full transition-all"
-                          style={{ border: "1px solid var(--border)" }}
-                        >
-                          <Play size={14} fill="currentColor" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        </div>
-
-        {/* Right col: 4 */}
-        <div className="lg:col-span-4 space-y-8">
-
-          {/* Active Unit */}
-          <section className="card-premium p-8 group" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-black uppercase tracking-widest" style={{ fontSize: 11, color: "var(--text-3)", letterSpacing: "0.2em" }}>
-                Active Unit
-              </h3>
-              <GraduationCap size={18} style={{ color: "var(--accent)" }} />
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-end justify-between">
-                <h4 className="text-2xl font-bold italic serif" style={{ color: "var(--text)" }}>
-                  {lastStory ? lastStory.story.title : t(locale, "home_learningPath")}
-                </h4>
-                <span className="text-xs font-bold mono" style={{ color: "var(--accent)" }}>
-                  {unitPct}%
-                </span>
+            {recentWord.exampleFr && (
+              <div style={{ fontSize: 13, fontStyle: "italic", color: "var(--ink-3)", marginBottom: 14 }}>
+                {recentWord.exampleFr}
               </div>
-              <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                <div className="h-full transition-all duration-1000" style={{ width: `${unitPct}%`, background: "var(--accent)" }} />
-              </div>
-              <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-3)" }}>
-                {lastStory ? t(locale, "home_pickUpWhere") : t(locale, "home_startFirstLesson")}
-              </p>
-              <Link
-                href={lastStory ? `/stories/${lastStory.storyId}` : "/learn"}
-                className="btn-secondary w-full text-[10px]"
-                style={{ padding: "10px", display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}
-              >
-                {lastStory?.completed ? t(locale, "home_readAgain") : t(locale, "home_resume")}
-                <ArrowRight size={12} className="ml-1.5" />
-              </Link>
-            </div>
-          </section>
+            )}
+            <Link href={`/dictionary/${recentWord.id}`} className="lv-btn lv-btn--ghost lv-btn--sm" style={{ textDecoration: "none", marginTop: 8 }}>
+              {t(locale, "home_learnThisWord")}
+            </Link>
+          </div>
+        ) : (
+          <div className="lv-card" style={{ padding: 28 }}>
+            <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_wordOfDay")}</span>
+          </div>
+        )}
+      </section>
 
-          {/* Word of the Day */}
-          {recentWord && (
-            <section
-              className="card-premium p-8 relative overflow-hidden group"
-              style={{
-                background: "linear-gradient(135deg, rgba(16,185,129,0.18), transparent 60%)",
-                borderColor: "rgba(16,185,129,0.22)",
-              }}
-            >
-              <div
-                className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full"
-                style={{ background: "rgba(16,185,129,0.10)", filter: "blur(60px)" }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="font-black uppercase tracking-widest" style={{ fontSize: 11, color: "var(--accent)", letterSpacing: "0.3em" }}>
-                    {t(locale, "home_wordOfDay")}
-                  </h3>
-                  <WordOfDayPlayer word={recentWord.word} ttsLocale={langConfig.ttsLocale ?? targetLang} />
-                </div>
-                <div className="space-y-4">
-                  <p
-                    className="font-black italic serif tracking-tighter"
-                    style={{ fontSize: "clamp(40px, 5vw, 56px)", color: "var(--text)", lineHeight: 1, letterSpacing: "-0.04em" }}
-                  >
-                    {recentWord.word}
-                  </p>
-                  <p className="text-base font-light" style={{ color: "var(--text-2)" }}>
-                    &ldquo;{recentWord.translation}&rdquo;
-                  </p>
-                  {recentWord.exampleFr && (
-                    <p className="text-sm italic" style={{ color: "var(--text-3)" }}>
-                      {recentWord.exampleFr}
-                    </p>
-                  )}
-                  <div className="pt-4 grid grid-cols-1 gap-2">
-                    <Link href={`/dictionary/${recentWord.id}`} className="btn-primary py-3 text-xs" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-                      {t(locale, "home_learnThisWord")}
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Progress Rings */}
-          <Link
-            href="/progress"
-            className="card-premium p-8 space-y-8 cursor-pointer transition-all group block"
-            style={{ textDecoration: "none" }}
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl italic serif" style={{ color: "var(--text)" }}>Progress Rings</h3>
-              <ChevronRight size={18} style={{ color: "var(--text-3)" }} className="group-hover:translate-x-1 transition-transform" />
+      {/* ─── Skill compass + Quick actions ─── */}
+      <section className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: 16, marginBottom: 40 }}>
+        <Link href="/progress" className="lv-card lv-card--hover lg:col-span-2" style={{ padding: 28, textDecoration: "none", display: "block" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 24 }}>
+            <div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Skill compass</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4 }}>This week&apos;s tuning</div>
             </div>
-            <div className="grid grid-cols-2 gap-8">
-              {rings.map((s) => {
-                const colorMap: Record<string, string> = {
-                  emerald: "var(--accent)",
-                  blue: "#60a5fa",
-                  purple: "#a78bfa",
-                  rose: "#fb7185",
-                };
-                const stroke = colorMap[s.color] ?? "var(--accent)";
-                const r = 34;
-                const dash = 2 * Math.PI * r;
-                const offset = dash - (dash * Math.max(s.val, 0)) / 100;
-                return (
-                  <div key={s.skill} className="flex flex-col items-center gap-3">
-                    <div className="relative w-20 h-20 flex items-center justify-center">
-                      <svg className="w-full h-full -rotate-90">
-                        <circle cx="40" cy="40" r={r} stroke="currentColor" strokeWidth="4" fill="transparent" style={{ color: "rgba(255,255,255,0.06)" }} />
-                        <circle
-                          cx="40"
-                          cy="40"
-                          r={r}
-                          stroke={stroke}
-                          strokeWidth="4"
-                          fill="transparent"
-                          strokeDasharray={dash}
-                          strokeDashoffset={offset}
-                          strokeLinecap="round"
-                          style={{ transition: "stroke-dashoffset 1s ease" }}
-                        />
-                      </svg>
-                      <span className="absolute text-lg font-black mono italic" style={{ color: "var(--text)" }}>
-                        {s.val}%
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-center" style={{ color: "var(--text-3)" }}>
-                      {s.skill}
+            <span className="lv-btn lv-btn--ghost lv-btn--sm">See progress <ArrowRight size={14} /></span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4" style={{ gap: 16 }}>
+            {rings.map((s) => {
+              const colorMap: Record<string, string> = {
+                emerald: "var(--terracotta)",
+                blue: "var(--marine)",
+                purple: "var(--lime)",
+                rose: "var(--gold)",
+              };
+              const stroke = colorMap[s.color] ?? "var(--terracotta)";
+              const r = 34;
+              const dash = 2 * Math.PI * r;
+              const offset = dash - (dash * Math.max(s.val, 0)) / 100;
+              return (
+                <div key={s.skill} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                  <div style={{ position: "relative", width: 80, height: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg className="-rotate-90" style={{ width: "100%", height: "100%" }}>
+                      <circle cx="40" cy="40" r={r} stroke="var(--line)" strokeWidth="6" fill="transparent" />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r={r}
+                        stroke={stroke}
+                        strokeWidth="6"
+                        fill="transparent"
+                        strokeDasharray={dash}
+                        strokeDashoffset={offset}
+                        strokeLinecap="round"
+                        style={{ transition: "stroke-dashoffset 1s ease" }}
+                      />
+                    </svg>
+                    <span className="mono-sm" style={{ position: "absolute", fontSize: 14, color: "var(--ink)" }}>
+                      {s.val}%
                     </span>
                   </div>
+                  <span style={{ fontSize: 13, fontWeight: 500, textAlign: "center" }}>{s.skill}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Link>
+
+        <div className="lv-card" style={{ padding: 28 }}>
+          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Jump in</span>
+          <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4, marginBottom: 18 }}>
+            {t(locale, "home_quickActions")}
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.label}
+                  href={action.href}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                    padding: "12px 14px",
+                    borderRadius: 12,
+                    textDecoration: "none",
+                    color: "var(--ink)",
+                    border: "1px solid var(--line)",
+                  }}
+                >
+                  <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--paper-2)", display: "grid", placeItems: "center" }}>
+                    <Icon size={16} />
+                  </span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: "block", fontWeight: 500, fontSize: 14 }}>{action.label}</span>
+                    <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{action.desc}</span>
+                  </span>
+                  <ArrowRight size={14} />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Daily curriculum ─── */}
+      <section style={{ marginBottom: 40 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 24 }}>
+          <div>
+            <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Today&apos;s plan</span>
+            <div style={{ fontFamily: "var(--display)", fontSize: 36, marginTop: 4 }}>Daily curriculum</div>
+          </div>
+          <DailyGoals />
+        </div>
+        <Suspense fallback={null}>
+          <TodayPlan targetLang={targetLang} />
+        </Suspense>
+      </section>
+
+      {/* ─── Recommended games + leaderboard ─── */}
+      <section className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: 16, marginBottom: 40 }}>
+        <div className="lv-card lg:col-span-2" style={{ padding: 28 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 18 }}>
+            <div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Recommended for you</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4 }}>Games we picked</div>
+            </div>
+            <Link href="/games" className="lv-btn lv-btn--ghost lv-btn--sm" style={{ textDecoration: "none" }}>
+              Games Hub <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 12 }}>
+            {recommended.map((game) => {
+              const toneMap: Record<string, { bg: string; fg: string }> = {
+                blue: { bg: "var(--marine-soft)", fg: "var(--marine)" },
+                purple: { bg: "var(--lime)", fg: "var(--ink)" },
+                emerald: { bg: "var(--terracotta-soft)", fg: "var(--terracotta)" },
+                amber: { bg: "var(--paper-2)", fg: "var(--gold)" },
+              };
+              const tone = toneMap[game.color] ?? toneMap.emerald;
+              return (
+                <Link
+                  key={game.title}
+                  href={game.href}
+                  style={{ textDecoration: "none", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: 14, padding: 16, display: "block" }}
+                >
+                  <span style={{ width: 44, height: 44, borderRadius: 11, background: tone.bg, color: tone.fg, display: "grid", placeItems: "center", marginBottom: 12 }}>
+                    <Gamepad2 size={20} />
+                  </span>
+                  <div className="mono-sm" style={{ color: "var(--ink-3)" }}>{game.category} · {game.mode}</div>
+                  <div style={{ fontFamily: "var(--display)", fontSize: 22, lineHeight: 1.1, margin: "4px 0 8px" }}>{game.title}</div>
+                  <div className="mono-sm" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--ink-3)" }}>
+                    <Play size={12} fill="currentColor" /> Play
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="lv-card" style={{ padding: 28 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
+            <div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Weekly pulse</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 24, marginTop: 4 }}>Top this week</div>
+            </div>
+            <Link href="/leaderboard" className="lv-btn lv-btn--ghost lv-btn--sm" style={{ textDecoration: "none" }}>
+              Full
+            </Link>
+          </div>
+          {topLeaders.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {topLeaders.slice(0, 4).map((p, idx) => {
+                const isYou = p.name === session?.user?.name;
+                return (
+                  <div
+                    key={`${p.name}-${idx}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "10px 12px",
+                      borderRadius: 10,
+                      background: isYou ? "var(--paper-2)" : "transparent",
+                    }}
+                  >
+                    <span className="mono-sm" style={{ width: 22, color: idx === 0 ? "var(--gold)" : "var(--ink-3)" }}>{idx + 1}</span>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--paper-3)", border: "1px solid var(--line)", display: "grid", placeItems: "center", fontSize: 12, fontWeight: 600 }}>
+                      {(p.name ?? "?")[0]}
+                    </div>
+                    <span style={{ flex: 1, fontWeight: isYou ? 600 : 400, fontSize: 13.5 }}>
+                      {isYou ? "You" : p.name}
+                    </span>
+                    <span className="mono-sm" style={{ color: "var(--ink-3)", fontVariantNumeric: "tabular-nums" }}>{p.xp.toLocaleString()}</span>
+                  </div>
                 );
               })}
             </div>
-          </Link>
-
-          {/* Weekly Pulse */}
-          {topLeaders.length > 0 && (
-            <section className="card-premium p-8">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-2xl italic serif" style={{ color: "var(--text)" }}>Weekly Pulse</h3>
-                <TrendingUp size={18} style={{ color: "var(--accent)" }} />
-              </div>
-              <div className="space-y-4">
-                {topLeaders.slice(0, 4).map((p, idx) => {
-                  const isYou = p.name === session?.user?.name;
-                  return (
-                    <div
-                      key={`${p.name}-${idx}`}
-                      className="flex items-center gap-4 p-3 rounded-2xl transition-all"
-                      style={{
-                        background: isYou ? "rgba(16,185,129,0.10)" : "transparent",
-                        border: isYou ? "1px solid rgba(16,185,129,0.22)" : "1px solid transparent",
-                      }}
-                    >
-                      <span
-                        className="w-6 text-sm font-black mono italic"
-                        style={{ color: idx === 0 ? "#fbbf24" : "var(--text-3)" }}
-                      >
-                        {idx + 1}
-                      </span>
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs"
-                        style={{ background: "var(--surface-3)", border: "1px solid var(--border)" }}
-                      >
-                        {(p.name ?? "?")[0]}
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <span className="text-sm font-bold block truncate" style={{ color: "var(--text)" }}>
-                          {isYou ? "You" : p.name}
-                        </span>
-                        <span className="text-[10px] font-bold uppercase italic" style={{ color: "var(--text-3)" }}>
-                          {p.xp.toLocaleString()} XP
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+          ) : (
+            <p className="mono-sm" style={{ color: "var(--ink-3)" }}>No leaders yet</p>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Stats summary at bottom (stories etc, kept) */}
+      {/* ─── Passport / badges ─── */}
+      {earnedBadges.length > 0 && (
+        <section style={{ marginBottom: 40 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
+            <div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Stamps · {earnedBadges.length} {t(locale, "home_badgesEarned")}</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 36, marginTop: 4 }}>Your passport</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 md:grid-cols-8" style={{ gap: 12 }}>
+            {earnedBadges.slice(0, 8).map((b) => (
+              <div
+                key={b.id}
+                className="lv-card"
+                style={{ aspectRatio: "1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: 8 }}
+              >
+                <span style={{ fontSize: 28 }}>{b.emoji}</span>
+                <span className="mono-sm" style={{ fontSize: 9, textAlign: "center", color: "var(--ink-3)" }}>{b.name}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Stories summary (kept) */}
       {completedStories > 0 && (
-        <div className="card-premium p-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BookOpen size={20} style={{ color: "var(--accent)" }} />
-            <p className="text-sm font-medium" style={{ color: "var(--text-2)" }}>
+        <div className="lv-card" style={{ padding: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <BookOpen size={20} style={{ color: "var(--terracotta)" }} />
+            <p style={{ fontSize: 14, color: "var(--ink-2)" }}>
               {completedStories} {t(locale, "home_storiesDone")}
             </p>
           </div>
-          <Link href="/stories" className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+          <Link href="/stories" className="mono-sm" style={{ color: "var(--terracotta)" }}>
             {t(locale, "home_viewAll")}
           </Link>
         </div>

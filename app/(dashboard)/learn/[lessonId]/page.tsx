@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { getLessonById, getAllLessons } from "@/data/learning-path";
@@ -32,10 +32,14 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <div className="max-w-3xl text-center py-20">
-        <p style={{ fontSize: 24, marginBottom: 12, color: "var(--text-3)" }}>◈</p>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>Lesson not found</h1>
-        <Link href="/learn" className="btn-primary mt-4 inline-flex">Back to Learning Path</Link>
+      <div className="max-w-3xl mx-auto" style={{ textAlign: "center", padding: "80px 0" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+          <span className="lv-stamp" style={{ color: "var(--rose)", transform: "rotate(-3deg)" }}>Not found</span>
+        </div>
+        <h1 className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, lineHeight: 1.1, marginBottom: 20 }}>
+          Lesson not found
+        </h1>
+        <Link href="/learn" className="lv-btn lv-btn--primary" style={{ display: "inline-flex" }}>Back to Learning Path</Link>
       </div>
     );
   }
@@ -91,51 +95,48 @@ export default function LessonPage() {
   // ── LEARN PHASE ──────────────────────────────────────────────────────────────
   if (phase === "learn") {
     return (
-      <div className="max-w-3xl">
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          <Link href="/learn" style={{
-            width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-            background: "var(--surface-2)", border: "1px solid var(--border)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "var(--text-2)",
-          }}>
+      <div className="max-w-3xl mx-auto lv-fade-up">
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 8 }}>
+          <Link href="/learn" className="lv-btn lv-btn--ghost lv-btn--icon" aria-label="Back to Learning Path">
             <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <div>
-            <p style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{lesson.topicTitle}</p>
-            <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>{lesson.title}</h1>
-          </div>
+          <p className="mono" style={{ fontSize: 11, color: "var(--ink-3)" }}>§ {lesson.topicTitle}</p>
         </div>
+        <h1
+          className="serif-i"
+          style={{ fontFamily: "var(--display)", fontSize: 56, lineHeight: 1.05, letterSpacing: "-0.02em", margin: "12px 0 36px" }}
+        >
+          {lesson.title}
+        </h1>
 
-        <div className="space-y-5">
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           {lesson.content.map((section, i) => (
-            <div key={i} style={{ background: "var(--surface-2)", borderRadius: 18, border: "1px solid var(--border-md)", padding: "22px 24px" }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", marginBottom: 8 }}>{section.heading}</h2>
-              <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.7, marginBottom: 16 }}>{section.body}</p>
+            <div key={i} className="lv-card" style={{ padding: "24px 26px" }}>
+              <h2 className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 26, marginBottom: 10, lineHeight: 1.15 }}>{section.heading}</h2>
+              <p style={{ fontSize: 15, color: "var(--ink-2)", lineHeight: 1.7, marginBottom: 16 }}>{section.body}</p>
 
               {section.table && (
                 <div style={{ overflowX: "auto", marginBottom: 16 }}>
-                  <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+                  <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
                     <thead>
-                      <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                      <tr style={{ borderBottom: "1px solid var(--line)" }}>
                         {section.table.columns.map((col, j) => (
-                          <th key={j} style={{
+                          <th key={j} className="mono" style={{
                             textAlign: "left", paddingBottom: 8, paddingLeft: 8,
-                            fontSize: 10, fontWeight: 700, textTransform: "uppercase",
-                            letterSpacing: "0.07em", color: "var(--text-3)",
+                            fontSize: 10, color: "var(--ink-3)",
                           }}>{col}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {section.table.rows.map((row, j) => (
-                        <tr key={j} style={{ borderBottom: "1px solid var(--border)" }}>
+                        <tr key={j} style={{ borderBottom: "1px solid var(--line)" }}>
                           {row.map((cell, k) => (
                             <td key={k} style={{
                               padding: "9px 8px",
-                              color: k === 0 ? "var(--accent-2)" : "var(--text-2)",
+                              color: k === 0 ? "var(--terracotta)" : "var(--ink-2)",
                               fontWeight: k === 0 ? 700 : 400,
                             }}>
                               {cell}
@@ -151,25 +152,21 @@ export default function LessonPage() {
               {section.examples && section.examples.length > 0 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                   {section.examples.map((ex, j) => (
-                    <div key={j} style={{
+                    <div key={j} className="lv-card lv-card--paper2" style={{
                       display: "flex", gap: 12, alignItems: "baseline",
-                      background: "var(--accent-dim)", borderRadius: 10,
-                      padding: "9px 14px", border: "1px solid rgba(16,185,129,0.2)",
+                      padding: "10px 16px",
                     }}>
-                      <span style={{ fontWeight: 700, color: "var(--accent-2)", fontSize: 13 }}>{ex.fr}</span>
-                      <span style={{ color: "var(--text-3)", fontSize: 13 }}>— {ex.en}</span>
+                      <span style={{ fontWeight: 700, color: "var(--terracotta)", fontSize: 14 }}>{ex.fr}</span>
+                      <span style={{ color: "var(--ink-3)", fontSize: 14 }}>— {ex.en}</span>
                     </div>
                   ))}
                 </div>
               )}
 
               {section.tip && (
-                <div style={{
-                  background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.22)",
-                  borderRadius: 12, padding: "12px 14px", marginTop: 12,
-                }}>
-                  <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>
-                    <span style={{ fontWeight: 700, color: "rgba(245,158,11,0.9)" }}>Tip: </span>{section.tip}
+                <div className="lv-card lv-card--paper2" style={{ padding: "12px 16px", marginTop: 12, borderColor: "var(--terracotta)" }}>
+                  <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
+                    <span className="mono" style={{ fontWeight: 700, color: "var(--terracotta)" }}>Tip: </span>{section.tip}
                   </p>
                 </div>
               )}
@@ -179,10 +176,13 @@ export default function LessonPage() {
 
         <button
           onClick={() => { setPhase("practice"); setCurrentExercise(0); setAnswers({}); setShowResult({}); setScore(0); }}
-          className="btn-primary w-full"
-          style={{ marginTop: 24, padding: "14px" }}
+          className="lv-btn lv-btn--primary lv-btn--lg"
+          style={{ marginTop: 28, width: "100%", justifyContent: "center" }}
         >
           Practice What You Learned ({exercises.length} questions)
+          <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     );
@@ -195,64 +195,63 @@ export default function LessonPage() {
     const isCorrect = normalize(userAnswer ?? "") === normalize(exercise.answer);
 
     return (
-      <div className="max-w-2xl">
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-            <Link href="/learn" style={{
-              width: 32, height: 32, borderRadius: 10,
-              background: "var(--surface-2)", border: "1px solid var(--border)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "var(--text-2)",
-            }}>
+      <div className="max-w-2xl mx-auto lv-fade-up">
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <Link href="/learn" className="lv-btn lv-btn--ghost lv-btn--icon" aria-label="Exit lesson">
               <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </Link>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
+            <span className="mono" style={{ fontSize: 12, color: "var(--ink-3)" }}>
               {currentExercise + 1} / {exercises.length}
             </span>
           </div>
-          <div style={{ height: 6, background: "var(--surface-3)", borderRadius: 999, overflow: "hidden" }}>
-            <div
-              style={{
-                height: "100%", borderRadius: 999, transition: "width 0.5s ease",
-                background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
-                width: `${((currentExercise + 1) / exercises.length) * 100}%`,
-              }}
-            />
+          <div className="lv-progress lv-progress--terra">
+            <span style={{ width: `${((currentExercise + 1) / exercises.length) * 100}%` }} />
           </div>
         </div>
 
-        <div style={{ background: "var(--surface-2)", borderRadius: 18, border: "1px solid var(--border-md)", padding: "22px 24px" }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", marginBottom: 20 }}>{exercise.question}</h2>
+        <div className="lv-card" style={{ padding: "26px 28px" }}>
+          <p className="mono" style={{ fontSize: 11, color: "var(--ink-3)", marginBottom: 8 }}>
+            {exercise.type === "multiple-choice" ? "Multiple choice" : exercise.type === "translate" ? "Translate" : "Fill the blank"}
+          </p>
+          <h2 className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 32, lineHeight: 1.1, marginBottom: 24 }}>{exercise.question}</h2>
 
           {/* Multiple choice */}
           {exercise.type === "multiple-choice" && exercise.options && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {exercise.options.map((opt) => {
+              {exercise.options.map((opt, oi) => {
                 const selected = userAnswer === opt;
                 const correct = opt === exercise.answer;
 
-                let bg = "var(--surface-3)";
-                let border = "var(--border)";
-                let color = "var(--text-2)";
+                let bg = "var(--paper)";
+                let border = "var(--line-2)";
+                let color = "var(--ink)";
 
-                if (answered && correct)            { bg = "rgba(16,185,129,0.10)"; border = "rgba(16,185,129,0.4)"; color = "var(--green)"; }
-                else if (answered && selected)      { bg = "rgba(239,68,68,0.10)";  border = "rgba(239,68,68,0.4)";  color = "var(--red)"; }
+                if (answered && correct)       { bg = "var(--success-soft)"; border = "var(--success)"; color = "var(--success)"; }
+                else if (answered && selected) { bg = "var(--rose-soft)";    border = "var(--rose)";    color = "var(--rose)"; }
 
                 return (
                   <button
                     key={opt}
                     onClick={() => !answered && handleAnswer(opt)}
                     disabled={!!answered}
+                    className="lv-card lv-card--hover"
                     style={{
-                      width: "100%", textAlign: "left", padding: "12px 16px",
-                      borderRadius: 12, border: `1px solid ${border}`,
-                      background: bg, color, fontSize: 13, fontWeight: 500,
-                      cursor: answered ? "default" : "pointer", transition: "all 0.12s",
+                      width: "100%", textAlign: "left", padding: "16px 18px",
+                      border: `1.5px solid ${border}`,
+                      background: bg, color, fontSize: 16, fontWeight: 500,
+                      display: "flex", alignItems: "center", gap: 14,
+                      cursor: answered ? "default" : "pointer",
                     }}
                   >
-                    {opt}
+                    <span className="mono" style={{
+                      width: 28, height: 28, borderRadius: "var(--r-sm)",
+                      background: "var(--paper-2)", color: "var(--ink-3)",
+                      display: "grid", placeItems: "center", fontSize: 11, flexShrink: 0,
+                    }}>{oi + 1}</span>
+                    <span style={{ flex: 1 }}>{opt}</span>
                     {answered && correct && " ✓"}
                     {answered && selected && !correct && " ✗"}
                   </button>
@@ -265,7 +264,7 @@ export default function LessonPage() {
           {(exercise.type === "fill-blank" || exercise.type === "translate") && (
             <div>
               {exercise.hint && !answered && (
-                <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 10 }}>Hint: {exercise.hint}</p>
+                <p className="mono" style={{ fontSize: 12, color: "var(--ink-3)", marginBottom: 12 }}>Hint: {exercise.hint}</p>
               )}
               <div style={{ display: "flex", gap: 10 }}>
                 <input
@@ -275,6 +274,11 @@ export default function LessonPage() {
                   onKeyDown={(e) => { if (e.key === "Enter" && fillInput.trim() && !answered) handleAnswer(fillInput); }}
                   placeholder="Type your answer..."
                   className="input flex-1"
+                  style={{
+                    flex: 1, padding: "14px 16px", fontSize: 16,
+                    borderRadius: "var(--r-md)", border: "1.5px solid var(--line-2)",
+                    background: "var(--paper)", color: "var(--ink)",
+                  }}
                   disabled={!!answered}
                   autoFocus
                 />
@@ -282,20 +286,22 @@ export default function LessonPage() {
                   <button
                     onClick={() => fillInput.trim() && handleAnswer(fillInput)}
                     disabled={!fillInput.trim()}
-                    className="btn-primary"
-                    style={{ padding: "0 20px" }}
+                    className="lv-btn lv-btn--primary"
                   >
                     Check
                   </button>
                 )}
               </div>
               {answered && (
-                <div style={{
-                  marginTop: 12, padding: "10px 14px", borderRadius: 12, fontSize: 13,
-                  background: isCorrect ? "rgba(16,185,129,0.10)" : "rgba(239,68,68,0.10)",
-                  border: `1px solid ${isCorrect ? "rgba(16,185,129,0.35)" : "rgba(239,68,68,0.35)"}`,
-                  color: isCorrect ? "var(--green)" : "var(--red)",
-                }}>
+                <div
+                  className="lv-card"
+                  style={{
+                    marginTop: 14, padding: "12px 16px", fontSize: 14,
+                    background: isCorrect ? "var(--success-soft)" : "var(--rose-soft)",
+                    border: `1.5px solid ${isCorrect ? "var(--success)" : "var(--rose)"}`,
+                    color: isCorrect ? "var(--success)" : "var(--rose)",
+                  }}
+                >
                   {isCorrect ? (
                     <span>Correct! ✓</span>
                   ) : (
@@ -307,7 +313,7 @@ export default function LessonPage() {
           )}
 
           {answered && (
-            <button onClick={nextExercise} className="btn-primary w-full" style={{ marginTop: 20, padding: "13px" }}>
+            <button onClick={nextExercise} className="lv-btn lv-btn--primary lv-btn--lg" style={{ marginTop: 22, width: "100%", justifyContent: "center" }}>
               {currentExercise < exercises.length - 1 ? "Next Question" : "See Results"}
             </button>
           )}
@@ -319,71 +325,74 @@ export default function LessonPage() {
   // ── DONE PHASE ───────────────────────────────────────────────────────────────
   const pct = Math.round((score / exercises.length) * 100);
   const nextLesson = getNextLesson();
-  const pctColor = pct >= 80 ? "var(--green)" : pct >= 50 ? "var(--xp)" : "var(--red)";
+  const pctColor = pct >= 80 ? "var(--success)" : pct >= 50 ? "var(--terracotta)" : "var(--rose)";
 
   return (
-    <div className="max-w-2xl animate-fade-up" style={{ textAlign: "center" }}>
-      <div style={{ background: "var(--surface-2)", borderRadius: 20, border: "1px solid var(--border-md)", padding: "40px 32px" }}>
-        <div style={{
-          width: 64, height: 64, borderRadius: 18, margin: "0 auto 16px",
-          background: "linear-gradient(135deg, var(--accent), var(--accent-press))",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 26, color: "#fff",
-        }}>
+    <div className="max-w-2xl mx-auto lv-fade-up" style={{ textAlign: "center" }}>
+      <div className="lv-card" style={{ padding: "48px 36px" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+          <span className="lv-stamp" style={{ color: "oklch(0.55 0.18 130)", transform: "rotate(-3deg)" }}>Lesson complete</span>
+        </div>
+        <div style={{ fontSize: 60, lineHeight: 1, marginBottom: 8 }}>
           {pct >= 80 ? "◈" : pct >= 50 ? "▤" : "△"}
         </div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>
-          Lesson Complete!
+        <h1
+          className="serif-i"
+          style={{ fontFamily: "var(--display)", fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em", margin: "16px 0 8px" }}
+        >
+          <em style={{ color: "var(--terracotta)" }}>¡Bien hecho!</em>
         </h1>
-        <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>{lesson.title}</p>
+        <p style={{ fontSize: 15, color: "var(--ink-3)", marginBottom: 32 }}>{lesson.title}</p>
 
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 24,
-          background: "var(--surface-3)", borderRadius: 16, padding: "16px 28px",
-          marginBottom: 24, border: "1px solid var(--border)",
-        }}>
+        <div
+          className="lv-card lv-card--paper2"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 28,
+            padding: "20px 32px", marginBottom: 32,
+          }}
+        >
           <div style={{ textAlign: "center" }}>
-            <p style={{ fontSize: 28, fontWeight: 800, color: "var(--accent-2)", fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
+            <p className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, color: "var(--terracotta)", lineHeight: 1 }}>
               {score}/{exercises.length}
             </p>
-            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>Correct</p>
+            <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>Correct</p>
           </div>
-          <div style={{ width: 1, height: 40, background: "var(--border-md)" }} />
+          <div style={{ width: 1, height: 44, background: "var(--line-2)" }} />
           <div style={{ textAlign: "center" }}>
-            <p style={{ fontSize: 28, fontWeight: 800, color: pctColor, fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
+            <p className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, color: pctColor, lineHeight: 1 }}>
               {pct}%
             </p>
-            <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>Score</p>
+            <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>Score</p>
           </div>
           {xpEarned > 0 && (
             <>
-              <div style={{ width: 1, height: 40, background: "var(--border-md)" }} />
+              <div style={{ width: 1, height: 44, background: "var(--line-2)" }} />
               <div style={{ textAlign: "center" }}>
-                <p style={{ fontSize: 28, fontWeight: 800, color: "var(--accent-2)", fontFamily: "var(--font-mono)", letterSpacing: "-0.03em" }}>
+                <p className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, color: "var(--marine)", lineHeight: 1 }}>
                   +{xpEarned}
                 </p>
-                <p style={{ fontSize: 11, color: "var(--text-3)", marginTop: 4 }}>XP Earned</p>
+                <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>XP Earned</p>
               </div>
             </>
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 280, margin: "0 auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 300, margin: "0 auto" }}>
           {pct < 80 && (
             <button
               onClick={() => { setPhase("learn"); setCurrentExercise(0); setAnswers({}); setShowResult({}); setScore(0); setFillInput(""); }}
-              className="btn-secondary w-full"
-              style={{ padding: "12px" }}
+              className="lv-btn lv-btn--ghost"
+              style={{ width: "100%", justifyContent: "center" }}
             >
               Review Lesson
             </button>
           )}
           {nextLesson && (
-            <Link href={`/learn/${nextLesson.id}`} className="btn-primary w-full" style={{ padding: "12px", textAlign: "center" }}>
+            <Link href={`/learn/${nextLesson.id}`} className="lv-btn lv-btn--primary" style={{ width: "100%", justifyContent: "center" }}>
               Next: {nextLesson.title}
             </Link>
           )}
-          <Link href="/learn" className="btn-ghost w-full" style={{ padding: "12px", textAlign: "center" }}>
+          <Link href="/learn" className="lv-btn lv-btn--ghost" style={{ width: "100%", justifyContent: "center" }}>
             Back to Learning Path
           </Link>
         </div>

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { t, getLocale } from "@/lib/i18n";
-import { Lock, Check, ChevronRight, Star, GraduationCap } from "lucide-react";
+import { Lock, Check, ChevronRight, Star } from "lucide-react";
 
 // ── phases ───────────────────────────────────────────────────────────────
 const FR_PHASES = [
@@ -42,60 +42,58 @@ interface CelebModal {
 }
 
 function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () => void }) {
-  const ringColor = modal.kind === "course" ? "#fbbf24" : modal.kind === "phase" ? "#a78bfa" : "#10b981";
+  const tone =
+    modal.kind === "course" ? "var(--lime-2)" :
+    modal.kind === "phase"  ? "var(--marine)" :
+    "var(--terracotta)";
   return (
     <div
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 999,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)",
-        animation: "fadeIn 0.2s ease",
+        background: "oklch(0.17 0.018 60 / 0.55)", backdropFilter: "blur(6px)",
+        animation: "lv-fade-up 0.24s ease",
       }}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="card-premium"
+        className="lv-card lv-pop"
         style={{
           padding: "40px 32px",
-          maxWidth: 400,
+          maxWidth: 420,
           width: "90%",
           textAlign: "center",
-          boxShadow: `0 0 60px ${ringColor}33`,
-          animation: "scaleIn 0.3s cubic-bezier(.34,1.56,.64,1)",
-          border: `1px solid ${ringColor}55`,
+          boxShadow: "var(--sh-3)",
+          borderColor: tone,
         }}
       >
-        <div style={{ fontSize: 72, marginBottom: 8, lineHeight: 1 }}>{modal.emoji}</div>
-        {modal.kind === "course" && (
-          <div className="text-xs font-bold uppercase tracking-widest" style={{ color: "#fbbf24", marginBottom: 8 }}>
-            🎓 Course Complete
-          </div>
-        )}
-        {modal.kind === "phase" && (
-          <div className="text-xs font-bold uppercase tracking-widest" style={{ color: "#a78bfa", marginBottom: 8 }}>
-            ✨ {modal.phaseLabel} Complete
-          </div>
-        )}
-        <h2 className="serif italic" style={{ fontSize: 28, fontWeight: 700, margin: "0 0 8px" }}>{modal.title}</h2>
-        <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 24px", lineHeight: 1.5 }}>{modal.subtitle}</p>
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.4)",
-          borderRadius: 99, padding: "10px 24px", marginBottom: 28,
-        }}>
-          <span style={{ fontSize: 22 }}>⚡</span>
-          <span className="mono" style={{ fontSize: 24, fontWeight: 800, color: "#fbbf24" }}>+{modal.xp} XP</span>
-          <span style={{ fontSize: 12, color: "var(--text-3)" }}>reward</span>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+          <span className="lv-stamp" style={{ color: tone, transform: "rotate(-3deg)" }}>
+            {modal.kind === "course" ? "Course complete" : modal.kind === "phase" ? `${modal.phaseLabel} · complete` : "Chapter complete"}
+          </span>
         </div>
-        <button onClick={onClose} className="btn-primary" style={{ width: "100%", padding: "14px", fontSize: 15 }}>
-          {modal.kind === "course" ? "🎓 View My Certificate" : "Continue →"}
+        <div style={{ fontSize: 64, marginBottom: 12, lineHeight: 1 }}>{modal.emoji}</div>
+        <h2 className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 38, lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 10px" }}>
+          {modal.title}
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--ink-3)", margin: "0 0 28px", lineHeight: 1.55 }}>{modal.subtitle}</p>
+        <div
+          className="lv-sticker"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: "12px 24px", marginBottom: 28, color: "var(--terracotta)",
+          }}
+        >
+          <span style={{ fontSize: 18 }}>⚡</span>
+          <span className="mono" style={{ fontSize: 22, fontWeight: 700, color: "var(--terracotta)", letterSpacing: 0 }}>+{modal.xp} XP</span>
+          <span className="mono" style={{ fontSize: 11, color: "var(--ink-3)" }}>reward</span>
+        </div>
+        <button onClick={onClose} className="lv-btn lv-btn--primary lv-btn--lg" style={{ width: "100%", justifyContent: "center" }}>
+          {modal.kind === "course" ? "View My Certificate" : "Continue"}
+          <ChevronRight size={16} />
         </button>
       </div>
-      <style>{`
-        @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-        @keyframes scaleIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-      `}</style>
     </div>
   );
 }
@@ -118,48 +116,88 @@ function TopicNode({ topic, topicIndex }: { topic: TopicNodeData; topicIndex: nu
   const isCompleted = topic.isCompleted;
   const isInProgress = !isLocked && !isCompleted && topic.doneCount > 0;
 
+  const ring =
+    isLocked      ? { bg: "var(--paper-2)", fg: "var(--ink-4)", border: "var(--line-2)", glow: "none" } :
+    isCompleted   ? { bg: "var(--ink)", fg: "var(--paper)", border: "var(--ink)", glow: "0 0 0 6px var(--success-soft)" } :
+    isInProgress  ? { bg: "var(--terracotta)", fg: "white", border: "var(--terracotta)", glow: "0 0 0 6px oklch(0.66 0.17 42 / 0.15)" } :
+                    { bg: "var(--paper)", fg: "var(--ink)", border: "var(--line-2)", glow: "none" };
+
   const node = (
     <div
-      className={`w-24 h-24 rounded-full border-4 flex items-center justify-center transition-all duration-300 relative z-10 ${
-        isLocked
-          ? "border-white/10 bg-black"
-          : isCompleted
-          ? "border-emerald-500 bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-          : "border-amber-500 bg-black text-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
-      } ${!isLocked ? "cursor-pointer hover:scale-110 active:scale-95" : "cursor-not-allowed"}`}
+      className="lv-card"
+      style={{
+        width: 96, height: 96, borderRadius: "50%", padding: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        position: "relative", zIndex: 10,
+        background: ring.bg, color: ring.fg,
+        border: `2px solid ${ring.border}`,
+        boxShadow: ring.glow,
+        transition: "transform 200ms var(--ease-spring)",
+        cursor: isLocked ? "not-allowed" : "pointer",
+      }}
+      onMouseEnter={e => !isLocked && (e.currentTarget.style.transform = "scale(1.08)")}
+      onMouseLeave={e => (e.currentTarget.style.transform = "")}
     >
       {isLocked ? (
-        <Lock size={28} className="text-white/20" />
+        <Lock size={26} style={{ color: "var(--ink-4)" }} />
       ) : isCompleted ? (
         <Check size={32} strokeWidth={3} />
       ) : isInProgress ? (
-        <Star size={32} strokeWidth={2} fill="currentColor" />
+        <Star size={30} strokeWidth={2} fill="currentColor" />
       ) : (
-        <span className="text-3xl">{topic.emoji}</span>
+        <span style={{ fontSize: 30 }}>{topic.emoji}</span>
       )}
 
       {/* Hover tooltip */}
-      <div className="absolute left-32 w-64 text-left invisible group-hover:visible group-hover:opacity-100 opacity-0 transition-all hidden md:block pointer-events-none">
-        <div className="card-premium p-4 -translate-y-1/2">
-          <p className="text-xs uppercase tracking-widest font-bold text-white/40 mb-1">Topic {topicIndex + 1}</p>
-          <h4 className="text-xl font-bold mb-1 italic serif">{topic.title}</h4>
-          {topic.description && <p className="text-sm text-white/60 mb-3">{topic.description}</p>}
-          <div className="flex gap-2 text-[10px] font-bold uppercase tracking-wider">
-            <span className="px-2 py-0.5 rounded bg-white/5">{topic.lessonsCount} Lessons</span>
-            <span className="px-2 py-0.5 rounded bg-white/5">
-              {isCompleted ? "Done" : isInProgress ? `${topic.doneCount}/${topic.lessonsCount}` : "Locked"}
-            </span>
-          </div>
+      <div
+        className="lv-card"
+        style={{
+          position: "absolute", left: 128, width: 256, top: "50%",
+          transform: "translateY(-50%)", textAlign: "left",
+          visibility: "hidden", opacity: 0, transition: "opacity 160ms",
+          pointerEvents: "none", padding: 16, zIndex: 20,
+        }}
+        data-tooltip
+      >
+        <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginBottom: 4 }}>Topic {topicIndex + 1}</p>
+        <h4 className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 20, marginBottom: 6 }}>{topic.title}</h4>
+        {topic.description && <p style={{ fontSize: 13, color: "var(--ink-3)", marginBottom: 12, lineHeight: 1.5 }}>{topic.description}</p>}
+        <div style={{ display: "flex", gap: 8 }}>
+          <span className="lv-chip">{topic.lessonsCount} Lessons</span>
+          <span className="lv-chip">
+            {isCompleted ? "Done" : isInProgress ? `${topic.doneCount}/${topic.lessonsCount}` : "Locked"}
+          </span>
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="relative flex flex-col items-center group">
-      {/* Connector line above this node */}
+    <div
+      className="relative flex flex-col items-center"
+      style={{ position: "relative" }}
+      onMouseEnter={e => {
+        const tt = e.currentTarget.querySelector<HTMLElement>("[data-tooltip]");
+        if (tt) { tt.style.visibility = "visible"; tt.style.opacity = "1"; }
+      }}
+      onMouseLeave={e => {
+        const tt = e.currentTarget.querySelector<HTMLElement>("[data-tooltip]");
+        if (tt) { tt.style.visibility = "hidden"; tt.style.opacity = "0"; }
+      }}
+    >
+      {/* Dotted journey connector above this node */}
       {topicIndex !== 0 && (
-        <div className={`absolute -top-16 w-0.5 h-16 ${isCompleted ? "bg-emerald-500" : "bg-white/10"}`} />
+        <div
+          className="lv-dashed-v"
+          style={{
+            position: "absolute", top: -64, height: 64,
+            background: isCompleted
+              ? "linear-gradient(0deg, var(--ink) 50%, transparent 50%)"
+              : undefined,
+            backgroundSize: isCompleted ? "1.5px 12px" : undefined,
+            backgroundRepeat: isCompleted ? "repeat-y" : undefined,
+          }}
+        />
       )}
 
       {isLocked || !topic.firstLessonId ? (
@@ -170,10 +208,17 @@ function TopicNode({ topic, topicIndex }: { topic: TopicNodeData; topicIndex: nu
         </Link>
       )}
 
-      <div className="mt-4 text-center max-w-[140px]">
-        <p className={`text-sm font-bold tracking-tight ${isLocked ? "text-white/20" : "text-white"}`}>{topic.title}</p>
+      <div style={{ marginTop: 16, textAlign: "center", maxWidth: 150 }}>
+        <p
+          style={{
+            fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em",
+            color: isLocked ? "var(--ink-4)" : isInProgress ? "var(--terracotta)" : "var(--ink)",
+          }}
+        >
+          {topic.title}
+        </p>
         {!isLocked && topic.lessonsCount > 0 && (
-          <p className="text-[10px] mono uppercase tracking-widest text-white/30 mt-1">
+          <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 4 }}>
             {topic.doneCount}/{topic.lessonsCount}
           </p>
         )}
@@ -305,17 +350,24 @@ export default function LearnPage() {
   }, [LEARNING_PATH, completedLessons, isTopicUnlocked]);
 
   return (
-    <div className="max-w-3xl mx-auto pb-32">
+    <div className="max-w-3xl mx-auto pb-32 lv-fade-up">
 
       {modal && <CelebrationModal modal={modal} onClose={() => setModal(null)} />}
 
       {/* ── Header ── */}
-      <header className="text-center space-y-4 mb-20 relative">
-        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-emerald-500/10 text-emerald-500 mb-2">
-          <GraduationCap size={40} />
+      <header className="text-center mb-20 relative" style={{ position: "relative" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+          <span className="lv-stamp" style={{ color: "var(--terracotta)", transform: "rotate(-2deg)" }}>
+            § Journey · Field Guide 001
+          </span>
         </div>
-        <h1 className="text-5xl md:text-6xl italic serif">The Path to Mastery</h1>
-        <p className="text-white/40 text-lg md:text-xl max-w-xl mx-auto">
+        <h1
+          className="serif-i"
+          style={{ fontFamily: "var(--display)", fontSize: 64, lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 auto" }}
+        >
+          The road to <em style={{ color: "var(--terracotta)" }}>fluency.</em>
+        </h1>
+        <p style={{ fontSize: 18, color: "var(--ink-3)", maxWidth: 560, margin: "16px auto 0", lineHeight: 1.55 }}>
           From zero to fluent. Work through lessons at your own pace and unlock new chapters as you go.
         </p>
 
@@ -326,7 +378,8 @@ export default function LearnPage() {
               localStorage.removeItem(`completedLessons_${targetLang}`);
               setCompletedLessons([]);
             }}
-            className="absolute top-0 right-0 text-[11px] font-bold uppercase tracking-widest text-white/30 hover:text-rose-400 border border-white/10 hover:border-rose-500/40 rounded-full px-3 py-1.5 transition-colors"
+            className="lv-btn lv-btn--ghost lv-btn--sm"
+            style={{ position: "absolute", top: 0, right: 0 }}
           >
             Reset progress
           </button>
@@ -337,18 +390,45 @@ export default function LearnPage() {
       <div className="space-y-20">
         {PHASES.map((phase, phaseIdx) => {
           const phaseTopics = LEARNING_PATH.filter(topic => phase.ids.includes(topic.id));
+          const phaseDone =
+            phaseTopics.length > 0 &&
+            phaseTopics.every(tp => tp.lessons.every(l => completedLessons.includes(l.id)));
+          const phaseUnlocked =
+            phaseTopics.length > 0 && phaseTopics.some(tp => isTopicUnlocked(tp));
 
           return (
             <section key={phaseIdx} className="space-y-16">
-              <div className="flex items-center gap-6">
-                <div className="h-px flex-1 bg-white/10" />
-                <h2 className="text-xl md:text-2xl font-bold mono tracking-widest text-white/40 uppercase whitespace-nowrap">
-                  {phase.label}
-                </h2>
-                <div className="h-px flex-1 bg-white/10" />
+              <div
+                style={{
+                  display: "flex", justifyContent: "space-between",
+                  alignItems: "baseline", borderTop: "1px solid var(--line)",
+                  paddingTop: 28,
+                }}
+              >
+                <div>
+                  <p className="mono" style={{ fontSize: 11, color: "var(--ink-3)" }}>{phase.emoji}&nbsp;&nbsp;{`Section ${phaseIdx + 1}`}</p>
+                  <h2
+                    className="serif-i"
+                    style={{ fontFamily: "var(--display)", fontSize: 40, marginTop: 4, lineHeight: 1.1 }}
+                  >
+                    {phase.label}
+                  </h2>
+                </div>
+                {phaseDone ? (
+                  <span className="lv-sticker" style={{ color: "oklch(0.55 0.18 130)", transform: "rotate(-2deg)" }}>Complete</span>
+                ) : phaseUnlocked ? (
+                  <span className="lv-sticker" style={{ color: "var(--terracotta)", transform: "rotate(-2deg)" }}>You are here</span>
+                ) : (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--ink-3)", fontSize: 13 }}>
+                    <Lock size={14} /> Locked
+                  </span>
+                )}
               </div>
 
-              <div className="flex flex-col items-center gap-16">
+              <div
+                className="flex flex-col items-center"
+                style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 64, paddingTop: 8 }}
+              >
                 {phaseTopics.length > 0 ? (
                   phaseTopics.map((topic, topicIdx) => {
                     const doneCount = topic.lessons.filter(l => completedLessons.includes(l.id)).length;
@@ -375,9 +455,16 @@ export default function LearnPage() {
                     );
                   })
                 ) : (
-                  <div className="flex flex-col items-center gap-4 text-white/20 border-2 border-dashed border-white/5 rounded-3xl p-12 w-full">
+                  <div
+                    className="lv-card"
+                    style={{
+                      display: "flex", flexDirection: "column", alignItems: "center",
+                      gap: 16, padding: 48, width: "100%",
+                      borderStyle: "dashed", color: "var(--ink-4)",
+                    }}
+                  >
                     <Lock size={32} />
-                    <p className="font-medium">Complete previous phase to unlock</p>
+                    <p style={{ fontWeight: 500 }}>Complete previous phase to unlock</p>
                   </div>
                 )}
               </div>
@@ -391,9 +478,10 @@ export default function LearnPage() {
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
           <Link
             href={continueHref}
-            className="btn-primary py-4 px-12 text-lg flex items-center gap-3 shadow-2xl shadow-emerald-500/20"
+            className="lv-btn lv-btn--primary lv-btn--lg"
+            style={{ boxShadow: "var(--sh-3)" }}
           >
-            Continue Learning <ChevronRight size={20} />
+            Continue Learning <ChevronRight size={18} />
           </Link>
         </div>
       )}
