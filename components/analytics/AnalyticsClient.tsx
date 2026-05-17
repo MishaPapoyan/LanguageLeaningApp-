@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { t, getLocale } from "@/lib/i18n";
+import { t, getLocale, type Locale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import {
@@ -120,7 +120,7 @@ function StatCard({ label, value, subtext, emoji, gradient }: {
   );
 }
 
-function HeatmapGrid({ data }: { data: { date: string; total: number; xp: number }[] }) {
+function HeatmapGrid({ data, locale }: { data: { date: string; total: number; xp: number }[]; locale: Locale }) {
   const maxTotal = Math.max(...data.map((d) => d.total), 1);
   return (
     <div>
@@ -143,13 +143,13 @@ function HeatmapGrid({ data }: { data: { date: string; total: number; xp: number
         })}
       </div>
       <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: "var(--text-3)" }}>
-        <span>Less</span>
+        <span>{t(locale, "analytics_less")}</span>
         {[0, 0.25, 0.5, 0.75, 1].map((intensity, i) => (
           <div key={i} className="w-4 h-4 rounded-sm"
             style={{ backgroundColor: intensity === 0 ? "rgba(255,255,255,0.05)" : `rgba(16,185,129,${0.15 + intensity * 0.75})` }}
           />
         ))}
-        <span>More</span>
+        <span>{t(locale, "analytics_more")}</span>
       </div>
     </div>
   );
@@ -236,7 +236,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>Analytics</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: "-0.02em", marginBottom: 4 }}>{t(locale, "nav_analytics")}</h1>
           <p style={{ fontSize: 14, color: "var(--text-2)" }}>Deep insights into your {langConfig.label} learning journey</p>
         </div>
         <div style={{ textAlign: "right", fontSize: 13, color: "var(--text-3)", fontFamily: "var(--font-mono)" }}>
@@ -276,7 +276,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>XP Over Time</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_xpOverTime")}</h3>
               {weeklyXpData.some((w) => w.value > 0) ? (
                 <SimpleAreaChart data={weeklyXpData} height={200} color="#3b82f6" formatValue={(v) => `${v} XP`} />
               ) : (
@@ -285,7 +285,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </div>
 
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>XP Sources</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_xpSources")}</h3>
               {xpPieData.length > 0 ? (
                 <div className="flex items-center gap-4">
                   <SimplePieChart data={xpPieData} size={160} innerRadius={50} />
@@ -307,12 +307,12 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Skill Balance</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_skillBalance")}</h3>
               <SimpleRadarChart data={skillRadar} size={220} color="#3b82f6" />
             </div>
 
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Learning Summary</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_learningSummary")}</h3>
               <div className="space-y-3">
                 {[
                   { label: "Words Saved", value: vocabulary.total, total: vocabulary.totalAvailable, emoji: "📚", color: "#8b5cf6" },
@@ -349,13 +349,13 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
       {activeTab === "activity" && (
         <div className="space-y-6">
           <div className="card">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4, fontFamily: "var(--font-display)" }}>Activity Heatmap</h3>
-            <p className="text-sm text-fg-3 mb-4">Last 30 days</p>
-            <HeatmapGrid data={activity.heatmap} />
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_activityHeatmap")}</h3>
+            <p className="text-sm text-fg-3 mb-4">{t(locale, "analytics_last30days")}</p>
+            <HeatmapGrid data={activity.heatmap} locale={locale} />
           </div>
 
           <div className="card">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Daily XP Earned</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_dailyXpEarned")}</h3>
             {activity.daily.some((d) => d.xp > 0) ? (
               <SimpleBarChart
                 data={activity.daily.map((d) => ({
@@ -372,7 +372,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Activity Breakdown (30 Days)</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_activityBreakdown")}</h3>
             {activity.daily.some((d) => d.games + d.stories + d.words + d.tutor > 0) ? (
               <StackedBarChart
                 data={activity.daily.map((d) => ({
@@ -418,7 +418,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Mastery Distribution</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_masteryDist")}</h3>
               {vocabulary.total > 0 ? (
                 <SimpleBarChart
                   data={masteryData.map((d) => {
@@ -434,7 +434,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </div>
 
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Words by Category</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_wordsByCategory")}</h3>
               {categoryData.length > 0 ? (
                 <div className="space-y-2.5">
                   {categoryData.map((cat, i) => {
@@ -460,7 +460,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Words Added Per Week</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_wordsPerWeek")}</h3>
             {vocabulary.perWeek.some((w) => w.count > 0) ? (
               <SimpleBarChart
                 data={vocabulary.perWeek.map((w) => ({ label: w.week, value: w.count }))}
@@ -475,7 +475,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>By Difficulty</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_byDifficulty")}</h3>
               {Object.keys(vocabulary.byDifficulty).length > 0 ? (
                 <div className="space-y-3">
                   {[
@@ -509,7 +509,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
             </div>
 
             <div className="card">
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Recently Added</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_recentlyAdded")}</h3>
               {vocabulary.recentWords.length > 0 ? (
                 <div className="space-y-2">
                   {vocabulary.recentWords.slice(0, 6).map((w) => (
@@ -568,7 +568,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-fg-3">Not played yet</p>
+                    <p className="text-sm text-fg-3">{t(locale, "analytics_notPlayedYet")}</p>
                   )}
                 </div>
               );
@@ -576,7 +576,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Score Trend (Last 20 Games)</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_scoreTrend")}</h3>
             {games.scoreTrend.length > 0 ? (
               <SimpleLineChart
                 data={games.scoreTrend.map((g) => ({
@@ -605,7 +605,7 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
           </div>
 
           <div className="card">
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>Sessions by Scenario</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 16, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_sessionsByScenario")}</h3>
             {Object.keys(tutor.byScenario).length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children">
                 {Object.entries(tutor.byScenario).map(([scenario, stats]) => (
@@ -624,19 +624,19 @@ export default function AnalyticsClient({ data }: { data: AnalyticsData }) {
 
           {tutor.totalSessions > 0 && (
             <div className="card" style={{ background: "var(--accent-dim)", border: "1px solid rgba(16,185,129,0.2)" }}>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--accent-2)", marginBottom: 8, fontFamily: "var(--font-display)" }}>Tutor Insights</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--accent-2)", marginBottom: 8, fontFamily: "var(--font-display)" }}>{t(locale, "analytics_tutorInsights")}</h3>
               <div className="space-y-2 text-sm text-fg-2">
                 {tutor.avgGrammarScore !== null && tutor.avgGrammarScore < 60 && (
-                  <p>Your grammar score is below 60% — try the <strong>Language Teacher</strong> scenario for structured practice.</p>
+                  <p>{t(locale, "analytics_lowGrammarTip")}</p>
                 )}
                 {tutor.avgAccuracy !== null && tutor.avgAccuracy >= 80 && (
-                  <p>Great accuracy at {tutor.avgAccuracy}%! Try more advanced scenarios to keep improving.</p>
+                  <p>{t(locale, "analytics_highAccuracyTip", { pct: String(tutor.avgAccuracy) })}</p>
                 )}
                 {Object.keys(tutor.byScenario).length < 3 && (
-                  <p>You&apos;ve only tried {Object.keys(tutor.byScenario).length} scenario(s) — explore others for broader practice!</p>
+                  <p>{t(locale, "analytics_fewScenariosTip", { n: String(Object.keys(tutor.byScenario).length) })}</p>
                 )}
                 {tutor.totalSessions >= 5 && (
-                  <p>With {tutor.totalSessions} sessions, you&apos;re building great conversational habits!</p>
+                  <p>{t(locale, "analytics_manySessionsTip", { n: String(tutor.totalSessions) })}</p>
                 )}
               </div>
             </div>
