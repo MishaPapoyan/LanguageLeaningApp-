@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Play, Pause, RefreshCw, Loader2, ChevronRight, BookOpen } from "lucide-react";
 
@@ -20,6 +21,7 @@ interface Props { language?: string; level?: string; }
 export function StoryAudio({ language, level }: Props) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? language ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const userLevel = (session?.user as any)?.cefrLevel ?? level ?? "B1";
 
   const [story, setStory]           = useState<StoryData | null>(null);
@@ -263,7 +265,7 @@ export function StoryAudio({ language, level }: Props) {
       {/* Vocabulary */}
       {story.vocabulary.length > 0 && (
         <div className="rounded-2xl p-4 space-y-3" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 1 }}>Vocabulary from this story</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 1 }}>{t(locale, "game_vocabFromStory")}</p>
           {story.vocabulary.map((v) => (
             <div key={v.word} className="flex items-center justify-between">
               <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>{v.word}</span>
@@ -285,7 +287,7 @@ export function StoryAudio({ language, level }: Props) {
       </div>
       <div className="flex gap-3">
         <button onClick={loadGame} className="btn-primary flex items-center gap-2"><RefreshCw size={14} /> New Story</button>
-        <Link href="/games" className="btn-secondary">All Games</Link>
+        <Link href="/games" className="btn-secondary">{t(locale, "game_allGames")}</Link>
       </div>
     </div>
   );

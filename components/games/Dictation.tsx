@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Play, RefreshCw, Loader2, Volume2, Snail, ChevronRight } from "lucide-react";
 
@@ -27,6 +28,7 @@ interface Props { language?: string; level?: string; }
 export function Dictation({ language, level }: Props) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? language ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const userLevel = (session?.user as any)?.cefrLevel ?? level ?? "B1";
 
   const [sentences, setSentences]   = useState<string[]>([]);
@@ -201,7 +203,7 @@ export function Dictation({ language, level }: Props) {
         )}
         <div className="flex gap-3 justify-center">
           <button onClick={loadGame} className="btn-primary flex items-center gap-2"><RefreshCw size={14} /> Play Again</button>
-          <Link href="/games" className="btn-secondary">All Games</Link>
+          <Link href="/games" className="btn-secondary">{t(locale, "game_allGames")}</Link>
         </div>
       </div>
     );
@@ -264,7 +266,7 @@ export function Dictation({ language, level }: Props) {
         <div className="space-y-2">
           <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-            placeholder="Type what you heard…"
+            placeholder={t(locale, "game_typeWhatHeard")}
             disabled={!sentences[idx]}
             style={{
               width: "100%", height: 52, fontSize: 18, padding: "0 16px",

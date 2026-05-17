@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Check, X, AlertCircle, RefreshCw, Loader2 } from "lucide-react";
 
@@ -20,6 +21,7 @@ interface Props { language?: string; level?: string; }
 export function WordAssociation({ language, level }: Props) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? language ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const userLevel = (session?.user as any)?.level ?? level ?? "B1";
 
   const [gameData, setGameData]   = useState<GameData | null>(null);
@@ -124,8 +126,8 @@ export function WordAssociation({ language, level }: Props) {
 
   if (!gameData) return (
     <div className="text-center py-16">
-      <p style={{ color: "var(--text-2)" }}>Failed to load game.</p>
-      <button onClick={loadGame} className="btn-secondary mt-4">Try again</button>
+      <p style={{ color: "var(--text-2)" }}>{t(locale, "game_failedLoad")}</p>
+      <button onClick={loadGame} className="btn-secondary mt-4">{t(locale, "game_tryAgain")}</button>
     </div>
   );
 
@@ -189,7 +191,7 @@ export function WordAssociation({ language, level }: Props) {
           <button onClick={loadGame} className="btn-primary flex items-center gap-2">
             <RefreshCw size={14} /> Play Again
           </button>
-          <Link href="/games" className="btn-secondary">All Games</Link>
+          <Link href="/games" className="btn-secondary">{t(locale, "game_allGames")}</Link>
         </div>
       </div>
     );
@@ -200,7 +202,7 @@ export function WordAssociation({ language, level }: Props) {
     <div className="max-w-md mx-auto text-center py-12 space-y-6 animate-fade-up">
       <div className="text-5xl">🔗</div>
       <div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Word Association</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{t(locale, "game_wordAssociation")}</h2>
         <p style={{ color: "var(--text-2)", fontSize: 13, marginTop: 6 }}>
           A target word appears. Tap all words in the grid that are <strong style={{ color: "var(--accent)" }}>semantically related</strong> to it before time runs out.
         </p>
@@ -215,7 +217,7 @@ export function WordAssociation({ language, level }: Props) {
           <p key={tip} style={{ fontSize: 12, color: "var(--text-2)" }}>{tip}</p>
         ))}
       </div>
-      <button onClick={() => setStarted(true)} className="btn-primary w-full text-base py-3">Start Game</button>
+      <button onClick={() => setStarted(true)} className="btn-primary w-full text-base py-3">{t(locale, "game_startGame")}</button>
     </div>
   );
 
@@ -225,7 +227,7 @@ export function WordAssociation({ language, level }: Props) {
       {/* Timer + target word */}
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 4 }}>TARGET WORD</p>
+          <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 4 }}>{t(locale, "game_targetWord")}</p>
           <div className="inline-block rounded-xl px-4 py-2" style={{ background: "var(--accent)", color: "#fff" }}>
             <span style={{ fontSize: 22, fontWeight: 900 }}>{gameData.targetWord}</span>
           </div>
