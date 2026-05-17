@@ -65,6 +65,12 @@ const en = {
   auth_phone: "Phone",
   auth_phoneNumber: "Phone number",
   auth_passwordRepeat: "Repeat your password",
+  auth_passwordsMismatch: "Passwords don't match",
+  auth_signinAfterRegisterFailed: "Account created but sign-in failed. Please log in.",
+  auth_myLanguage: "My language",
+  auth_yourName: "Your name",
+  auth_confirmPassword: "Confirm password",
+  auth_signupTerms: "By signing up you agree to our terms of service. No credit card required.",
 
   // Landing page
   landing_tagline: "For absolute beginners & returners",
@@ -587,6 +593,12 @@ const hy: typeof en = {
   auth_phone: "Հեռախոս",
   auth_phoneNumber: "Հեռախոսահամար",
   auth_passwordRepeat: "Կրկնեք գաղտնաբառը",
+  auth_passwordsMismatch: "Գաղտնաբառերը չեն համընկնում",
+  auth_signinAfterRegisterFailed: "Հաշիվը ստեղծվեց, բայց մուտքը ձախողվեց։ Մուտք գործեք ձեռքով։",
+  auth_myLanguage: "Իմ լեզուն",
+  auth_yourName: "Ձեր անունը",
+  auth_confirmPassword: "Հաստատեք գաղտնաբառը",
+  auth_signupTerms: "Գրանցվելով՝ դուք համաձայնում եք մեր ծառայության պայմաններին։ Բանկային քարտ չի պահանջվում։",
 
   // Landing
   landing_tagline: "Սկսնակների և վերադարձողների համար",

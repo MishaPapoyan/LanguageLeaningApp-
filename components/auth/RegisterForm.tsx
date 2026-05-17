@@ -45,7 +45,7 @@ export function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      setError(t(locale, "auth_passwordsMismatch"));
       return;
     }
     setLoading(true);
@@ -59,7 +59,7 @@ export function RegisterForm() {
 
     if (!res.ok) {
       const data = await res.json();
-      const msg = typeof data.error === "string" ? data.error : "Registration failed";
+      const msg = typeof data.error === "string" ? data.error : t(locale, "auth_registrationFailed");
       setError(msg);
       setLoading(false);
       return;
@@ -67,7 +67,7 @@ export function RegisterForm() {
 
     const result = await signIn("credentials", { email, password, redirect: false });
     if (result?.error) {
-      setError("Account created but sign-in failed. Please log in.");
+      setError(t(locale, "auth_signinAfterRegisterFailed"));
       setLoading(false);
       return;
     }
@@ -91,7 +91,7 @@ export function RegisterForm() {
       {/* Language selector */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "10px" }}>
-          I want to learn
+          {t(locale, "auth_iWantToLearn")}
         </label>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
           {LANGUAGES.map((lang) => (
@@ -142,7 +142,7 @@ export function RegisterForm() {
       {/* Native language */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "10px" }}>
-          My language
+          {t(locale, "auth_myLanguage")}
         </label>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
           {NATIVE_LANGUAGES.map((lang) => (
@@ -174,7 +174,7 @@ export function RegisterForm() {
       {/* Name */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-          Your name
+          {t(locale, "auth_yourName")}
         </label>
         <input
           type="text" value={name} onChange={(e) => setName(e.target.value)}
@@ -185,7 +185,7 @@ export function RegisterForm() {
       {/* Email */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-          Email
+          {t(locale, "auth_email")}
         </label>
         <input
           type="email" value={email} onChange={(e) => setEmail(e.target.value)}
@@ -196,7 +196,7 @@ export function RegisterForm() {
       {/* Phone */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-          Phone number
+          {t(locale, "auth_phoneNumber")}
         </label>
         <input
           type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
@@ -207,7 +207,7 @@ export function RegisterForm() {
       {/* Password */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-          Password
+          {t(locale, "auth_password")}
         </label>
         <div style={{ position: "relative" }}>
           <input
@@ -234,7 +234,7 @@ export function RegisterForm() {
       {/* Confirm password */}
       <div>
         <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: "8px" }}>
-          Confirm password
+          {t(locale, "auth_confirmPassword")}
         </label>
         <div style={{ position: "relative" }}>
           <input
@@ -266,7 +266,7 @@ export function RegisterForm() {
         </div>
         {passwordMismatch && (
           <p style={{ fontSize: "12px", color: "var(--red)", marginTop: "6px" }}>
-            Passwords don't match
+            {t(locale, "auth_passwordsMismatch")}
           </p>
         )}
       </div>
@@ -287,8 +287,7 @@ export function RegisterForm() {
       </button>
 
       <p style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center", lineHeight: 1.5 }}>
-        By signing up you agree to our terms of service.
-        No credit card required.
+        {t(locale, "auth_signupTerms")}
       </p>
     </form>
   );
