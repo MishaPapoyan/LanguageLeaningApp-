@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { speakTarget } from "@/lib/speech";
 
 interface Word { id: string; word: string; translation: string; }
@@ -26,6 +28,8 @@ function buildRound(correct: Word | undefined, pool: Word[]): { options: Word[];
 }
 
 export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: string }) {
+  const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const ROUNDS = Math.min(words.length, 12);
   const [queue] = useState(() => shuffle(words).slice(0, ROUNDS));
   const [current, setCurrent] = useState(0);
@@ -99,7 +103,7 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "🎧" : pct >= 60 ? "🎉" : "💪"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>{t(locale, "game_done")}</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
             <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct · {fmt(elapsed)} · {pct}%
           </p>
@@ -109,8 +113,8 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
             </div>
           )}
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex: 1 }}>Play again</button>
-            <Link href="/games" className="btn-outline" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>Back</Link>
+            <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex: 1 }}>{t(locale, "game_playAgain")}</button>
+            <Link href="/games" className="btn-outline" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>{t(locale, "game_back")}</Link>
           </div>
         </div>
       </div>
@@ -123,7 +127,7 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}>🎧</div>
-          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>Not enough words yet</p>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>{t(locale, "game_notEnoughWords")}</p>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
             Play other games first — words get saved to your dictionary automatically and will appear here.
           </p>

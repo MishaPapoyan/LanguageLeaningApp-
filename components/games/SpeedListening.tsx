@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Play, RefreshCw, Loader2, ChevronRight, Zap } from "lucide-react";
 
@@ -16,6 +17,7 @@ interface Props { language?: string; level?: string; }
 export function SpeedListening({ language, level }: Props) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? language ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const userLevel = (session?.user as any)?.cefrLevel ?? level ?? "B1";
 
   const [data, setData]           = useState<GameData | null>(null);
@@ -123,7 +125,7 @@ export function SpeedListening({ language, level }: Props) {
       <div className="text-5xl">🔒</div>
       <p style={{ fontSize: 18, fontWeight: 700, color: "var(--text)" }}>B1 Required</p>
       <p style={{ color: "var(--text-2)", fontSize: 13 }}>{data.message}</p>
-      <Link href="/games" className="btn-secondary">Back to Games</Link>
+      <Link href="/games" className="btn-secondary">{t(locale, "game_backToGames")}</Link>
     </div>
   );
 
@@ -135,7 +137,7 @@ export function SpeedListening({ language, level }: Props) {
         <span style={{ fontSize: 12, fontWeight: 700, color: "var(--red)" }}>1.5× SPEED</span>
       </div>
       <div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>Speed Listening</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)" }}>{t(locale, "game_speedListening")}</h2>
         <p style={{ fontSize: 13, color: "var(--text-2)", marginTop: 6 }}>Audio plays at 1.5× — train your ear for real-world speech speed</p>
       </div>
       <div className="rounded-2xl p-4 text-left space-y-2" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
@@ -247,7 +249,7 @@ export function SpeedListening({ language, level }: Props) {
       )}
       <div className="flex gap-3 justify-center">
         <button onClick={loadGame} className="btn-primary flex items-center gap-2"><RefreshCw size={14} /> Play Again</button>
-        <Link href="/games" className="btn-secondary">All Games</Link>
+        <Link href="/games" className="btn-secondary">{t(locale, "game_allGames")}</Link>
       </div>
     </div>
   );

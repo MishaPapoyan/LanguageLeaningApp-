@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { t, getLocale } from "@/lib/i18n";
 import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface Word { id: string; word: string; translation: string; }
@@ -35,13 +36,14 @@ function buildRounds(words: Word[], total: number): { word: Word; shownTranslati
 
 export function TrueFalse({ words }: { words: Word[] }) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const targetLang = session?.user?.targetLanguage ?? "fr";
   if (words.length < 3) {
     return (
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}>✅</div>
-          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>Not enough words yet</p>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>{t(locale, "game_notEnoughWords")}</p>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
             Play other games first — words get saved to your dictionary automatically and will appear here.
           </p>
@@ -111,7 +113,7 @@ export function TrueFalse({ words }: { words: Word[] }) {
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "🏆" : pct >= 60 ? "🎉" : "💪"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>{t(locale, "game_done")}</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
             <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct · {fmt(elapsed)} · {pct}%
           </p>
@@ -121,8 +123,8 @@ export function TrueFalse({ words }: { words: Word[] }) {
             </div>
           )}
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex: 1 }}>Play again</button>
-            <Link href="/games" className="btn-outline" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>Back</Link>
+            <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex: 1 }}>{t(locale, "game_playAgain")}</button>
+            <Link href="/games" className="btn-outline" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>{t(locale, "game_back")}</Link>
           </div>
         </div>
       </div>
@@ -138,7 +140,7 @@ export function TrueFalse({ words }: { words: Word[] }) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
-          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>True or False</p>
+          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>{t(locale, "game_trueFalse")}</p>
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{current + 1} of {ROUNDS}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
