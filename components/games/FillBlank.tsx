@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Lightbulb, Check, X } from "lucide-react";
 import { SpeakButton } from "@/components/ui/SpeakButton";
@@ -49,6 +50,7 @@ async function spendXp(amount: number): Promise<boolean> {
 export function FillBlank({ words }: { words: Word[] }) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const [questions]             = useState<Question[]>(() => buildQuestions(words));
   const [idx, setIdx]           = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -103,7 +105,7 @@ export function FillBlank({ words }: { words: Word[] }) {
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 52, marginBottom: 12 }}>{pct >= 80 ? "🏆" : pct >= 50 ? "🎉" : "💪"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Complete!</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>{t(locale, "game_complete")}</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
             <strong style={{ color: "var(--accent)" }}>{score}/{questions.length}</strong> correct · {pct}%
           </p>
@@ -133,7 +135,7 @@ export function FillBlank({ words }: { words: Word[] }) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
-          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>Fill in the Blank</p>
+          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>{t(locale, "games_fillBlank")}</p>
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{idx + 1} of {questions.length}</p>
         </div>
         <span style={{ fontSize: 13, fontWeight: 700, color: "var(--green)" }}>✓ {score}</span>

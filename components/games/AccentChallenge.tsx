@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Play, RefreshCw, Loader2, Volume2 } from "lucide-react";
 
@@ -15,6 +16,7 @@ interface Props { language?: string; level?: string; }
 export function AccentChallenge({ language, level }: Props) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? language ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const userLevel = (session?.user as any)?.cefrLevel ?? level ?? "B1";
 
   const [gameData, setGameData]     = useState<GameData | null>(null);
@@ -139,7 +141,7 @@ export function AccentChallenge({ language, level }: Props) {
         )}
         <div className="flex gap-3 justify-center">
           <button onClick={loadGame} className="btn-primary flex items-center gap-2"><RefreshCw size={14} /> Play Again</button>
-          <Link href="/games" className="btn-secondary">All Games</Link>
+          <Link href="/games" className="btn-secondary">{t(locale, "game_allGames")}</Link>
         </div>
       </div>
     );

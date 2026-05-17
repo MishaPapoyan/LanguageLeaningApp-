@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface SentenceData {
@@ -66,6 +68,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function SentenceBuilder({ targetLang }: { targetLang: string }) {
+  const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const lang = (["fr","es","en"].includes(targetLang) ? targetLang : "fr") as "fr" | "es" | "en";
   const langLabel = lang === "es" ? "Spanish" : lang === "en" ? "English" : "French";
   const allSentences = SENTENCES[lang];
@@ -170,7 +174,7 @@ export function SentenceBuilder({ targetLang }: { targetLang: string }) {
       <div style={{ maxWidth: 480, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "🏆" : pct >= 60 ? "🎉" : "💪"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>{t(locale, "game_done")}</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
             <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> correct · {fmt(elapsed)} · {pct}%
           </p>
@@ -202,7 +206,7 @@ export function SentenceBuilder({ targetLang }: { targetLang: string }) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
-          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>Sentence Builder</p>
+          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>{t(locale, "game_sentenceBuilder")}</p>
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{round + 1} of {ROUNDS}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
