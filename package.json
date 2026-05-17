@@ -13,7 +13,8 @@
     "db:studio": "prisma studio",
     "build:wasm": "wasm-pack build games/immersion-wasm --target web --out-dir ../../public/wasm/immersion",
     "postinstall": "prisma generate",
-    "check:i18n": "node scripts/check-hy-i18n.mjs"
+    "check:i18n": "node scripts/check-hy-i18n.mjs",
+    "scan:i18n": "node scripts/scan-hardcoded.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
