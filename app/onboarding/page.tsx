@@ -1,71 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { t, getClientLocale, type Locale, type TranslationKey } from "@/lib/i18n";
 
 // ─── Step data ────────────────────────────────────────────────────────────────
+// label/desc are i18n keys (TranslationKey-typed) so the compiler rejects raw
+// English literals here — this is the permanent fix for the recurring problem.
 
-const AGE_GROUPS = [
-  { value: "under_18", label: "Under 18", emoji: "🧒" },
-  { value: "18_24",    label: "18 – 24",  emoji: "🎓" },
-  { value: "25_34",    label: "25 – 34",  emoji: "💼" },
-  { value: "35_49",    label: "35 – 49",  emoji: "🌿" },
-  { value: "50_plus",  label: "50+",      emoji: "🌟" },
+const AGE_GROUPS: { value: string; labelKey: TranslationKey; emoji: string }[] = [
+  { value: "under_18", labelKey: "onb_age_under18", emoji: "🧒" },
+  { value: "18_24",    labelKey: "onb_age_18_24",   emoji: "🎓" },
+  { value: "25_34",    labelKey: "onb_age_25_34",   emoji: "💼" },
+  { value: "35_49",    labelKey: "onb_age_35_49",   emoji: "🌿" },
+  { value: "50_plus",  labelKey: "onb_age_50_plus", emoji: "🌟" },
 ];
 
-const NATIVE_LANGUAGES = [
+// Language endonyms stay as-is (proper nouns shown in a native-language picker);
+// only the "Other" UI word is localized.
+const NATIVE_LANGUAGES: { value: string; label: string; flag: string }[] = [
   { value: "en", label: "English",    flag: "🇬🇧" },
-  { value: "ru", label: "Russian",    flag: "🇷🇺" },
-  { value: "ar", label: "Arabic",     flag: "🇸🇦" },
-  { value: "zh", label: "Chinese",    flag: "🇨🇳" },
-  { value: "de", label: "German",     flag: "🇩🇪" },
-  { value: "pt", label: "Portuguese", flag: "🇧🇷" },
-  { value: "it", label: "Italian",    flag: "🇮🇹" },
-  { value: "hi", label: "Hindi",      flag: "🇮🇳" },
-  { value: "tr", label: "Turkish",    flag: "🇹🇷" },
-  { value: "ja", label: "Japanese",   flag: "🇯🇵" },
-  { value: "ko", label: "Korean",     flag: "🇰🇷" },
-  { value: "hy", label: "Armenian",  flag: "🇦🇲" },
-  { value: "other", label: "Other",   flag: "🌍" },
+  { value: "ru", label: "Русский",    flag: "🇷🇺" },
+  { value: "ar", label: "العربية",     flag: "🇸🇦" },
+  { value: "zh", label: "中文",         flag: "🇨🇳" },
+  { value: "de", label: "Deutsch",    flag: "🇩🇪" },
+  { value: "pt", label: "Português",  flag: "🇧🇷" },
+  { value: "it", label: "Italiano",   flag: "🇮🇹" },
+  { value: "hi", label: "हिन्दी",       flag: "🇮🇳" },
+  { value: "tr", label: "Türkçe",     flag: "🇹🇷" },
+  { value: "ja", label: "日本語",       flag: "🇯🇵" },
+  { value: "ko", label: "한국어",       flag: "🇰🇷" },
+  { value: "hy", label: "Հայերեն",     flag: "🇦🇲" },
+  { value: "other", label: "",        flag: "🌍" },
 ];
 
-const LEARNING_GOALS = [
-  { value: "travel",    label: "Travel",            emoji: "✈️",  desc: "Get by on trips and holidays" },
-  { value: "work",      label: "Career",             emoji: "💼",  desc: "Use it professionally or in meetings" },
-  { value: "casual",    label: "Casual",             emoji: "😊",  desc: "Chat with friends, watch shows" },
-  { value: "heritage",  label: "Heritage",           emoji: "🌳",  desc: "Connect with family roots" },
-  { value: "fluency",   label: "Full fluency",       emoji: "🏆",  desc: "Become truly fluent long-term" },
-  { value: "academic",  label: "Academic",           emoji: "📚",  desc: "Study, exams, or university" },
+const LEARNING_GOALS: { value: string; labelKey: TranslationKey; emoji: string; descKey: TranslationKey }[] = [
+  { value: "travel",   labelKey: "onb_goal_travel_l",   emoji: "✈️", descKey: "onb_goal_travel_d" },
+  { value: "work",     labelKey: "onb_goal_work_l",     emoji: "💼", descKey: "onb_goal_work_d" },
+  { value: "casual",   labelKey: "onb_goal_casual_l",   emoji: "😊", descKey: "onb_goal_casual_d" },
+  { value: "heritage", labelKey: "onb_goal_heritage_l", emoji: "🌳", descKey: "onb_goal_heritage_d" },
+  { value: "fluency",  labelKey: "onb_goal_fluency_l",  emoji: "🏆", descKey: "onb_goal_fluency_d" },
+  { value: "academic", labelKey: "onb_goal_academic_l", emoji: "📚", descKey: "onb_goal_academic_d" },
 ];
 
-const PROFICIENCY_LEVELS = [
-  {
-    value: "beginner",
-    label: "Absolute beginner",
-    emoji: "🌱",
-    desc: "I know almost nothing yet",
-  },
-  {
-    value: "elementary",
-    label: "Some basics",
-    emoji: "📖",
-    desc: "I know a few words and phrases",
-  },
-  {
-    value: "intermediate",
-    label: "Intermediate",
-    emoji: "🚀",
-    desc: "I can hold simple conversations",
-  },
+const PROFICIENCY_LEVELS: { value: string; labelKey: TranslationKey; emoji: string; descKey: TranslationKey }[] = [
+  { value: "beginner",     labelKey: "onb_prof_beginner_l",     emoji: "🌱", descKey: "onb_prof_beginner_d" },
+  { value: "elementary",   labelKey: "onb_prof_elementary_l",   emoji: "📖", descKey: "onb_prof_elementary_d" },
+  { value: "intermediate", labelKey: "onb_prof_intermediate_l", emoji: "🚀", descKey: "onb_prof_intermediate_d" },
 ];
 
-const DAILY_GOALS = [
-  { value: 5,  label: "5 min",  sub: "Casual — just keep it up" },
-  { value: 10, label: "10 min", sub: "Steady — great for beginners" },
-  { value: 20, label: "20 min", sub: "Committed — you'll see results fast" },
-  { value: 30, label: "30 min", sub: "Serious — fluency within a year" },
+const DAILY_GOALS: { value: number; labelKey: TranslationKey; subKey: TranslationKey }[] = [
+  { value: 5,  labelKey: "onb_daily_5_l",  subKey: "onb_daily_5_s" },
+  { value: 10, labelKey: "onb_daily_10_l", subKey: "onb_daily_10_s" },
+  { value: 20, labelKey: "onb_daily_20_l", subKey: "onb_daily_20_s" },
+  { value: 30, labelKey: "onb_daily_30_l", subKey: "onb_daily_30_s" },
 ];
+
+const STEP_TITLE_KEYS: TranslationKey[] = ["onb_step1Title", "onb_step2Title", "onb_step3Title", "onb_step4Title", "onb_step5Title"];
+const STEP_SUB_KEYS: TranslationKey[] = ["onb_step1Sub", "onb_step2Sub", "onb_step3Sub", "onb_step4Sub", "onb_step5Sub"];
 
 const TOTAL_STEPS = 5;
 
@@ -80,12 +73,12 @@ function OptionCard({
       onClick={onClick}
       style={{
         padding: "14px 16px",
-        borderRadius: "14px",
-        border: selected ? "2px solid var(--accent)" : "2px solid var(--border)",
-        background: selected ? "var(--accent-dim)" : "var(--surface)",
+        borderRadius: "var(--r-md)",
+        border: selected ? "2px solid var(--terracotta)" : "2px solid var(--line-2)",
+        background: selected ? "var(--terracotta-soft)" : "var(--paper)",
         cursor: "pointer",
         textAlign: "left",
-        transition: "all 0.15s",
+        transition: "all 0.15s var(--ease-out)",
         position: "relative",
         width: "100%",
       }}
@@ -94,7 +87,7 @@ function OptionCard({
         <div style={{
           position: "absolute", top: "8px", right: "8px",
           width: "18px", height: "18px", borderRadius: "50%",
-          background: "var(--accent)",
+          background: "var(--terracotta)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <Check size={10} style={{ color: "white" }} />
@@ -109,6 +102,8 @@ function OptionCard({
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const [locale, setLocale] = useState<Locale>("en");
+  useEffect(() => { setLocale(getClientLocale()); }, []);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
@@ -132,7 +127,6 @@ export default function OnboardingPage() {
       setStep(step + 1);
       return;
     }
-    // Final step — submit
     setSubmitting(true);
     try {
       const res = await fetch("/api/onboarding", {
@@ -140,7 +134,6 @@ export default function OnboardingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ageGroup, nativeLanguage, learningGoal, proficiencyLevel, dailyGoalMinutes }),
       });
-      // MED-11: surface API errors instead of silently proceeding
       if (!res.ok) {
         console.error("[onboarding] save failed:", res.status);
       }
@@ -154,26 +147,11 @@ export default function OnboardingPage() {
 
   const progress = (step / TOTAL_STEPS) * 100;
 
-  const stepTitles = [
-    "How old are you?",
-    "What's your native language?",
-    "Why are you learning?",
-    "What's your current level?",
-    "How much time daily?",
-  ];
-  const stepSubs = [
-    "We use this to tailor difficulty and content.",
-    "Your first language helps us personalise explanations.",
-    "Your goal shapes the vocabulary and scenarios we show you.",
-    "No judgement — just helps us start at the right point.",
-    "Even 5 minutes a day makes a real difference.",
-  ];
-
   return (
     <div style={{
       minHeight: "100vh",
-      background: "var(--bg)",
-      color: "var(--text)",
+      background: "var(--paper)",
+      color: "var(--ink)",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -184,48 +162,40 @@ export default function OnboardingPage() {
 
         {/* Logo + step counter */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "36px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{
-              width: "28px", height: "28px", borderRadius: "7px",
-              background: "linear-gradient(135deg, #7c6aff 0%, #5b4fcf 100%)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "white", fontWeight: 700, fontSize: "10px",
-            }}>LG</div>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", color: "var(--text)", fontWeight: 800, letterSpacing: "-0.02em" }}>
-              Lingova
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <svg viewBox="0 0 40 40" width={26} height={26} aria-hidden>
+              <circle cx="20" cy="20" r="18" fill="none" stroke="var(--ink)" strokeWidth="1.5" />
+              <path d="M12 27 V13 H15 V24 H22" fill="none" stroke="var(--ink)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="27" cy="13" r="2.5" fill="var(--terracotta)" />
+            </svg>
+            <span style={{ fontFamily: "var(--display)", fontSize: "22px", color: "var(--ink)", letterSpacing: "-0.02em" }}>
+              Ling<em style={{ fontStyle: "italic", color: "var(--terracotta)" }}>o</em>va
             </span>
           </div>
-          <span style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 600 }}>
+          <span style={{ fontFamily: "var(--mono)", fontSize: "11px", letterSpacing: "0.1em", color: "var(--ink-3)" }}>
             {step} / {TOTAL_STEPS}
           </span>
         </div>
 
         {/* Progress bar */}
-        <div style={{
-          width: "100%", height: "4px", background: "var(--border)",
-          borderRadius: "999px", marginBottom: "40px", overflow: "hidden",
-        }}>
-          <div style={{
-            height: "100%", borderRadius: "999px",
-            background: "linear-gradient(90deg, #7c6aff, #14b8a6)",
-            width: `${progress}%`,
-            transition: "width 0.4s ease",
-          }} />
+        <div className="lv-progress lv-progress--terra" style={{ marginBottom: "40px" }}>
+          <span style={{ width: `${progress}%` }} />
         </div>
 
         {/* Step heading */}
         <div style={{ marginBottom: "28px" }}>
           <h1 style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(24px, 4vw, 32px)",
-            color: "var(--text)",
-            margin: "0 0 8px",
-            letterSpacing: "-0.01em",
+            fontFamily: "var(--display)",
+            fontSize: "clamp(28px, 5vw, 44px)",
+            color: "var(--ink)",
+            margin: "0 0 10px",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.05,
           }}>
-            {stepTitles[step - 1]}
+            {t(locale, STEP_TITLE_KEYS[step - 1])}
           </h1>
-          <p style={{ fontSize: "14px", color: "var(--text-2)", margin: 0, lineHeight: 1.55 }}>
-            {stepSubs[step - 1]}
+          <p style={{ fontSize: "15px", color: "var(--ink-3)", margin: 0, lineHeight: 1.55 }}>
+            {t(locale, STEP_SUB_KEYS[step - 1])}
           </p>
         </div>
 
@@ -240,8 +210,8 @@ export default function OnboardingPage() {
                   <div style={{ fontSize: "26px", marginBottom: "6px" }}>{a.emoji}</div>
                   <div style={{
                     fontSize: "14px", fontWeight: 600,
-                    color: ageGroup === a.value ? "var(--accent-2)" : "var(--text)",
-                  }}>{a.label}</div>
+                    color: ageGroup === a.value ? "var(--terracotta)" : "var(--ink)",
+                  }}>{t(locale, a.labelKey)}</div>
                 </OptionCard>
               ))}
             </div>
@@ -256,8 +226,8 @@ export default function OnboardingPage() {
                     <span style={{ fontSize: "22px" }}>{l.flag}</span>
                     <span style={{
                       fontSize: "14px", fontWeight: 500,
-                      color: nativeLanguage === l.value ? "var(--accent-2)" : "var(--text)",
-                    }}>{l.label}</span>
+                      color: nativeLanguage === l.value ? "var(--terracotta)" : "var(--ink)",
+                    }}>{l.value === "other" ? t(locale, "onb_langOther") : l.label}</span>
                   </div>
                 </OptionCard>
               ))}
@@ -274,9 +244,9 @@ export default function OnboardingPage() {
                     <div>
                       <div style={{
                         fontSize: "14px", fontWeight: 600, marginBottom: "2px",
-                        color: learningGoal === g.value ? "var(--accent-2)" : "var(--text)",
-                      }}>{g.label}</div>
-                      <div style={{ fontSize: "12px", color: "var(--text-3)" }}>{g.desc}</div>
+                        color: learningGoal === g.value ? "var(--terracotta)" : "var(--ink)",
+                      }}>{t(locale, g.labelKey)}</div>
+                      <div style={{ fontSize: "12px", color: "var(--ink-3)" }}>{t(locale, g.descKey)}</div>
                     </div>
                   </div>
                 </OptionCard>
@@ -294,9 +264,9 @@ export default function OnboardingPage() {
                     <div>
                       <div style={{
                         fontSize: "15px", fontWeight: 600, marginBottom: "3px",
-                        color: proficiencyLevel === p.value ? "var(--accent-2)" : "var(--text)",
-                      }}>{p.label}</div>
-                      <div style={{ fontSize: "12px", color: "var(--text-3)" }}>{p.desc}</div>
+                        color: proficiencyLevel === p.value ? "var(--terracotta)" : "var(--ink)",
+                      }}>{t(locale, p.labelKey)}</div>
+                      <div style={{ fontSize: "12px", color: "var(--ink-3)" }}>{t(locale, p.descKey)}</div>
                     </div>
                   </div>
                 </OptionCard>
@@ -310,11 +280,11 @@ export default function OnboardingPage() {
               {DAILY_GOALS.map((d) => (
                 <OptionCard key={d.value} selected={dailyGoalMinutes === d.value} onClick={() => setDailyGoal(d.value)}>
                   <div style={{
-                    fontSize: "22px", fontWeight: 800, fontFamily: "var(--font-display)",
-                    color: dailyGoalMinutes === d.value ? "var(--accent-2)" : "var(--text)",
+                    fontSize: "22px", fontWeight: 800, fontFamily: "var(--display)",
+                    color: dailyGoalMinutes === d.value ? "var(--terracotta)" : "var(--ink)",
                     marginBottom: "4px",
-                  }}>{d.label}</div>
-                  <div style={{ fontSize: "12px", color: "var(--text-3)", lineHeight: 1.4 }}>{d.sub}</div>
+                  }}>{t(locale, d.labelKey)}</div>
+                  <div style={{ fontSize: "12px", color: "var(--ink-3)", lineHeight: 1.4 }}>{t(locale, d.subKey)}</div>
                 </OptionCard>
               ))}
             </div>
@@ -327,14 +297,10 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => setStep(step - 1)}
-              className="btn-ghost"
-              style={{
-                padding: "12px 16px",
-                display: "flex", alignItems: "center", gap: "6px",
-                fontSize: "14px", flexShrink: 0,
-              }}
+              className="lv-btn lv-btn--ghost"
+              style={{ flexShrink: 0 }}
             >
-              <ArrowLeft size={15} /> Back
+              <ArrowLeft size={15} /> {t(locale, "onb_back")}
             </button>
           )}
 
@@ -342,20 +308,17 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleNext}
             disabled={!canProceed() || submitting}
-            className="btn-primary"
+            className="lv-btn lv-btn--primary"
             style={{
-              flex: 1, padding: "14px",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-              fontSize: "15px", fontWeight: 600,
+              flex: 1,
               opacity: !canProceed() || submitting ? 0.5 : 1,
               cursor: !canProceed() || submitting ? "not-allowed" : "pointer",
-              transition: "opacity 0.15s",
             }}
           >
-            {submitting ? "Saving…" : step === TOTAL_STEPS ? (
-              <>Let's start! <Check size={15} /></>
+            {submitting ? t(locale, "onb_saving") : step === TOTAL_STEPS ? (
+              <>{t(locale, "onb_letsStart")} <Check size={15} /></>
             ) : (
-              <>Continue <ArrowRight size={15} /></>
+              <>{t(locale, "onb_continue")} <ArrowRight size={15} /></>
             )}
           </button>
         </div>
@@ -367,10 +330,11 @@ export default function OnboardingPage() {
             onClick={() => { router.push("/home"); router.refresh(); }}
             style={{
               background: "none", border: "none", cursor: "pointer",
-              fontSize: "12px", color: "var(--text-3)", textDecoration: "underline",
+              fontFamily: "var(--mono)", fontSize: "11px", letterSpacing: "0.08em",
+              textTransform: "uppercase", color: "var(--ink-3)", textDecoration: "underline",
             }}
           >
-            Skip for now
+            {t(locale, "onb_skip")}
           </button>
         </p>
 
