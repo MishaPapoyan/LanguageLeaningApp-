@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import { speakTarget } from "@/lib/speech";
 
 interface Word {
@@ -33,6 +34,7 @@ function buildOptions(correct: Word, pool: Word[]): string[] {
 export function FlashcardGame({ words }: { words: Word[] }) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
 
   const [queue] = useState(() => shuffle(words).slice(0, Math.min(words.length, 20)));
   const [current, setCurrent]   = useState(0);
@@ -103,7 +105,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
           }}>
             {pct >= 80 ? "🏆" : pct >= 60 ? "🎉" : "💪"}
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 6 }}>Round Complete!</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", marginBottom: 6 }}>{t(locale, "game_roundComplete")}</h2>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginBottom: 24 }}>
             <strong style={{ color: "var(--accent)" }}>{score}/{queue.length}</strong> correct · {pct}%
           </p>
@@ -117,8 +119,8 @@ export function FlashcardGame({ words }: { words: Word[] }) {
             </div>
           )}
           <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={restart} className="btn-primary" style={{ flex: 1 }}>Play again</button>
-            <Link href="/games" className="btn-secondary" style={{ flex: 1, textAlign: "center" }}>Back to games</Link>
+            <button onClick={restart} className="btn-primary" style={{ flex: 1 }}>{t(locale, "game_playAgain")}</button>
+            <Link href="/games" className="btn-secondary" style={{ flex: 1, textAlign: "center" }}>{t(locale, "game_backToGames")}</Link>
           </div>
         </div>
       </div>

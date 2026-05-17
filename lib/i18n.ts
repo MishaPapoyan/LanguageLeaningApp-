@@ -208,6 +208,13 @@ const en = {
 
   // Games
   games_title: "Games",
+  game_playAgain: "Play again",
+  game_backToGames: "Back to games",
+  game_back: "Back",
+  game_roundComplete: "Round Complete!",
+  game_allMatched: "All matched!",
+  game_done: "Done!",
+  game_notEnoughWords: "Not enough words yet",
   games_subtitle: "Play & learn — earn XP for every game you finish",
   games_dailyChallenge: "Daily Challenge",
   games_dailyDesc: "Complete any game today for double XP — limited time!",
@@ -842,6 +849,13 @@ const hy: typeof en = {
 
   // Games
   games_title: "Խաղեր",
+  game_playAgain: "Կրկնել",
+  game_backToGames: "Վերադառնալ խաղեր",
+  game_back: "Հետ",
+  game_roundComplete: "Փուլն ավարտված է։",
+  game_allMatched: "Բոլորը համընկնեցին։",
+  game_done: "Պատրաստ է։",
+  game_notEnoughWords: "Դեռ բավարար բառեր չկան",
   games_subtitle: "Խաղացեք և սովորեք — վաստակեք XP յուրաքանչյուր խաղի համար",
   games_dailyChallenge: "Օրվա մարտահրավեր",
   games_dailyDesc: "Ավարտեք ցանկացած խաղ այսօր՝ կրկնակի XP-ի համար!",

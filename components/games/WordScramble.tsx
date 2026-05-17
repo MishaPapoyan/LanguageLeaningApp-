@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { Lightbulb, RotateCcw } from "lucide-react";
 import { SpeakButton } from "@/components/ui/SpeakButton";
@@ -34,6 +35,7 @@ async function spendXp(amount: number): Promise<boolean> {
 export function WordScramble({ words }: { words: Word[] }) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   // Multi-word vocab (e.g. "la madre") can't be scrambled letter-by-letter meaningfully
   const singleWords = words.filter(w => !w.word.includes(" "));
   words = singleWords.length >= 5 ? singleWords : words;
@@ -213,7 +215,7 @@ export function WordScramble({ words }: { words: Word[] }) {
       <div style={{ maxWidth: 440, textAlign: "center" }}>
         <div className="card" style={{ padding: "40px 28px" }}>
           <div style={{ fontSize: 52, marginBottom: 12 }}>{pct === 100 ? "🏆" : pct >= 60 ? "🎉" : "💪"}</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>Done!</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", margin: "0 0 8px" }}>{t(locale, "game_done")}</h2>
           <p style={{ fontSize: 14, color: "var(--text-2)", margin: "0 0 20px" }}>
             <strong style={{ color: "var(--accent)" }}>{score}/{ROUNDS}</strong> words · {fmt(elapsed)} · {pct}%
           </p>
@@ -224,7 +226,7 @@ export function WordScramble({ words }: { words: Word[] }) {
           )}
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={() => { setRound(0); setScore(0); setElapsed(0); setFinished(false); }} className="btn-primary" style={{ flex: 1 }}>
-              Play again
+              {t(locale, "game_playAgain")}
             </button>
             <Link href="/games" className="btn-outline" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
               Back
@@ -244,7 +246,7 @@ export function WordScramble({ words }: { words: Word[] }) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
-          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>Word Scramble</p>
+          <p style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", margin: 0 }}>{t(locale, "games_wordScramble")}</p>
           <p style={{ fontSize: 12, color: "var(--text-3)", margin: 0 }}>{round + 1} of {ROUNDS}</p>
         </div>
         <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-3)" }}>⏱ {fmt(elapsed)}</span>

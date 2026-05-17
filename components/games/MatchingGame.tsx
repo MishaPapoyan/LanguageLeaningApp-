@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 import { SpeakButton } from "@/components/ui/SpeakButton";
 
@@ -20,6 +21,7 @@ function shuffle<T>(arr: T[]): T[] {
 export function MatchingGame({ words }: { words: Word[] }) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const [frCards, setFrCards] = useState<Word[]>(() => shuffle(words));
   const [enCards, setEnCards] = useState<Word[]>(() => shuffle(words));
   const [selected, setSelected] = useState<{ col: "fr" | "en"; id: string } | null>(null);
@@ -117,7 +119,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
     return (
       <div className="card p-8 text-center animate-fade-up">
         <p className="text-5xl mb-3">🎯</p>
-        <h2 className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>All matched!</h2>
+        <h2 className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>{t(locale, "game_allMatched")}</h2>
         <p className="text-sm mb-6" style={{ color: "var(--text-2)" }}>
           {errors === 0 ? "Perfect — no mistakes! 🏆" : `${errors} mistake${errors !== 1 ? "s" : ""}`}
         </p>
@@ -134,8 +136,8 @@ export function MatchingGame({ words }: { words: Word[] }) {
           ))}
         </div>
         <div className="flex gap-3">
-          <button onClick={restart} className="btn-primary flex-1">Play again</button>
-          <Link href="/games" className="btn-secondary flex-1 text-center">Back to Games</Link>
+          <button onClick={restart} className="btn-primary flex-1">{t(locale, "game_playAgain")}</button>
+          <Link href="/games" className="btn-secondary flex-1 text-center">{t(locale, "game_backToGames")}</Link>
         </div>
       </div>
     );
