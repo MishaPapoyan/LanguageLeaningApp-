@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import { speakTarget } from "@/lib/speech";
 
 interface Word { id: string; word: string; translation: string; }
@@ -211,7 +212,7 @@ export function ListenQuiz({ words, targetLang }: { words: Word[]; targetLang: s
                 transition: "all 0.15s", textAlign: "center",
               }}
             >
-              {opt.translation}
+              {wordTranslation(opt, locale)}
               {selected !== null && isCorrect && <div style={{ fontSize: 18, marginTop: 4 }}>✓</div>}
               {selected !== null && isSelected && !isCorrect && <div style={{ fontSize: 18, marginTop: 4 }}>✗</div>}
             </button>

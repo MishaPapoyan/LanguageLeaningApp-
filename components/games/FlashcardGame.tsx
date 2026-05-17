@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import { speakTarget } from "@/lib/speech";
 
 interface Word {
@@ -24,11 +25,11 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function buildOptions(correct: Word, pool: Word[]): string[] {
+function buildOptions(correct: Word, pool: Word[], locale: string): string[] {
   const distractors = shuffle(pool.filter(w => w.id !== correct.id))
     .slice(0, 3)
-    .map(w => w.translation);
-  return shuffle([correct.translation, ...distractors]);
+    .map(w => wordTranslation(w, locale));
+  return shuffle([wordTranslation(correct, locale), ...distractors]);
 }
 
 export function FlashcardGame({ words }: { words: Word[] }) {
@@ -50,7 +51,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
   // Build fresh options when card changes
   useEffect(() => {
     if (!card) return;
-    setOptions(buildOptions(card, words));
+    setOptions(buildOptions(card, words, locale));
     setChosen(null);
     setFlipped(false);
   }, [current, card, words]);
@@ -58,7 +59,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
   const pick = useCallback((opt: string) => {
     if (chosen || !card) return;
     setChosen(opt);
-    const correct = opt === card.translation;
+    const correct = opt === wordTranslation(card, locale);
     if (correct) setScore(s => s + 1);
 
     // Flip card to show answer
@@ -186,18 +187,18 @@ export function FlashcardGame({ words }: { words: Word[] }) {
             borderRadius: 20,
             background: chosen === null
               ? "var(--surface-2)"
-              : chosen === card.translation
+              : chosen === wordTranslation(card, locale)
                 ? "linear-gradient(145deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))"
                 : "linear-gradient(145deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04))",
-            border: `1px solid ${chosen === null ? "var(--border-md)" : chosen === card.translation ? "rgba(16,185,129,0.4)" : "rgba(239,68,68,0.35)"}`,
+            border: `1px solid ${chosen === null ? "var(--border-md)" : chosen === wordTranslation(card, locale) ? "rgba(16,185,129,0.4)" : "rgba(239,68,68,0.35)"}`,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             padding: "24px", gap: 8,
           }}>
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: chosen === null ? "var(--text-3)" : chosen === card.translation ? "var(--green)" : "var(--red)" }}>
-              {chosen === null ? "" : chosen === card.translation ? "✓ Correct!" : "✗ Not quite"}
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: chosen === null ? "var(--text-3)" : chosen === wordTranslation(card, locale) ? "var(--green)" : "var(--red)" }}>
+              {chosen === null ? "" : chosen === wordTranslation(card, locale) ? "✓ Correct!" : "✗ Not quite"}
             </p>
             <p style={{ fontSize: 24, fontWeight: 800, color: "var(--text)", textAlign: "center" }}>
-              {card.translation}
+              {wordTranslation(card, locale)}
             </p>
             {card.exampleFr && (
               <p style={{ fontSize: 12, color: "var(--text-3)", fontStyle: "italic", textAlign: "center", lineHeight: 1.5 }}>
@@ -219,7 +220,7 @@ export function FlashcardGame({ words }: { words: Word[] }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {options.map((opt) => {
           const isChosen  = chosen === opt;
-          const isCorrect = opt === card.translation;
+          const isCorrect = opt === wordTranslation(card, locale);
           let bg = "var(--surface-2)", border = "var(--border-md)", color = "var(--text)";
           if (chosen) {
             if (isCorrect)       { bg = "rgba(16,185,129,0.12)"; border = "rgba(16,185,129,0.45)"; color = "var(--green)"; }

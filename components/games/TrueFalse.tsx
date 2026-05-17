@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import { SpeakButton } from "@/components/ui/SpeakButton";
 
 interface Word { id: string; word: string; translation: string; }
@@ -17,17 +18,17 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function buildRounds(words: Word[], total: number): { word: Word; shownTranslation: string; isCorrect: boolean }[] {
+function buildRounds(words: Word[], total: number, locale: string): { word: Word; shownTranslation: string; isCorrect: boolean }[] {
   const shuffled = shuffle(words);
   const rounds = [];
   for (let i = 0; i < total; i++) {
     const word = shuffled[i % shuffled.length];
     const correct = Math.random() > 0.45;
-    let shownTranslation = word.translation;
+    let shownTranslation = wordTranslation(word, locale);
     if (!correct) {
       const others = words.filter((w) => w.id !== word.id);
       const other = others[Math.floor(Math.random() * others.length)];
-      shownTranslation = other ? other.translation : word.translation + "?";
+      shownTranslation = other ? wordTranslation(other, locale) : wordTranslation(word, locale) + "?";
     }
     rounds.push({ word, shownTranslation, isCorrect: correct });
   }
@@ -53,7 +54,7 @@ export function TrueFalse({ words }: { words: Word[] }) {
     );
   }
   const ROUNDS = Math.min(words.length >= 6 ? 15 : 10, words.length * 2);
-  const [rounds] = useState(() => buildRounds(words, ROUNDS));
+  const [rounds] = useState(() => buildRounds(words, ROUNDS, locale));
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
@@ -171,7 +172,7 @@ export function TrueFalse({ words }: { words: Word[] }) {
         </p>
         {status !== "idle" && (
           <p style={{ fontSize: 13, marginTop: 12, color: "var(--text-3)" }}>
-            {status === "correct" ? "✓ Correct!" : `✗ Wrong — answer: ${round.word.translation}`}
+            {status === "correct" ? "✓ Correct!" : `✗ Wrong — answer: ${wordTranslation(round.word, locale)}`}
           </p>
         )}
       </div>

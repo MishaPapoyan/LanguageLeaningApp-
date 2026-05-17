@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import Link from "next/link";
 import { SpeakButton } from "@/components/ui/SpeakButton";
 
@@ -170,7 +171,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
             <button key={w.id} onClick={() => handleSelect("en", w.id)} disabled={matched.has(w.id)}
               className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150"
               style={cardStyle("en", w.id)}>
-              {w.translation}{matched.has(w.id) && " ✓"}
+              {wordTranslation(w, locale)}{matched.has(w.id) && " ✓"}
             </button>
           ))}
         </div>
