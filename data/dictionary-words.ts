@@ -3,6 +3,11 @@ export interface DictionaryWord {
   word: string;
   translation: string;
   definition: string;
+  // Native-language overlays (optional). Absent → fall back to English.
+  translationHy?: string;
+  definitionHy?: string;
+  translationRu?: string;
+  definitionRu?: string;
   exampleFr: string;
   exampleEn: string;
   miniStory: string | null;

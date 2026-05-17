@@ -198,6 +198,12 @@ model Word {
   word        String
   translation String
   definition  String
+  // Native-language overlays. Null → fall back to English (translation/definition).
+  // Backfilled progressively; nullable so existing rows and the migration are safe.
+  translationHy String?
+  definitionHy  String?
+  translationRu String?
+  definitionRu  String?
   exampleFr   String
   exampleEn   String
   miniStory   String?
