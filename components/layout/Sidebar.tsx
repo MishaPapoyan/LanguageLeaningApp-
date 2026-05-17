@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { getXpProgress } from "@/types";
+import { t, getLocale, type TranslationKey } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Home, BookOpen, MessageSquare, Gamepad2,
@@ -17,25 +18,25 @@ import {
 interface ProgressData { xp: number; level: number; streak: number; }
 
 type NavEntry =
-  | { group: string }
-  | { id: string; href: string; icon: typeof Home; label: string };
+  | { groupKey: TranslationKey }
+  | { id: string; href: string; icon: typeof Home; labelKey: TranslationKey };
 
 const NAV_ITEMS: NavEntry[] = [
-  { group: "Learn" },
-  { id: "dashboard",  href: "/home",       icon: Home,           label: "Today" },
-  { id: "path",       href: "/learn",      icon: GraduationCap,  label: "Learning Path" },
-  { id: "games",      href: "/games",      icon: Gamepad2,       label: "Games" },
-  { id: "tutor",      href: "/tutor",      icon: MessageSquare,  label: "AI Tutor" },
-  { id: "stories",    href: "/stories",    icon: BookOpen,       label: "Stories" },
-  { id: "writing",    href: "/writing",    icon: Award,          label: "Writing Lab" },
-  { group: "Library" },
-  { id: "dictionary", href: "/dictionary", icon: Search,         label: "Dictionary" },
-  { id: "mywords",    href: "/my-words",   icon: BookMarked,     label: "My Words" },
-  { id: "review",     href: "/review",     icon: RotateCcw,      label: "Review" },
-  { group: "Community" },
-  { id: "progress",   href: "/progress",   icon: TrendingUp,     label: "Progress" },
-  { id: "leaderboard",href: "/leaderboard",icon: Trophy,         label: "Leaderboard" },
-  { id: "community",  href: "/community",  icon: Users,          label: "Community" },
+  { groupKey: "nav_secLearn" },
+  { id: "dashboard",  href: "/home",       icon: Home,           labelKey: "nav_home" },
+  { id: "path",       href: "/learn",      icon: GraduationCap,  labelKey: "nav_learn" },
+  { id: "games",      href: "/games",      icon: Gamepad2,       labelKey: "nav_games" },
+  { id: "tutor",      href: "/tutor",      icon: MessageSquare,  labelKey: "nav_tutor" },
+  { id: "stories",    href: "/stories",    icon: BookOpen,       labelKey: "nav_stories" },
+  { id: "writing",    href: "/writing",    icon: Award,          labelKey: "nav_writing" },
+  { groupKey: "nav_secLibrary" },
+  { id: "dictionary", href: "/dictionary", icon: Search,         labelKey: "nav_dictionary" },
+  { id: "mywords",    href: "/my-words",   icon: BookMarked,     labelKey: "nav_myWords" },
+  { id: "review",     href: "/review",     icon: RotateCcw,      labelKey: "nav_review" },
+  { groupKey: "nav_secCommunity" },
+  { id: "progress",   href: "/progress",   icon: TrendingUp,     labelKey: "nav_progress" },
+  { id: "leaderboard",href: "/leaderboard",icon: Trophy,         labelKey: "nav_leaderboard" },
+  { id: "community",  href: "/community",  icon: Users,          labelKey: "nav_community" },
 ];
 
 const TARGET_LANG_FLAGS: Record<string, string> = {
@@ -66,6 +67,7 @@ function isEmoji(str: string) {
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const pcacheRef = useRef<PCache>(null);
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -98,7 +100,7 @@ export function Sidebar() {
       <button
         onClick={() => setMobileOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-40 lv-btn lv-btn--ghost lv-btn--icon"
-        aria-label="Open menu"
+        aria-label={t(locale, "nav_openMenu")}
       >
         <Menu size={18} />
       </button>
@@ -139,7 +141,7 @@ export function Sidebar() {
             onClick={() => setMobileOpen(false)}
             className="lg:hidden"
             style={{ color: "var(--ink-3)", background: "none", border: "none", cursor: "pointer" }}
-            aria-label="Close menu"
+            aria-label={t(locale, "nav_closeMenu")}
           >
             <X size={20} />
           </button>
@@ -148,7 +150,7 @@ export function Sidebar() {
         {/* Nav */}
         <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {NAV_ITEMS.map((item, i) => {
-            if ("group" in item) {
+            if ("groupKey" in item) {
               return (
                 <div
                   key={"g" + i}
@@ -157,7 +159,7 @@ export function Sidebar() {
                     textTransform: "uppercase", color: "var(--ink-4)", padding: "14px 12px 6px",
                   }}
                 >
-                  {item.group}
+                  {t(locale, item.groupKey)}
                 </div>
               );
             }
@@ -184,7 +186,7 @@ export function Sidebar() {
                 }}
               >
                 <Icon size={17} style={{ flexShrink: 0, opacity: 0.85 }} />
-                <span>{item.label}</span>
+                <span>{t(locale, item.labelKey)}</span>
               </Link>
             );
           })}
@@ -232,7 +234,7 @@ export function Sidebar() {
               style={{ padding: 7, color: "var(--ink-3)", borderRadius: 8, display: "flex", transition: "color 160ms" }}
               onMouseEnter={e => { e.currentTarget.style.color = "var(--ink)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-3)"; }}
-              aria-label="Settings"
+              aria-label={t(locale, "nav_settings")}
             >
               <Settings size={17} />
             </Link>
@@ -242,7 +244,7 @@ export function Sidebar() {
               style={{ padding: 7, color: "var(--ink-3)", borderRadius: 8, background: "none", border: "none", cursor: "pointer", display: "flex", transition: "color 160ms" }}
               onMouseEnter={e => { e.currentTarget.style.color = "var(--terracotta)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-3)"; }}
-              aria-label="Sign out"
+              aria-label={t(locale, "nav_signOut")}
             >
               <LogOut size={17} />
             </button>

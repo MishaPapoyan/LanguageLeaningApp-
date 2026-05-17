@@ -22,6 +22,13 @@ const en = {
   nav_progress: "Progress",
   nav_analytics: "Analytics",
   nav_signOut: "Sign out",
+  nav_review: "Review",
+  nav_leaderboard: "Leaderboard",
+  nav_secLearn: "Learn",
+  nav_secLibrary: "Library",
+  nav_secCommunity: "Community",
+  nav_openMenu: "Open menu",
+  nav_closeMenu: "Close menu",
 
   // Auth
   auth_welcome: "Welcome back",
@@ -517,6 +524,13 @@ const hy: typeof en = {
   nav_progress: "Հաջողություն",
   nav_analytics: "Վերլուծություն",
   nav_signOut: "Դուրս գալ",
+  nav_review: "Կրկնել",
+  nav_leaderboard: "Առաջատարների աղյուսակ",
+  nav_secLearn: "Սովորել",
+  nav_secLibrary: "Գրադարան",
+  nav_secCommunity: "Համայնք",
+  nav_openMenu: "Բացել ընտրացանկը",
+  nav_closeMenu: "Փակել ընտրացանկը",
 
   // Auth
   auth_welcome: "Բարի գալուստ",
