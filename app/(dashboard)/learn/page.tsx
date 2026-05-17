@@ -70,7 +70,7 @@ function CelebrationModal({ modal, onClose, locale }: { modal: CelebModal; onClo
       >
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
           <span className="lv-stamp" style={{ color: tone, transform: "rotate(-3deg)" }}>
-            {modal.kind === "course" ? "Course complete" : modal.kind === "phase" ? `${modal.phaseLabel} · complete` : "Chapter complete"}
+            {modal.kind === "course" ? t(locale, "learn_stampCourse") : modal.kind === "phase" ? t(locale, "learn_stampPhase", { phase: modal.phaseLabel ?? "" }) : t(locale, "learn_stampChapter")}
           </span>
         </div>
         <div style={{ fontSize: 64, marginBottom: 12, lineHeight: 1 }}>{modal.emoji}</div>
@@ -90,7 +90,7 @@ function CelebrationModal({ modal, onClose, locale }: { modal: CelebModal; onClo
           <span className="mono" style={{ fontSize: 11, color: "var(--ink-3)" }}>{t(locale, "learn_reward")}</span>
         </div>
         <button onClick={onClose} className="lv-btn lv-btn--primary lv-btn--lg" style={{ width: "100%", justifyContent: "center" }}>
-          {modal.kind === "course" ? "View My Certificate" : "Continue"}
+          {modal.kind === "course" ? t(locale, "learn_viewCertificate") : t(locale, "onb_continue")}
           <ChevronRight size={16} />
         </button>
       </div>
@@ -265,8 +265,8 @@ export default function LearnPage() {
           const xp = CHAPTER_PRIZES[ci % CHAPTER_PRIZES.length];
           setModal({
             kind: "chapter", emoji: topic.emoji,
-            title: `"${topic.title}" Complete!`,
-            subtitle: "Great work finishing this chapter. Your XP has been added.",
+            title: t(locale, "learn_chapterCompleteTitle", { name: topic.title }),
+            subtitle: t(locale, "learn_chapterCompleteSub"),
             xp,
           });
           return;
@@ -286,8 +286,8 @@ export default function LearnPage() {
           setShownCelebrations(prev => new Set(prev).add(key));
           setModal({
             kind: "phase", emoji: phase.emoji,
-            title: `${phase.label} Complete!`,
-            subtitle: `You've mastered all ${phaseTopics.length} topics in this phase. Incredible!`,
+            title: t(locale, "learn_phaseCompleteTitle", { phase: phase.label }),
+            subtitle: t(locale, "learn_phaseCompleteSub", { n: String(phaseTopics.length) }),
             xp: PHASE_PRIZES[pi] ?? 200,
             phaseLabel: phase.label,
           });
@@ -304,13 +304,13 @@ export default function LearnPage() {
         setShownCelebrations(prev => new Set(prev).add("course"));
         setModal({
           kind: "course", emoji: "🎓",
-          title: "Course Complete!",
-          subtitle: "You've completed the entire learning path! Collect your reward and keep growing.",
+          title: t(locale, "learn_courseCompleteTitle"),
+          subtitle: t(locale, "learn_courseCompleteSub"),
           xp: COURSE_PRIZE,
         });
       }
     }
-  }, [LEARNING_PATH, PHASES, shownCelebrations, targetLang]);
+  }, [LEARNING_PATH, PHASES, shownCelebrations, targetLang, locale]);
 
   useEffect(() => {
     const sync = () => {
