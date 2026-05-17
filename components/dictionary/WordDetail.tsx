@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { getLocale } from "@/lib/i18n";
+import { wordTranslation, wordDefinition } from "@/lib/wordI18n";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { speak } from "@/lib/speech";
@@ -25,6 +27,7 @@ interface WordData {
 
 export function WordDetail({ word }: { word: WordData }) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [isSaved, setIsSaved] = useState(word.isSaved);
   const [saving, setSaving] = useState(false);
@@ -115,7 +118,7 @@ export function WordDetail({ word }: { word: WordData }) {
                 </button>
               </div>
               <p style={{ fontSize: 20, color: "var(--accent-2)", fontWeight: 700, marginBottom: 4 }}>
-                {word.translation}
+                {wordTranslation(word, locale)}
               </p>
               <button
                 onClick={() => handleSpeak(word.translation, "en-US")}
@@ -149,7 +152,7 @@ export function WordDetail({ word }: { word: WordData }) {
           <p style={{ fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
             Definition
           </p>
-          <p style={{ fontSize: 14, color: "var(--text-1)", lineHeight: 1.6 }}>{word.definition}</p>
+          <p style={{ fontSize: 14, color: "var(--text-1)", lineHeight: 1.6 }}>{wordDefinition(word, locale)}</p>
         </div>
 
         {/* Quiz stats — only for saved words with attempts */}

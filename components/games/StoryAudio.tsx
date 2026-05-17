@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation, wordDefinition } from "@/lib/wordI18n";
 import Link from "next/link";
 import { Play, Pause, RefreshCw, Loader2, ChevronRight, BookOpen } from "lucide-react";
 
@@ -269,7 +270,7 @@ export function StoryAudio({ language, level }: Props) {
           {story.vocabulary.map((v) => (
             <div key={v.word} className="flex items-center justify-between">
               <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>{v.word}</span>
-              <span style={{ fontSize: 13, color: "var(--text-2)" }}>{v.definition}</span>
+              <span style={{ fontSize: 13, color: "var(--text-2)" }}>{wordDefinition(v, locale)}</span>
             </div>
           ))}
         </div>

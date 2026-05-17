@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import Link from "next/link";
 import { Lightbulb, Check, X } from "lucide-react";
 import { SpeakButton } from "@/components/ui/SpeakButton";
@@ -26,14 +27,14 @@ function shuffle<T>(a: T[]): T[] {
   return r;
 }
 
-function buildQuestions(words: Word[]): Question[] {
+function buildQuestions(words: Word[], locale: string): Question[] {
   const pool = shuffle(words).slice(0, 10);
   return pool.map(w => {
     // Build sentence with blank
     const sentence = w.exampleFr
       ? w.exampleFr.replace(new RegExp(`\\b${w.word}\\b`, "i"), "___")
-      : `___ (${w.translation})`;
-    const context = w.exampleEn || `Translation: "${w.translation}"`;
+      : `___ (${wordTranslation(w, locale)})`;
+    const context = w.exampleEn || `Translation: "${wordTranslation(w, locale)}"`;
 
     // 3 distractors
     const distractors = shuffle(words.filter(x => x.id !== w.id)).slice(0, 3).map(x => x.word);
@@ -51,7 +52,7 @@ export function FillBlank({ words }: { words: Word[] }) {
   const { data: session } = useSession();
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
-  const [questions]             = useState<Question[]>(() => buildQuestions(words));
+  const [questions]             = useState<Question[]>(() => buildQuestions(words, locale));
   const [idx, setIdx]           = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [eliminated, setEliminated] = useState<number[]>([]);

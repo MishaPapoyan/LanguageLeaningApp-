@@ -7,6 +7,7 @@ import { speak } from "@/lib/speech";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 
 interface ReviewWord {
   id: string;
@@ -242,7 +243,7 @@ export default function ReviewPage() {
           <>
             <div style={{ width: 48, height: 2, background: "var(--border-md)", borderRadius: 999, margin: "12px 0" }} />
             <p style={{ fontSize: 26, fontWeight: 800, color: "var(--accent)", margin: "0 0 16px" }}>
-              {word.translation}
+              {wordTranslation(word, locale)}
             </p>
             <button
               onClick={(e) => { e.stopPropagation(); speak(word.word, { lang: langConfig.ttsLocale }); }}

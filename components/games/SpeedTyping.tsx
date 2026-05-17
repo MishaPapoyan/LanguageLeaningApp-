@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import { speakTarget } from "@/lib/speech";
 
 interface Word { id: string; word: string; translation: string; }
@@ -223,7 +224,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
           Type the {targetLang === "es" ? "Spanish" : targetLang === "en" ? "English" : "French"} word for:
         </p>
         <p style={{ fontSize: 36, fontWeight: 900, color: "var(--accent)", margin: "0 0 6px", lineHeight: 1.1 }}>
-          {word.translation}
+          {wordTranslation(word, locale)}
         </p>
         <button
           onClick={() => speakTarget(word.word, targetLang)}
@@ -308,7 +309,7 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
               {savePrompt.word}
             </p>
             <p style={{ fontSize: 14, color: "var(--text-3)", marginBottom: 20 }}>
-              {savePrompt.translation}
+              {wordTranslation(savePrompt, locale)}
             </p>
             <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
               Save this word to your dictionary?

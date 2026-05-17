@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { getLanguageConfig } from "@/data/language-config";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation } from "@/lib/wordI18n";
 import Link from "next/link";
 import { Lightbulb, RotateCcw } from "lucide-react";
 import { SpeakButton } from "@/components/ui/SpeakButton";
@@ -262,7 +263,7 @@ export function WordScramble({ words }: { words: Word[] }) {
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 4px" }}>
           Unscramble the {langConfig.label} word for:
         </p>
-        <p style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", margin: "0 0 10px" }}>{word.translation}</p>
+        <p style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", margin: "0 0 10px" }}>{wordTranslation(word, locale)}</p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
           <SpeakButton text={word.word} lang={session?.user?.targetLanguage ?? "fr"} size={14} />
           <span style={{ fontSize: 12, color: "var(--text-3)" }}>hear pronunciation</span>
@@ -354,7 +355,7 @@ export function WordScramble({ words }: { words: Word[] }) {
               {savePrompt.word}
             </p>
             <p style={{ fontSize: 14, color: "var(--text-3)", marginBottom: 20 }}>
-              {savePrompt.translation}
+              {wordTranslation(savePrompt, locale)}
             </p>
             <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 20 }}>
               Save this word to your dictionary?

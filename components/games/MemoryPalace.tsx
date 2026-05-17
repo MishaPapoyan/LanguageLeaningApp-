@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { getLocale } from "@/lib/i18n";
+import { wordTranslation, wordDefinition } from "@/lib/wordI18n";
 import { getLanguageConfig } from "@/data/language-config";
 import Link from "next/link";
 import { speakTarget } from "@/lib/speech";
@@ -21,6 +23,7 @@ const PALACE_OBJECTS = [
 
 export function MemoryPalace({ words }: { words: Word[] }) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [activeObj, setActiveObj] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
@@ -196,10 +199,10 @@ export function MemoryPalace({ words }: { words: Word[] }) {
                 </button>
               </div>
               <p style={{ fontSize: 14, color: "var(--accent-2)", fontWeight: 600, marginTop: 4 }}>
-                {assignments[activeObj].translation}
+                {wordTranslation(assignments[activeObj], locale)}
               </p>
               <p style={{ fontSize: 12, color: "var(--text-3)", marginTop: 3 }}>
-                {assignments[activeObj].definition}
+                {wordDefinition(assignments[activeObj], locale)}
               </p>
             </div>
           )}
@@ -232,7 +235,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
               }}>
                 <span style={{ fontSize: 28 }}>{obj.emoji}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 6 }}>{word.translation}</p>
+                  <p style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 6 }}>{wordTranslation(word, locale)}</p>
                   <input
                     type="text"
                     value={quizAnswers[obj.id] ?? ""}
@@ -269,7 +272,7 @@ export function MemoryPalace({ words }: { words: Word[] }) {
               >
                 <span style={{ fontSize: 28 }}>{obj.emoji}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 12, color: "var(--text-3)" }}>{word.translation}</p>
+                  <p style={{ fontSize: 12, color: "var(--text-3)" }}>{wordTranslation(word, locale)}</p>
                   <p style={{ fontSize: 15, fontWeight: 700, color: correct ? "var(--green)" : "var(--red)" }}>
                     {answer || "(blank)"} {correct ? "✓" : "✗"}
                   </p>

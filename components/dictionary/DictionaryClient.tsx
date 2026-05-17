@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { t, getLocale } from "@/lib/i18n";
+import { wordTranslation, wordDefinition } from "@/lib/wordI18n";
 import { getLanguageConfig } from "@/data/language-config";
 import { speak } from "@/lib/speech";
 import Link from "next/link";
@@ -39,8 +40,8 @@ export function DictionaryClient({ initialWords }: Props) {
       .filter(
         (w) =>
           w.word.toLowerCase().includes(q) ||
-          w.translation.toLowerCase().includes(q) ||
-          w.definition.toLowerCase().includes(q),
+          wordTranslation(w, locale).toLowerCase().includes(q) ||
+          wordDefinition(w, locale).toLowerCase().includes(q),
       )
       .slice(0, 6);
   }, [query, initialWords]);
@@ -160,10 +161,10 @@ export function DictionaryClient({ initialWords }: Props) {
                   <p className="text-xs font-bold uppercase tracking-widest text-white/40">
                     Translation
                   </p>
-                  <p className="text-3xl font-medium">{primary.translation}</p>
-                  {primary.definition && (
+                  <p className="text-3xl font-medium">{wordTranslation(primary, locale)}</p>
+                  {wordDefinition(primary, locale) && (
                     <p className="text-sm text-white/50 leading-relaxed">
-                      {primary.definition}
+                      {wordDefinition(primary, locale)}
                     </p>
                   )}
                 </div>
@@ -201,7 +202,7 @@ export function DictionaryClient({ initialWords }: Props) {
                       <div className="flex-1 min-w-0">
                         <p className="font-bold mono lowercase">{w.word}</p>
                         <p className="text-sm text-white/40 truncate">
-                          {w.translation}
+                          {wordTranslation(w, locale)}
                         </p>
                       </div>
                     </Link>
