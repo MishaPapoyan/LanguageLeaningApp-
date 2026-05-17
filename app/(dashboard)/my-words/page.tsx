@@ -514,7 +514,7 @@ export default function MyWordsPage() {
       {/* ── Header ── */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-5xl mb-2">My Collection</h1>
+          <h1 className="text-5xl mb-2">{t(locale, "mywords_collection")}</h1>
           <p className="text-white/40 text-lg">
             Mastering <span className="text-emerald-400 font-bold mono">{totalWords}</span> terms in your personal vocabulary bank.
           </p>
@@ -538,20 +538,20 @@ export default function MyWordsPage() {
       {/* ── Stats row ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-premium p-6 flex flex-col items-center">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">Overall Mastery</h4>
+          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">{t(locale, "mywords_overallMastery")}</h4>
           <span className="text-5xl font-bold mono">{overallMastery}%</span>
           <div className="w-full h-1.5 bg-white/5 rounded-full mt-4 overflow-hidden">
             <div className="h-full bg-emerald-500" style={{ width: `${overallMastery}%` }} />
           </div>
         </div>
         <div className="card-premium p-6 flex flex-col items-center">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">New Words</h4>
+          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">{t(locale, "mywords_newWords")}</h4>
           <span className="text-5xl font-bold mono">{newThisWeek}</span>
-          <p className="text-xs text-white/40 mt-3 font-bold italic uppercase tracking-widest">Added this week</p>
+          <p className="text-xs text-white/40 mt-3 font-bold italic uppercase tracking-widest">{t(locale, "mywords_addedThisWeek")}</p>
         </div>
         <div className="card-premium p-6 flex flex-col items-center">
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">Next Session</h4>
-          <span className="text-3xl font-medium serif italic">Today, 5 PM</span>
+          <h4 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">{t(locale, "mywords_nextSession")}</h4>
+          <span className="text-3xl font-medium serif italic">{t(locale, "mywords_nextSessionTime")}</span>
           <p className="text-xs text-rose-400 mt-3 font-bold uppercase tracking-widest flex items-center gap-1">
             <Zap size={10} fill="currentColor" /> Overdue: {Math.min(words.length, 8)} terms
           </p>
@@ -591,7 +591,7 @@ export default function MyWordsPage() {
               type="text" value={front}
               onChange={e => setFront(e.target.value)}
               onKeyDown={e => e.key === "Enter" && back.trim() && addWord()}
-              placeholder="e.g. hello"
+              placeholder={t(locale, "mywords_frontPlaceholder")}
               className="input"
               style={{ width: "100%", fontSize: 15 }}
             />
@@ -635,7 +635,7 @@ export default function MyWordsPage() {
               transition: "all 0.2s",
               boxShadow: front.trim() && back.trim() && !saving ? "0 4px 12px rgba(16,185,129,0.35)" : "none",
             }}
-            title="Add word pair"
+            title={t(locale, "mywords_addWordPair")}
           >
             <Plus size={18} />
           </button>
@@ -670,11 +670,11 @@ export default function MyWordsPage() {
           {/* Column headers */}
           <div className="flex items-center justify-between px-2 text-xs font-bold uppercase tracking-widest text-white/40">
             <div className="flex gap-8">
-              <span>Term</span>
+              <span>{t(locale, "mywords_colTerm")}</span>
             </div>
             <div className="flex gap-12 mr-12">
-              <span>Mastery</span>
-              <span>Lv</span>
+              <span>{t(locale, "mywords_colMastery")}</span>
+              <span>{t(locale, "mywords_colLv")}</span>
             </div>
           </div>
 
@@ -693,7 +693,7 @@ export default function MyWordsPage() {
                       autoFocus
                       value={editFront}
                       onChange={(e) => setEditFront(e.target.value)}
-                      placeholder="Your language"
+                      placeholder={t(locale, "mywords_yourLanguage")}
                       className="input flex-1"
                     />
                     <input
@@ -706,14 +706,14 @@ export default function MyWordsPage() {
                     <button
                       onClick={saveEdit}
                       className="p-2 rounded-full bg-emerald-500 text-black hover:bg-emerald-400 transition-colors"
-                      aria-label="Save"
+                      aria-label={t(locale, "mywords_save")}
                     >
                       <Check size={16} />
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
                       className="p-2 rounded-full border border-white/10 text-white/40 hover:text-white transition-colors"
-                      aria-label="Cancel"
+                      aria-label={t(locale, "mywords_cancel")}
                     >
                       <X size={16} />
                     </button>
@@ -731,7 +731,7 @@ export default function MyWordsPage() {
                     <button
                       onClick={() => speakTarget(word.back, langConfig.code)}
                       className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 text-white/40 hover:text-white transition-colors flex-shrink-0"
-                      aria-label="Listen"
+                      aria-label={t(locale, "mywords_listen")}
                     >
                       <Volume2 size={16} />
                     </button>
@@ -768,14 +768,14 @@ export default function MyWordsPage() {
                       <button
                         onClick={() => startEdit(word)}
                         className="p-2 text-white/40 hover:text-emerald-500 transition-colors"
-                        aria-label="Edit"
+                        aria-label={t(locale, "mywords_edit")}
                       >
                         <Pencil size={16} />
                       </button>
                       <button
                         onClick={() => deleteWord(word.id)}
                         className="p-2 text-rose-500/40 hover:text-rose-500 transition-colors"
-                        aria-label="Delete"
+                        aria-label={t(locale, "mywords_delete")}
                       >
                         <Trash2 size={16} />
                       </button>

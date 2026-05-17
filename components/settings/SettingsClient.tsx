@@ -126,7 +126,7 @@ export function SettingsClient({
               type="button"
               onClick={() => setShowAvatarPicker(v => !v)}
               className="w-full h-full rounded-full bg-black flex items-center justify-center text-5xl font-bold italic serif transition-transform hover:scale-105"
-              aria-label="Change avatar"
+              aria-label={t(locale, "settings_chooseAvatar")}
             >
               {isEmojiAvatar ? avatar : initial}
             </button>
@@ -135,7 +135,7 @@ export function SettingsClient({
             type="button"
             onClick={() => setShowAvatarPicker(v => !v)}
             className="absolute bottom-0 right-0 p-2 bg-white text-black rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all"
-            aria-label="Edit avatar"
+            aria-label={t(locale, "settings_editAvatar")}
           >
             <Smile size={18} />
           </button>
@@ -206,7 +206,7 @@ export function SettingsClient({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* System */}
         <section className="space-y-4">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">System</h3>
+          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">{t(locale, "settings_system")}</h3>
           <div className="space-y-2">
             {/* Display name row (editable) */}
             <div className="card-premium p-4">
@@ -240,7 +240,7 @@ export function SettingsClient({
             <div className="w-full card-premium p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Mail size={18} className="text-white/20" />
-                <span className="text-sm font-medium">Email</span>
+                <span className="text-sm font-medium">{t(locale, "auth_email")}</span>
               </div>
               <span className="text-xs font-bold text-white/40 truncate max-w-[180px]">{email}</span>
             </div>
@@ -290,7 +290,7 @@ export function SettingsClient({
             >
               <div className="flex items-center gap-3">
                 <Smile size={18} className="text-white/20" />
-                <span className="text-sm font-medium">Avatar</span>
+                <span className="text-sm font-medium">{t(locale, "settings_avatar")}</span>
               </div>
               <span className="text-2xl">{isEmojiAvatar ? avatar : initial}</span>
             </button>
@@ -299,7 +299,7 @@ export function SettingsClient({
 
         {/* Targeting */}
         <section className="space-y-4">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">Targeting</h3>
+          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">{t(locale, "settings_targeting")}</h3>
           <p className="text-xs text-white/40 px-2">{t(locale, "settings_learning")}</p>
           <div className="space-y-2">
             {TARGET_LANGUAGES.map((l) => {
@@ -350,18 +350,18 @@ export function SettingsClient({
 
       {/* Subscriptions */}
       <section className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">Subscriptions</h3>
+        <h3 className="text-sm font-bold uppercase tracking-widest text-white/30 px-2">{t(locale, "settings_subscriptions")}</h3>
         <div className="card-premium p-8 bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 rounded-2xl bg-white text-black flex items-center justify-center font-black italic text-2xl">L+</div>
             <div>
-              <h4 className="text-2xl font-bold italic serif">Lingova Premium</h4>
-              <p className="text-white/40 text-sm">Free plan — upgrade to unlock everything</p>
+              <h4 className="text-2xl font-bold italic serif">{t(locale, "settings_premiumName")}</h4>
+              <p className="text-white/40 text-sm">{t(locale, "settings_freePlanCta")}</p>
             </div>
           </div>
           <div className="flex gap-4 w-full md:w-auto">
-            <button type="button" className="flex-1 btn-secondary py-3 px-8 text-xs font-bold">Manage Plan</button>
-            <button type="button" className="flex-1 btn-primary py-3 px-8 text-xs font-bold">Upgrade</button>
+            <button type="button" className="flex-1 btn-secondary py-3 px-8 text-xs font-bold">{t(locale, "settings_managePlan")}</button>
+            <button type="button" className="flex-1 btn-primary py-3 px-8 text-xs font-bold">{t(locale, "settings_upgrade")}</button>
           </div>
         </div>
       </section>
@@ -370,7 +370,7 @@ export function SettingsClient({
       {earnedBadges.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-white/30">Earned Badges</h3>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white/30">{t(locale, "settings_earnedBadges")}</h3>
             <Link href="/progress" className="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300">
               {t(locale, "settings_allBadgesArrow")}
             </Link>
@@ -424,7 +424,7 @@ export function SettingsClient({
             </button>
           ) : (
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-xs font-bold text-rose-400">Are you sure? This is permanent.</span>
+              <span className="text-xs font-bold text-rose-400">{t(locale, "settings_deleteConfirm")}</span>
               <button
                 type="button"
                 onClick={handleDelete}
@@ -449,7 +449,7 @@ export function SettingsClient({
             <Mail size={16} /> Contact Support
           </a>
         </div>
-        <p className="text-xs text-white/10 mono">Build Version: 2.14.8-premium</p>
+        <p className="text-xs text-white/10 mono">{t(locale, "settings_buildVersion")}</p>
       </section>
 
       {deleteError && <p className="text-xs text-rose-400 px-2">{deleteError}</p>}
