@@ -6,12 +6,14 @@ import { getLessonByIdEs, getAllLessonsEs } from "@/data/learning-path-es";
 import { getLessonByIdEn, getAllLessonsEn } from "@/data/learning-path-en";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import Link from "next/link";
 
 export default function LessonPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const router = useRouter();
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const targetLang = session?.user?.targetLanguage ?? "fr";
   const lesson = targetLang === "es" ? getLessonByIdEs(lessonId)
                : targetLang === "en" ? getLessonByIdEn(lessonId)
@@ -34,12 +36,12 @@ export default function LessonPage() {
     return (
       <div className="max-w-3xl mx-auto" style={{ textAlign: "center", padding: "80px 0" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-          <span className="lv-stamp" style={{ color: "var(--rose)", transform: "rotate(-3deg)" }}>Not found</span>
+          <span className="lv-stamp" style={{ color: "var(--rose)", transform: "rotate(-3deg)" }}>{t(locale, "lesson_notFoundStamp")}</span>
         </div>
         <h1 className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, lineHeight: 1.1, marginBottom: 20 }}>
-          Lesson not found
+          {t(locale, "lesson_notFound")}
         </h1>
-        <Link href="/learn" className="lv-btn lv-btn--primary" style={{ display: "inline-flex" }}>Back to Learning Path</Link>
+        <Link href="/learn" className="lv-btn lv-btn--primary" style={{ display: "inline-flex" }}>{t(locale, "lesson_backToPath")}</Link>
       </div>
     );
   }
@@ -97,7 +99,7 @@ export default function LessonPage() {
     return (
       <div className="max-w-3xl mx-auto lv-fade-up">
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 8 }}>
-          <Link href="/learn" className="lv-btn lv-btn--ghost lv-btn--icon" aria-label="Back to Learning Path">
+          <Link href="/learn" className="lv-btn lv-btn--ghost lv-btn--icon" aria-label={t(locale, "lesson_backToPath")}>
             <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -166,7 +168,7 @@ export default function LessonPage() {
               {section.tip && (
                 <div className="lv-card lv-card--paper2" style={{ padding: "12px 16px", marginTop: 12, borderColor: "var(--terracotta)" }}>
                   <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
-                    <span className="mono" style={{ fontWeight: 700, color: "var(--terracotta)" }}>Tip: </span>{section.tip}
+                    <span className="mono" style={{ fontWeight: 700, color: "var(--terracotta)" }}>{t(locale, "lesson_tip")}</span>{section.tip}
                   </p>
                 </div>
               )}
@@ -198,7 +200,7 @@ export default function LessonPage() {
       <div className="max-w-2xl mx-auto lv-fade-up">
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <Link href="/learn" className="lv-btn lv-btn--ghost lv-btn--icon" aria-label="Exit lesson">
+            <Link href="/learn" className="lv-btn lv-btn--ghost lv-btn--icon" aria-label={t(locale, "lesson_exit")}>
               <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -272,7 +274,7 @@ export default function LessonPage() {
                   value={fillInput}
                   onChange={(e) => setFillInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter" && fillInput.trim() && !answered) handleAnswer(fillInput); }}
-                  placeholder="Type your answer..."
+                  placeholder={t(locale, "lesson_answerPlaceholder")}
                   className="input flex-1"
                   style={{
                     flex: 1, padding: "14px 16px", fontSize: 16,
@@ -303,9 +305,9 @@ export default function LessonPage() {
                   }}
                 >
                   {isCorrect ? (
-                    <span>Correct! ✓</span>
+                    <span>{t(locale, "lesson_correct")}</span>
                   ) : (
-                    <span>The answer is: <strong>{exercise.answer}</strong></span>
+                    <span>{t(locale, "lesson_theAnswerIs")} <strong>{exercise.answer}</strong></span>
                   )}
                 </div>
               )}
@@ -331,7 +333,7 @@ export default function LessonPage() {
     <div className="max-w-2xl mx-auto lv-fade-up" style={{ textAlign: "center" }}>
       <div className="lv-card" style={{ padding: "48px 36px" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-          <span className="lv-stamp" style={{ color: "oklch(0.55 0.18 130)", transform: "rotate(-3deg)" }}>Lesson complete</span>
+          <span className="lv-stamp" style={{ color: "oklch(0.55 0.18 130)", transform: "rotate(-3deg)" }}>{t(locale, "lesson_completeStamp")}</span>
         </div>
         <div style={{ fontSize: 60, lineHeight: 1, marginBottom: 8 }}>
           {pct >= 80 ? "◈" : pct >= 50 ? "▤" : "△"}
@@ -355,14 +357,14 @@ export default function LessonPage() {
             <p className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, color: "var(--terracotta)", lineHeight: 1 }}>
               {score}/{exercises.length}
             </p>
-            <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>Correct</p>
+            <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>{t(locale, "lesson_correctLabel")}</p>
           </div>
           <div style={{ width: 1, height: 44, background: "var(--line-2)" }} />
           <div style={{ textAlign: "center" }}>
             <p className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, color: pctColor, lineHeight: 1 }}>
               {pct}%
             </p>
-            <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>Score</p>
+            <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>{t(locale, "lesson_score")}</p>
           </div>
           {xpEarned > 0 && (
             <>
@@ -371,7 +373,7 @@ export default function LessonPage() {
                 <p className="serif-i" style={{ fontFamily: "var(--display)", fontSize: 40, color: "var(--marine)", lineHeight: 1 }}>
                   +{xpEarned}
                 </p>
-                <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>XP Earned</p>
+                <p className="mono" style={{ fontSize: 10, color: "var(--ink-3)", marginTop: 6 }}>{t(locale, "lesson_xpEarned")}</p>
               </div>
             </>
           )}

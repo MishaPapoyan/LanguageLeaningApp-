@@ -6,7 +6,7 @@ import { LEARNING_PATH_META_EN } from "@/data/learning-path-en-meta";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { t, getLocale } from "@/lib/i18n";
+import { t, getLocale, type Locale } from "@/lib/i18n";
 import { Lock, Check, ChevronRight, Star } from "lucide-react";
 
 // ── phases ───────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ interface CelebModal {
   phaseLabel?: string;
 }
 
-function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () => void }) {
+function CelebrationModal({ modal, onClose, locale }: { modal: CelebModal; onClose: () => void; locale: Locale }) {
   const tone =
     modal.kind === "course" ? "var(--lime-2)" :
     modal.kind === "phase"  ? "var(--marine)" :
@@ -87,7 +87,7 @@ function CelebrationModal({ modal, onClose }: { modal: CelebModal; onClose: () =
         >
           <span style={{ fontSize: 18 }}>⚡</span>
           <span className="mono" style={{ fontSize: 22, fontWeight: 700, color: "var(--terracotta)", letterSpacing: 0 }}>+{modal.xp} XP</span>
-          <span className="mono" style={{ fontSize: 11, color: "var(--ink-3)" }}>reward</span>
+          <span className="mono" style={{ fontSize: 11, color: "var(--ink-3)" }}>{t(locale, "learn_reward")}</span>
         </div>
         <button onClick={onClose} className="lv-btn lv-btn--primary lv-btn--lg" style={{ width: "100%", justifyContent: "center" }}>
           {modal.kind === "course" ? "View My Certificate" : "Continue"}
@@ -352,7 +352,7 @@ export default function LearnPage() {
   return (
     <div className="max-w-3xl mx-auto pb-32 lv-fade-up">
 
-      {modal && <CelebrationModal modal={modal} onClose={() => setModal(null)} />}
+      {modal && <CelebrationModal modal={modal} onClose={() => setModal(null)} locale={locale} />}
 
       {/* ── Header ── */}
       <header className="text-center mb-20 relative" style={{ position: "relative" }}>
@@ -365,7 +365,7 @@ export default function LearnPage() {
           className="serif-i"
           style={{ fontFamily: "var(--display)", fontSize: 64, lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 auto" }}
         >
-          The road to <em style={{ color: "var(--terracotta)" }}>fluency.</em>
+          {t(locale, "learn_roadTo")} <em style={{ color: "var(--terracotta)" }}>{t(locale, "learn_fluency")}</em>
         </h1>
         <p style={{ fontSize: 18, color: "var(--ink-3)", maxWidth: 560, margin: "16px auto 0", lineHeight: 1.55 }}>
           From zero to fluent. Work through lessons at your own pace and unlock new chapters as you go.
@@ -415,9 +415,9 @@ export default function LearnPage() {
                   </h2>
                 </div>
                 {phaseDone ? (
-                  <span className="lv-sticker" style={{ color: "oklch(0.55 0.18 130)", transform: "rotate(-2deg)" }}>Complete</span>
+                  <span className="lv-sticker" style={{ color: "oklch(0.55 0.18 130)", transform: "rotate(-2deg)" }}>{t(locale, "learn_phaseComplete")}</span>
                 ) : phaseUnlocked ? (
-                  <span className="lv-sticker" style={{ color: "var(--terracotta)", transform: "rotate(-2deg)" }}>You are here</span>
+                  <span className="lv-sticker" style={{ color: "var(--terracotta)", transform: "rotate(-2deg)" }}>{t(locale, "learn_youAreHere")}</span>
                 ) : (
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--ink-3)", fontSize: 13 }}>
                     <Lock size={14} /> Locked
@@ -464,7 +464,7 @@ export default function LearnPage() {
                     }}
                   >
                     <Lock size={32} />
-                    <p style={{ fontWeight: 500 }}>Complete previous phase to unlock</p>
+                    <p style={{ fontWeight: 500 }}>{t(locale, "learn_completePrevPhase")}</p>
                   </div>
                 )}
               </div>
