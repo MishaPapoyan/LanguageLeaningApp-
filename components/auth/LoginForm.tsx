@@ -1,12 +1,15 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Zap, Phone, Mail } from "lucide-react";
+import { t, getClientLocale, type Locale } from "@/lib/i18n";
 
 export function LoginForm() {
   const router = useRouter();
+  const [locale, setLocale] = useState<Locale>("en");
+  useEffect(() => { setLocale(getClientLocale()); }, []);
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const [email, setEmail]       = useState("");
   const [phone, setPhone]       = useState("");
@@ -18,7 +21,7 @@ export function LoginForm() {
   const doSignIn = async (e: string, p: string) => {
     const result = await signIn("credentials", { email: e, password: p, redirect: false });
     if (result?.error) {
-      setError("Invalid credentials");
+      setError(t(locale, "auth_invalidCredentials"));
       setLoading(false);
       setDemoLoading(false);
     } else {
@@ -61,13 +64,13 @@ export function LoginForm() {
       >
         <Zap size={15} style={{ color: "var(--accent)" }} />
         <span style={{ fontSize: 14, fontWeight: 700, color: "var(--accent)" }}>
-          {demoLoading ? "Loading demo…" : "Try demo account — one click"}
+          {demoLoading ? t(locale, "auth_demoLoading") : t(locale, "auth_demoBtn")}
         </span>
       </button>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-        <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>or sign in</span>
+        <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>{t(locale, "auth_orSignIn")}</span>
         <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
       </div>
 
@@ -89,7 +92,7 @@ export function LoginForm() {
             }}
           >
             {method === "email" ? <Mail size={14} /> : <Phone size={14} />}
-            {method === "email" ? "Email" : "Phone"}
+            {method === "email" ? t(locale, "auth_email") : t(locale, "auth_phone")}
           </button>
         ))}
       </div>
@@ -103,22 +106,22 @@ export function LoginForm() {
 
         {loginMethod === "email" ? (
           <div>
-            <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="you@example.com" required />
+            <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>{t(locale, "auth_email")}</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder={t(locale, "auth_emailPlaceholder")} required />
           </div>
         ) : (
           <div>
-            <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Phone number</label>
+            <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>{t(locale, "auth_phoneNumber")}</label>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input" placeholder="+1 555 000 0000" required />
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder="Enter your password" required />
+          <label className="block text-xs font-medium uppercase tracking-wide mb-1.5" style={{ color: "var(--text-3)" }}>{t(locale, "auth_password")}</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder={t(locale, "auth_passwordEnter")} required />
         </div>
         <button type="submit" disabled={loading || demoLoading} className="btn-primary w-full py-3">
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? t(locale, "auth_signingIn") : t(locale, "auth_signIn")}
         </button>
       </form>
     </div>

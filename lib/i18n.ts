@@ -61,6 +61,10 @@ const en = {
   auth_invalidCredentials: "Invalid email or password",
   auth_registrationFailed: "Registration failed",
   auth_startFree: "Start free",
+  auth_orSignIn: "or sign in",
+  auth_phone: "Phone",
+  auth_phoneNumber: "Phone number",
+  auth_passwordRepeat: "Repeat your password",
 
   // Landing page
   landing_tagline: "For absolute beginners & returners",
@@ -579,6 +583,10 @@ const hy: typeof en = {
   auth_invalidCredentials: "Սխալ էլ. փոստ կամ գաղտնաբառ",
   auth_registrationFailed: "Գրանցումը ձախողվեց",
   auth_startFree: "Սկսել անվճար",
+  auth_orSignIn: "կամ մուտք գործել",
+  auth_phone: "Հեռախոս",
+  auth_phoneNumber: "Հեռախոսահամար",
+  auth_passwordRepeat: "Կրկնեք գաղտնաբառը",
 
   // Landing
   landing_tagline: "Սկսնակների և վերադարձողների համար",
@@ -1538,5 +1546,24 @@ export function t(locale: Locale, key: TranslationKey, vars?: Record<string, str
 export function getLocale(nativeLanguage?: string | null): Locale {
   if (nativeLanguage === "hy") return "hy";
   if (nativeLanguage === "ru") return "ru";
+  return "en";
+}
+
+/**
+ * Pre-auth locale source. On the landing/login/register pages there is no
+ * session yet, so we derive the UI language from (1) an explicit override
+ * persisted in localStorage, else (2) the browser/OS language. SSR-safe:
+ * returns "en" on the server; call inside useEffect to avoid hydration
+ * mismatch, then setState.
+ */
+export function getClientLocale(): Locale {
+  if (typeof window === "undefined") return "en";
+  try {
+    const saved = window.localStorage.getItem("lingova_locale");
+    if (saved === "hy" || saved === "ru" || saved === "en") return saved;
+  } catch {}
+  const nav = (navigator.language || "").toLowerCase();
+  if (nav.startsWith("hy")) return "hy";
+  if (nav.startsWith("ru")) return "ru";
   return "en";
 }

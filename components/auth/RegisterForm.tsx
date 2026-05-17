@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff, ArrowRight, Check } from "lucide-react";
+import { t, getClientLocale, type Locale } from "@/lib/i18n";
 
 type TargetLang = "fr" | "es" | "en";
 
@@ -24,6 +25,8 @@ const NATIVE_LANGUAGES = [
 
 export function RegisterForm() {
   const router = useRouter();
+  const [locale, setLocale] = useState<Locale>("en");
+  useEffect(() => { setLocale(getClientLocale()); }, []);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -175,7 +178,7 @@ export function RegisterForm() {
         </label>
         <input
           type="text" value={name} onChange={(e) => setName(e.target.value)}
-          className="input" placeholder="Alex" required minLength={2}
+          className="input" placeholder={t(locale, "auth_namePlaceholder")} required minLength={2}
         />
       </div>
 
@@ -186,7 +189,7 @@ export function RegisterForm() {
         </label>
         <input
           type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="input" placeholder="you@example.com" required
+          className="input" placeholder={t(locale, "auth_emailPlaceholder")} required
         />
       </div>
 
@@ -210,7 +213,7 @@ export function RegisterForm() {
           <input
             type={showPassword ? "text" : "password"}
             value={password} onChange={(e) => setPassword(e.target.value)}
-            className="input" placeholder="At least 6 characters"
+            className="input" placeholder={t(locale, "auth_passwordPlaceholder")}
             required minLength={6}
             style={{ paddingRight: "44px" }}
           />
@@ -237,7 +240,7 @@ export function RegisterForm() {
           <input
             type={showConfirm ? "text" : "password"}
             value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-            className="input" placeholder="Repeat your password"
+            className="input" placeholder={t(locale, "auth_passwordRepeat")}
             required
             style={{
               paddingRight: "44px",
@@ -280,7 +283,7 @@ export function RegisterForm() {
           opacity: loading || passwordMismatch ? 0.7 : 1,
         }}
       >
-        {loading ? "Creating account…" : <>Create account <ArrowRight size={15} /></>}
+        {loading ? t(locale, "auth_creatingAccount") : <>{t(locale, "auth_createAccount")} <ArrowRight size={15} /></>}
       </button>
 
       <p style={{ fontSize: "11px", color: "var(--text-3)", textAlign: "center", lineHeight: 1.5 }}>
