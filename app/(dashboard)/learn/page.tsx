@@ -6,24 +6,24 @@ import { LEARNING_PATH_META_EN } from "@/data/learning-path-en-meta";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { t, getLocale, type Locale } from "@/lib/i18n";
+import { t, getLocale, type Locale, type TranslationKey } from "@/lib/i18n";
 import { Lock, Check, ChevronRight, Star } from "lucide-react";
 
 // ── phases ───────────────────────────────────────────────────────────────
-const FR_PHASES = [
-  { label: "Phase 1 — The Basics",         emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
-  { label: "Phase 2 — Core Grammar",       emoji: "⚙️", ids: ["articles-gender","subject-pronouns","avoir-verb","present-tense","adjectives","negation","questions"] },
-  { label: "Phase 3 — Real World French",  emoji: "🌍", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
+const FR_PHASES: { labelKey: TranslationKey; emoji: string; ids: string[] }[] = [
+  { labelKey: "learn_phase1",   emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
+  { labelKey: "learn_phase2",   emoji: "⚙️", ids: ["articles-gender","subject-pronouns","avoir-verb","present-tense","adjectives","negation","questions"] },
+  { labelKey: "learn_phase3Fr", emoji: "🌍", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
 ];
-const ES_PHASES = [
-  { label: "Phase 1 — The Basics",         emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
-  { label: "Phase 2 — Core Grammar",       emoji: "⚙️", ids: ["articles-gender","subject-pronouns","tener-verb","present-tense","adjectives","negation","questions"] },
-  { label: "Phase 3 — Real World Spanish", emoji: "🌍", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
+const ES_PHASES: { labelKey: TranslationKey; emoji: string; ids: string[] }[] = [
+  { labelKey: "learn_phase1",   emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
+  { labelKey: "learn_phase2",   emoji: "⚙️", ids: ["articles-gender","subject-pronouns","tener-verb","present-tense","adjectives","negation","questions"] },
+  { labelKey: "learn_phase3Es", emoji: "🌍", ids: ["food-drinks","directions-places","time-days","past-tense","future-plans"] },
 ];
-const EN_PHASES = [
-  { label: "Phase 1 — The Basics",         emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
-  { label: "Phase 2 — Core Grammar",       emoji: "⚙️", ids: ["articles","pronouns-be","have-do","present-simple","adjectives","negation","questions"] },
-  { label: "Phase 3 — Real World English", emoji: "🌍", ids: ["food-drinks","directions","time-days","past-simple","future"] },
+const EN_PHASES: { labelKey: TranslationKey; emoji: string; ids: string[] }[] = [
+  { labelKey: "learn_phase1",   emoji: "🌱", ids: ["alphabet","pronunciation","greetings","numbers","essentials"] },
+  { labelKey: "learn_phase2",   emoji: "⚙️", ids: ["articles","pronouns-be","have-do","present-simple","adjectives","negation","questions"] },
+  { labelKey: "learn_phase3En", emoji: "🌍", ids: ["food-drinks","directions","time-days","past-simple","future"] },
 ];
 
 // ── prize definitions ────────────────────────────────────────────────────
@@ -286,10 +286,10 @@ export default function LearnPage() {
           setShownCelebrations(prev => new Set(prev).add(key));
           setModal({
             kind: "phase", emoji: phase.emoji,
-            title: t(locale, "learn_phaseCompleteTitle", { phase: phase.label }),
+            title: t(locale, "learn_phaseCompleteTitle", { phase: t(locale, phase.labelKey) }),
             subtitle: t(locale, "learn_phaseCompleteSub", { n: String(phaseTopics.length) }),
             xp: PHASE_PRIZES[pi] ?? 200,
-            phaseLabel: phase.label,
+            phaseLabel: t(locale, phase.labelKey),
           });
           return;
         }
@@ -411,7 +411,7 @@ export default function LearnPage() {
                     className="serif-i"
                     style={{ fontFamily: "var(--display)", fontSize: 40, marginTop: 4, lineHeight: 1.1 }}
                   >
-                    {phase.label}
+                    {t(locale, phase.labelKey)}
                   </h2>
                 </div>
                 {phaseDone ? (
