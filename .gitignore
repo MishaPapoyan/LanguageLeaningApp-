@@ -42,3 +42,7 @@ next-env.d.ts
 /.lingova-design/
 /.design-drop/
 /.claude/worktrees/
+/.i18n-audit/
+.i18n-*.py
+.i18n-*.txt
+*.ts.bak
