@@ -71,8 +71,8 @@ export default async function ProgressPage() {
   return (
     <div className="space-y-12">
       <header>
-        <h1 className="text-5xl mb-2">Your Progress</h1>
-        <p className="text-white/40 text-lg">Detailed breakdown of your language acquisition journey.</p>
+        <h1 className="text-5xl mb-2">{t(locale, "progress_yourProgress")}</h1>
+        <p className="text-white/40 text-lg">{t(locale, "progress_subtitle")}</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -81,9 +81,9 @@ export default async function ProgressPage() {
           {/* Weekly XP chart */}
           <section className="card-premium p-8 h-[400px] flex flex-col">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl italic font-serif">Weekly XP Volume</h3>
+              <h3 className="text-2xl italic font-serif">{t(locale, "progress_weeklyXpVolume")}</h3>
               <div className="flex gap-4 text-xs font-bold uppercase tracking-widest text-white/40">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Current</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> {t(locale, "progress_current")}</span>
               </div>
             </div>
             <div className="flex-1 min-h-0">
@@ -93,7 +93,7 @@ export default async function ProgressPage() {
 
           {/* Milestones */}
           <section>
-            <h3 className="text-3xl mb-6 italic font-serif">Milestones Achieved</h3>
+            <h3 className="text-3xl mb-6 italic font-serif">{t(locale, "progress_milestonesAchieved")}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {earnedBadges.length === 0 ? (
                 <div className="col-span-full card-premium p-8 text-center text-white/40 text-sm">
@@ -110,7 +110,7 @@ export default async function ProgressPage() {
                       </div>
                       <div>
                         <p className="font-bold text-sm">{badge.name}</p>
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-white/30">Earned</p>
+                        <p className="text-[10px] uppercase tracking-widest font-bold text-white/30">{t(locale, "progress_earned")}</p>
                       </div>
                     </div>
                   );
@@ -148,7 +148,7 @@ export default async function ProgressPage() {
 
           {/* Skill Breakdown */}
           <section className="card-premium p-8 space-y-6">
-            <h4 className="text-2xl italic font-serif">Skill Breakdown</h4>
+            <h4 className="text-2xl italic font-serif">{t(locale, "progress_skillBreakdown")}</h4>
             <div className="space-y-6">
               {skills.map((s) => (
                 <div key={s.label} className="space-y-2">
@@ -174,7 +174,7 @@ export default async function ProgressPage() {
                 <Target size={20} />
               </div>
               <div>
-                <p className="text-sm font-bold">Estimated Level</p>
+                <p className="text-sm font-bold">{t(locale, "progress_estimatedLevel")}</p>
                 <p className="text-xs text-white/40 uppercase font-bold tracking-widest">{t(locale, "progress_levelLabel")} {xpInfo.level}</p>
               </div>
             </div>

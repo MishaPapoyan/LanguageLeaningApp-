@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { BookOpen, Play, ChevronRight } from "lucide-react";
 
 interface StoryItem {
@@ -33,6 +35,8 @@ const FILTERS = ["All", "Beginner", "Intermediate", "Advanced"] as const;
 type Filter = (typeof FILTERS)[number];
 
 export function StoriesClient({ stories }: { stories: StoryItem[] }) {
+  const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const [active, setActive] = useState<Filter>("All");
 
   const visible =
@@ -113,8 +117,8 @@ export function StoriesClient({ stories }: { stories: StoryItem[] }) {
         {visible.length === 0 && (
           <div className="card-premium p-12 text-center col-span-full">
             <p className="text-5xl mb-4">📭</p>
-            <p className="text-2xl font-bold italic serif mb-2">No stories found</p>
-            <p className="text-white/40 text-sm">Try a different difficulty filter.</p>
+            <p className="text-2xl font-bold italic serif mb-2">{t(locale, "stories_noneFound")}</p>
+            <p className="text-white/40 text-sm">{t(locale, "stories_tryFilter")}</p>
           </div>
         )}
       </div>

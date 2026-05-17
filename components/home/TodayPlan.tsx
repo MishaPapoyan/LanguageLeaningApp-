@@ -1,5 +1,6 @@
 ﻿import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { t, getLocale } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Brain, BookOpen, Gamepad2, ArrowRight, CheckCircle2 } from "lucide-react";
@@ -22,6 +23,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
   if (!userId) return null;
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
 
   const now = new Date();
   const todayStart = new Date(now);
@@ -65,7 +67,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
       style={{ border: "1px solid var(--border)", gridColumn: "1 / -1" }}
     >
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <p className="section-label">Today's Plan</p>
+        <p className="section-label">{t(locale, "home_todaysPlan")}</p>
         {allDone && (
           <span style={{
             display: "inline-flex", alignItems: "center", gap: 5,
@@ -101,7 +103,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
               <Brain size={18} style={{ color: dueCount > 0 ? "var(--accent-2)" : "var(--text-3)" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: 0 }}>Review words</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: 0 }}>{t(locale, "tp_reviewWords")}</p>
               <p style={{ fontSize: 11, color: dueCount > 0 ? "var(--accent-2)" : "var(--text-3)", margin: 0, marginTop: 2 }}>
                 {savedWordCount === 0
                   ? "Save words in games first"
@@ -143,7 +145,7 @@ export async function TodayPlan({ targetLang }: { targetLang: string }) {
               <BookOpen size={18} style={{ color: "#2dd4bf" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: 0 }}>Continue lesson</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", margin: 0 }}>{t(locale, "tp_continueLesson")}</p>
               <p style={{ fontSize: 11, color: "var(--text-3)", margin: 0, marginTop: 2 }}>
                 Pick up your learning path
               </p>

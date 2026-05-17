@@ -148,7 +148,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
         </section>
 
         <section className="card-premium p-8 space-y-6 text-center text-emerald-400 border-emerald-500/20 bg-emerald-500/5">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30">Targeting</h3>
+          <h3 className="text-sm font-bold uppercase tracking-widest text-white/30">{t(locale, "settings_targeting")}</h3>
           <div className="flex items-center justify-center gap-4">
             <span className="text-4xl">{targetLang.flag}</span>
             <span className="text-3xl font-medium serif italic">
@@ -206,7 +206,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
 
       {/* Account info */}
       <div className="space-y-6">
-        <h3 className="text-2xl font-bold serif italic mb-4">Account Information</h3>
+        <h3 className="text-2xl font-bold serif italic mb-4">{t(locale, "pp_accountInfo")}</h3>
         <div className="space-y-2">
           {accountInfo.map((item, i) => (
             <div
@@ -237,7 +237,7 @@ export function PublicProfile({ profile, viewerUserId }: Props) {
       {/* Badges */}
       {badges.length > 0 && (
         <div className="space-y-6">
-          <h3 className="text-2xl font-bold serif italic mb-4">Badges Earned</h3>
+          <h3 className="text-2xl font-bold serif italic mb-4">{t(locale, "settings_earnedBadges")}</h3>
           <div className="flex flex-wrap gap-2">
             {badges.map((b, i) => (
               <span

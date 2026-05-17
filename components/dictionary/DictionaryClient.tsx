@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
+import { t, getLocale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import { speak } from "@/lib/speech";
 import Link from "next/link";
@@ -25,6 +26,7 @@ interface Props {
 
 export function DictionaryClient({ initialWords }: Props) {
   const { data: session } = useSession();
+  const locale = getLocale((session?.user as { nativeLanguage?: string })?.nativeLanguage);
   const langConfig = getLanguageConfig(session?.user?.targetLanguage ?? "fr");
   const [query, setQuery] = useState("");
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
@@ -72,7 +74,7 @@ export function DictionaryClient({ initialWords }: Props) {
     <div className="space-y-12 max-w-4xl mx-auto">
       {/* ── Header ── */}
       <header>
-        <h1 className="text-5xl mb-2">Omnilingual Dictionary</h1>
+        <h1 className="text-5xl mb-2">{t(locale, "dict_title")}</h1>
         <p className="text-white/40 text-lg">
           Search {langConfig.label} vocabulary. Add words to your collection to master them.
         </p>
@@ -123,7 +125,7 @@ export function DictionaryClient({ initialWords }: Props) {
                     <button
                       onClick={() => handleSpeak(primary.word)}
                       className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 text-emerald-500 transition-colors"
-                      aria-label="Pronounce"
+                      aria-label={t(locale, "dict_pronounce")}
                     >
                       <Volume2 size={20} />
                     </button>

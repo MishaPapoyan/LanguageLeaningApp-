@@ -62,7 +62,7 @@ export default async function LeaderboardPage() {
       {/* ── Header ── */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-5xl mb-4">Elite Leagues</h1>
+          <h1 className="text-5xl mb-4">{t(locale, "lb_eliteLeagues")}</h1>
           <div className="flex items-center gap-6">
             <div className="flex -space-x-4">
               {[1, 2, 3, 4].map((i) => (
@@ -175,11 +175,11 @@ export default async function LeaderboardPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-white/10 text-[10px] uppercase tracking-widest font-bold text-white/40">
-                <th className="p-6">Rank</th>
-                <th className="p-6">Learner</th>
-                <th className="p-6">Level</th>
+                <th className="p-6">{t(locale, "lb_rank")}</th>
+                <th className="p-6">{t(locale, "lb_learner")}</th>
+                <th className="p-6">{t(locale, "lb_level")}</th>
                 <th className="p-6">XP</th>
-                <th className="p-6 text-right">Status</th>
+                <th className="p-6 text-right">{t(locale, "lb_status")}</th>
               </tr>
             </thead>
             <tbody>
