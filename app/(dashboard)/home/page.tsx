@@ -184,7 +184,7 @@ export default async function HomePage() {
       {/* ─── Today's path ─── */}
       <section className="lv-fade-up" style={{ marginBottom: 40 }}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 16 }}>
-          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Today&apos;s path</span>
+          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_todaysPath")}</span>
           <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Level {xpInfo.level} · {(progress?.xp ?? 0).toLocaleString()} xp earned</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: 16 }}>
@@ -209,8 +209,8 @@ export default async function HomePage() {
                       <Zap size={14} />
                     </span>
                   )}
-                  {now && <span className="lv-sticker" style={{ color: "var(--lime)", transform: "rotate(3deg)" }}>In progress</span>}
-                  {!done && !now && <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Up next</span>}
+                  {now && <span className="lv-sticker" style={{ color: "var(--lime)", transform: "rotate(3deg)" }}>{t(locale, "home_inProgress")}</span>}
+                  {!done && !now && <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_upNext")}</span>}
                 </div>
                 <div style={{ fontFamily: "var(--display)", fontSize: 26, lineHeight: 1.1, marginBottom: 6 }}>{task.title}</div>
                 <div style={{ fontSize: 13.5, opacity: 0.7, marginBottom: 16 }}>{task.sub}</div>
@@ -255,7 +255,7 @@ export default async function HomePage() {
             <Flame size={36} />
             <span style={{ fontFamily: "var(--display)", fontSize: 72, lineHeight: 1 }}>{streakDays}</span>
           </div>
-          <span className="mono-sm" style={{ color: "var(--paper)", opacity: 0.8 }}>days streak</span>
+          <span className="mono-sm" style={{ color: "var(--paper)", opacity: 0.8 }}>{t(locale, "home_daysStreak")}</span>
           <div style={{ display: "flex", gap: 4, marginTop: 18 }}>
             {Array.from({ length: 7 }).map((_, i) => (
               <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i < (streakDays % 7 || (streakDays > 0 ? 7 : 0)) ? "var(--paper)" : "rgba(255,255,255,0.3)" }} />
@@ -297,10 +297,10 @@ export default async function HomePage() {
         <Link href="/progress" className="lv-card lv-card--hover lg:col-span-2" style={{ padding: 28, textDecoration: "none", display: "block" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 24 }}>
             <div>
-              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Skill compass</span>
-              <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4 }}>This week&apos;s tuning</div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_skillCompass")}</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4 }}>{t(locale, "home_weeksTuning")}</div>
             </div>
-            <span className="lv-btn lv-btn--ghost lv-btn--sm">See progress <ArrowRight size={14} /></span>
+            <span className="lv-btn lv-btn--ghost lv-btn--sm">{t(locale, "home_seeProgress")} <ArrowRight size={14} /></span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4" style={{ gap: 16 }}>
             {rings.map((s) => {
@@ -344,7 +344,7 @@ export default async function HomePage() {
         </Link>
 
         <div className="lv-card" style={{ padding: 28 }}>
-          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Jump in</span>
+          <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_jumpIn")}</span>
           <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4, marginBottom: 18 }}>
             {t(locale, "home_quickActions")}
           </div>
@@ -385,8 +385,8 @@ export default async function HomePage() {
       <section style={{ marginBottom: 40 }}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 24 }}>
           <div>
-            <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Today&apos;s plan</span>
-            <div style={{ fontFamily: "var(--display)", fontSize: 36, marginTop: 4 }}>Daily curriculum</div>
+            <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_todaysPlan")}</span>
+            <div style={{ fontFamily: "var(--display)", fontSize: 36, marginTop: 4 }}>{t(locale, "home_dailyCurriculum")}</div>
           </div>
           <DailyGoals />
         </div>
@@ -400,8 +400,8 @@ export default async function HomePage() {
         <div className="lv-card lg:col-span-2" style={{ padding: 28 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 18 }}>
             <div>
-              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Recommended for you</span>
-              <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4 }}>Games we picked</div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_recommendedForYou")}</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 28, marginTop: 4 }}>{t(locale, "home_gamesWePicked")}</div>
             </div>
             <Link href="/games" className="lv-btn lv-btn--ghost lv-btn--sm" style={{ textDecoration: "none" }}>
               Games Hub <ArrowRight size={14} />
@@ -439,8 +439,8 @@ export default async function HomePage() {
         <div className="lv-card" style={{ padding: 28 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
             <div>
-              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Weekly pulse</span>
-              <div style={{ fontFamily: "var(--display)", fontSize: 24, marginTop: 4 }}>Top this week</div>
+              <span className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_weeklyPulse")}</span>
+              <div style={{ fontFamily: "var(--display)", fontSize: 24, marginTop: 4 }}>{t(locale, "home_topThisWeek")}</div>
             </div>
             <Link href="/leaderboard" className="lv-btn lv-btn--ghost lv-btn--sm" style={{ textDecoration: "none" }}>
               Full
@@ -475,7 +475,7 @@ export default async function HomePage() {
               })}
             </div>
           ) : (
-            <p className="mono-sm" style={{ color: "var(--ink-3)" }}>No leaders yet</p>
+            <p className="mono-sm" style={{ color: "var(--ink-3)" }}>{t(locale, "home_noLeadersYet")}</p>
           )}
         </div>
       </section>
@@ -486,7 +486,7 @@ export default async function HomePage() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
             <div>
               <span className="mono-sm" style={{ color: "var(--ink-3)" }}>Stamps · {earnedBadges.length} {t(locale, "home_badgesEarned")}</span>
-              <div style={{ fontFamily: "var(--display)", fontSize: 36, marginTop: 4 }}>Your passport</div>
+              <div style={{ fontFamily: "var(--display)", fontSize: 36, marginTop: 4 }}>{t(locale, "home_yourPassport")}</div>
             </div>
           </div>
           <div className="grid grid-cols-4 md:grid-cols-8" style={{ gap: 12 }}>
