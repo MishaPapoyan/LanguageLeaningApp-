@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import {
   Sparkles, History, BrainCircuit, Type, CheckCircle2, AlertCircle, ChevronRight,
+  Lightbulb, BookMarked,
 } from "lucide-react";
 import { t, getLocale } from "@/lib/i18n";
+import type { TutorFeedback } from "@/types";
 
 interface WritingHistoryItem {
   id: string;
@@ -53,6 +55,15 @@ const PROMPTS_EN: WritingPrompt[] = [
   { id: "w6", emoji: "🛒", title: "Shopping List", prompt: "Write a shopping list in English and describe how you'd ask for each item politely in a shop.", level: "beginner", hints: ["I need to get...", "Do you have any...?", "How much is...?"], sampleWords: ["need", "some", "few", "fresh", "please"] },
 ];
 
+/** Old writing sessions stored a raw text blob; new ones store JSON. */
+function parseStoredFeedback(raw: string): TutorFeedback | null {
+  try {
+    const o = JSON.parse(raw);
+    if (o && typeof o === "object" && Array.isArray(o.corrections)) return o as TutorFeedback;
+  } catch { /* legacy plain-text feedback */ }
+  return null;
+}
+
 export default function WritingPage() {
   const { data: session } = useSession();
   const locale = getLocale((session?.user as any)?.nativeLanguage);
@@ -60,19 +71,19 @@ export default function WritingPage() {
   const PROMPTS = targetLanguage === "es" ? PROMPTS_ES : targetLanguage === "en" ? PROMPTS_EN : PROMPTS_FR;
   const langName = targetLanguage === "es" ? "Spanish" : targetLanguage === "en" ? "English" : "French";
 
-  // selectedPrompt = null  → Free Write mode (no constraint, user writes anything)
-  // selectedPrompt = prompt → Prompted mode (writing exercise around a topic)
   const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(null);
   const [text, setText] = useState("");
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<TutorFeedback | null>(null);
+  const [feedbackTab, setFeedbackTab] = useState<"corrections" | "strengths" | "next">("corrections");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [savingVocab, setSavingVocab] = useState(false);
+  const [vocabSaved, setVocabSaved] = useState(false);
   const [view, setView] = useState<"write" | "prompts" | "history">("write");
   const [history, setHistory] = useState<WritingHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Free-write prompt sent to the AI. Reads as a real writing task so the API
-  // validation passes and the model knows there's no topic constraint.
   const freeWritePrompt =
     `Free writing — the student is practising ${langName} writing without a fixed topic. ` +
     `Critique grammar, vocabulary, and naturalness regardless of subject.`;
@@ -95,6 +106,9 @@ export default function WritingPage() {
     if (!text.trim() || text.length < 20) return;
     setLoading(true);
     setFeedback(null);
+    setErrorMsg(null);
+    setVocabSaved(false);
+    setFeedbackTab("corrections");
 
     try {
       const res = await fetch("/api/writing/feedback", {
@@ -107,35 +121,53 @@ export default function WritingPage() {
         }),
       });
 
-      if (!res.ok || !res.body) throw new Error("Failed");
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        result += decoder.decode(value, { stream: true });
-        setFeedback(result);
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        throw new Error(e.error || "Failed");
       }
-    } catch {
-      setFeedback("Could not get feedback right now. Please try again later.");
+      const data = await res.json();
+      setFeedback(data.feedback as TutorFeedback);
+      window.dispatchEvent(new CustomEvent("xp-updated"));
+    } catch (err) {
+      setErrorMsg(
+        err instanceof Error && err.message.includes("Too many")
+          ? "Too many requests — please wait a moment and try again."
+          : "Could not get feedback right now. Please try again later."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Parse feedback into structured shape
-  const parsedFeedback = (() => {
-    if (!feedback) return null;
-    const gradeMatch = feedback.match(/^GRADE:\s*(\d+)\/10/);
-    const score = gradeMatch ? parseInt(gradeMatch[1]) : null;
-    const grade =
-      score === null ? "—" : score >= 9 ? "A" : score >= 7 ? "B" : score >= 5 ? "C" : score >= 3 ? "D" : "F";
-    const body = feedback.replace(/^GRADE:\s*\d+\/10\n?/, "").trimStart();
-    return { grade, body, score };
-  })();
+  // Save the AI-suggested new vocabulary (individual words, never sentences)
+  // into the "My Words" list.
+  const saveVocabToMyWords = async () => {
+    if (!feedback?.newVocabulary.length || savingVocab || vocabSaved) return;
+    setSavingVocab(true);
+    try {
+      await Promise.all(
+        feedback.newVocabulary.map((v) =>
+          fetch("/api/my-words", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ front: v.word, back: v.translation }),
+          })
+        )
+      );
+      setVocabSaved(true);
+    } catch {
+      /* ignore — UI just won't flip to the saved state */
+    } finally {
+      setSavingVocab(false);
+    }
+  };
+
+  const grade =
+    !feedback ? "—"
+      : feedback.grammarScore >= 90 ? "A"
+      : feedback.grammarScore >= 75 ? "B"
+      : feedback.grammarScore >= 60 ? "C"
+      : feedback.grammarScore >= 45 ? "D" : "F";
 
   return (
     <div className="space-y-12">
@@ -211,50 +243,75 @@ export default function WritingPage() {
               <p className="text-sm">Submit your first piece to start a journal.</p>
             </div>
           )}
-          {history.map((item) => (
-            <div key={item.id} className="card-premium overflow-hidden">
-              <button
-                onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                className="w-full p-6 flex items-center justify-between text-left"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-                      {item.level}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mono">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </span>
+          {history.map((item) => {
+            const fb = parseStoredFeedback(item.feedback);
+            return (
+              <div key={item.id} className="card-premium overflow-hidden">
+                <button
+                  onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                  className="w-full p-6 flex items-center justify-between text-left"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+                        {item.level}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mono">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-white/60 truncate italic serif">"{item.prompt}"</p>
                   </div>
-                  <p className="text-sm text-white/60 truncate italic serif">"{item.prompt}"</p>
-                </div>
-                <ChevronRight
-                  size={18}
-                  className={`text-white/20 transition-transform ${
-                    expandedId === item.id ? "rotate-90" : ""
-                  }`}
-                />
-              </button>
-              {expandedId === item.id && (
-                <div className="px-6 pb-6 border-t border-white/5 pt-4 space-y-4">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
-                      Your Writing
-                    </p>
-                    <p className="text-sm font-light leading-relaxed whitespace-pre-wrap">{item.text}</p>
+                  <ChevronRight
+                    size={18}
+                    className={`text-white/20 transition-transform ${
+                      expandedId === item.id ? "rotate-90" : ""
+                    }`}
+                  />
+                </button>
+                {expandedId === item.id && (
+                  <div className="px-6 pb-6 border-t border-white/5 pt-4 space-y-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-2">
+                        Your Writing
+                      </p>
+                      <p className="text-sm font-light leading-relaxed whitespace-pre-wrap">{item.text}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
+                        AI Feedback
+                      </p>
+                      {fb ? (
+                        <div className="space-y-3">
+                          <p className="text-xs text-white/40">
+                            Grammar {fb.grammarScore}% · Accuracy {fb.accuracyPct}%
+                          </p>
+                          {fb.corrections.length > 0 && (
+                            <ul className="space-y-2">
+                              {fb.corrections.map((c, i) => (
+                                <li key={i} className="text-sm">
+                                  <span className="text-rose-400 line-through">{c.original}</span>{" "}
+                                  → <span className="text-emerald-400">{c.corrected}</span>
+                                  <span className="block text-xs text-white/40 italic">{c.rule}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {fb.recommendation && (
+                            <p className="text-sm text-white/60 italic">💡 {fb.recommendation}</p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-white/60 italic leading-relaxed whitespace-pre-wrap">
+                          {item.feedback}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
-                      AI Feedback
-                    </p>
-                    <p className="text-sm text-white/60 italic leading-relaxed whitespace-pre-wrap">
-                      {item.feedback}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -358,9 +415,16 @@ export default function WritingPage() {
             )}
           </div>
 
-          {/* RIGHT: Feedback */}
+          {/* RIGHT: Feedback — same structured shape as the AI Tutor */}
           <div className="space-y-6">
-            {!parsedFeedback ? (
+            {errorMsg && (
+              <div className="card-premium p-6 text-sm text-amber-400 flex items-start gap-3">
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {!feedback ? (
               <div className="card-premium p-8 h-full flex flex-col items-center justify-center text-center space-y-4 text-white/20 border-dashed">
                 <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
                   <Type size={32} />
@@ -372,60 +436,124 @@ export default function WritingPage() {
               </div>
             ) : (
               <>
-                {/* Grade */}
+                {/* Grade + scores */}
                 <div className="card-premium p-8 text-center bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20">
                   <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">
                     Proficiency Grade
                   </p>
                   <span className="text-7xl md:text-8xl font-black italic serif text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                    {parsedFeedback.grade}
+                    {grade}
                   </span>
-                  {parsedFeedback.score !== null && (
-                    <p className="text-xs text-white/30 font-bold mono mt-2">
-                      {parsedFeedback.score}/10
-                    </p>
+                  <div className="flex justify-center gap-6 mt-4 text-xs text-white/40 font-bold mono">
+                    <span>Grammar {feedback.grammarScore}%</span>
+                    <span>Accuracy {feedback.accuracyPct}%</span>
+                  </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex items-center gap-1 border-b border-white/10">
+                  {([
+                    { id: "corrections", label: "Corrections", count: feedback.corrections.length, Icon: AlertCircle },
+                    { id: "strengths", label: "Wins", count: feedback.strengths.length, Icon: CheckCircle2 },
+                    { id: "next", label: "Next step", count: 0, Icon: Lightbulb },
+                  ] as const).map((tab) => {
+                    const active = feedbackTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setFeedbackTab(tab.id)}
+                        className={`flex items-center gap-2 px-4 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
+                          active ? "text-emerald-400 border-b-2 border-emerald-500" : "text-white/40"
+                        }`}
+                      >
+                        <tab.Icon size={14} />
+                        <span>{tab.label}</span>
+                        {tab.count > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px]">{tab.count}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Tab content */}
+                <div className="space-y-3">
+                  {feedbackTab === "corrections" && (
+                    feedback.corrections.length === 0 ? (
+                      <div className="card-premium p-8 text-center text-white/30">
+                        <CheckCircle2 size={28} className="mx-auto mb-3 text-emerald-500" />
+                        <p className="serif italic">No corrections — clean work.</p>
+                      </div>
+                    ) : (
+                      <ul className="space-y-3">
+                        {feedback.corrections.map((c, i) => (
+                          <li key={i} className="card-premium p-4 space-y-2">
+                            <p className="text-sm">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400 mr-2">Was</span>
+                              <span className="text-white/40 line-through">{c.original}</span>
+                            </p>
+                            <p className="text-sm">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mr-2">Should be</span>
+                              <span className="text-emerald-400 font-medium">{c.corrected}</span>
+                            </p>
+                            <p className="text-xs text-white/40 italic pt-2 border-t border-white/5">{c.rule}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  )}
+
+                  {feedbackTab === "strengths" && (
+                    feedback.strengths.length === 0 ? (
+                      <div className="card-premium p-8 text-center text-white/30">
+                        <Lightbulb size={28} className="mx-auto mb-3 text-emerald-500" />
+                        <p className="serif italic">More wins next time.</p>
+                      </div>
+                    ) : (
+                      <ul className="space-y-2">
+                        {feedback.strengths.map((s, i) => (
+                          <li key={i} className="card-premium p-4 flex items-start gap-3">
+                            <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-500" />
+                            <p className="text-sm text-white/70 leading-relaxed">{s}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )
+                  )}
+
+                  {feedbackTab === "next" && (
+                    <div className="card-premium p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Lightbulb size={16} className="text-emerald-400" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                          Recommended next step
+                        </span>
+                      </div>
+                      <p className="text-sm text-white/70 leading-relaxed">
+                        {feedback.recommendation || "Keep practising — write another piece to reinforce these corrections."}
+                      </p>
+                    </div>
                   )}
                 </div>
 
-                {/* Strengths */}
-                <section className="card-premium p-6 space-y-4">
-                  <h4 className="text-sm font-bold uppercase tracking-widest text-white/40 flex items-center gap-2">
-                    <CheckCircle2 size={14} className="text-emerald-500" /> Key Strengths
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {["Clear vocabulary", "Good flow", "Topic relevance"].map((s) => (
-                      <span
-                        key={s}
-                        className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Critical Edits / Overall feedback */}
-                <section className="card-premium p-6 space-y-4">
-                  <h4 className="text-sm font-bold uppercase tracking-widest text-white/40 flex items-center gap-2">
-                    <AlertCircle size={14} className="text-amber-500" /> Critical Edits
-                  </h4>
-                  <div className="text-sm text-white/60 italic leading-relaxed whitespace-pre-wrap">
-                    {parsedFeedback.body}
-                  </div>
-                </section>
-
-                {/* Overall */}
-                <div className="card-premium p-6 text-sm text-white/60 italic leading-relaxed">
-                  <Sparkles size={14} className="inline mr-2 text-emerald-400" />
-                  Keep practicing — review the corrections above and try writing the prompt again
-                  to reinforce what you've learned.
-                </div>
+                {/* Save new vocabulary → My Words (individual words, never sentences) */}
+                {feedback.newVocabulary.length > 0 && (
+                  <button
+                    onClick={saveVocabToMyWords}
+                    disabled={savingVocab || vocabSaved}
+                    className="btn-secondary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    <BookMarked size={15} />
+                    {vocabSaved
+                      ? "Saved to My Words ✓"
+                      : savingVocab
+                      ? "Saving…"
+                      : `Save ${feedback.newVocabulary.length} new word${feedback.newVocabulary.length === 1 ? "" : "s"} to My Words`}
+                  </button>
+                )}
 
                 <button
-                  onClick={() => {
-                    setFeedback(null);
-                    setText("");
-                  }}
+                  onClick={() => { setFeedback(null); setText(""); setVocabSaved(false); }}
                   className="btn-secondary w-full py-3"
                 >
                   Try Again

@@ -183,12 +183,25 @@ export function getTutorSystemPrompt(scenario: TutorScenario, language = "fr"): 
 
 export { SCENARIO_INFO } from "./scenarios";
 
-export async function analyzeTutorSession(messages: ChatMessage[], language = "fr"): Promise<TutorFeedback> {
+/** Human label for the learner's native language (used so vocabulary
+ *  translations come back in a language they actually understand). */
+function nativeLabel(nativeLang?: string | null): string {
+  if (nativeLang === "hy") return "Armenian";
+  if (nativeLang === "ru") return "Russian";
+  return "English";
+}
+
+export async function analyzeTutorSession(
+  messages: ChatMessage[],
+  language = "fr",
+  nativeLang = "en",
+): Promise<TutorFeedback> {
   const conversation = messages
     .map((m) => `${m.role === "user" ? "Learner" : "Tutor"}: ${m.content}`)
     .join("\n");
 
   const langLabel = language === "es" ? "Spanish" : language === "en" ? "English" : "French";
+  const natLabel = nativeLabel(nativeLang);
 
   try {
     const response = await groq.chat.completions.create({
@@ -212,21 +225,107 @@ Return this exact JSON structure:
   "corrections": [
     {"original": "exact wrong phrase the learner used", "corrected": "the correct version", "rule": "clear explanation of the grammar/vocabulary rule, e.g. 'Use passé composé (j\\'ai mangé) for completed past actions, not imparfait'"}
   ],
+  "newVocabulary": [
+    {"word": "<a single useful ${langLabel} word or SHORT phrase the learner should learn — NEVER a full sentence>", "translation": "<its meaning in ${natLabel}>"}
+  ],
   "recommendation": "one specific, actionable tip — e.g. 'Practice the difference between imparfait and passé composé for past narratives.' Not a generic encouragement."
 }
 
-Be thorough: list ALL meaningful corrections (not just 1). A correction is meaningful if it's a grammar rule, wrong word choice, or structural error. Do not correct punctuation or capitalisation. strengths should be specific observations, not vague praise.`,
+Be thorough: list ALL meaningful corrections (not just 1). A correction is meaningful if it's a grammar rule, wrong word choice, or structural error. Do not correct punctuation or capitalisation. strengths should be specific observations, not vague praise. For newVocabulary: pick 3-8 individual words or short (2-3 word) phrases from the conversation that are useful for this learner to memorise — each "word" MUST be a single word or short phrase, NEVER a whole sentence; "translation" MUST be in ${natLabel}.`,
         },
       ],
     });
 
     const text = response.choices[0]?.message?.content || "{}";
     const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    return JSON.parse(cleaned) as TutorFeedback;
+    return normalizeFeedback(JSON.parse(cleaned));
   } catch (err) {
     // MED-7: Surface the error so callers can return a proper 5xx instead of
     // silently returning fake feedback that masks AI/network failures.
     console.error("[analyzeTutorSession] error:", err);
+    throw err;
+  }
+}
+
+/** Coerce a raw model object into a safe, fully-populated TutorFeedback.
+ *  Filters out any "vocabulary" item that is actually a whole sentence. */
+function normalizeFeedback(raw: any): TutorFeedback {
+  const vocab = Array.isArray(raw?.newVocabulary) ? raw.newVocabulary : [];
+  return {
+    grammarScore: Number(raw?.grammarScore) || 0,
+    accuracyPct: Number(raw?.accuracyPct) || 0,
+    strengths: Array.isArray(raw?.strengths) ? raw.strengths.filter((s: any) => typeof s === "string") : [],
+    corrections: Array.isArray(raw?.corrections)
+      ? raw.corrections.filter((c: any) => c && c.original && c.corrected)
+      : [],
+    newVocabulary: vocab
+      .map((v: any) => ({
+        word: String(v?.word ?? "").trim(),
+        translation: String(v?.translation ?? "").trim(),
+      }))
+      // Guard: a real vocab item is short — drop anything sentence-like so we
+      // never persist a whole sentence as a single "word".
+      .filter((v: { word: string; translation: string }) => {
+        if (!v.word || !v.translation) return false;
+        const words = v.word.split(/\s+/).length;
+        return words <= 4 && v.word.length <= 40 && !/[.!?]$/.test(v.word);
+      }),
+    recommendation: typeof raw?.recommendation === "string" ? raw.recommendation : "",
+  };
+}
+
+/** Structured single-piece writing critique — same shape & quality bar as
+ *  the AI Tutor's session feedback, so the Writing Lab can render the
+ *  identical UI. */
+export async function analyzeWriting(
+  text: string,
+  prompt: string,
+  level: string,
+  language = "fr",
+  nativeLang = "en",
+): Promise<TutorFeedback> {
+  const langLabel = language === "es" ? "Spanish" : language === "en" ? "English" : "French";
+  const natLabel = nativeLabel(nativeLang);
+
+  try {
+    const response = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [
+        {
+          role: "system",
+          content: `You are a ${langLabel} writing analyst. Always respond with valid JSON only, no markdown code fences.`,
+        },
+        {
+          role: "user",
+          content: `A learner (level: ${level || "beginner"}) wrote the following ${langLabel} text for this task: "${prompt}"
+
+LEARNER'S TEXT:
+${text}
+
+Return this exact JSON structure:
+{
+  "grammarScore": <0-100, grammar accuracy of the text>,
+  "accuracyPct": <0-100, vocabulary range and naturalness>,
+  "strengths": ["specific strength observed", "another concrete strength — not vague praise"],
+  "corrections": [
+    {"original": "exact wrong phrase from the text", "corrected": "the correct version", "rule": "clear explanation of the grammar/vocabulary rule"}
+  ],
+  "newVocabulary": [
+    {"word": "<a single useful ${langLabel} word or SHORT phrase — NEVER a full sentence>", "translation": "<its meaning in ${natLabel}>"}
+  ],
+  "recommendation": "one specific, actionable next-step tip — not generic encouragement."
+}
+
+Be thorough: list ALL meaningful corrections (grammar rule, wrong word choice, structural error). Do not correct punctuation/capitalisation. For newVocabulary: pick 3-8 individual words or short (2-3 word) phrases the learner should memorise to improve this kind of writing — each "word" MUST be a single word or short phrase, NEVER a whole sentence; "translation" MUST be in ${natLabel}.`,
+        },
+      ],
+    });
+
+    const out = response.choices[0]?.message?.content || "{}";
+    const cleaned = out.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    return normalizeFeedback(JSON.parse(cleaned));
+  } catch (err) {
+    console.error("[analyzeWriting] error:", err);
     throw err;
   }
 }

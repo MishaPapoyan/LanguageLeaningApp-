@@ -228,6 +228,7 @@ export function TutorClient({ userLevel }: Props) {
       setFeedback({
         grammarScore: 75, accuracyPct: 75,
         strengths: ["Great effort!"], corrections: [],
+        newVocabulary: [],
         recommendation: "Keep practicing!",
       });
     } finally {
@@ -246,19 +247,19 @@ export function TutorClient({ userLevel }: Props) {
   };
 
   const saveCorrectionsAsCards = async () => {
-    if (!feedback?.corrections.length || savingCorrections) return;
+    const vocab = feedback?.newVocabulary ?? [];
+    if (!vocab.length || savingCorrections) return;
     setSavingCorrections(true);
     try {
-      // Each correction becomes a custom card: front = corrected phrase, back = rule + original
+      // Save each NEW VOCABULARY item as its own card: front = the word/short
+      // phrase (target language), back = its translation (native language).
+      // Never a whole sentence — newVocabulary is sentence-filtered server-side.
       await Promise.all(
-        feedback.corrections.map((c) =>
+        vocab.map((v) =>
           fetch("/api/my-words", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              front: c.corrected,
-              back: `${c.rule}${c.original ? ` (was: "${c.original}")` : ""}`,
-            }),
+            body: JSON.stringify({ front: v.word, back: v.translation }),
           })
         )
       );
@@ -765,7 +766,7 @@ export function TutorClient({ userLevel }: Props) {
                   className="flex flex-col sm:flex-row gap-2 p-4 md:p-6"
                   style={{ borderTop: "1px solid var(--line)", background: "var(--paper-2)" }}
                 >
-                  {feedback.corrections.length > 0 && (
+                  {feedback.newVocabulary.length > 0 && (
                     <button
                       onClick={saveCorrectionsAsCards}
                       disabled={savingCorrections || correctionsSaved}
@@ -776,7 +777,7 @@ export function TutorClient({ userLevel }: Props) {
                         ? "Saved to My Words ✓"
                         : savingCorrections
                         ? "Saving…"
-                        : `Save ${feedback.corrections.length} correction${feedback.corrections.length === 1 ? "" : "s"} to My Words`}
+                        : `Save ${feedback.newVocabulary.length} new word${feedback.newVocabulary.length === 1 ? "" : "s"} to My Words`}
                     </button>
                   )}
                   <button

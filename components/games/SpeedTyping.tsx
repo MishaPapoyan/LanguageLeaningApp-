@@ -135,13 +135,24 @@ export function SpeedTyping({ words, targetLang }: { words: Word[]; targetLang: 
         localStorage.setItem("langcraft_seen_words", JSON.stringify([...seen, wordId]));
       }
     } catch {}
+    const w = savePrompt;
     setSavePrompt(null);
     if (doSave) {
+      // Spaced-repetition (Review) entry
       fetch("/api/dictionary/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wordId }),
       }).catch(() => {});
+      // Also add it to the "My Words" list so it's visible where the
+      // learner looks — front = target word, back = native translation.
+      if (w) {
+        fetch("/api/my-words", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ front: w.word, back: wordTranslation(w, locale) }),
+        }).catch(() => {});
+      }
     }
     // Reproduce advance(true) using refs (avoids stale closure)
     setScore(s => s + 1);

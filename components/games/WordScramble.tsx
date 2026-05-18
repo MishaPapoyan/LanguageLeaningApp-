@@ -183,13 +183,23 @@ export function WordScramble({ words }: { words: Word[] }) {
         localStorage.setItem("langcraft_seen_words", JSON.stringify([...seen, wordId]));
       }
     } catch {}
+    const w = savePrompt;
     setSavePrompt(null);
     if (doSave) {
+      // Spaced-repetition (Review) entry
       fetch("/api/dictionary/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wordId }),
       }).catch(() => {});
+      // Also add to "My Words" so it's visible where the learner looks.
+      if (w) {
+        fetch("/api/my-words", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ front: w.word, back: wordTranslation(w, locale) }),
+        }).catch(() => {});
+      }
     }
     // Advance — use scoreRef.current (post-increment value)
     const next = round + 1;

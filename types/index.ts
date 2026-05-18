@@ -98,6 +98,10 @@ export interface TutorFeedback {
     corrected: string;
     rule: string;
   }>;
+  // Individual new vocabulary words/short phrases worth saving (NOT full
+  // sentences). `word` is in the target language, `translation` in the
+  // learner's native language. Used by the "Save to My Words" action.
+  newVocabulary: Array<{ word: string; translation: string }>;
   recommendation: string;
 }
 
