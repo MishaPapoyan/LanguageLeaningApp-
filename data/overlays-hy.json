@@ -1,0 +1,970 @@
+{
+  "en:acquaintance": {
+    "translationHy": "ծանոթ",
+    "definitionHy": "Մի մարդ, ում դուք ծանոթ եք, բայց ոչ մտերիմ ընկեր"
+  },
+  "en:algorithm": {
+    "translationHy": "համակարգչային հրահանգների հավաքածու",
+    "definitionHy": "Մի գործընթաց կամ կանոնների հավաքածու, որը պետք է հետևել հաշվարկներում կամ խնդիրների լուծման ժամանակ"
+  },
+  "en:allergy": {
+    "translationHy": "ալերգիա",
+    "definitionHy": "Որոշ նյութի նկատմամբ բացասական ֆիզիկական արձագանք"
+  },
+  "en:ambiguous": {
+    "translationHy": "երկիմաստ",
+    "definitionHy": "Բաց է մեկից ավելի մեկնաբանության համար, մեկ ակնհայտ իմաստ չունի"
+  },
+  "en:ambitious": {
+    "translationHy": "երազանքներ ունեցող",
+    "definitionHy": "Ունենալ հաջողության կամ կոնկրետ նպատակի հասնելու ուժեղ ցանկություն"
+  },
+  "en:anxious": {
+    "translationHy": "մտահոգ",
+    "definitionHy": "Մտահոգ կամ նյարդայնացած զգալ ինչ-որ բանի մասին, որ կարող է տեղի ունենալ"
+  },
+  "en:appetising": {
+    "translationHy": "համեղ",
+    "definitionHy": "Ուտելիքը համեղ երևալ կամ հոտ ունենալ"
+  },
+  "en:appliance": {
+    "translationHy": "սարք",
+    "definitionHy": "Տնային աշխատանք կատարելու համար նախատեսված սարք կամ սարքավորում"
+  },
+  "en:bandwidth": {
+    "translationHy": "ինտերնետային տվյալների ծավալ",
+    "definitionHy": "Տվյալների փոխանցման առավելագույն արագություն տվյալ ուղու վրա"
+  },
+  "en:bargain": {
+    "translationHy": "գործարք",
+    "definitionHy": "Ինչ-որ բան գնել սովորական գնից ցածր կամ ցածր գին բանակցել"
+  },
+  "en:bite off more than you can chew": {
+    "translationHy": "վերցնել ավելին, քան կարող ես",
+    "definitionHy": "Վերցնել ավելի աշխատանք կամ պատասխանատվություն, քան կարող ես կրել"
+  },
+  "en:bland": {
+    "translationHy": "անհամ",
+    "definitionHy": "Ուժեղ համ կամ բնավորություն չունենալ"
+  },
+  "en:bloke": {
+    "translationHy": "տղամարդ (բրիտանական ժարգոն)",
+    "definitionHy": "Տղամարդ, հատկապես սովորական մեկը (բրիտանական ոչ պաշտոնական)"
+  },
+  "en:break the ice": {
+    "translationHy": "սկսել զրույց",
+    "definitionHy": "Ասել կամ անել ինչ-որ բան, որպեսզի թեթևացնել լարվածությունը և սկսել զրույց"
+  },
+  "en:breeze": {
+    "translationHy": "թեթև քամի",
+    "definitionHy": "Թեթև քամի, սովորաբար հաճելի"
+  },
+  "en:brilliant": {
+    "translationHy": "գերազանց",
+    "definitionHy": "Բրիտանական անգլերենում ոչ պաշտոնական ձևով օգտագործվում է գերազանց կամ հրաշալի իմաստով"
+  },
+  "en:browse": {
+    "translationHy": "անցնել ակնարկ",
+    "definitionHy": "Անցնել բաների մեջ անհոգ ձևով, հատկապես ինտերնետում"
+  },
+  "en:budget": {
+    "translationHy": "բյուջե",
+    "definitionHy": "Որոշակի ժամանակահատվածի եկամուտների և ծախսերի գնահատական"
+  },
+  "en:carry on": {
+    "translationHy": "շարունակել",
+    "definitionHy": "Շարունակել ինչ-որ բան անել առանց կանգ առնելու"
+  },
+  "en:cheers": {
+    "translationHy": "շնորհակալություն / ցտեսություն (բրիտանական)",
+    "definitionHy": "Բրիտանական անգլերենում ոչ պաշտոնական ձևով օգտագործվում է շնորհակալություն կամ ցտեսություն իմաստով"
+  },
+  "en:cherish": {
+    "translationHy": "սիրել ու գնահատել",
+    "definitionHy": "Ինչ-որ բան կամ ինչ-որ մեկին սիրել ու խնամքով պահպանել"
+  },
+  "en:chuffed": {
+    "translationHy": "շատ գոհ",
+    "definitionHy": "Բրիտանական անգլերենում ոչ պաշտոնական ձևով օգտագործվում է շատ գոհ կամ բավարարված իմաստով"
+  },
+  "en:cluttered": {
+    "translationHy": "աղբոտ",
+    "definitionHy": "Անկարգ իրերի հավաքածոյով լեցուն"
+  },
+  "en:colleague": {
+    "translationHy": "գործընկեր",
+    "definitionHy": "Մարդ, որի հետ դուք աշխատում եք, հատկապես մասնագիտական միջավայրում"
+  },
+  "en:come across": {
+    "translationHy": "հանդիպել պատահաբար",
+    "definitionHy": "Գտնել կամ հանդիպել ինչ-որ բանի պատահաբար"
+  },
+  "en:commute": {
+    "translationHy": "ամենօրյա ճանապարհորդություն",
+    "definitionHy": "Ամեն օր ճանապարհորդել տուն և աշխատանք"
+  },
+  "en:compassionate": {
+    "translationHy": "կարեկցող",
+    "definitionHy": "Ուրիշների հանդեպ կարեկցանք ու մասնակցություն ցուցաբերել"
+  },
+  "en:content": {
+    "translationHy": "հանդարտ",
+    "definitionHy": "Խաղաղ երջանկության կամ բավարարվածության վիճակում"
+  },
+  "en:curriculum": {
+    "translationHy": "ուսումնական ծրագիր",
+    "definitionHy": "Դպրոցում կամ համալսարանում ուսումնասիրվող առարկաներ"
+  },
+  "en:customs": {
+    "translationHy": "մաքսային ստուգում",
+    "definitionHy": "Ապրանքների և անձանց ստուգման պաշտոնական ընթացակարգ երկիր մուտք գործելիս"
+  },
+  "en:deadline": {
+    "translationHy": "վերջնաժամկետ",
+    "definitionHy": "Ամենաուշ ժամանակ կամ ամսաթիվ, որի ընթացքում ինչ-որ բան պետք է ավարտվի"
+  },
+  "en:departure": {
+    "translationHy": "մեկնում",
+    "definitionHy": "Մեկնելու արարողություն, հատկապես ճամփորդություն սկսելու համար"
+  },
+  "en:drought": {
+    "translationHy": "երաշտ",
+    "definitionHy": "Երկարատև չոր շրջան, որը բերում է ջրի պակասի"
+  },
+  "en:elaborate": {
+    "translationHy": "մանրամասնել",
+    "definitionHy": "Արդեն ասված բանին ավելացնել մանրամասներ կամ բացատրություն"
+  },
+  "en:eloquent": {
+    "translationHy": "հռետորական",
+    "definitionHy": "Խոսքում կամ գրության մեջ հեշտ ու համոզիչ"
+  },
+  "en:emphasise": {
+    "translationHy": "շեշտել",
+    "definitionHy": "Մի բանի կարևորությունը ընդգծել"
+  },
+  "en:exhausted": {
+    "translationHy": "սպառված",
+    "definitionHy": "Ընդհանրապես էներգիայից զուրկ"
+  },
+  "en:farewell": {
+    "translationHy": "հրաժեշտ",
+    "definitionHy": "Հրաժեշտ տալու կամ հրաժեշտ տվող արարողություն"
+  },
+  "en:flourish": {
+    "translationHy": "աճել ու ծաղկել",
+    "definitionHy": "Աճել կամ զարգանալ առողջ կամ ուժեղ ձևով"
+  },
+  "en:fortnight": {
+    "translationHy": "երկու շաբաթ",
+    "definitionHy": "Երկու շաբաթ ժամանակաշրջան"
+  },
+  "en:furious": {
+    "translationHy": "բարկացած",
+    "definitionHy": "Ծայրահեղ զայրացած, վերահսկողության կորստի աստիճանի"
+  },
+  "en:give up": {
+    "translationHy": "հրաժարվել",
+    "definitionHy": "Հրաժարվել փորձելուց, ընդունել պարտություն"
+  },
+  "en:gratitude": {
+    "translationHy": "շնորհակալություն",
+    "definitionHy": "Շնորհակալ լինելու որակ, շնորհակալություն ցուցաբերելու պատրաստակամություն"
+  },
+  "en:greet": {
+    "translationHy": "ողջունել",
+    "definitionHy": "Ողջունել մեկին բարի ձևով հանդիպման ժամանակ"
+  },
+  "en:habitat": {
+    "translationHy": "բնակավայր",
+    "definitionHy": "Կենդանու, բույսի կամ այլ օրգանիզմի բնական տուն կամ միջավայր"
+  },
+  "en:hit the nail on the head": {
+    "translationHy": "ճիշտ նկարագրել",
+    "definitionHy": "Նկարագրել ճիշտ այն, ինչ է պատճառ հանդիսանում ինչ-որ իրավիճակի կամ խնդրի"
+  },
+  "en:imply": {
+    "translationHy": "ենթադրել",
+    "definitionHy": "Ինչ-որ բան առաջարկել անուղղակիորեն"
+  },
+  "en:indulge": {
+    "translationHy": "հաճույք բերել",
+    "definitionHy": "Թույլ տալ ինքդ քեզ հաճույք ստանալ ինչ-որ բանից"
+  },
+  "en:inherent": {
+    "translationHy": "բնածին",
+    "definitionHy": "Գոյություն ունենալ ինչ-որ բանի մեջ որպես մշտական, անհրաժեշտ կամ բնորոշ հատկանիշ"
+  },
+  "en:invest": {
+    "translationHy": "ներդնել",
+    "definitionHy": "Գումար ներդնել ֆինանսական եկամուտ ստանալու հույսով"
+  },
+  "en:itinerary": {
+    "translationHy": "ճանապարհորդական ծրագիր",
+    "definitionHy": "Ճամփորդության մանրամասն ծրագիր, ներառյալ վայրեր և ժամանակացույց"
+  },
+  "en:knackered": {
+    "translationHy": "կուլ եկած",
+    "definitionHy": "Բրիտանական անգլերենում ոչ պաշտոնական ձևով օգտագործվում է շատ հյուծված իմաստով"
+  },
+  "en:landmark": {
+    "translationHy": "հուշարձան",
+    "definitionHy": "Լանդշաֆտի ճանաչելի առանձնահատկություն, հաճախ օգտագործվում է նավիգացիայի կամ զբոսաշրջության համար"
+  },
+  "en:layover": {
+    "translationHy": "ընդմիջում",
+    "definitionHy": "Սպասման ժամանակահատված օդանավակայանում միացյալ չվերթների միջև"
+  },
+  "en:look into": {
+    "translationHy": "ուսումնասիրել",
+    "definitionHy": "Ուսումնասիրել կամ հետազոտել ինչ-որ բան"
+  },
+  "en:melancholy": {
+    "translationHy": "մելանխոլիա",
+    "definitionHy": "Մտախոհ սգում, հաճախ առանց որևէ պատճառի"
+  },
+  "en:negotiate": {
+    "translationHy": "բանակցել",
+    "definitionHy": "Ինչ-որ բան քննարկել համաձայնության հասնելու համար"
+  },
+  "en:overwhelmed": {
+    "translationHy": "գերբեռնված",
+    "definitionHy": "Ունենալ շատ բան հաղթահարելու, այնպես որ դուք չեք կարող հաղթահարել"
+  },
+  "en:postpone": {
+    "translationHy": "հետաձգել",
+    "definitionHy": "Ինչ-որ բան ավելի ուշ ժամանակով կազմակերպել"
+  },
+  "en:prescription": {
+    "translationHy": "դեղատոմս",
+    "definitionHy": "Բժշկի կողմից գրված հրահանգ հիվանդի անհրաժեշտ դեղորայքի մասին"
+  },
+  "en:proficient": {
+    "translationHy": "հմտավոր",
+    "definitionHy": "Որոշ բան անելու համար որակավորված կամ հմտավոր"
+  },
+  "en:punctual": {
+    "translationHy": "ժամանակին",
+    "definitionHy": "Իրականացվել կամ ինչ-որ բան անել համաձայնեցված ժամանակին, ոչ ուշ"
+  },
+  "en:put off": {
+    "translationHy": "հետաձգել",
+    "definitionHy": "Հետաձգել ինչ-որ բան անել, բերել մեկին ինչ-որ բանը դառը համարել"
+  },
+  "en:queue": {
+    "translationHy": "սպասման հերթ",
+    "definitionHy": "Մարդկանց կամ տրանսպորտային միջոցների շարք, որոնք ինչ-որ բանի համար սպասում են"
+  },
+  "en:receipt": {
+    "translationHy": "ստացման վկայական",
+    "definitionHy": "Գրավոր հաստատում գումարի կամ ապրանքի ստացման մասին"
+  },
+  "en:reconcile": {
+    "translationHy": "հաշտվել",
+    "definitionHy": "Բարեկամական հարաբերություններ վերականգնել հակամարտությունից հետո"
+  },
+  "en:recover": {
+    "translationHy": "ապաքինվել",
+    "definitionHy": "Հիվանդությունից կամ վնասվածքից հետո առողջության նորմալ վիճակի վերադառնալ"
+  },
+  "en:redundant": {
+    "translationHy": "ավելորդ",
+    "definitionHy": "Այլևս պետք չէ կամ օգտակար չէ, բրիտանական անգլերենում՝ աշխատանքից ազատված"
+  },
+  "en:relieved": {
+    "translationHy": "փարթամ",
+    "definitionHy": "Ուրախ լինել, որ ինչ-որ վատ բան ավարտվել է"
+  },
+  "en:renovate": {
+    "translationHy": "վերանորոգել",
+    "definitionHy": "Շենքը լավ վիճակի բերել, վերակառուցել"
+  },
+  "en:reserved": {
+    "translationHy": "զուսպ",
+    "definitionHy": "Զգացմունքներ կամ կարծիքներ բացահայտելու համար դանդաղ"
+  },
+  "en:resilient": {
+    "translationHy": "դիմացկուն",
+    "definitionHy": "Կարող լինել դիմանալ կամ արագ ապաքինվել դժվար պայմաններից"
+  },
+  "en:revise": {
+    "translationHy": "վերանայել",
+    "definitionHy": "Արդեն արված աշխատանքը կրկին կարդալ ու ուսումնասիրել քննության նախապատրաստվելու համար"
+  },
+  "en:run out": {
+    "translationHy": "սպառել",
+    "definitionHy": "Օգտագործել ինչ-որ բանը այնպես, որ ոչինչ չմնա"
+  },
+  "en:savoury": {
+    "translationHy": "աղի",
+    "definitionHy": "Ունենալ ուժեղ, աղի կամ կարմիր համ, այլ ոչ քաղցր"
+  },
+  "en:schedule": {
+    "translationHy": "ժամանակացույց",
+    "definitionHy": "Ժամանակացույց, որը պարունակում է միջոցառումների և խնդիրների ցանկ ու դրանց կատարման ժամանակ"
+  },
+  "en:set up": {
+    "translationHy": "կազմակերպել",
+    "definitionHy": "Կազմակերպել կամ հաստատել ինչ-որ բան, պատրաստել կամ հավաքել"
+  },
+  "en:sip": {
+    "translationHy": "փոքր ըմպել",
+    "definitionHy": "Փոքր քանակությամբ ըմպել, հեղուկի փոքր չափ"
+  },
+  "en:spontaneous": {
+    "translationHy": "ինքնաբուխ",
+    "definitionHy": "Բնականորեն ու առանց մտածված կամ ուժեղ լինելը"
+  },
+  "en:stubborn": {
+    "translationHy": "անկենսաղեկ",
+    "definitionHy": "Ունենալ կամ ցուցաբերել որոշում չփոխել իր վերաբերմունքը կամ դիրքորոշումը"
+  },
+  "en:subsequent": {
+    "translationHy": "հաջորդ",
+    "definitionHy": "Ինչ-որ բանից հետո գալիս կամ հետևում"
+  },
+  "en:symptom": {
+    "translationHy": "ախտանշան",
+    "definitionHy": "Ֆիզիկական կամ հոգեկան նշան, որը ցույց է տալիս հիվանդություն կամ հիվանդություն"
+  },
+  "en:thesis": {
+    "translationHy": "ատենախոսություն",
+    "definitionHy": "Երկար գրվածք որոշ թեմայի վերաբերյալ, հատկապես համալսարանական աստիճան ստանալու համար"
+  },
+  "en:tidy": {
+    "translationHy": "կարգավորված",
+    "definitionHy": "Կարգով դասավորված ու կարգապահ"
+  },
+  "en:tuition": {
+    "translationHy": "ուսուցում",
+    "definitionHy": "Ուսուցում կամ դասեր, հատկապես փոքր խմբերի կամ անհատների համար"
+  },
+  "en:under the weather": {
+    "translationHy": "առողջության վատ",
+    "definitionHy": "Զգալ թեթև հիվանդ, չզգալ իրեն սովորական ձևով"
+  },
+  "en:update": {
+    "translationHy": "թարմացնել",
+    "definitionHy": "Ինչ-որ բան թարմ տեղեկություններ ավելացնելով կամ առանձնահատկություններ ավելացնելով այն թարմացնել"
+  },
+  "es:adiós": {
+    "translationHy": "մինչև հանդիպում",
+    "definitionHy": "Հրաժեշտ արտահայտություն, որն օգտագործվում է բաժանվելիս"
+  },
+  "es:amarillo": {
+    "translationHy": "դեղին",
+    "definitionHy": "Դեղին գույն"
+  },
+  "es:aprovechar": {
+    "translationHy": "օգտվել",
+    "definitionHy": "Ինչ-որ բանից լիովին օգտվել"
+  },
+  "es:azul": {
+    "translationHy": "կապույտ",
+    "definitionHy": "Կապույտ գույն"
+  },
+  "es:beber": {
+    "translationHy": "խմել",
+    "definitionHy": "Հեղուկ օգտագործել"
+  },
+  "es:blanco": {
+    "translationHy": "սպիտակ",
+    "definitionHy": "Սպիտակ գույն"
+  },
+  "es:bonito": {
+    "translationHy": "գեղեցիկ",
+    "definitionHy": "Զգայարների, հատկապես աչքերի համար հաճելի"
+  },
+  "es:buenas noches": {
+    "translationHy": "բարի գիշեր",
+    "definitionHy": "Երեկոյան ողջույն կամ հրաժեշտ"
+  },
+  "es:bueno": {
+    "translationHy": "լավ",
+    "definitionHy": "Բավարար որակ կամ ստանդարտ"
+  },
+  "es:buenos días": {
+    "translationHy": "բարի առավոտ",
+    "definitionHy": "Առավոտյան ողջույն, որ օգտագործվում է կեսօրից առաջ"
+  },
+  "es:cansado": {
+    "translationHy": "հոգնած",
+    "definitionHy": "Հանգստի կամ քնի կարիք ունենալ"
+  },
+  "es:cien": {
+    "translationHy": "հարյուր",
+    "definitionHy": "100 թիվ"
+  },
+  "es:comer": {
+    "translationHy": "ուտել",
+    "definitionHy": "Սնունդ օգտագործել"
+  },
+  "es:diez": {
+    "translationHy": "տաս",
+    "definitionHy": "10 թիվ"
+  },
+  "es:dos": {
+    "translationHy": "երկու",
+    "definitionHy": "2 թիվ"
+  },
+  "es:el abuelo": {
+    "translationHy": "պապ",
+    "definitionHy": "Հայրի կամ մոր հայր"
+  },
+  "es:el aeropuerto": {
+    "translationHy": "օդանավակայան",
+    "definitionHy": "Օդանավերի թռիչքի և վայրէջքի վայր"
+  },
+  "es:el agua": {
+    "translationHy": "ջուր",
+    "definitionHy": "Կենսական ըմպելիք, որը հաճախ պատվիրում են անշարժ կամ շարժուն"
+  },
+  "es:el desayuno": {
+    "translationHy": "նախաճաշ",
+    "definitionHy": "Օրվա առաջին ճաշ"
+  },
+  "es:el dinero": {
+    "translationHy": "գումար",
+    "definitionHy": "Գումար, որը օգտագործվում է գնումների և վաճառքի համար"
+  },
+  "es:el hermano": {
+    "translationHy": "եղբայր",
+    "definitionHy": "Տղամարդ եղբայր"
+  },
+  "es:el hotel": {
+    "translationHy": "հյուրանոց",
+    "definitionHy": "Ուղևորության ընթացքում մնալու վայր"
+  },
+  "es:el libro": {
+    "translationHy": "գիրք",
+    "definitionHy": "Գրված կամ տպագրված աշխատանք շապիկներով"
+  },
+  "es:el padre": {
+    "translationHy": "հայր",
+    "definitionHy": "Ծնող տղամարդ"
+  },
+  "es:el pan": {
+    "translationHy": "հաց",
+    "definitionHy": "Սննդամթերք, որը միշտ ներկա է իսպանական սեղանների վրա"
+  },
+  "es:el pollo": {
+    "translationHy": "հավ",
+    "definitionHy": "Իսպանական խոհանոցում տարածված սպիտակ մսի տեսակ"
+  },
+  "es:el queso": {
+    "translationHy": "պանիր",
+    "definitionHy": "Կաթնամթերք, որը լայնորեն օգտագործվում է Իսպանիայում"
+  },
+  "es:el recuerdo": {
+    "translationHy": "հիշողություն / հուշ",
+    "definitionHy": "Հիշողության մեջ պահպանված կամ հիշվող բան"
+  },
+  "es:el tiempo": {
+    "translationHy": "ժամանակ",
+    "definitionHy": "Ժամանակ և եղանակ իսպաներենում"
+  },
+  "es:el trabajo": {
+    "translationHy": "աշխատանք",
+    "definitionHy": "Մասնագիտական գործունեություն եկամուտ ստանալու համար"
+  },
+  "es:el tren": {
+    "translationHy": "գնացք",
+    "definitionHy": "Փոխադրամիջոց, որը շարժվում է երկաթուղային գծերով"
+  },
+  "es:el vecino": {
+    "translationHy": "հարևան",
+    "definitionHy": "Մոտակայքում բնակվող մարդ"
+  },
+  "es:feliz": {
+    "translationHy": "երջանիկ",
+    "definitionHy": "Զգալ կամ ցուցադրել հաճոյք կամ բավարարվածություն"
+  },
+  "es:gracias": {
+    "translationHy": "շնորհակալություն",
+    "definitionHy": "Բագնում արտահայտվող շնորհակալության արտահայտություն"
+  },
+  "es:grande": {
+    "translationHy": "մեծ",
+    "definitionHy": "Նշանակալից չափս"
+  },
+  "es:hablar": {
+    "translationHy": "խոսել",
+    "definitionHy": "Լեզու օգտագործել բանավոր հաղորդակցության համար"
+  },
+  "es:hola": {
+    "translationHy": "բարեւ",
+    "definitionHy": "Ողջույն, որ օգտագործվում է ցերեկվա բոլոր ժամերին"
+  },
+  "es:ir": {
+    "translationHy": "գնալ",
+    "definitionHy": "Մի վայրից մյուս վայր տեղաշարժվել"
+  },
+  "es:la abuela": {
+    "translationHy": "տատ",
+    "definitionHy": "Հայրի կամ մոր մայր"
+  },
+  "es:la calle": {
+    "translationHy": "փողոց",
+    "definitionHy": "Քաղաքի կամ քաղաքի ճանապարհ"
+  },
+  "es:la casa": {
+    "translationHy": "տուն",
+    "definitionHy": "Այն վայրը, որտեղ մեկը ապրում է"
+  },
+  "es:la cena": {
+    "translationHy": "ընթրիք",
+    "definitionHy": "Երեկոյան ճաշ, որը սովորաբար ուշ է ուտում Իսպանիայում"
+  },
+  "es:la ciudad": {
+    "translationHy": "քաղաք",
+    "definitionHy": "Մեծ քաղաքային տարածք"
+  },
+  "es:la hermana": {
+    "translationHy": "քույր",
+    "definitionHy": "Իգական սեռի եղբայր"
+  },
+  "es:la leche": {
+    "translationHy": "կաթ",
+    "definitionHy": "Կաթնամթերք, որը օգտագործվում է սուրճի և անուշեղեղների մեջ"
+  },
+  "es:la madre": {
+    "translationHy": "մայր",
+    "definitionHy": "Ծնող կին"
+  },
+  "es:la manzana": {
+    "translationHy": "խնձոր",
+    "definitionHy": "Տարածված մրգի տեսակ, կարմիր կամ կանաչ"
+  },
+  "es:la montaña": {
+    "translationHy": "լեռ",
+    "definitionHy": "Երկրի բնական բարձրություն"
+  },
+  "es:la playa": {
+    "translationHy": "ափ",
+    "definitionHy": "Ծովափնյա ավազոտ ափ"
+  },
+  "es:la tienda": {
+    "translationHy": "խանութ",
+    "definitionHy": "Ապրանքներ վաճառելու վայր"
+  },
+  "es:malo": {
+    "translationHy": "վատ",
+    "definitionHy": "Վատ որակ կամ բարոյապես սխալ"
+  },
+  "es:negro": {
+    "translationHy": "սև",
+    "definitionHy": "Սև գույն"
+  },
+  "es:nuevo": {
+    "translationHy": "նոր",
+    "definitionHy": "Թարմ ստեղծված, հայտնաբերված կամ ստեղծված"
+  },
+  "es:pequeño": {
+    "translationHy": "փոքր",
+    "definitionHy": "Սահմանափակ չափս"
+  },
+  "es:perdón": {
+    "translationHy": "ներողություն",
+    "definitionHy": "Ներողություն խնդրելու կամ ուշադրություն գրավելու արտահայտություն"
+  },
+  "es:por favor": {
+    "translationHy": "խնդրեմ",
+    "definitionHy": "Լիներ խնդրեմ կամ խնդրական արտահայտություն"
+  },
+  "es:querer": {
+    "translationHy": "ցանկանալ / սիրել",
+    "definitionHy": "Ինչ-որ բան ցանկանալ կամ մեկին սիրել"
+  },
+  "es:rojo": {
+    "translationHy": "կարմիր",
+    "definitionHy": "Կարմիր գույն"
+  },
+  "es:saber": {
+    "translationHy": "իմանալ (փաստ)",
+    "definitionHy": "Ինչ-որ բան մասին գիտելիք ունենալ"
+  },
+  "es:sin embargo": {
+    "translationHy": "սակայն",
+    "definitionHy": "Հակադրվող պնդում ներմուծել"
+  },
+  "es:tener": {
+    "translationHy": "ունենալ",
+    "definitionHy": "Ինչ-որ բան տիրապետել կամ պահել"
+  },
+  "es:tres": {
+    "translationHy": "երեք",
+    "definitionHy": "3 թիվ"
+  },
+  "es:uno": {
+    "translationHy": "մեկ",
+    "definitionHy": "1 թիվ"
+  },
+  "es:verde": {
+    "translationHy": "կանաչ",
+    "definitionHy": "Կանաչ գույն"
+  },
+  "es:viejo": {
+    "translationHy": "հին",
+    "definitionHy": "Երկար ժամանակ գոյություն ունենալ"
+  },
+  "es:vivir": {
+    "translationHy": "ապրել",
+    "definitionHy": "Կենդանի լինել կամ ինչ-որ տեղ բնակվել"
+  },
+  "fr:acheter": {
+    "translationHy": "գնել",
+    "definitionHy": "Գնել կամ ձեռք բերել որոշակի բան"
+  },
+  "fr:addition": {
+    "translationHy": "հաշիվ",
+    "definitionHy": "Ռեստորանում հաշիվ"
+  },
+  "fr:aéroport": {
+    "translationHy": "օդանավակայան",
+    "definitionHy": "Օդանավերի մեկնման և ժամանման համար նախատեսված հաստատություն"
+  },
+  "fr:aider": {
+    "translationHy": "օգնել",
+    "definitionHy": "Որպես օգնություն կամ օգնել մեկին"
+  },
+  "fr:aller": {
+    "translationHy": "գնալ",
+    "definitionHy": "Գնալ ինչ-որ տեղ"
+  },
+  "fr:amour": {
+    "translationHy": "սեր",
+    "definitionHy": "խորը համակրանքի զգացում"
+  },
+  "fr:au revoir": {
+    "translationHy": "մայր մտնել",
+    "definitionHy": "Ցավակցության արտահայտություն, բառացիորեն «մինչև մենք կրկին տեսնվենք»"
+  },
+  "fr:aujourd'hui": {
+    "translationHy": "այսօր",
+    "definitionHy": "Ներկա օրը"
+  },
+  "fr:avoir": {
+    "translationHy": "ունենալ",
+    "definitionHy": "Ֆրանսերենի ամենատարածված բայերից մեկը, որը նշանակում է «ունենալ»"
+  },
+  "fr:beau / belle": {
+    "translationHy": "գեղեցիկ / գեղեցկուհի",
+    "definitionHy": "Ինչ-որ բանը կամ մեկին նկարագրել որպես գրավիչ"
+  },
+  "fr:bibliothèque": {
+    "translationHy": "գրադարան",
+    "definitionHy": "Հանրային շենք, որտեղ գրքեր են վարձվում"
+  },
+  "fr:billet": {
+    "translationHy": "տոմս",
+    "definitionHy": "Տրանսպորտի կամ մուտքի տոմս"
+  },
+  "fr:blanc": {
+    "translationHy": "սպիտակ",
+    "definitionHy": "Սպիտակ գույն"
+  },
+  "fr:bleu": {
+    "translationHy": "կապույտ",
+    "definitionHy": "Կապույտ գույն"
+  },
+  "fr:bonjour": {
+    "translationHy": "բարի օր / բարի առավոտ",
+    "definitionHy": "Օրվա ընթացքում ֆրանսերենով օգտագործվող ողջույն"
+  },
+  "fr:bonsoir": {
+    "translationHy": "բարի երեկո",
+    "definitionHy": "Երեկոյան ողջույն"
+  },
+  "fr:changer": {
+    "translationHy": "փոխել",
+    "definitionHy": "Ինչ-որ բան փոխել կամ դառնալ տարբեր"
+  },
+  "fr:chercher": {
+    "translationHy": "փնտրել",
+    "definitionHy": "Որոշակի բան փնտրել կամ որոնել"
+  },
+  "fr:cinq": {
+    "translationHy": "հինգ",
+    "definitionHy": "Հինգ թիվ"
+  },
+  "fr:combien": {
+    "translationHy": "քանի",
+    "definitionHy": "Օգտագործվում է քանակի կամ գնի մասին հարցնելու համար"
+  },
+  "fr:comment ça va": {
+    "translationHy": "ինչպե՞ս ես",
+    "definitionHy": "Թե ինչպես ես եք հարցնելու ոչ պաշտոնական ձև"
+  },
+  "fr:comprendre": {
+    "translationHy": "հասկանալ",
+    "definitionHy": "Հասկանալ կամ ընկալել"
+  },
+  "fr:croissant": {
+    "translationHy": "կրոասան",
+    "definitionHy": "Բուսական յուղով պատրաստված փափուկ խմորեղեն"
+  },
+  "fr:délicieux": {
+    "translationHy": "համեղ",
+    "definitionHy": "Ինչ-որ բան, որ շատ համեղ է"
+  },
+  "fr:demain": {
+    "translationHy": "վաղը",
+    "definitionHy": "Այսօրվանից հետո օրը"
+  },
+  "fr:deux": {
+    "translationHy": "երկու",
+    "definitionHy": "Երկու թիվ"
+  },
+  "fr:dix": {
+    "translationHy": "տաս",
+    "definitionHy": "թիվ տաս"
+  },
+  "fr:dormir": {
+    "translationHy": "քնել",
+    "definitionHy": "քնած վիճակում հանգիստ պահել"
+  },
+  "fr:eau": {
+    "translationHy": "ջուր",
+    "definitionHy": "Ջուր"
+  },
+  "fr:ensemble": {
+    "translationHy": "միասին",
+    "definitionHy": "Խմբով, մյուսների հետ միասին"
+  },
+  "fr:espérer": {
+    "translationHy": "հույս ունենալ",
+    "definitionHy": "Ուզենալ, որ ինչ-որ բան կատարվի և հավատալ, որ այդ բանը կարող է կատարվել"
+  },
+  "fr:être": {
+    "translationHy": "լինել",
+    "definitionHy": "Լինել բայը, ֆրանսերենի ամենակարևոր բայերից մեկը"
+  },
+  "fr:excusez-moi": {
+    "translationHy": "ներողություն (պաշտոնական)",
+    "definitionHy": "Ուշադրություն գրավելու կամ ներողություն խնդրելու արտահայտություն"
+  },
+  "fr:famille": {
+    "translationHy": "ընտանիք",
+    "definitionHy": "ազգականների խումբ"
+  },
+  "fr:frère": {
+    "translationHy": "եղբայր",
+    "definitionHy": "եղբայրը"
+  },
+  "fr:fromage": {
+    "translationHy": "պանիր",
+    "definitionHy": "Պանիր՝ Ֆրանսիայում 400-ից ավելի տեսակ"
+  },
+  "fr:gare": {
+    "translationHy": "երկաթուղային կայարան",
+    "definitionHy": "Երկաթուղային կայարան"
+  },
+  "fr:grand / grande": {
+    "translationHy": "մեծ / բարձր",
+    "definitionHy": "Մեծ չափսով կամ բարձր հասակով"
+  },
+  "fr:habiter": {
+    "translationHy": "բնակվել",
+    "definitionHy": "Բնակվել կամ ապրել որոշակի վայրում"
+  },
+  "fr:hôtel": {
+    "translationHy": "հյուրանոց",
+    "definitionHy": "Ուղևորության ընթացքում բնակվելու վայր"
+  },
+  "fr:huit": {
+    "translationHy": "ութ",
+    "definitionHy": "Ութ թիվ"
+  },
+  "fr:il fait chaud": {
+    "translationHy": "շոգ է",
+    "definitionHy": "շոգ եղանակ նկարագրելու համար օգտագործվում է"
+  },
+  "fr:il fait froid": {
+    "translationHy": "ցուրտ է",
+    "definitionHy": "ցուրտ եղանակ նկարագրելու համար օգտագործվում է"
+  },
+  "fr:il pleut": {
+    "translationHy": "անձրև է գալիս",
+    "definitionHy": "անձրև լինելու դեպքում օգտագործվում է"
+  },
+  "fr:jaune": {
+    "translationHy": "դեղին",
+    "definitionHy": "Դեղին գույն"
+  },
+  "fr:je m'appelle": {
+    "translationHy": "իմ անունն է",
+    "definitionHy": "Ինքնաներկայացման արտահայտություն"
+  },
+  "fr:je ne comprends pas": {
+    "translationHy": "ես չեմ հասկանում",
+    "definitionHy": "երբ ինչ-որ բան չես հասկանում"
+  },
+  "fr:le soleil": {
+    "translationHy": "արև",
+    "definitionHy": "այն աստղը, որ լուսավորում է մեր օրը"
+  },
+  "fr:liberté": {
+    "translationHy": "ազատություն",
+    "definitionHy": "Ազատ վիճակ, Ֆրանսիայի հիմնական արժեքներից մեկը"
+  },
+  "fr:maintenant": {
+    "translationHy": "հիմա",
+    "definitionHy": "Այս պահին"
+  },
+  "fr:maison": {
+    "translationHy": "տուն",
+    "definitionHy": "շենք, որտեղ մարդիկ ապրում են"
+  },
+  "fr:manger": {
+    "translationHy": "ուտել",
+    "definitionHy": "սնունդ օգտագործել"
+  },
+  "fr:marché": {
+    "translationHy": "շուկա",
+    "definitionHy": "Բացօթյա շուկա, որտեղ ապրանքներ են վաճառվում"
+  },
+  "fr:menu": {
+    "translationHy": "ճանաչարան",
+    "definitionHy": "Ռեստորանում առաջարկվող ուտեստների ցանկ"
+  },
+  "fr:merci": {
+    "translationHy": "շնորհակալ",
+    "definitionHy": "Բագնում արտահայտություն"
+  },
+  "fr:mère": {
+    "translationHy": "մայր",
+    "definitionHy": "մայրը"
+  },
+  "fr:métro": {
+    "translationHy": "մետրո",
+    "definitionHy": "Երկաթուղային համակարգ, հատկապես Փարիզում"
+  },
+  "fr:musée": {
+    "translationHy": "թանգարան",
+    "definitionHy": "Շենք, որտեղ ցուցադրվում են արվեստի և պատմական առարկաներ"
+  },
+  "fr:neuf": {
+    "translationHy": "ինը",
+    "definitionHy": "թիվ ինը"
+  },
+  "fr:noir": {
+    "translationHy": "սև",
+    "definitionHy": "Սև գույն"
+  },
+  "fr:où sont les toilettes": {
+    "translationHy": "ուր են զուգարանները",
+    "definitionHy": "զուգարան գտնելու համար կարևոր հարց"
+  },
+  "fr:pain": {
+    "translationHy": "հաց",
+    "definitionHy": "Հաց՝ ֆրանսիական խոհանոցի հիմնական մաս"
+  },
+  "fr:parler": {
+    "translationHy": "խոսել",
+    "definitionHy": "Խոսել կամ զրուցել բայը"
+  },
+  "fr:parlez-vous anglais": {
+    "translationHy": "ձեր անգլերեն խոսում եք",
+    "definitionHy": "օգնության համար անգլերենով հարց տվող հարց"
+  },
+  "fr:père": {
+    "translationHy": "հայր",
+    "definitionHy": "հայրը"
+  },
+  "fr:petit / petite": {
+    "translationHy": "փոքր / փոքրիկ",
+    "definitionHy": "Փոքր չափսով"
+  },
+  "fr:pharmacie": {
+    "translationHy": "դեղատուն",
+    "definitionHy": "Դեղատուն, որտեղ դեղորայք են վաճառվում"
+  },
+  "fr:pouvoir": {
+    "translationHy": "կարողանալ / կարելի է",
+    "definitionHy": "Ունենալ որոշակի հնարավորություն կամ թույլտվություն ինչ-որ բան անելու համար"
+  },
+  "fr:quatre": {
+    "translationHy": "չորս",
+    "definitionHy": "Չորս թիվ"
+  },
+  "fr:quelque chose": {
+    "translationHy": "ինչ-որ բան",
+    "definitionHy": "Չորոշված բան"
+  },
+  "fr:réserver": {
+    "translationHy": "պահել / նախապես պահել",
+    "definitionHy": "Նախապես պահել"
+  },
+  "fr:rêve": {
+    "translationHy": "երազանք",
+    "definitionHy": "Քնի ընթացքում երևացող պատկերներ, ինչպես նաև ձգտում"
+  },
+  "fr:rouge": {
+    "translationHy": "կարմիր",
+    "definitionHy": "Կարմիր գույն"
+  },
+  "fr:rue": {
+    "translationHy": "փողոց",
+    "definitionHy": "Ճանապարհ կամ փողոց"
+  },
+  "fr:s'il vous plaît": {
+    "translationHy": "խնդրեմ (պաշտոնական)",
+    "definitionHy": "Պաշտոնական խնդրելու արտահայտություն"
+  },
+  "fr:savoir": {
+    "translationHy": "իմանալ",
+    "definitionHy": "Ունենալ ինչ-որ փաստերի կամ տեղեկատվության իմացություն"
+  },
+  "fr:sept": {
+    "translationHy": "յոթ",
+    "definitionHy": "Յոթ թիվ"
+  },
+  "fr:six": {
+    "translationHy": "վեց",
+    "definitionHy": "Վեց թիվ"
+  },
+  "fr:soeur": {
+    "translationHy": "քույր",
+    "definitionHy": "քույրը"
+  },
+  "fr:temps": {
+    "translationHy": "ժամանակ / եղանակ",
+    "definitionHy": "կախված համատեքստից նշանակում է ժամանակ կամ եղանակ"
+  },
+  "fr:toujours": {
+    "translationHy": "միշտ / դեռ",
+    "definitionHy": "Բոլոր ժամանակներում, կամ առ այսօր շարունակվելով"
+  },
+  "fr:travailler": {
+    "translationHy": "աշխատել",
+    "definitionHy": "աշխատանք կամ խնդիր կատարել"
+  },
+  "fr:trois": {
+    "translationHy": "երեք",
+    "definitionHy": "Երեք թիվ"
+  },
+  "fr:trouver": {
+    "translationHy": "գտնել",
+    "definitionHy": "Ինչ-որ բան հայտնաբերել կամ գտնել"
+  },
+  "fr:un": {
+    "translationHy": "մեկ",
+    "definitionHy": "Մեկ թիվ"
+  },
+  "fr:vert": {
+    "translationHy": "կանաչ",
+    "definitionHy": "Կանաչ գույն"
+  },
+  "fr:ville": {
+    "translationHy": "քաղաք / բնակավայր",
+    "definitionHy": "Քաղաքային բնակավայր է"
+  },
+  "fr:vin": {
+    "translationHy": "գինի",
+    "definitionHy": "Գինի՝ ֆրանսիական մշակույթի անբաժան մաս"
+  },
+  "fr:vouloir": {
+    "translationHy": "ցանկանալ",
+    "definitionHy": "Ինչ-որ բան ցանկանալ կամ ցանկություն ունենալ"
+  }
+}

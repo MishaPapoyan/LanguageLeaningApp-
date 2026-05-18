@@ -12,24 +12,26 @@
  * in every word game) — it is exactly "en" | "hy" | "ru".
  */
 
-export interface WordLike {
+interface TranslationLike {
   translation: string;
-  definition: string;
   translationHy?: string | null;
-  definitionHy?: string | null;
   translationRu?: string | null;
+}
+interface DefinitionLike {
+  definition: string;
+  definitionHy?: string | null;
   definitionRu?: string | null;
 }
 
 /** The translation a native speaker should see for this word. */
-export function wordTranslation(w: WordLike, locale?: string | null): string {
+export function wordTranslation(w: TranslationLike, locale?: string | null): string {
   if (locale === "hy" && w.translationHy) return w.translationHy;
   if (locale === "ru" && w.translationRu) return w.translationRu;
   return w.translation;
 }
 
 /** The definition a native speaker should see for this word. */
-export function wordDefinition(w: WordLike, locale?: string | null): string {
+export function wordDefinition(w: DefinitionLike, locale?: string | null): string {
   if (locale === "hy" && w.definitionHy) return w.definitionHy;
   if (locale === "ru" && w.definitionRu) return w.definitionRu;
   return w.definition;

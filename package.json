@@ -14,7 +14,9 @@
     "build:wasm": "wasm-pack build games/immersion-wasm --target web --out-dir ../../public/wasm/immersion",
     "postinstall": "prisma generate",
     "check:i18n": "node scripts/check-hy-i18n.mjs",
-    "scan:i18n": "node scripts/scan-hardcoded.mjs"
+    "scan:i18n": "node scripts/scan-hardcoded.mjs",
+    "i18n:gen-hy": "ts-node -P tsconfig.scripts.json scripts/generate-hy-overlays.ts",
+    "i18n:backfill-hy": "ts-node -P tsconfig.scripts.json scripts/backfill-hy-overlays.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

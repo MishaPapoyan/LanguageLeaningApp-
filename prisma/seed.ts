@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { readFileSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { frenchVocabulary } from "../data/french-vocabulary";
 import { frenchStories } from "../data/french-stories";
 import { spanishVocabulary } from "../data/spanish-vocabulary";
@@ -9,8 +11,19 @@ import { englishStories } from "../data/english-stories";
 
 const prisma = new PrismaClient();
 
+// ── Armenian overlays (generated via `npm run i18n:gen-hy`) ───────────────────
+// Keyed by "<lang>:<word lowercased>". Absent → English fallback at runtime.
+interface HyOverlay { translationHy: string; definitionHy: string }
+const HY_PATH = resolve(__dirname, "../data/overlays-hy.json");
+const HY: Record<string, HyOverlay> = existsSync(HY_PATH)
+  ? JSON.parse(readFileSync(HY_PATH, "utf8"))
+  : {};
+const hy = (lang: string, word: string): Partial<HyOverlay> =>
+  HY[`${lang}:${word.toLowerCase()}`] ?? {};
+
 async function main() {
   console.log("🌱 Seeding database...");
+  console.log(`🇦🇲 ${Object.keys(HY).length} Armenian overlays loaded`);
 
   // 1. Seed vocabulary words (bulk)
   console.log("📚 Seeding French vocabulary...");
@@ -27,6 +40,7 @@ async function main() {
       difficulty: vocab.difficulty,
       imageEmoji: vocab.imageEmoji,
       language: "fr",
+      ...hy("fr", vocab.word),
     })),
     skipDuplicates: true,
   });
@@ -45,6 +59,7 @@ async function main() {
       difficulty: vocab.difficulty,
       imageEmoji: vocab.imageEmoji,
       language: "es",
+      ...hy("es", vocab.word),
     })),
     skipDuplicates: true,
   });
@@ -63,6 +78,7 @@ async function main() {
       difficulty: vocab.difficulty,
       imageEmoji: vocab.imageEmoji,
       language: "en",
+      ...hy("en", vocab.word),
     })),
     skipDuplicates: true,
   });
