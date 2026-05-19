@@ -82,7 +82,7 @@ export function VideoTutorClient({ userLevel }: Props) {
     onTranscript: useCallback((text: string) => {
       sendMessageFn.current?.(text);
     }, []),
-    onStateChange: useCallback((s) => {
+    onStateChange: useCallback((s: import("@/lib/useVoiceRecorder").RecorderState) => {
       if (s === "recording")   setAvatarState("listening");
       if (s === "processing")  setAvatarState("thinking");
       if (s === "idle")        setAvatarState("idle");
