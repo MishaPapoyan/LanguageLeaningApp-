@@ -12,7 +12,7 @@ import {
   Trophy, Users, Search, GraduationCap,
   Settings, LogOut, ChevronRight, Award,
   TrendingUp, BookMarked, PenLine, Menu, X,
-  RotateCcw,
+  RotateCcw, Video,
 } from "lucide-react";
 
 interface ProgressData { xp: number; level: number; streak: number; }
@@ -27,6 +27,7 @@ const NAV_ITEMS: NavEntry[] = [
   { id: "path",       href: "/learn",      icon: GraduationCap,  labelKey: "nav_learn" },
   { id: "games",      href: "/games",      icon: Gamepad2,       labelKey: "nav_games" },
   { id: "tutor",      href: "/tutor",      icon: MessageSquare,  labelKey: "nav_tutor" },
+  { id: "videotutor", href: "/video-tutor", icon: Video,          labelKey: "nav_videoTutor" },
   { id: "stories",    href: "/stories",    icon: BookOpen,       labelKey: "nav_stories" },
   { id: "writing",    href: "/writing",    icon: Award,          labelKey: "nav_writing" },
   { groupKey: "nav_secLibrary" },
