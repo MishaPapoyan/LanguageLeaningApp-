@@ -7,9 +7,10 @@ import { getLanguageConfig } from "@/data/language-config";
 import { SCENARIO_INFO } from "@/lib/scenarios";
 import { TutorScenario, ChatMessage, TutorFeedback } from "@/types";
 import { VideoTutorAvatar, AvatarState } from "./VideoTutorAvatar";
+import { useVoiceRecorder } from "@/lib/useVoiceRecorder";
 import {
   Mic, MicOff, PhoneOff, Send, ChevronDown, ChevronUp,
-  RotateCcw, Play, Volume2, VolumeX, Repeat2,
+  RotateCcw, Play, Volume2, VolumeX, Repeat2, Loader2,
   Award, BrainCircuit, CheckCircle2, AlertCircle,
   Lightbulb, TrendingUp, BookMarked, X, ArrowRight,
 } from "lucide-react";
@@ -20,10 +21,6 @@ const AVATAR_NAMES: Record<string, Record<string, string>> = {
   en: { waiter: "Tom",    traveler: "Emma",   teacher: "Ms. Johnson", free: "James" },
 };
 
-const LANG_LOCALE: Record<string, string> = {
-  fr: "fr-FR", es: "es-ES", en: "en-US", hy: "hy-AM",
-};
-
 const SCENARIOS = Object.entries(SCENARIO_INFO).map(([key, val]) => ({
   id: key as TutorScenario, ...val,
 }));
@@ -32,13 +29,10 @@ interface Props { userLevel: number; }
 
 export function VideoTutorClient({ userLevel }: Props) {
   const { data: session } = useSession();
-  const langConfig = getLanguageConfig(
-    (session?.user as { targetLanguage?: string })?.targetLanguage ?? "fr"
-  );
-  const avatarNames  = AVATAR_NAMES[langConfig.code] ?? AVATAR_NAMES.fr;
-  const recognitionLocale = LANG_LOCALE[langConfig.code] ?? "fr-FR";
+  const langConfig    = getLanguageConfig((session?.user as any)?.targetLanguage ?? "fr");
+  const avatarNames   = AVATAR_NAMES[langConfig.code] ?? AVATAR_NAMES.fr;
 
-  // ── session state ──────────────────────────────────────────────────────────
+  // ── session ────────────────────────────────────────────────────────────────
   const [scenario,       setScenario]       = useState<TutorScenario | null>(null);
   const [pickedScenario, setPickedScenario] = useState<TutorScenario>("free");
   const [messages,       setMessages]       = useState<ChatMessage[]>([]);
@@ -46,37 +40,32 @@ export function VideoTutorClient({ userLevel }: Props) {
   const [streaming,      setStreaming]       = useState(false);
   const [sessionEnded,   setSessionEnded]   = useState(false);
 
-  // ── avatar / voice state ───────────────────────────────────────────────────
-  const [avatarState,   setAvatarState]   = useState<AvatarState>("idle");
-  const [isListening,   setIsListening]   = useState(false);
-  const [micSupported,  setMicSupported]  = useState(false);
-  const [liveTranscript,setLiveTranscript]= useState("");
-  const [muted,         setMuted]         = useState(false);
-  const [autoListen,    setAutoListen]    = useState(true);
+  // ── avatar / audio ─────────────────────────────────────────────────────────
+  const [avatarState,  setAvatarState]  = useState<AvatarState>("idle");
+  const [muted,        setMuted]        = useState(false);
+  const [autoListen,   setAutoListen]   = useState(true);
 
-  // ── UI state ───────────────────────────────────────────────────────────────
+  // ── UI ─────────────────────────────────────────────────────────────────────
   const [showTranscript, setShowTranscript] = useState(true);
 
-  // ── feedback state ─────────────────────────────────────────────────────────
-  const [feedback,          setFeedback]          = useState<TutorFeedback | null>(null);
-  const [xpEarned,          setXpEarned]          = useState(0);
-  const [feedbackOpen,      setFeedbackOpen]       = useState(false);
-  const [loadingFeedback,   setLoadingFeedback]    = useState(false);
-  const [feedbackTab,       setFeedbackTab]        = useState<"corrections"|"strengths"|"next">("corrections");
-  const [savingWords,       setSavingWords]        = useState(false);
-  const [wordsSaved,        setWordsSaved]         = useState(false);
+  // ── feedback ───────────────────────────────────────────────────────────────
+  const [feedback,        setFeedback]        = useState<TutorFeedback | null>(null);
+  const [xpEarned,        setXpEarned]        = useState(0);
+  const [feedbackOpen,    setFeedbackOpen]     = useState(false);
+  const [loadingFeedback, setLoadingFeedback]  = useState(false);
+  const [feedbackTab,     setFeedbackTab]      = useState<"corrections"|"strengths"|"next">("corrections");
+  const [savingWords,     setSavingWords]      = useState(false);
+  const [wordsSaved,      setWordsSaved]       = useState(false);
 
-  // ── refs ───────────────────────────────────────────────────────────────────
-  const recognitionRef   = useRef<any>(null);
-  const pendingRef       = useRef("");
+  // ── stable refs ────────────────────────────────────────────────────────────
   const bottomRef        = useRef<HTMLDivElement>(null);
   const inputRef         = useRef<HTMLInputElement>(null);
-  // stable refs so callbacks don't go stale
   const mutedRef         = useRef(false);
   const autoListenRef    = useRef(true);
   const sessionEndedRef  = useRef(false);
   const streamingRef     = useRef(false);
-  const startListeningFn = useRef<(() => void) | null>(null);
+  const sendMessageFn    = useRef<((text: string) => void) | null>(null);
+  const startRecordingFn = useRef<(() => void) | null>(null);
 
   mutedRef.current       = muted;
   autoListenRef.current  = autoListen;
@@ -84,16 +73,31 @@ export function VideoTutorClient({ userLevel }: Props) {
   streamingRef.current   = streaming;
 
   const currentAvatarName = scenario ? (avatarNames[scenario] ?? "AI") : "AI";
-  const userName = (session?.user as { name?: string })?.name ?? "You";
+  const userName = (session?.user as any)?.name ?? "You";
 
-  useEffect(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    setMicSupported(!!SR);
-  }, []);
+  // ── Groq Whisper voice recorder ────────────────────────────────────────────
+  const recorder = useVoiceRecorder({
+    lang: langConfig.code,
+    silenceMs: 1600,
+    onTranscript: useCallback((text: string) => {
+      sendMessageFn.current?.(text);
+    }, []),
+    onStateChange: useCallback((s) => {
+      if (s === "recording")   setAvatarState("listening");
+      if (s === "processing")  setAvatarState("thinking");
+      if (s === "idle")        setAvatarState("idle");
+    }, []),
+    onError: useCallback((msg: string) => {
+      console.warn("[VoiceRecorder]", msg);
+      setAvatarState("idle");
+    }, []),
+  });
+
+  startRecordingFn.current = recorder.start;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, liveTranscript]);
+  }, [messages]);
 
   useEffect(() => {
     if (!feedbackOpen) return;
@@ -102,86 +106,13 @@ export function VideoTutorClient({ userLevel }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [feedbackOpen]);
 
-  // ── start listening ────────────────────────────────────────────────────────
-  const startListening = useCallback(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR || sessionEndedRef.current || streamingRef.current) return;
-
-    const recognition = new SR();
-    recognition.lang = recognitionLocale;
-    recognition.continuous = false;   // auto-stops after silence → natural feel
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-
-    recognition.onresult = (event: any) => {
-      let interim = "";
-      let finalChunk = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const r = event.results[i];
-        if (r.isFinal) finalChunk += r[0].transcript;
-        else interim += r[0].transcript;
-      }
-      if (finalChunk) pendingRef.current += finalChunk + " ";
-      setLiveTranscript((pendingRef.current + interim).trim());
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      // auto-stops after silence — submit whatever was captured
-      const text = pendingRef.current.trim();
-      pendingRef.current = "";
-      setLiveTranscript("");
-      if (text && !sessionEndedRef.current) {
-        submitText(text);
-      } else {
-        setAvatarState("idle");
-      }
-    };
-
-    recognition.onerror = (e: any) => {
-      // "no-speech" is fine — just go idle
-      if (e.error !== "no-speech") console.warn("Speech recognition error:", e.error);
-      setIsListening(false);
-      setAvatarState("idle");
-      pendingRef.current = "";
-      setLiveTranscript("");
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-    setAvatarState("listening");
-    pendingRef.current = "";
-    setLiveTranscript("");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recognitionLocale]);
-
-  // keep ref in sync so speakResponse can call it without stale closure
-  startListeningFn.current = startListening;
-
-  // ── stop listening manually ────────────────────────────────────────────────
-  const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
-    // onend will handle submission
-  }, []);
-
-  // ── submit text to AI ──────────────────────────────────────────────────────
-  // kept as a plain function (not useCallback) so it always reads latest messages
-  function submitText(text: string) {
-    if (!text.trim() || sessionEndedRef.current) return;
-    // sendMessage reads current messages via closure captured at call time
-    sendMessageFn.current?.(text.trim());
-  }
-
-  const sendMessageFn = useRef<((text: string) => void) | null>(null);
-
-  // ── speak response + auto-listen loop ─────────────────────────────────────
+  // ── auto-listen after AI speaks ────────────────────────────────────────────
   const afterSpeak = useCallback(() => {
     setAvatarState("idle");
     if (autoListenRef.current && !sessionEndedRef.current && !streamingRef.current) {
       setTimeout(() => {
         if (!sessionEndedRef.current && !streamingRef.current) {
-          startListeningFn.current?.();
+          startRecordingFn.current?.();
         }
       }, 700);
     }
@@ -197,7 +128,7 @@ export function VideoTutorClient({ userLevel }: Props) {
     });
   }, [langConfig.code, afterSpeak]);
 
-  // ── send message ───────────────────────────────────────────────────────────
+  // ── send message to AI ─────────────────────────────────────────────────────
   const sendMessage = useCallback(async (
     currentMessages: ChatMessage[],
     currentScenario: TutorScenario,
@@ -224,7 +155,7 @@ export function VideoTutorClient({ userLevel }: Props) {
       let assistantText = "";
 
       setMessages(prev => [...prev, { role: "assistant", content: "" }]);
-      setAvatarState("idle"); // stop thinking once stream starts
+      setAvatarState("idle");
 
       while (true) {
         const { done, value } = await reader.read();
@@ -247,14 +178,14 @@ export function VideoTutorClient({ userLevel }: Props) {
     }
   }, [speakResponse]);
 
-  // wire stable ref so submitText can call latest sendMessage
+  // stable ref so onTranscript callback reaches latest sendMessage
   const messagesRef = useRef<ChatMessage[]>([]);
   const scenarioRef = useRef<TutorScenario | null>(null);
   messagesRef.current = messages;
   scenarioRef.current = scenario;
 
   sendMessageFn.current = (text: string) => {
-    if (!scenarioRef.current) return;
+    if (!scenarioRef.current || sessionEndedRef.current) return;
     sendMessage(messagesRef.current, scenarioRef.current, text);
   };
 
@@ -263,10 +194,8 @@ export function VideoTutorClient({ userLevel }: Props) {
     setScenario(s);
     setMessages([]);
     setSessionEnded(false);
-    setLiveTranscript("");
     setFeedback(null);
     setWordsSaved(false);
-    pendingRef.current = "";
     await sendMessage([], s, "");
   };
 
@@ -279,8 +208,7 @@ export function VideoTutorClient({ userLevel }: Props) {
 
   // ── end session → feedback ─────────────────────────────────────────────────
   const endSession = async () => {
-    recognitionRef.current?.abort();
-    setIsListening(false);
+    recorder.cancel();
     setAvatarState("idle");
     setSessionEnded(true);
     sessionEndedRef.current = true;
@@ -310,10 +238,8 @@ export function VideoTutorClient({ userLevel }: Props) {
     setMessages([]);
     setSessionEnded(false);
     setFeedbackOpen(false);
-    setLiveTranscript("");
     setFeedback(null);
     setWordsSaved(false);
-    pendingRef.current = "";
     setAvatarState("idle");
   };
 
@@ -331,6 +257,11 @@ export function VideoTutorClient({ userLevel }: Props) {
     }
   };
 
+  const toggleMic = () => {
+    if (recorder.isRecording) recorder.stop();
+    else if (!streaming && !sessionEnded) recorder.start();
+  };
+
   // ══════════════════════════════════════════════════════════════════════════
   // SCENARIO PICKER
   // ══════════════════════════════════════════════════════════════════════════
@@ -341,7 +272,7 @@ export function VideoTutorClient({ userLevel }: Props) {
           <div className="mono-sm" style={{ color: "var(--ink-3)" }}>§ Video · AI Tutor</div>
           <h1 className="serif" style={{ fontSize: 48, lineHeight: 1, letterSpacing: "-0.02em" }}>Video Tutor</h1>
           <p style={{ color: "var(--ink-3)", fontSize: 18, maxWidth: 480, margin: "0 auto" }}>
-            Talk face-to-face with your AI language tutor. Speaks back, listens automatically.
+            Talk face-to-face with your AI language tutor. Powered by Groq Whisper — speaks back, listens naturally.
           </p>
         </header>
 
@@ -350,7 +281,12 @@ export function VideoTutorClient({ userLevel }: Props) {
         </div>
 
         <div className="flex items-center justify-center gap-3 flex-wrap">
-          {[{ icon: "🎙️", label: "Auto-listens" }, { icon: "🔊", label: "Speaks back" }, { icon: "💬", label: "Live transcript" }, { icon: "🆓", label: "100% free" }].map(b => (
+          {[
+            { icon: "🎙️", label: "Groq Whisper AI" },
+            { icon: "🔊", label: "Speaks back" },
+            { icon: "🔁", label: "Auto-conversation" },
+            { icon: "🆓", label: "100% free" },
+          ].map(b => (
             <div key={b.label} className="lv-chip flex items-center gap-1.5">
               <span>{b.icon}</span><span className="mono-sm">{b.label}</span>
             </div>
@@ -393,7 +329,6 @@ export function VideoTutorClient({ userLevel }: Props) {
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-4" style={{ height: "calc(100vh - 140px)" }}>
 
-      {/* Main area */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
 
         {/* Avatar feed */}
@@ -406,7 +341,7 @@ export function VideoTutorClient({ userLevel }: Props) {
               {userName[0]?.toUpperCase() ?? "U"}
             </div>
             <span style={{ fontSize: 9, color: "rgba(255,255,255,0.6)", fontFamily: "var(--mono)", letterSpacing: "0.06em" }}>You</span>
-            {isListening && <div style={{ position: "absolute", bottom: 6, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 6px #10b981", animation: "vt-pip-blink 0.8s ease-in-out infinite" }} />}
+            {recorder.isRecording && <div style={{ position: "absolute", bottom: 6, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 6px #10b981", animation: "vt-pip-blink 0.8s ease-in-out infinite" }} />}
           </div>
         </div>
 
@@ -424,16 +359,13 @@ export function VideoTutorClient({ userLevel }: Props) {
             <div className="flex items-center gap-1.5 mono-sm" style={{ color: "var(--ink-3)" }}>
               <span>{langConfig.flag}</span><span>{langConfig.label} session</span>
             </div>
-            {/* Auto-listen toggle */}
-            {micSupported && (
-              <button onClick={() => setAutoListen(v => !v)}
-                className="flex items-center gap-2 mono-sm w-full"
-                style={{ color: autoListen ? "var(--fg-success)" : "var(--ink-4)", paddingTop: 8, borderTop: "1px solid var(--line)", marginTop: 4 }}
-              >
-                <Repeat2 size={12} />
-                <span>Auto-listen: {autoListen ? "ON" : "OFF"}</span>
-              </button>
-            )}
+            <button onClick={() => setAutoListen(v => !v)}
+              className="flex items-center gap-2 mono-sm w-full"
+              style={{ color: autoListen ? "var(--fg-success)" : "var(--ink-4)", paddingTop: 8, borderTop: "1px solid var(--line)", marginTop: 4 }}
+            >
+              <Repeat2 size={12} />
+              <span>Auto-listen: {autoListen ? "ON" : "OFF"}</span>
+            </button>
           </div>
 
           {/* Transcript */}
@@ -445,7 +377,6 @@ export function VideoTutorClient({ userLevel }: Props) {
               <span>Transcript</span>
               {showTranscript ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
-
             {showTranscript && (
               <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ minHeight: 0 }}>
                 {messages.map((msg, i) => (
@@ -455,10 +386,12 @@ export function VideoTutorClient({ userLevel }: Props) {
                     </div>
                   </div>
                 ))}
-                {liveTranscript && (
+                {/* Processing indicator */}
+                {recorder.isProcessing && (
                   <div className="flex justify-end">
-                    <div className="text-sm max-w-[92%]" style={{ padding: "7px 11px", borderRadius: 11, borderTopRightRadius: 2, background: "rgba(192,57,43,0.18)", color: "var(--ink-2)", border: "1px dashed var(--terracotta)" }}>
-                      {liveTranscript}
+                    <div className="flex items-center gap-2 text-sm" style={{ padding: "7px 11px", borderRadius: 11, borderTopRightRadius: 2, background: "rgba(192,57,43,0.18)", color: "var(--ink-3)" }}>
+                      <Loader2 size={12} className="animate-spin" />
+                      <span>Transcribing…</span>
                     </div>
                   </div>
                 )}
@@ -487,38 +420,44 @@ export function VideoTutorClient({ userLevel }: Props) {
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            {/* Mute */}
             <button onClick={() => setMuted(v => !v)} className="lv-btn lv-btn--ghost lv-btn--icon lv-btn--sm" title={muted ? "Unmute tutor" : "Mute tutor"}>
               {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
             </button>
-            {/* Mic */}
-            {micSupported && (
-              <button onClick={isListening ? stopListening : startListening} disabled={streaming}
-                title={isListening ? "Stop listening" : "Tap to speak"}
-                className="lv-btn lv-btn--icon disabled:opacity-40"
-                style={isListening ? { background: "#10b981", color: "#fff", animation: "vt-pulse-btn 1.4s ease-in-out infinite" } : { background: "var(--paper-2)", color: "var(--ink-2)" }}
-              >
-                {isListening ? <Mic size={22} /> : <MicOff size={22} />}
-              </button>
-            )}
-            {/* Text input */}
+
+            {/* Mic — Groq Whisper */}
+            <button onClick={toggleMic}
+              disabled={streaming || recorder.isProcessing}
+              title={recorder.isRecording ? "Stop (auto-sends on silence)" : recorder.isProcessing ? "Transcribing…" : "Tap to speak — Groq Whisper AI"}
+              className="lv-btn lv-btn--icon disabled:opacity-40"
+              style={
+                recorder.isRecording
+                  ? { background: "#10b981", color: "#fff", animation: "vt-pulse-btn 1.4s ease-in-out infinite" }
+                  : recorder.isProcessing
+                  ? { background: "var(--marine-soft)", color: "var(--marine)" }
+                  : { background: "var(--paper-2)", color: "var(--ink-2)" }
+              }
+            >
+              {recorder.isProcessing ? <Loader2 size={22} className="animate-spin" /> : recorder.isRecording ? <Mic size={22} /> : <MicOff size={22} />}
+            </button>
+
             <div className="flex-1 relative">
               <input ref={inputRef} type="text" value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleTextSend(); } }}
-                placeholder={isListening ? "Speaking… auto-submits on silence" : `Reply to ${currentAvatarName}…`}
-                disabled={streaming || isListening}
+                placeholder={recorder.isRecording ? "Listening… auto-sends on silence" : recorder.isProcessing ? "Transcribing with Groq Whisper…" : `Reply to ${currentAvatarName}…`}
+                disabled={streaming || recorder.isRecording || recorder.isProcessing}
                 className="lv-input w-full disabled:opacity-50"
                 style={{ paddingRight: 50 }}
               />
-              <button onClick={handleTextSend} disabled={streaming || !input.trim() || isListening}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 lv-btn lv-btn--icon lv-btn--sm ${input.trim() && !streaming && !isListening ? "lv-btn--primary" : ""}`}
-                style={input.trim() && !streaming && !isListening ? undefined : { background: "transparent", color: "var(--ink-4)", cursor: "not-allowed" }}
+              <button onClick={handleTextSend}
+                disabled={streaming || !input.trim() || recorder.isRecording || recorder.isProcessing}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 lv-btn lv-btn--icon lv-btn--sm ${input.trim() && !streaming && !recorder.isRecording && !recorder.isProcessing ? "lv-btn--primary" : ""}`}
+                style={input.trim() && !streaming && !recorder.isRecording && !recorder.isProcessing ? undefined : { background: "transparent", color: "var(--ink-4)", cursor: "not-allowed" }}
               >
                 <Send size={16} />
               </button>
             </div>
-            {/* End call */}
+
             <button onClick={endSession} className="lv-btn lv-btn--icon" style={{ background: "#ef4444", color: "white" }} title="End session">
               <PhoneOff size={20} />
             </button>
@@ -554,9 +493,8 @@ export function VideoTutorClient({ userLevel }: Props) {
               </div>
             ) : (
               <>
-                {/* Hero */}
                 <div className="relative p-6 md:p-8" style={{ borderBottom: "1px solid var(--line)" }}>
-                  <button onClick={() => setFeedbackOpen(false)} aria-label="Close" className="absolute top-4 right-4 lv-btn lv-btn--ghost lv-btn--icon lv-btn--sm"><X size={16} /></button>
+                  <button onClick={() => setFeedbackOpen(false)} className="absolute top-4 right-4 lv-btn lv-btn--ghost lv-btn--icon lv-btn--sm"><X size={16} /></button>
                   <p className="mono-sm mb-2" style={{ color: "var(--terracotta)" }}>Session feedback</p>
                   <h2 className="serif" style={{ fontSize: 34, marginBottom: 20 }}>
                     {feedback.grammarScore >= 85 ? "Outstanding work." : feedback.grammarScore >= 70 ? "Solid progress." : feedback.grammarScore >= 50 ? "Good effort — keep going." : "Every attempt builds you up."}
@@ -579,7 +517,6 @@ export function VideoTutorClient({ userLevel }: Props) {
                   </div>
                 </div>
 
-                {/* Tabs */}
                 <div className="flex items-center gap-1 px-4 md:px-6 pt-4" style={{ borderBottom: "1px solid var(--line)" }}>
                   {([
                     { id: "corrections", label: "Corrections", count: feedback.corrections.length,  Icon: AlertCircle },
@@ -599,7 +536,6 @@ export function VideoTutorClient({ userLevel }: Props) {
                   })}
                 </div>
 
-                {/* Tab content */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-6">
                   {feedbackTab === "corrections" && (
                     feedback.corrections.length === 0
@@ -632,7 +568,6 @@ export function VideoTutorClient({ userLevel }: Props) {
                   )}
                 </div>
 
-                {/* Footer */}
                 <div className="flex flex-col sm:flex-row gap-2 p-4 md:p-6" style={{ borderTop: "1px solid var(--line)", background: "var(--paper-2)" }}>
                   {(feedback.newVocabulary?.length ?? 0) > 0 && (
                     <button onClick={saveVocab} disabled={savingWords || wordsSaved} className="flex-1 lv-btn lv-btn--ghost flex items-center justify-center gap-2 disabled:opacity-60">
