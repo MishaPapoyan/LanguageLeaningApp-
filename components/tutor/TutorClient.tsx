@@ -6,9 +6,10 @@ import { t, getLocale } from "@/lib/i18n";
 import { getLanguageConfig } from "@/data/language-config";
 import { ChatMessage, TutorScenario, TutorFeedback } from "@/types";
 import { SCENARIO_INFO } from "@/lib/scenarios";
+import { useVoiceRecorder } from "@/lib/useVoiceRecorder";
 import Link from "next/link";
 import {
-  Send, User, Mic, Sparkles, ShieldCheck, BrainCircuit, Play,
+  Send, User, Mic, Loader2, Sparkles, ShieldCheck, BrainCircuit, Play,
   X, Award, TrendingUp, BookMarked, RotateCcw, ArrowRight, CheckCircle2, AlertCircle, Lightbulb,
 } from "lucide-react";
 
@@ -78,6 +79,28 @@ export function TutorClient({ userLevel }: Props) {
   const [pickedScenario, setPickedScenario] = useState<TutorScenario>("waiter");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesRef  = useRef<ChatMessage[]>([]);
+  const scenarioRef  = useRef<TutorScenario | null>(null);
+  const streamingRef = useRef(false);
+  // sendMessage is defined below; ref avoids stale-closure in voice callback
+  const sendMsgRef   = useRef<((msgs: ChatMessage[], sc: TutorScenario, text: string) => Promise<void>) | null>(null);
+
+  // Keep refs in sync with current render values
+  useEffect(() => { messagesRef.current  = messages;  }, [messages]);
+  useEffect(() => { scenarioRef.current  = scenario;  }, [scenario]);
+  useEffect(() => { streamingRef.current = streaming; }, [streaming]);
+
+  const recorder = useVoiceRecorder({
+    lang: langConfig.code,
+    silenceMs: 1800,
+    onTranscript: (text) => {
+      const sc = scenarioRef.current;
+      if (!sc || streamingRef.current) return;
+      setInput("");
+      sendMsgRef.current?.(messagesRef.current, sc, text);
+    },
+    onError: () => {},
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -201,6 +224,9 @@ export function TutorClient({ userLevel }: Props) {
       inputRef.current?.focus();
     }
   };
+
+  // Keep ref pointing to latest sendMessage (safe for voice-recorder callback)
+  sendMsgRef.current = sendMessage;
 
   const handleSend = async () => {
     if (!input.trim() || streaming || !scenario) return;
@@ -380,6 +406,7 @@ export function TutorClient({ userLevel }: Props) {
   const currentAvatarName = avatarNames[scenario] ?? "AI";
 
   return (
+    <>
     <div className="h-[calc(100vh-140px)] flex flex-col max-w-4xl mx-auto">
       <header
         className="flex items-center justify-between pb-6"
@@ -490,8 +517,25 @@ export function TutorClient({ userLevel }: Props) {
         ) : (
           <>
             <div className="flex items-center gap-4">
-              <button className="lv-btn lv-btn--ghost lv-btn--icon">
-                <Mic size={24} />
+              <button
+                onClick={() => recorder.isRecording ? recorder.stop() : recorder.start()}
+                disabled={streaming || sessionEnded || !scenario || recorder.isProcessing}
+                title={recorder.isRecording ? "Stop recording" : "Speak your answer"}
+                className="lv-btn lv-btn--icon"
+                style={{
+                  background: recorder.isRecording
+                    ? "rgba(16,185,129,0.15)"
+                    : "transparent",
+                  color: recorder.isRecording
+                    ? "#10b981"
+                    : recorder.isProcessing
+                    ? "var(--ink-3)"
+                    : "var(--ink-2)",
+                  animation: recorder.isRecording ? "mic-pulse 1.5s ease-in-out infinite" : "none",
+                  border: recorder.isRecording ? "1.5px solid rgba(16,185,129,0.4)" : "1.5px solid transparent",
+                }}
+              >
+                {recorder.isProcessing ? <Loader2 size={22} className="animate-spin" /> : <Mic size={22} />}
               </button>
               <div className="flex-1 relative">
                 <input
@@ -800,5 +844,7 @@ export function TutorClient({ userLevel }: Props) {
         </div>
       )}
     </div>
+    <style>{`@keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4);} 50%{box-shadow:0 0 0 8px rgba(16,185,129,0);} }`}</style>
+    </>
   );
 }
