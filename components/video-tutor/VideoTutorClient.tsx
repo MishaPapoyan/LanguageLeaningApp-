@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { speakTarget } from "@/lib/speech";
+import { speakTargetChunked } from "@/lib/speech";
 import { getLanguageConfig } from "@/data/language-config";
 import { SCENARIO_INFO } from "@/lib/scenarios";
 import { TutorScenario, ChatMessage, TutorFeedback } from "@/types";
@@ -120,8 +120,10 @@ export function VideoTutorClient({ userLevel }: Props) {
 
   const speakResponse = useCallback(async (text: string) => {
     if (mutedRef.current) { afterSpeak(); return; }
-    setAvatarState("speaking");
-    await speakTarget(text, langConfig.code, 0.88, {
+    // Stay in "thinking" while TTS is being fetched; switch to "speaking" when audio starts
+    setAvatarState("thinking");
+    await speakTargetChunked(text, langConfig.code, 0.92, {
+      onLoading: () => setAvatarState("thinking"),
       onPlaying: () => setAvatarState("speaking"),
       onEnd:     () => afterSpeak(),
       onError:   () => afterSpeak(),
@@ -155,7 +157,6 @@ export function VideoTutorClient({ userLevel }: Props) {
       let assistantText = "";
 
       setMessages(prev => [...prev, { role: "assistant", content: "" }]);
-      setAvatarState("idle");
 
       while (true) {
         const { done, value } = await reader.read();

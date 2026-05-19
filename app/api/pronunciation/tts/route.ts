@@ -45,9 +45,9 @@ async function elevenLabsTTS(text: string, lang: string): Promise<ArrayBuffer | 
         text,
         model_id: "eleven_multilingual_v2",
         voice_settings: {
-          stability: 0.45,        // slightly lower = more expressive/natural
-          similarity_boost: 0.80,
-          style: 0.15,            // adds natural expressiveness
+          stability: 0.40,        // lower = more expressive, natural variation
+          similarity_boost: 0.82,
+          style: 0.30,            // adds intonation and rhythm
           use_speaker_boost: true,
         },
       }),
@@ -73,9 +73,9 @@ async function openaiTTS(text: string, lang: string): Promise<ArrayBuffer | null
     body: JSON.stringify({
       model: "tts-1-hd",
       input: text,
-      voice: "nova",
+      voice: "shimmer",   // warmer, more natural tone than nova
       response_format: "mp3",
-      speed: 0.9,
+      speed: 0.92,
     }),
   });
 

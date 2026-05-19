@@ -190,6 +190,118 @@ function speakViaWebSpeech(
   next();
 }
 
+// ─── Sentence-by-sentence TTS ────────────────────────────────────────────────
+
+function splitSentences(text: string): string[] {
+  // Split at sentence-ending punctuation; keep short fragments together
+  const parts = text.split(/(?<=[.!?…])\s+/).map(s => s.trim()).filter(Boolean);
+  // Merge very short fragments (<= 6 chars) with the next sentence
+  const merged: string[] = [];
+  for (const p of parts) {
+    if (merged.length > 0 && merged[merged.length - 1].length <= 6) {
+      merged[merged.length - 1] += " " + p;
+    } else {
+      merged.push(p);
+    }
+  }
+  return merged.length > 0 ? merged : [text.trim()];
+}
+
+async function fetchTTSBlob(text: string, lang: string): Promise<string | null> {
+  const cacheKey = `${lang}:${text.trim().toLowerCase()}`;
+  const cached = voxtralCache.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch("/api/pronunciation/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text.trim(), lang }),
+    });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    if (voxtralCache.size >= MAX_VOXTRAL_CACHE) {
+      const oldestKey = voxtralCache.keys().next().value as string;
+      const oldUrl = voxtralCache.get(oldestKey);
+      if (oldUrl) URL.revokeObjectURL(oldUrl);
+      voxtralCache.delete(oldestKey);
+    }
+    voxtralCache.set(cacheKey, blobUrl);
+    return blobUrl;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Speak text in sentence-by-sentence chunks for minimal latency.
+ * Fetches TTS for each sentence sequentially; while sentence N plays,
+ * sentence N+1 is pre-fetched so transitions are seamless.
+ */
+export async function speakChunked(text: string, options: SpeakOptions = {}): Promise<void> {
+  const {
+    lang = "fr-FR",
+    rate = 0.88,
+    pitch = 1.0,
+    volume = 0.95,
+    onLoading,
+    onPlaying,
+    onEnd,
+    onError,
+  } = options;
+
+  stopCurrentAudio();
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+  const sentences = splitSentences(text);
+  if (sentences.length === 0) { onEnd?.(); return; }
+
+  let playingStarted = false;
+  let prefetchPromise: Promise<string | null> | null = null;
+
+  for (let i = 0; i < sentences.length; i++) {
+    const sentence = sentences[i];
+    const isLast = i === sentences.length - 1;
+
+    // Signal loading on first sentence
+    if (i === 0) onLoading?.();
+
+    // Use pre-fetched result if available, otherwise fetch now
+    const blobUrl = prefetchPromise
+      ? await prefetchPromise
+      : await fetchTTSBlob(sentence, lang ?? "fr-FR");
+
+    // Pre-fetch next sentence in parallel while current plays
+    if (!isLast) {
+      prefetchPromise = fetchTTSBlob(sentences[i + 1], lang ?? "fr-FR");
+    } else {
+      prefetchPromise = null;
+    }
+
+    if (!playingStarted) { onPlaying?.(); playingStarted = true; }
+
+    if (blobUrl) {
+      // Play this sentence; await completion before next sentence
+      await new Promise<void>((resolve) => {
+        playAudioUrl(blobUrl, volume,
+          () => resolve(),
+          () => resolve()  // on error, continue to next sentence
+        );
+      });
+    } else {
+      // Server TTS unavailable for this sentence — use Web Speech
+      const voices = cachedVoices ?? [];
+      const voice = voices.length > 0 ? pickBestVoice(voices, lang ?? "fr") : null;
+      await new Promise<void>((resolve) => {
+        speakViaWebSpeech(sentence, { lang, rate, pitch, volume, onEnd: resolve, onError: resolve }, voice);
+      });
+    }
+  }
+
+  onEnd?.();
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export async function speak(text: string, options: SpeakOptions = {}): Promise<void> {
@@ -244,6 +356,16 @@ export function speakTarget(
   callbacks?: { onLoading?: () => void; onPlaying?: () => void; onEnd?: () => void; onError?: () => void }
 ) {
   return speak(text, { lang: toLocale(targetLang), rate, pitch: 1.0, ...callbacks });
+}
+
+/** Sentence-chunked version of speakTarget — lower latency for long AI responses */
+export function speakTargetChunked(
+  text: string,
+  targetLang: string,
+  rate = 0.92,
+  callbacks?: { onLoading?: () => void; onPlaying?: () => void; onEnd?: () => void; onError?: () => void }
+) {
+  return speakChunked(text, { lang: toLocale(targetLang), rate, pitch: 1.0, ...callbacks });
 }
 
 /** Speak French text at a natural learning pace (legacy — prefer speakTarget) */
